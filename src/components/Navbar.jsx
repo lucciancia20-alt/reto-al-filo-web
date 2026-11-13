@@ -57,7 +57,7 @@ export default function Navbar({ onOpenModal }) {
           onClick={() => setMobileMenuOpen((prev) => !prev)}
           aria-expanded={mobileMenuOpen}
           aria-label="Abrir menú de navegación"
-          className="md:hidden p-2 rounded-lg text-stone-200 hover:bg-stone-800/80 transition-colors"
+          className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-lg text-stone-200 hover:bg-stone-800/80 transition-colors"
         >
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>

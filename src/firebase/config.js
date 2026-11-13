@@ -9,11 +9,11 @@ const LOCAL_CONFIG_STORAGE_KEY = 'reto_al_filo_config_v1';
  */
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'reto-al-filo.firebaseapp.com',
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'reto-al-filo',
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'reto-al-filo.firebasestorage.app',
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '707903621149',
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:707903621149:web:3e66823ee1f1df32a31ef4',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
 };
 
 let firestoreBundlePromise = null;
@@ -81,7 +81,8 @@ export function getCloudinaryUrl(urlOrPublicId, { width = 800 } = {}) {
   }
 
   // Si se recibe un publicId relativo de Cloudinary
-  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'wr4ml3tn';
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '';
+  if (!cloudName) return '';
   const cleanId = urlOrPublicId.replace(/^\/+/, '');
   return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto,w_${width}/${cleanId}`;
 }
@@ -143,6 +144,7 @@ export async function searchPhotosByBib(rawBib, { edicion = 1 } = {}) {
     return {
       photos: filterDemoPhotos('', edicion),
       source: 'demo-showcase',
+      networkError: false,
     };
   }
 
@@ -150,6 +152,8 @@ export async function searchPhotosByBib(rawBib, { edicion = 1 } = {}) {
   if (bibQueryCache.has(cacheKey)) {
     return bibQueryCache.get(cacheKey);
   }
+
+  let networkError = false;
 
   if (isFirebaseConfigured()) {
     try {
@@ -174,12 +178,14 @@ export async function searchPhotosByBib(rawBib, { edicion = 1 } = {}) {
           const result = {
             photos: firestorePhotos,
             source: 'firestore',
+            networkError: false,
           };
           bibQueryCache.set(cacheKey, result);
           return result;
         }
       }
     } catch (error) {
+      networkError = true;
       console.warn(
         '[Reto al Filo] Fallback a galería demo local para dorsal:',
         cleanBib,
@@ -192,8 +198,13 @@ export async function searchPhotosByBib(rawBib, { edicion = 1 } = {}) {
   const fallbackResult = {
     photos: demoMatches,
     source: 'demo-fallback',
+    networkError,
   };
-  bibQueryCache.set(cacheKey, fallbackResult);
+
+  // No envenenar la caché si falló la red para permitir reintento cuando vuelva la señal
+  if (!networkError) {
+    bibQueryCache.set(cacheKey, fallbackResult);
+  }
   return fallbackResult;
 }
 
@@ -354,13 +365,19 @@ export async function uploadImageToCloudinary(file, { cloudName, uploadPreset } 
   const targetCloud = (
     cloudName ||
     import.meta.env.VITE_CLOUDINARY_CLOUD_NAME ||
-    'wr4ml3tn'
+    ''
   ).trim();
   const targetPreset = (
     uploadPreset ||
     import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET ||
-    'reto_al_filo'
+    ''
   ).trim();
+
+  if (!targetCloud || !targetPreset) {
+    throw new Error(
+      'Falta configurar VITE_CLOUDINARY_CLOUD_NAME o VITE_CLOUDINARY_UPLOAD_PRESET en las variables de entorno.'
+    );
+  }
 
   const formData = new FormData();
   formData.append('file', file);

@@ -17,14 +17,29 @@ export default function GallerySection() {
   const [photos, setPhotos] = useState(() => filterDemoPhotos('', 1));
   const [isSearching, setIsSearching] = useState(false);
   const [dataSource, setDataSource] = useState('demo-showcase');
+  const [networkWarning, setNetworkWarning] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
-  // Debounce de 350ms para evitar lecturas innecesarias en Firestore en cada pulsación
+  // Cerrar lightbox con tecla Escape
   useEffect(() => {
+    if (!selectedPhoto) return undefined;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setSelectedPhoto(null);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selectedPhoto]);
+
+  // Debounce de 350ms con guarda de cancelación contra race conditions en redes móviles lentas
+  useEffect(() => {
+    let isCancelled = false;
     const cleanInput = bibInput.trim();
     if (!cleanInput) {
       setPhotos(filterDemoPhotos('', 1));
       setDataSource('demo-showcase');
+      setNetworkWarning(false);
       setIsSearching(false);
       return undefined;
     }
@@ -32,12 +47,17 @@ export default function GallerySection() {
     setIsSearching(true);
     const timer = setTimeout(async () => {
       const result = await searchPhotosByBib(cleanInput, { edicion: 1 });
+      if (isCancelled) return;
       setPhotos(result.photos);
       setDataSource(result.source);
+      setNetworkWarning(Boolean(result.networkError));
       setIsSearching(false);
     }, 350);
 
-    return () => clearTimeout(timer);
+    return () => {
+      isCancelled = true;
+      clearTimeout(timer);
+    };
   }, [bibInput]);
 
   return (
@@ -83,7 +103,7 @@ export default function GallerySection() {
               <button
                 type="button"
                 onClick={() => setBibInput('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold px-3 py-1.5 transition-colors cursor-pointer"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 min-h-[36px] inline-flex items-center gap-1 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold px-3.5 py-2 transition-colors cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 Limpiar
@@ -93,12 +113,12 @@ export default function GallerySection() {
 
           {/* Píldoras de prueba rápida (101, 205, 302) */}
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs">
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-stone-400 mr-1">Probar dorsal:</span>
               <button
                 type="button"
                 onClick={() => setBibInput('')}
-                className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
+                className={`min-h-[40px] px-4 py-2 rounded-full font-bold transition-all cursor-pointer ${
                   bibInput === ''
                     ? 'bg-amber-500 text-stone-950'
                     : 'bg-stone-900 text-stone-300 border border-stone-800 hover:border-stone-700'
@@ -113,7 +133,7 @@ export default function GallerySection() {
                     key={bib}
                     type="button"
                     onClick={() => setBibInput(isActive ? '' : bib)}
-                    className={`px-3 py-1 rounded-full font-mono font-bold transition-all cursor-pointer ${
+                    className={`min-h-[40px] px-4 py-2 rounded-full font-mono font-bold transition-all cursor-pointer ${
                       isActive
                         ? 'bg-amber-500 text-stone-950'
                         : 'bg-stone-900 text-amber-300 border border-stone-800 hover:border-amber-500/40'
@@ -129,6 +149,8 @@ export default function GallerySection() {
               <Database className="w-3.5 h-3.5 text-amber-400" />
               {isSearching
                 ? 'Buscando dorsal...'
+                : networkWarning
+                ? 'Sin señal · Respaldo local activo'
                 : dataSource === 'firestore'
                 ? 'Firestore + Cloudinary Activo'
                 : 'Edición 1 · Galería Demo Activa'}
@@ -160,8 +182,17 @@ export default function GallerySection() {
             {photos.map((photo) => (
               <article
                 key={photo.id}
+                role="button"
+                tabIndex={0}
+                aria-label={`Ampliar foto en ${photo.sector} de dorsales ${photo.dorsales.join(', ')}`}
                 onClick={() => setSelectedPhoto(photo)}
-                className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-stone-900 border border-stone-800/90 shadow-xl cursor-pointer"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedPhoto(photo);
+                  }
+                }}
+                className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-stone-900 border border-stone-800/90 shadow-xl cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
               >
                 <div className={`w-full overflow-hidden bg-stone-900 ${photo.aspectClass}`}>
                   <img
@@ -169,6 +200,12 @@ export default function GallerySection() {
                     alt={`Corredor en ${photo.sector} — Dorsales ${photo.dorsales.join(', ')}`}
                     loading="lazy"
                     decoding="async"
+                    onError={(e) => {
+                      if (!e.currentTarget.dataset.fallbackApplied) {
+                        e.currentTarget.dataset.fallbackApplied = 'true';
+                        e.currentTarget.src = RACE_CONFIG.heroImage;
+                      }
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
@@ -208,6 +245,9 @@ export default function GallerySection() {
       {/* Modal Lightbox de foto seleccionada */}
       {selectedPhoto && (
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Vista ampliada de fotografía"
           className="fixed inset-0 z-50 bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-4"
           onClick={() => setSelectedPhoto(null)}
         >

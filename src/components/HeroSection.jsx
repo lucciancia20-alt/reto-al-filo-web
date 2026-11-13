@@ -41,14 +41,23 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
     { label: 'Seg', value: countdown.seconds },
   ];
 
+  const heroSrcSet =
+    raceConfig.heroImage && raceConfig.heroImage.includes('images.unsplash.com')
+      ? [800, 1280, 1920]
+          .map((w) => `${raceConfig.heroImage.replace(/w=\d+/, `w=${w}`)} ${w}w`)
+          .join(', ')
+      : undefined;
+
   return (
     <section
       id="inicio"
       className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-stone-950 pt-16"
     >
-      {/* Imagen de fondo Unsplash con respaldo de gradiente oscuro para máxima legibilidad en exterior */}
+      {/* Imagen de fondo Unsplash con srcSet responsivo y respaldo oscuro para lectura en exterior */}
       <img
         src={raceConfig.heroImage}
+        srcSet={heroSrcSet}
+        sizes="100vw"
         alt="Corredor de trail running en el filo de la montaña"
         fetchPriority="high"
         className="absolute inset-0 w-full h-full object-cover object-center scale-105 animate-[pulse_18s_ease-in-out_infinite]"

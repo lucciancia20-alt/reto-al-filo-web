@@ -108,6 +108,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   <button
                     type="button"
                     aria-expanded={isOpen}
+                    aria-controls={`faq-panel-${faq.id}`}
                     onClick={() => setOpenFaqId(isOpen ? null : faq.id)}
                     className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 cursor-pointer"
                   >
@@ -128,7 +129,10 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   </button>
 
                   {isOpen && (
-                    <div className="px-5 sm:px-6 pb-6 pt-1 text-xs sm:text-sm text-stone-300 leading-relaxed border-t border-stone-800/80">
+                    <div
+                      id={`faq-panel-${faq.id}`}
+                      className="px-5 sm:px-6 pb-6 pt-1 text-xs sm:text-sm text-stone-300 leading-relaxed border-t border-stone-800/80"
+                    >
                       <p className="mt-3">{faq.answer}</p>
 
                       {faq.hasMapButton && (

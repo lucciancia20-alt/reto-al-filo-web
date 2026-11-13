@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import CircuitSection from './components/CircuitSection';
@@ -6,13 +6,14 @@ import GallerySection from './components/GallerySection';
 import InfoFaqSection from './components/InfoFaqSection';
 import Footer from './components/Footer';
 import RegistrationModal from './components/RegistrationModal';
-import AdminModal from './components/AdminModal';
 import {
   getLocalCachedRaceConfig,
   fetchLiveRaceConfig,
   saveLiveRaceConfig,
   resetLiveRaceConfig,
 } from './firebase/config';
+
+const AdminModal = lazy(() => import('./components/AdminModal'));
 
 function isAdminUrl() {
   if (typeof window === 'undefined') return false;
@@ -36,17 +37,35 @@ export default function App() {
     };
     window.addEventListener('hashchange', onHashChange);
 
-    // Carga diferida de la configuración remota desde Firestore para no bloquear el primer render
-    const timer = setTimeout(async () => {
-      const result = await fetchLiveRaceConfig();
-      if (result?.config) {
-        setRaceConfig(result.config);
+    // En modo ahorro de datos (señal de montaña 3G/Edge), diferimos la carga de Firebase
+    // hasta que el corredor busque un dorsal o abra el panel de administración.
+    const saveDataEnabled = Boolean(navigator.connection?.saveData);
+    let idleId = null;
+    let fallbackTimer = null;
+
+    if (!saveDataEnabled) {
+      const loadRemoteConfig = async () => {
+        const result = await fetchLiveRaceConfig();
+        if (result?.config) {
+          setRaceConfig(result.config);
+        }
+      };
+
+      if (typeof window.requestIdleCallback === 'function') {
+        idleId = window.requestIdleCallback(loadRemoteConfig, { timeout: 2000 });
+      } else {
+        fallbackTimer = setTimeout(loadRemoteConfig, 1500);
       }
-    }, 600);
+    }
 
     return () => {
       window.removeEventListener('hashchange', onHashChange);
-      clearTimeout(timer);
+      if (idleId !== null && typeof window.cancelIdleCallback === 'function') {
+        window.cancelIdleCallback(idleId);
+      }
+      if (fallbackTimer !== null) {
+        clearTimeout(fallbackTimer);
+      }
     };
   }, []);
 
@@ -81,7 +100,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col">
+    <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col overflow-x-hidden">
       <Navbar onOpenModal={() => handleOpenModal(activeDistance)} />
 
       <main className="flex-1">
@@ -115,13 +134,17 @@ export default function App() {
         raceConfig={raceConfig}
       />
 
-      <AdminModal
-        isOpen={adminOpen}
-        onClose={handleCloseAdmin}
-        raceConfig={raceConfig}
-        onSaveConfig={handleSaveConfig}
-        onResetConfig={handleResetConfig}
-      />
+      {adminOpen && (
+        <Suspense fallback={null}>
+          <AdminModal
+            isOpen={adminOpen}
+            onClose={handleCloseAdmin}
+            raceConfig={raceConfig}
+            onSaveConfig={handleSaveConfig}
+            onResetConfig={handleResetConfig}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }

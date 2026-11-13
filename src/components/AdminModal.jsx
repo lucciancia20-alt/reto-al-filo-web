@@ -18,7 +18,7 @@ import { GPX_TRACKS, interpolatePointAtKm, parseGpxXml } from '../data/gpxTracks
 import { addPhotoToFirestore, uploadImageToCloudinary } from '../firebase/config';
 
 const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN || 'reto2027';
-const DEFAULT_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'wr4ml3tn';
+const DEFAULT_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '';
 const DEFAULT_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'reto_al_filo';
 
 export default function AdminModal({
@@ -295,7 +295,9 @@ export default function AdminModal({
       let finalUrl = photoUrl.trim();
 
       if (photoFile) {
-        setPhotoStepMessage(`Subiendo imagen a Cloudinary (${DEFAULT_CLOUD_NAME})...`);
+        setPhotoStepMessage(
+          `Subiendo imagen a Cloudinary (${DEFAULT_CLOUD_NAME || 'nube configurada'})...`
+        );
         const uploaded = await uploadImageToCloudinary(photoFile, {
           cloudName: DEFAULT_CLOUD_NAME,
           uploadPreset,
@@ -803,8 +805,10 @@ export default function AdminModal({
                       </h4>
                       <p className="text-xs text-stone-400 mt-0.5">
                         Elegí una imagen desde tu celular o PC (se sube a tu nube{' '}
-                        <span className="font-mono text-amber-300">{DEFAULT_CLOUD_NAME}</span>) o
-                        pegá un link existente y etiquetá los dorsales.
+                        <span className="font-mono text-amber-300">
+                          {DEFAULT_CLOUD_NAME || 'no configurada'}
+                        </span>
+                        ) o pegá un link existente y etiquetá los dorsales.
                       </p>
                     </div>
                   </div>
