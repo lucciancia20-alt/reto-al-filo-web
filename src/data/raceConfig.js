@@ -22,17 +22,17 @@ export const RACE_CONFIG = {
       tabLabel: '27K Competitivo',
       distanceLabel: '27K',
       price: '$45.000',
-      elevationGain: '+1.532 m',
+      elevationGain: '+1.510 m',
       hydrationCount: 4,
       cutoffTime: '5 hs',
       summaryBadge: 'Exigencia Alta · Terreno Técnico de Cumbre',
       description:
-        'Recorrido serrano técnico por los cordones de Tornquist con ascenso hasta los 941 msnm, crestas rocosas y descenso hacia el valle de largada.',
+        'Recorrido serrano técnico de 26,7 km por los cordones de Tornquist con dos ascensos fuertes (919 msnm en el KM 4,3 y 937 msnm en el KM 24,1), crestas rocosas y descenso hacia el valle de largada.',
       stats: [
         {
           label: 'Distancia y Desnivel',
-          value: '27K · +1.532 m',
-          sub: 'Track GPX oficial · Alt. máx 941 msnm',
+          value: '27K · +1.510 m',
+          sub: '26,7 km reales · Alt. máx 937 msnm',
         },
         {
           label: 'Puestos de Hidratación',
@@ -57,17 +57,17 @@ export const RACE_CONFIG = {
       tabLabel: '13K Montaña',
       distanceLabel: '13K',
       price: '$32.000',
-      elevationGain: '+666 m',
+      elevationGain: '+671 m',
       hydrationCount: 2,
       cutoffTime: '3 hs',
       summaryBadge: 'Exigencia Media · Ideal Debutantes en Trail',
       description:
-        'Trazado ágil y panorámico por senderos de montaña en Tornquist alcanzando los 945 msnm con vistas abiertas del cordón serrano.',
+        'Trazado ágil y panorámico de 12,5 km por senderos de montaña en Tornquist, con subida principal hasta los 902 msnm en el KM 8 y vistas abiertas del cordón serrano.',
       stats: [
         {
           label: 'Distancia y Desnivel',
-          value: '13K · +666 m',
-          sub: 'Track GPX oficial · Alt. máx 945 msnm',
+          value: '13K · +671 m',
+          sub: '12,5 km reales · Alt. máx 902 msnm',
         },
         {
           label: 'Puestos de Hidratación',
@@ -95,7 +95,7 @@ export const RACE_CONFIG = {
       cloudinaryThumb:
         'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=800&q=80',
       dorsales: ['101', '205'],
-      sector: 'Cumbre El Filo · 941 msnm',
+      sector: 'Cumbre El Filo · 937 msnm',
       edicion: 1,
       timestamp: 1712746800000,
       visible: true,
@@ -250,13 +250,20 @@ export function mergeRaceConfig(override) {
     if (!incoming) {
       return legacy?.price ? { ...base, price: legacy.price } : base;
     }
+    // Sin GPX personalizado, distancia/desnivel/descripción salen siempre del track oficial (Strava)
+    const usesOfficialTrack = !incoming.customGpx;
+    const incomingStats = Array.isArray(incoming.stats) ? incoming.stats : base.stats;
     return {
       ...base,
       ...incoming,
       id: base.id,
       tabLabel: base.tabLabel,
       distanceLabel: base.distanceLabel,
-      stats: Array.isArray(incoming.stats) ? incoming.stats : base.stats,
+      elevationGain: usesOfficialTrack ? base.elevationGain : incoming.elevationGain || base.elevationGain,
+      description: usesOfficialTrack ? base.description : incoming.description || base.description,
+      stats: usesOfficialTrack
+        ? [base.stats[0], ...incomingStats.slice(1)]
+        : incomingStats,
       hydrationStations: Array.isArray(incoming.hydrationStations)
         ? incoming.hydrationStations
         : base.hydrationStations,

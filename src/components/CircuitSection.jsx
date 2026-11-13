@@ -200,7 +200,7 @@ export default function CircuitSection({
     {
       label: 'Distancia y Desnivel',
       value: `${currentCircuit.distanceLabel} · ${currentCircuit.elevationGain}`,
-      sub: `Track GPX real · Alt. máx ${track.maxAlt} msnm`,
+      sub: `${String(track.totalKm).replace('.', ',')} km reales · Alt. máx ${track.maxAlt} msnm`,
     },
     {
       label: 'Puestos de Hidratación',
@@ -323,7 +323,7 @@ export default function CircuitSection({
                 <div className="flex items-center justify-between text-xs mb-2">
                   <span className="font-display font-bold uppercase tracking-wider text-stone-200 flex items-center gap-1.5">
                     <Compass className="w-3.5 h-3.5 text-amber-400" />
-                    Trazado GPS ({track.rawTotalKm} km track)
+                    Trazado GPS ({String(track.totalKm).replace('.', ',')} km)
                   </span>
                   <span className="font-mono text-[10px] text-stone-400 bg-stone-900 px-2 py-0.5 rounded border border-stone-800">
                     N ↑

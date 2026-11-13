@@ -551,7 +551,7 @@ export default function AdminModal({
     setGpxStatus('Procesando archivo GPX...');
     try {
       const xmlText = await file.text();
-      const targetKm = editDistance === '27K' ? 27.0 : 13.0;
+      const targetKm = editDistance === '27K' ? 26.7 : 12.5;
       const parsed = parseGpxXml(xmlText, targetKm);
       setDraft((prev) => ({
         ...prev,
@@ -573,7 +573,7 @@ export default function AdminModal({
   };
 
   const handleClearCustomGpx = () => {
-    const defaultGain = editDistance === '27K' ? '+1.532 m' : '+666 m';
+    const defaultGain = editDistance === '27K' ? '+1.510 m' : '+671 m';
     setDraft((prev) => ({
       ...prev,
       circuits: {
