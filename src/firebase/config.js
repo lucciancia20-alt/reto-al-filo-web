@@ -81,7 +81,7 @@ export function getCloudinaryUrl(urlOrPublicId, { width = 800 } = {}) {
   }
 
   // Si se recibe un publicId relativo de Cloudinary
-  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'reto-al-filo';
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'wr4ml3tn';
   const cleanId = urlOrPublicId.replace(/^\/+/, '');
   return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto,w_${width}/${cleanId}`;
 }
@@ -341,4 +341,53 @@ export async function addPhotoToFirestore({ cloudinaryUrl, dorsales, sector, edi
   }
 
   return { id: docRef.id, dorsales: cleanDorsales };
+}
+
+/**
+ * Sube una imagen directamente desde el navegador a Cloudinary usando un Upload Preset sin firma (Unsigned).
+ */
+export async function uploadImageToCloudinary(file, { cloudName, uploadPreset } = {}) {
+  if (!file) {
+    throw new Error('Seleccioná un archivo de imagen para subir.');
+  }
+
+  const targetCloud = (
+    cloudName ||
+    import.meta.env.VITE_CLOUDINARY_CLOUD_NAME ||
+    'wr4ml3tn'
+  ).trim();
+  const targetPreset = (
+    uploadPreset ||
+    import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET ||
+    'reto_al_filo'
+  ).trim();
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', targetPreset);
+  formData.append('folder', 'reto-al-filo');
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${encodeURIComponent(targetCloud)}/image/upload`,
+    {
+      method: 'POST',
+      body: formData,
+    }
+  );
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const rawMsg = payload?.error?.message || `Error HTTP ${response.status}`;
+    if (rawMsg.toLowerCase().includes('preset')) {
+      throw new Error(
+        `No se encontró el Upload Preset "${targetPreset}" en Cloudinary (${targetCloud}). Crealo en Cloudinary -> Configuración (⚙️) -> Carga (Upload) -> Upload Presets -> Add Upload Preset con nombre "${targetPreset}" y Modo de firma "Unsigned".`
+      );
+    }
+    throw new Error(`Error al subir a Cloudinary: ${rawMsg}`);
+  }
+
+  return {
+    secureUrl: payload.secure_url,
+    publicId: payload.public_id,
+  };
 }

@@ -15,9 +15,11 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { GPX_TRACKS, interpolatePointAtKm, parseGpxXml } from '../data/gpxTracks';
-import { addPhotoToFirestore } from '../firebase/config';
+import { addPhotoToFirestore, uploadImageToCloudinary } from '../firebase/config';
 
 const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN || 'reto2027';
+const DEFAULT_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'wr4ml3tn';
+const DEFAULT_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'reto_al_filo';
 
 export default function AdminModal({
   isOpen,
@@ -38,13 +40,25 @@ export default function AdminModal({
   const [saveFeedback, setSaveFeedback] = useState(null);
   const [gpxStatus, setGpxStatus] = useState('');
 
-  // Estado para carga de nuevas fotos por dorsal en Firestore
+  // Estado para carga de nuevas fotos por dorsal en Cloudinary + Firestore
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
+  const [uploadPreset, setUploadPreset] = useState(DEFAULT_UPLOAD_PRESET);
   const [photoBibs, setPhotoBibs] = useState('');
   const [photoSector, setPhotoSector] = useState('');
   const [photoEdition, setPhotoEdition] = useState(1);
   const [photoStatus, setPhotoStatus] = useState(null);
+  const [photoStepMessage, setPhotoStepMessage] = useState('');
   const [photoSubmitting, setPhotoSubmitting] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (photoPreview) {
+        URL.revokeObjectURL(photoPreview);
+      }
+    };
+  }, [photoPreview]);
 
   useEffect(() => {
     if (isOpen) {
@@ -260,30 +274,66 @@ export default function AdminModal({
     });
   };
 
+  const handleSelectPhotoFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (photoPreview) {
+      URL.revokeObjectURL(photoPreview);
+    }
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+    setPhotoStatus(null);
+  };
+
   const handleAddPhoto = async (e) => {
     e.preventDefault();
     setPhotoSubmitting(true);
     setPhotoStatus(null);
+    setPhotoStepMessage('');
+
     try {
+      let finalUrl = photoUrl.trim();
+
+      if (photoFile) {
+        setPhotoStepMessage(`Subiendo imagen a Cloudinary (${DEFAULT_CLOUD_NAME})...`);
+        const uploaded = await uploadImageToCloudinary(photoFile, {
+          cloudName: DEFAULT_CLOUD_NAME,
+          uploadPreset,
+        });
+        finalUrl = uploaded.secureUrl;
+      }
+
+      if (!finalUrl) {
+        throw new Error('Elegí una foto de tu dispositivo o pegá una URL de Cloudinary.');
+      }
+
+      setPhotoStepMessage('Guardando dorsal en Firestore...');
       const res = await addPhotoToFirestore({
-        cloudinaryUrl: photoUrl.trim(),
+        cloudinaryUrl: finalUrl,
         dorsales: photoBibs,
         sector: photoSector,
         edicion: Number(photoEdition),
       });
+
       setPhotoStatus({
         type: 'success',
-        message: `Foto publicada en Firestore (ID: ${res.id}) para dorsales: #${res.dorsales.join(', #')}`,
+        message: `¡Foto subida y publicada! (ID: ${res.id}) · Dorsales: #${res.dorsales.join(', #')}`,
       });
+      setPhotoFile(null);
+      if (photoPreview) {
+        URL.revokeObjectURL(photoPreview);
+      }
+      setPhotoPreview('');
       setPhotoUrl('');
       setPhotoBibs('');
       setPhotoSector('');
     } catch (err) {
       setPhotoStatus({
         type: 'error',
-        message: `No se pudo publicar en Firestore: ${err.message}`,
+        message: err.message || 'No se pudo subir la foto.',
       });
     } finally {
+      setPhotoStepMessage('');
       setPhotoSubmitting(false);
     }
   };
@@ -745,27 +795,94 @@ export default function AdminModal({
                   onSubmit={handleAddPhoto}
                   className="rounded-2xl bg-stone-950 border border-stone-800 p-5 space-y-4"
                 >
-                  <div>
-                    <h4 className="font-display text-base font-bold text-white uppercase">
-                      Agregar Foto Etiquetada a Firestore
-                    </h4>
-                    <p className="text-xs text-stone-400 mt-0.5">
-                      Pegá la URL de Cloudinary (o publicId) y los números de dorsal que aparecen en
-                      la foto. El sistema generará la miniatura optimizada automáticamente.
-                    </p>
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <h4 className="font-display text-base font-bold text-white uppercase">
+                        Subir Foto Directa a Cloudinary + Firestore
+                      </h4>
+                      <p className="text-xs text-stone-400 mt-0.5">
+                        Elegí una imagen desde tu celular o PC (se sube a tu nube{' '}
+                        <span className="font-mono text-amber-300">{DEFAULT_CLOUD_NAME}</span>) o
+                        pegá un link existente y etiquetá los dorsales.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Selector de archivo local */}
+                  <div className="rounded-2xl border border-dashed border-stone-700 bg-stone-900/60 p-4 flex flex-col sm:flex-row items-center gap-4">
+                    {photoPreview ? (
+                      <img
+                        src={photoPreview}
+                        alt="Vista previa de foto seleccionada"
+                        className="w-24 h-24 rounded-xl object-cover border border-stone-700 shrink-0"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-xl bg-stone-950 border border-stone-800 flex items-center justify-center text-stone-500 shrink-0">
+                        <Camera className="w-8 h-8" />
+                      </div>
+                    )}
+
+                    <div className="flex-1 text-center sm:text-left">
+                      <p className="text-xs font-semibold text-stone-200">
+                        {photoFile
+                          ? `Archivo seleccionado: ${photoFile.name}`
+                          : 'Seleccioná una foto (.jpg, .png, .webp) desde tu dispositivo'}
+                      </p>
+                      <p className="text-[11px] text-stone-400 mt-0.5">
+                        Se optimiza y almacena automáticamente en la carpeta{' '}
+                        <span className="font-mono">reto-al-filo</span>.
+                      </p>
+
+                      <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                        <label className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2 cursor-pointer transition-colors">
+                          <Upload className="w-4 h-4" />
+                          {photoFile ? 'Cambiar Foto' : 'Elegir Foto del Celular/PC'}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleSelectPhotoFile}
+                            className="hidden"
+                          />
+                        </label>
+                        {photoFile && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (photoPreview) URL.revokeObjectURL(photoPreview);
+                              setPhotoFile(null);
+                              setPhotoPreview('');
+                            }}
+                            className="text-xs text-stone-400 hover:text-stone-200 px-2 py-1 cursor-pointer"
+                          >
+                            Quitar archivo
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div className="sm:col-span-2">
+                    <div>
                       <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        URL de Cloudinary (o Public ID)
+                        Upload Preset (Unsigned en Cloudinary)
                       </label>
                       <input
                         type="text"
-                        required
+                        value={uploadPreset}
+                        onChange={(e) => setUploadPreset(e.target.value)}
+                        placeholder="reto_al_filo"
+                        className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2.5 text-sm font-mono text-amber-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-stone-300 mb-1">
+                        O pegar URL existente (opcional si subís archivo)
+                      </label>
+                      <input
+                        type="text"
                         value={photoUrl}
                         onChange={(e) => setPhotoUrl(e.target.value)}
-                        placeholder="https://res.cloudinary.com/.../image/upload/v1/reto/foto.jpg"
+                        placeholder="https://res.cloudinary.com/..."
                         className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2.5 text-sm text-white"
                       />
                     </div>
@@ -809,18 +926,24 @@ export default function AdminModal({
                     </div>
                   </div>
 
+                  {photoStepMessage && (
+                    <div className="p-3 rounded-xl text-xs bg-amber-500/15 text-amber-200 border border-amber-500/30">
+                      {photoStepMessage}
+                    </div>
+                  )}
+
                   {photoStatus && (
                     <div
-                      className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
+                      className={`p-3 rounded-xl text-xs flex items-start gap-2 ${
                         photoStatus.type === 'success'
                           ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
                           : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
                       }`}
                     >
                       {photoStatus.type === 'success' ? (
-                        <CheckCircle2 className="w-4 h-4 shrink-0" />
+                        <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
                       ) : (
-                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                       )}
                       <span>{photoStatus.message}</span>
                     </div>
@@ -832,7 +955,7 @@ export default function AdminModal({
                     className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs uppercase tracking-wider px-5 py-3 cursor-pointer disabled:opacity-50"
                   >
                     <Camera className="w-4 h-4" />
-                    {photoSubmitting ? 'Guardando en Firestore...' : 'Publicar Foto en Galería'}
+                    {photoSubmitting ? 'Subiendo y publicando...' : 'Subir y Publicar Foto'}
                   </button>
                 </form>
               )}
