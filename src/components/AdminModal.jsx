@@ -935,6 +935,12 @@ export default function AdminModal({
                   </button>
                 </div>
 
+                {emailMode === 'register' && (
+                  <p className="text-[11px] leading-relaxed text-amber-200/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-3 py-2">
+                    Elegí e inventá tu propia contraseña nueva (mínimo 6 caracteres) para tu correo autorizado (<span className="font-mono">lciancia1972@gmail.com</span> o <span className="font-mono">lucianociancia86@gmail.com</span>), o ingresá con 1 clic arriba usando <strong>Ingresar con Google</strong>.
+                  </p>
+                )}
+
                 <div>
                   <label
                     htmlFor="admin-email-input"
@@ -1680,6 +1686,19 @@ export default function AdminModal({
                       </div>
                     </div>
 
+                    {(photoFiles.length > 0 || photoUrl.trim().length > 0) && (
+                      <button
+                        type="submit"
+                        disabled={photoSubmitting}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-5 py-3 shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
+                      >
+                        <Upload className="w-4 h-4" />
+                        {photoSubmitting
+                          ? 'Subiendo y publicando...'
+                          : `Subir y Publicar ahora (${photoFiles.length || 1})`}
+                      </button>
+                    )}
+
                     {photoStepMessage && (
                       <div className="p-3 rounded-xl text-xs bg-amber-500/15 text-amber-200 border border-amber-500/30">
                         {photoStepMessage}
@@ -1711,9 +1730,15 @@ export default function AdminModal({
                         <h4 className="font-display text-sm font-bold text-white uppercase">
                           Postales publicadas actualmente ({galleryCustomCount > 0 ? galleryCustomCount : '6 de muestra'})
                         </h4>
-                        <p className="text-[11px] text-stone-400">
+                        <p
+                          className={`text-[11px] mt-0.5 ${
+                            galleryCustomCount > 0
+                              ? 'text-emerald-300 font-medium'
+                              : 'text-stone-400'
+                          }`}
+                        >
                           {galleryCustomCount > 0
-                            ? 'Estas son tus fotos cargadas en Firestore visibles en la web.'
+                            ? 'Estas fotos ya están cargadas en Cloudinary/Firestore y visibles en vivo en la web. No necesitás volver a subirlas.'
                             : 'Todavía no subiste fotos propias. Mientras tanto la web muestra las 6 postales iniciales de demostración.'}
                         </p>
                       </div>
@@ -1735,12 +1760,15 @@ export default function AdminModal({
                             key={item.id}
                             className="rounded-xl overflow-hidden bg-stone-900 border border-stone-800 flex flex-col"
                           >
-                            <div className="aspect-[4/3] bg-stone-950 overflow-hidden">
+                            <div className="relative aspect-[4/3] bg-stone-950 overflow-hidden">
                               <img
                                 src={item.cloudinaryThumb}
                                 alt={item.sector}
                                 className="w-full h-full object-cover"
                               />
+                              <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-emerald-500 text-stone-950 font-bold text-[10px] px-2 py-0.5 shadow-md">
+                                ✓ Publicada en la web
+                              </span>
                             </div>
                             <div className="p-2.5 flex items-center justify-between gap-2">
                               <span className="text-[11px] text-stone-200 truncate">
@@ -2085,19 +2113,35 @@ export default function AdminModal({
                     Cerrar Panel
                   </button>
 
-                  <button
-                    type="submit"
-                    form="admin-photo-form"
-                    disabled={photoSubmitting}
-                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
-                  >
-                    <Camera className="w-4 h-4" />
-                    {photoSubmitting
-                      ? 'Subiendo y publicando...'
-                      : photoFiles.length > 1
-                        ? `Subir y Publicar (${photoFiles.length})`
-                        : 'Subir y Publicar'}
-                  </button>
+                  {photoFiles.length > 0 || photoUrl.trim().length > 0 ? (
+                    <button
+                      type="submit"
+                      form="admin-photo-form"
+                      disabled={photoSubmitting}
+                      className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
+                    >
+                      <Camera className="w-4 h-4" />
+                      {photoSubmitting
+                        ? 'Subiendo y publicando...'
+                        : `Subir y Publicar (${photoFiles.length || 1})`}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        setTimeout(() => {
+                          document
+                            .getElementById('galeria')
+                            ?.scrollIntoView({ behavior: 'smooth' });
+                        }, 80);
+                      }}
+                      className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-amber-500/20 cursor-pointer"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      ✓ Listo · Ver Galería en la Web
+                    </button>
+                  )}
                 </>
               ) : activeTab === 'registrations' ? (
                 <>

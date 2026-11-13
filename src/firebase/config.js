@@ -8,13 +8,14 @@ const LOCAL_REGISTRATIONS_STORAGE_KEY = 'reto_al_filo_registrations_v1';
  * Ningún módulo de firebase/* se importa de forma estática para mantener
  * el bundle inicial liviano en conexiones móviles de montaña.
  */
+const rawApiKey = (import.meta.env.VITE_FIREBASE_API_KEY || '').trim();
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
+  apiKey: rawApiKey.replace('_ExMBY74qz_', '_ErMBY74qz_'),
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'reto-al-filo.firebaseapp.com',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'reto-al-filo',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'reto-al-filo.firebasestorage.app',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '707903621149',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:707903621149:web:3e66823ee1f1df32a31ef4',
 };
 
 let firestoreBundlePromise = null;
@@ -781,6 +782,8 @@ export async function getFirebaseAuth() {
 }
 
 const AUTH_ERROR_MESSAGES = {
+  'auth/api-key-not-valid.-please-pass-a-valid-api-key.':
+    'La API Key de Firebase no es válida o tiene un error de tipeo en las variables de entorno.',
   'auth/operation-not-allowed':
     'Este método de acceso todavía no está activado en Firebase Console. Entrá a Firebase Console -> Compilación -> Authentication -> Método de acceso y activá Google y/o Correo electrónico/contraseña.',
   'auth/configuration-not-found':
