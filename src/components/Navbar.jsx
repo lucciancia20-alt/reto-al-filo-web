@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mountain, Menu, X, ArrowUpRight, Settings } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Settings } from 'lucide-react';
 
 export default function Navbar({ onOpenModal, onOpenAdmin }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -19,9 +19,11 @@ export default function Navbar({ onOpenModal, onOpenAdmin }) {
             href="#inicio"
             className="flex items-center gap-2.5 text-stone-100 font-display font-extrabold tracking-tight text-lg"
           >
-            <span className="w-9 h-9 rounded-lg bg-amber-500 text-stone-950 flex items-center justify-center shadow-md shadow-amber-500/20">
-              <Mountain className="w-5 h-5 stroke-[2.5]" />
-            </span>
+            <img
+              src="/logo-raf.png"
+              alt="Logo Reto al Filo"
+              className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-md shrink-0"
+            />
             <span className="leading-none">
               RETO AL FILO
               <span className="block text-[10px] font-sans font-semibold tracking-widest text-amber-400 uppercase mt-0.5">

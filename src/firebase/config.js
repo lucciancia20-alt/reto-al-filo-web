@@ -1,6 +1,6 @@
 import { RACE_CONFIG, mergeRaceConfig } from '../data/raceConfig';
 
-const LOCAL_CONFIG_STORAGE_KEY = 'reto_al_filo_config_v1';
+const LOCAL_CONFIG_STORAGE_KEY = 'reto_al_filo_config_v2';
 const LOCAL_REGISTRATIONS_STORAGE_KEY = 'reto_al_filo_registrations_v1';
 
 /**
@@ -568,7 +568,7 @@ export async function submitRunnerRegistration(payload) {
   const now = Date.now();
   const record = {
     code: generateRegistrationCode(),
-    distance: payload.distance === '10K' ? '10K' : '21K',
+    distance: payload.distance === '13K' ? '13K' : '27K',
     priceSnapshot: String(payload.priceSnapshot || '').trim(),
     fullName: String(payload.fullName).trim(),
     dni: String(payload.dni).trim(),

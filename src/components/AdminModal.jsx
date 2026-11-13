@@ -66,7 +66,7 @@ export default function AdminModal({
   const [pinError, setPinError] = useState('');
 
   const [activeTab, setActiveTab] = useState('general');
-  const [editDistance, setEditDistance] = useState('21K');
+  const [editDistance, setEditDistance] = useState('27K');
   const [draft, setDraft] = useState(() => structuredClone(raceConfig));
 
   const [saving, setSaving] = useState(false);
@@ -131,20 +131,20 @@ export default function AdminModal({
   const regStats = useMemo(() => {
     let confirmed = 0;
     let pending = 0;
-    let count21k = 0;
-    let count10k = 0;
+    let count27k = 0;
+    let count13k = 0;
     for (const r of registrations) {
       if (r.status === 'confirmado') confirmed += 1;
       else if (r.status === 'pendiente') pending += 1;
-      if (r.distance === '21K') count21k += 1;
-      else if (r.distance === '10K') count10k += 1;
+      if (r.distance === '27K' || r.distance === '21K') count27k += 1;
+      else if (r.distance === '13K' || r.distance === '10K') count13k += 1;
     }
     return {
       total: registrations.length,
       confirmed,
       pending,
-      count21k,
-      count10k,
+      count27k,
+      count13k,
     };
   }, [registrations]);
 
@@ -511,7 +511,7 @@ export default function AdminModal({
       const nextNum = list.length + 1;
       list.push({
         id: `pa-${editDistance}-${Date.now()}`,
-        km: editDistance === '21K' ? 10 : 5,
+        km: editDistance === '27K' ? 12 : 5,
         label: `PA${nextNum} · Nuevo Puesto`,
       });
       return {
@@ -551,7 +551,7 @@ export default function AdminModal({
     setGpxStatus('Procesando archivo GPX...');
     try {
       const xmlText = await file.text();
-      const targetKm = editDistance === '21K' ? 21.0 : 10.0;
+      const targetKm = editDistance === '27K' ? 27.0 : 13.0;
       const parsed = parseGpxXml(xmlText, targetKm);
       setDraft((prev) => ({
         ...prev,
@@ -573,7 +573,7 @@ export default function AdminModal({
   };
 
   const handleClearCustomGpx = () => {
-    const defaultGain = editDistance === '21K' ? '+1.532 m' : '+666 m';
+    const defaultGain = editDistance === '27K' ? '+1.532 m' : '+666 m';
     setDraft((prev) => ({
       ...prev,
       circuits: {
@@ -1189,24 +1189,24 @@ export default function AdminModal({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       <div>
                         <label className="block text-xs font-semibold text-stone-300 mb-1">
-                          Valor Inscripción 21K
+                          Valor Inscripción 27K
                         </label>
                         <input
                           type="text"
-                          value={draft.circuits?.['21K']?.price || ''}
-                          onChange={(e) => updateCircuitField('21K', 'price', e.target.value)}
+                          value={draft.circuits?.['27K']?.price || ''}
+                          onChange={(e) => updateCircuitField('27K', 'price', e.target.value)}
                           placeholder="$45.000"
                           className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2 text-sm font-bold text-emerald-300"
                         />
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-stone-300 mb-1">
-                          Valor Inscripción 10K
+                          Valor Inscripción 13K
                         </label>
                         <input
                           type="text"
-                          value={draft.circuits?.['10K']?.price || ''}
-                          onChange={(e) => updateCircuitField('10K', 'price', e.target.value)}
+                          value={draft.circuits?.['13K']?.price || ''}
+                          onChange={(e) => updateCircuitField('13K', 'price', e.target.value)}
                           placeholder="$32.000"
                           className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2 text-sm font-bold text-emerald-300"
                         />
@@ -1278,7 +1278,7 @@ export default function AdminModal({
               {activeTab === 'circuits' && (
                 <div className="space-y-5">
                   <div className="flex items-center gap-2">
-                    {['21K', '10K'].map((d) => (
+                    {['27K', '13K'].map((d) => (
                       <button
                         key={d}
                         type="button"
@@ -1780,8 +1780,8 @@ export default function AdminModal({
                         value: regStats.pending,
                         tone: 'text-amber-300 border-amber-500/30',
                       },
-                      { label: '21K', value: regStats.count21k, tone: 'text-sky-300 border-stone-800' },
-                      { label: '10K', value: regStats.count10k, tone: 'text-stone-200 border-stone-800' },
+                      { label: '27K', value: regStats.count27k, tone: 'text-sky-300 border-stone-800' },
+                      { label: '13K', value: regStats.count13k, tone: 'text-stone-200 border-stone-800' },
                     ].map((stat) => (
                       <div
                         key={stat.label}
@@ -1817,8 +1817,8 @@ export default function AdminModal({
                           className="rounded-xl bg-stone-900 border border-stone-700 px-3 py-2 text-xs text-white"
                         >
                           <option value="all">Todas las distancias</option>
-                          <option value="21K">Solo 21K</option>
-                          <option value="10K">Solo 10K</option>
+                          <option value="27K">Solo 27K</option>
+                          <option value="13K">Solo 13K</option>
                         </select>
 
                         <select

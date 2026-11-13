@@ -136,8 +136,8 @@ export default function CircuitSection({
   const [hoverPoint, setHoverPoint] = useState(null);
 
   const circuits = raceConfig?.circuits || RACE_CONFIG.circuits;
-  const currentCircuit = circuits[activeDistance] || circuits['21K'];
-  const track = currentCircuit.customGpx || GPX_TRACKS[activeDistance] || GPX_TRACKS['21K'];
+  const currentCircuit = circuits[activeDistance] || circuits['27K'];
+  const track = currentCircuit.customGpx || GPX_TRACKS[activeDistance] || GPX_TRACKS['27K'];
 
   const stations = useMemo(() => {
     const list = Array.isArray(currentCircuit.hydrationStations)
@@ -240,7 +240,7 @@ export default function CircuitSection({
           </p>
         </div>
 
-        {/* Selector de Pestañas (21K Competitivo vs 10K Montaña) */}
+        {/* Selector de Pestañas (27K Competitivo vs 13K Montaña) */}
         <div
           role="tablist"
           aria-label="Seleccionar distancia del circuito"

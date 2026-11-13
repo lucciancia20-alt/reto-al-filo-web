@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mountain, Flame } from 'lucide-react';
+import { Flame } from 'lucide-react';
 import { RACE_CONFIG } from '../data/raceConfig';
 
 export default function Footer({
@@ -10,9 +10,11 @@ export default function Footer({
     <footer className="bg-stone-950 border-t border-stone-900 py-12 text-stone-400">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-3">
-          <span className="w-9 h-9 rounded-lg bg-amber-500 text-stone-950 flex items-center justify-center shrink-0">
-            <Mountain className="w-5 h-5 stroke-[2.5]" />
-          </span>
+          <img
+            src="/logo-raf.png"
+            alt="Logo Reto al Filo"
+            className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-md shrink-0"
+          />
           <div>
             <p className="font-display font-black text-white text-sm uppercase">
               {raceConfig.title}

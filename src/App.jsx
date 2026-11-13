@@ -25,7 +25,7 @@ function isAdminUrl() {
 
 export default function App() {
   const [raceConfig, setRaceConfig] = useState(() => getLocalCachedRaceConfig());
-  const [activeDistance, setActiveDistance] = useState('21K');
+  const [activeDistance, setActiveDistance] = useState('27K');
   const [modalOpen, setModalOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(() => isAdminUrl());
 
@@ -70,7 +70,7 @@ export default function App() {
   }, []);
 
   const handleOpenModal = (distanceOverride) => {
-    if (distanceOverride === '21K' || distanceOverride === '10K') {
+    if (distanceOverride === '27K' || distanceOverride === '13K') {
       setActiveDistance(distanceOverride);
     }
     setModalOpen(true);

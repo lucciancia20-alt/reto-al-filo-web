@@ -17,10 +17,10 @@ export const RACE_CONFIG = {
   },
 
   circuits: {
-    '21K': {
-      id: '21K',
-      tabLabel: '21K Competitivo',
-      distanceLabel: '21K',
+    '27K': {
+      id: '27K',
+      tabLabel: '27K Competitivo',
+      distanceLabel: '27K',
       price: '$45.000',
       elevationGain: '+1.532 m',
       hydrationCount: 4,
@@ -31,13 +31,13 @@ export const RACE_CONFIG = {
       stats: [
         {
           label: 'Distancia y Desnivel',
-          value: '21K · +1.532 m',
+          value: '27K · +1.532 m',
           sub: 'Track GPX oficial · Alt. máx 941 msnm',
         },
         {
           label: 'Puestos de Hidratación',
           value: '4 Puestos',
-          sub: 'KM 4.5, KM 9.5, KM 14.5 y KM 18.0',
+          sub: 'KM 6.0, KM 12.0, KM 18.5 y KM 23.0',
         },
         {
           label: 'Tiempo de Corte',
@@ -46,16 +46,16 @@ export const RACE_CONFIG = {
         },
       ],
       hydrationStations: [
-        { id: 'pa-21-1', km: 4.5, label: 'PA1 · Quebrada' },
-        { id: 'pa-21-2', km: 9.5, label: 'PA2 · Filo' },
-        { id: 'pa-21-3', km: 14.5, label: 'PA3 · Valle' },
-        { id: 'pa-21-4', km: 18.0, label: 'PA4 · Arroyo' },
+        { id: 'pa-27-1', km: 6.0, label: 'PA1 · Quebrada' },
+        { id: 'pa-27-2', km: 12.0, label: 'PA2 · Filo' },
+        { id: 'pa-27-3', km: 18.5, label: 'PA3 · Valle' },
+        { id: 'pa-27-4', km: 23.0, label: 'PA4 · Arroyo' },
       ],
     },
-    '10K': {
-      id: '10K',
-      tabLabel: '10K Montaña',
-      distanceLabel: '10K',
+    '13K': {
+      id: '13K',
+      tabLabel: '13K Montaña',
+      distanceLabel: '13K',
       price: '$32.000',
       elevationGain: '+666 m',
       hydrationCount: 2,
@@ -66,13 +66,13 @@ export const RACE_CONFIG = {
       stats: [
         {
           label: 'Distancia y Desnivel',
-          value: '10K · +666 m',
+          value: '13K · +666 m',
           sub: 'Track GPX oficial · Alt. máx 945 msnm',
         },
         {
           label: 'Puestos de Hidratación',
           value: '2 Puestos',
-          sub: 'KM 4.0 y KM 7.6',
+          sub: 'KM 5.0 y KM 10.0',
         },
         {
           label: 'Tiempo de Corte',
@@ -81,8 +81,8 @@ export const RACE_CONFIG = {
         },
       ],
       hydrationStations: [
-        { id: 'pa-10-1', km: 4.0, label: 'PA1 · Ascenso' },
-        { id: 'pa-10-2', km: 7.6, label: 'PA2 · Cumbre/Filo' },
+        { id: 'pa-13-1', km: 5.0, label: 'PA1 · Ascenso' },
+        { id: 'pa-13-2', km: 10.0, label: 'PA2 · Cumbre/Filo' },
       ],
     },
   },
@@ -187,7 +187,7 @@ export const RACE_CONFIG = {
     },
     {
       time: '08:00 hs',
-      title: 'Largada 21K y 10K',
+      title: 'Largada 27K y 13K',
       description:
         'Salida puntual de ambas distancias desde el arco principal del predio hacia el sendero de ascenso.',
       tag: 'Puntual',
@@ -219,12 +219,12 @@ export const RACE_CONFIG = {
       id: 'reglamento',
       question: 'Reglamento',
       answer:
-        'El tiempo máximo de corte es de 5 horas para los 21K (con corte intermedio a las 3 hs de carrera) y 3 horas para los 10K. Está terminantemente prohibido arrojar envoltorios de geles, botellas o cualquier tipo de residuo fuera de los cestos de los puestos de hidratación (penalización con descalificación directa). Es requisito excluyente presentar apto médico vigente (emitido dentro de los últimos 12 meses) y deslinde de responsabilidad firmado al retirar el kit.',
+        'El tiempo máximo de corte es de 5 horas para los 27K (con corte intermedio a las 3 hs de carrera) y 3 horas para los 13K. Está terminantemente prohibido arrojar envoltorios de geles, botellas o cualquier tipo de residuo fuera de los cestos de los puestos de hidratación (penalización con descalificación directa). Es requisito excluyente presentar apto médico vigente (emitido dentro de los últimos 12 meses) y deslinde de responsabilidad firmado al retirar el kit.',
     },
   ],
 };
 
-export function buildWhatsAppUrl(distance = '21K', whatsappNumber = RACE_CONFIG.whatsappNumber) {
+export function buildWhatsAppUrl(distance = '27K', whatsappNumber = RACE_CONFIG.whatsappNumber) {
   const cleanPhone = String(whatsappNumber || RACE_CONFIG.whatsappNumber).replace(/[^\d]/g, '');
   const message = `Hola! Quiero inscribirme al Reto al Filo - 2da Edición en la distancia de ${distance}`;
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
@@ -238,13 +238,24 @@ export function mergeRaceConfig(override) {
     return RACE_CONFIG;
   }
 
-  const mergeCircuit = (key) => {
+  const normalizeDistanceCopy = (text) =>
+    typeof text === 'string'
+      ? text.replace(/21K/gi, '27K').replace(/10K/gi, '13K')
+      : text;
+
+  const mergeCircuit = (key, legacyKey) => {
     const base = RACE_CONFIG.circuits[key];
     const incoming = override.circuits?.[key];
-    if (!incoming) return base;
+    const legacy = override.circuits?.[legacyKey];
+    if (!incoming) {
+      return legacy?.price ? { ...base, price: legacy.price } : base;
+    }
     return {
       ...base,
       ...incoming,
+      id: base.id,
+      tabLabel: base.tabLabel,
+      distanceLabel: base.distanceLabel,
       stats: Array.isArray(incoming.stats) ? incoming.stats : base.stats,
       hydrationStations: Array.isArray(incoming.hydrationStations)
         ? incoming.hydrationStations
@@ -258,6 +269,22 @@ export function mergeRaceConfig(override) {
       ? RACE_CONFIG.heroImage
       : override.heroImage;
 
+  const nextSchedule = Array.isArray(override.schedule)
+    ? override.schedule.map((item) => ({
+        ...item,
+        title: normalizeDistanceCopy(item?.title),
+        description: normalizeDistanceCopy(item?.description),
+      }))
+    : RACE_CONFIG.schedule;
+
+  const nextFaqs = Array.isArray(override.faqs)
+    ? override.faqs.map((faq) => ({
+        ...faq,
+        question: normalizeDistanceCopy(faq?.question),
+        answer: normalizeDistanceCopy(faq?.answer),
+      }))
+    : RACE_CONFIG.faqs;
+
   return {
     ...RACE_CONFIG,
     ...override,
@@ -267,10 +294,10 @@ export function mergeRaceConfig(override) {
       ...(override.payment && typeof override.payment === 'object' ? override.payment : {}),
     },
     circuits: {
-      '21K': mergeCircuit('21K'),
-      '10K': mergeCircuit('10K'),
+      '27K': mergeCircuit('27K', '21K'),
+      '13K': mergeCircuit('13K', '10K'),
     },
-    schedule: Array.isArray(override.schedule) ? override.schedule : RACE_CONFIG.schedule,
-    faqs: Array.isArray(override.faqs) ? override.faqs : RACE_CONFIG.faqs,
+    schedule: nextSchedule,
+    faqs: nextFaqs,
   };
 }

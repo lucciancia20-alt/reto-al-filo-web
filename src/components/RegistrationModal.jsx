@@ -42,7 +42,7 @@ const INITIAL_FORM = {
 export default function RegistrationModal({
   isOpen,
   onClose,
-  initialDistance = '21K',
+  initialDistance = '27K',
   raceConfig = RACE_CONFIG,
 }) {
   const [selectedDistance, setSelectedDistance] = useState(initialDistance);
@@ -88,7 +88,7 @@ export default function RegistrationModal({
   const circuits = raceConfig?.circuits || RACE_CONFIG.circuits;
   const payment = raceConfig?.payment || RACE_CONFIG.payment;
 
-  const distances = ['21K', '10K'].map((id) => {
+  const distances = ['27K', '13K'].map((id) => {
     const c = circuits[id] || RACE_CONFIG.circuits[id];
     const stationCount = Array.isArray(c.hydrationStations)
       ? c.hydrationStations.length
