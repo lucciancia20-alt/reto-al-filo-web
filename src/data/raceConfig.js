@@ -5,60 +5,74 @@ export const RACE_CONFIG = {
   whatsappNumber: '5491100000000',
   heroImage:
     'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1920&q=80',
-  googleMapsUrl: 'https://maps.google.com/?q=-31.9785,-64.5592',
-  locationName: 'Reserva Natural Base del Cerro — Villa Yacanto, Córdoba',
+  googleMapsUrl: 'https://maps.google.com/?q=-38.079253,-61.965131',
+  locationName: 'Base del Circuito Serrano — Tornquist / Sierra de la Ventana, Buenos Aires',
 
   circuits: {
     '21K': {
       id: '21K',
       tabLabel: '21K Competitivo',
       distanceLabel: '21K',
-      elevationGain: '+1.150 m',
+      elevationGain: '+1.532 m',
       hydrationCount: 4,
       cutoffTime: '5 hs',
       summaryBadge: 'Exigencia Alta · Terreno Técnico de Cumbre',
       description:
-        'Ascenso sostenido por sendero de bosque nativo hasta el filo rocoso a 2.150 msnm, con crestas técnicas y descenso rápido hacia el valle.',
+        'Recorrido serrano técnico por los cordones de Tornquist con ascenso hasta los 941 msnm, crestas rocosas y descenso hacia el valle de largada.',
       stats: [
-        { label: 'Distancia y Desnivel', value: '21K · +1.150 m', sub: 'Terreno técnico de alta montaña' },
-        { label: 'Puestos de Hidratación', value: '4 Puestos', sub: 'KM 4.5, KM 9.5, KM 14.0 y KM 18.0' },
-        { label: 'Tiempo de Corte', value: '5 hs', sub: 'Cierre general a las 13:00 hs' },
+        {
+          label: 'Distancia y Desnivel',
+          value: '21K · +1.532 m',
+          sub: 'Track GPX oficial · Alt. máx 941 msnm',
+        },
+        {
+          label: 'Puestos de Hidratación',
+          value: '4 Puestos',
+          sub: 'KM 4.5, KM 9.5, KM 14.5 y KM 18.0',
+        },
+        {
+          label: 'Tiempo de Corte',
+          value: '5 hs',
+          sub: 'Cierre general a las 13:00 hs',
+        },
       ],
-      waypoints: [
-        { km: 0, alt: 1200, label: 'Largada (1.200m)' },
-        { km: 2.5, alt: 1360 },
-        { km: 4.5, alt: 1520, hydration: true, label: 'PA1 · Bosque (KM 4.5)' },
-        { km: 7.0, alt: 1710 },
-        { km: 9.5, alt: 1890, hydration: true, label: 'PA2 · Filo Norte (KM 9.5)' },
-        { km: 12.5, alt: 2150, peak: true, label: 'Cumbre El Filo (2.150m)' },
-        { km: 14.0, alt: 1920, hydration: true, label: 'PA3 · Collado (KM 14.0)' },
-        { km: 16.2, alt: 1640 },
-        { km: 18.0, alt: 1450, hydration: true, label: 'PA4 · Arroyo (KM 18.0)' },
-        { km: 21.0, alt: 1200, label: 'Meta (21K)' },
+      hydrationStations: [
+        { id: 'pa-21-1', km: 4.5, label: 'PA1 · Quebrada' },
+        { id: 'pa-21-2', km: 9.5, label: 'PA2 · Filo' },
+        { id: 'pa-21-3', km: 14.5, label: 'PA3 · Valle' },
+        { id: 'pa-21-4', km: 18.0, label: 'PA4 · Arroyo' },
       ],
     },
     '10K': {
       id: '10K',
       tabLabel: '10K Montaña',
       distanceLabel: '10K',
-      elevationGain: '+480 m',
+      elevationGain: '+666 m',
       hydrationCount: 2,
       cutoffTime: '3 hs',
       summaryBadge: 'Exigencia Media · Ideal Debutantes en Trail',
       description:
-        'Recorrido ágil y panorámico por senderos de montaña, cruzando arroyos serranos y alcanzando el Mirador del Filo a 1.620 msnm.',
+        'Trazado ágil y panorámico por senderos de montaña en Tornquist alcanzando los 945 msnm con vistas abiertas del cordón serrano.',
       stats: [
-        { label: 'Distancia y Desnivel', value: '10K · +480 m', sub: 'Sendero serrano y huella ancha' },
-        { label: 'Puestos de Hidratación', value: '2 Puestos', sub: 'KM 4.0 y KM 7.5' },
-        { label: 'Tiempo de Corte', value: '3 hs', sub: 'Cierre general a las 11:00 hs' },
+        {
+          label: 'Distancia y Desnivel',
+          value: '10K · +666 m',
+          sub: 'Track GPX oficial · Alt. máx 945 msnm',
+        },
+        {
+          label: 'Puestos de Hidratación',
+          value: '2 Puestos',
+          sub: 'KM 4.0 y KM 7.6',
+        },
+        {
+          label: 'Tiempo de Corte',
+          value: '3 hs',
+          sub: 'Cierre general a las 11:00 hs',
+        },
       ],
-      waypoints: [
-        { km: 0, alt: 1200, label: 'Largada (1.200m)' },
-        { km: 2.0, alt: 1330 },
-        { km: 4.0, alt: 1460, hydration: true, label: 'PA1 · Quebrada (KM 4.0)' },
-        { km: 5.5, alt: 1620, peak: true, label: 'Mirador del Filo (1.620m)' },
-        { km: 7.5, alt: 1380, hydration: true, label: 'PA2 · Vado del Río (KM 7.5)' },
-        { km: 10.0, alt: 1200, label: 'Meta (10K)' },
+      hydrationStations: [
+        { id: 'pa-10-1', km: 4.0, label: 'PA1 · Ascenso' },
+        { id: 'pa-10-2', km: 7.6, label: 'PA2 · Cumbre/Filo' },
       ],
     },
   },
@@ -71,7 +85,7 @@ export const RACE_CONFIG = {
       cloudinaryThumb:
         'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=800&q=80',
       dorsales: ['101', '205'],
-      sector: 'Cumbre El Filo · 2.150 msnm',
+      sector: 'Cumbre El Filo · 941 msnm',
       edicion: 1,
       timestamp: 1712746800000,
       visible: true,
@@ -110,7 +124,7 @@ export const RACE_CONFIG = {
       cloudinaryThumb:
         'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80',
       dorsales: ['101'],
-      sector: 'Ascenso Bosque Nativo · KM 4.5',
+      sector: 'Ascenso Quebrada · KM 4.5',
       edicion: 1,
       timestamp: 1712748600000,
       visible: true,
@@ -123,7 +137,7 @@ export const RACE_CONFIG = {
       cloudinaryThumb:
         'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=800&q=80',
       dorsales: ['205', '302'],
-      sector: 'Bajada Técnica del Collado · KM 14',
+      sector: 'Bajada Técnica del Valle · KM 14.5',
       edicion: 1,
       timestamp: 1712749200000,
       visible: true,
@@ -188,19 +202,55 @@ export const RACE_CONFIG = {
       id: 'como-llegar',
       question: 'Cómo llegar al predio',
       answer:
-        'El predio de largada y llegada se encuentra en la Reserva Natural Base del Cerro (Villa Yacanto, Córdoba). El acceso vehicular está señalizado desde el ingreso principal por ripio consolidado apto para todo tipo de vehículos, con sector de estacionamiento gratuito a 150 metros del arco de largada.',
+        'El predio de largada y llegada está ubicado en la zona serrana de Tornquist / Sierra de la Ventana (Prov. de Buenos Aires). El acceso vehicular está señalizado desde el ingreso principal por camino consolidado apto para todo tipo de vehículos, con sector de estacionamiento gratuito a pocos metros del arco de largada.',
       hasMapButton: true,
     },
     {
       id: 'reglamento',
       question: 'Reglamento',
       answer:
-        'El tiempo máximo de corte es de 5 horas para los 21K (con corte intermedio en Cumbre a las 3 hs de carrera) y 3 horas para los 10K. Está terminantemente prohibido arrojar envoltorios de geles, botellas o cualquier tipo de residuo fuera de los cestos de los puestos de hidratación (penalización con descalificación directa). Es requisito excluyente presentar apto médico vigente (emitido dentro de los últimos 12 meses) y deslinde de responsabilidad firmado al retirar el kit.',
+        'El tiempo máximo de corte es de 5 horas para los 21K (con corte intermedio a las 3 hs de carrera) y 3 horas para los 10K. Está terminantemente prohibido arrojar envoltorios de geles, botellas o cualquier tipo de residuo fuera de los cestos de los puestos de hidratación (penalización con descalificación directa). Es requisito excluyente presentar apto médico vigente (emitido dentro de los últimos 12 meses) y deslinde de responsabilidad firmado al retirar el kit.',
     },
   ],
 };
 
-export function buildWhatsAppUrl(distance = '21K') {
+export function buildWhatsAppUrl(distance = '21K', whatsappNumber = RACE_CONFIG.whatsappNumber) {
+  const cleanPhone = String(whatsappNumber || RACE_CONFIG.whatsappNumber).replace(/[^\d]/g, '');
   const message = `Hola! Quiero inscribirme al Reto al Filo - 2da Edición en la distancia de ${distance}`;
-  return `https://wa.me/${RACE_CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+}
+
+/**
+ * Combina de forma segura la configuración guardada (Firestore / localStorage) con los valores por defecto.
+ */
+export function mergeRaceConfig(override) {
+  if (!override || typeof override !== 'object') {
+    return RACE_CONFIG;
+  }
+
+  const mergeCircuit = (key) => {
+    const base = RACE_CONFIG.circuits[key];
+    const incoming = override.circuits?.[key];
+    if (!incoming) return base;
+    return {
+      ...base,
+      ...incoming,
+      stats: Array.isArray(incoming.stats) ? incoming.stats : base.stats,
+      hydrationStations: Array.isArray(incoming.hydrationStations)
+        ? incoming.hydrationStations
+        : base.hydrationStations,
+      customGpx: incoming.customGpx || null,
+    };
+  };
+
+  return {
+    ...RACE_CONFIG,
+    ...override,
+    circuits: {
+      '21K': mergeCircuit('21K'),
+      '10K': mergeCircuit('10K'),
+    },
+    schedule: Array.isArray(override.schedule) ? override.schedule : RACE_CONFIG.schedule,
+    faqs: Array.isArray(override.faqs) ? override.faqs : RACE_CONFIG.faqs,
+  };
 }

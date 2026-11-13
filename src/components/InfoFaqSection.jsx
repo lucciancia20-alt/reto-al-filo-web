@@ -10,8 +10,10 @@ import {
 } from 'lucide-react';
 import { RACE_CONFIG } from '../data/raceConfig';
 
-export default function InfoFaqSection() {
-  const [openFaqId, setOpenFaqId] = useState(RACE_CONFIG.faqs[0].id);
+export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
+  const [openFaqId, setOpenFaqId] = useState(
+    raceConfig?.faqs?.[0]?.id || RACE_CONFIG.faqs[0].id
+  );
 
   const faqIcons = {
     'elementos-obligatorios': ShieldCheck,
@@ -41,11 +43,11 @@ export default function InfoFaqSection() {
           </p>
         </div>
 
-        {/* Línea de tiempo vertical con los 4 horarios */}
+        {/* Línea de tiempo vertical con los horarios del día */}
         <div className="mt-10 max-w-2xl mx-auto relative pl-6 sm:pl-8 before:content-[''] before:absolute before:left-2.5 sm:before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-amber-500 before:via-amber-500/50 before:to-stone-800 space-y-6">
-          {RACE_CONFIG.schedule.map((item, idx) => (
+          {(raceConfig.schedule || []).map((item, idx) => (
             <div
-              key={item.time}
+              key={`${item.time}-${idx}`}
               className="relative rounded-2xl bg-stone-900/80 border border-stone-800/90 p-5 sm:p-6 hover:border-amber-500/40 transition-colors"
             >
               {/* Punto indicador en la línea vertical */}
@@ -90,7 +92,7 @@ export default function InfoFaqSection() {
           </div>
 
           <div className="mt-8 max-w-3xl mx-auto space-y-3.5">
-            {RACE_CONFIG.faqs.map((faq) => {
+            {(raceConfig.faqs || []).map((faq) => {
               const isOpen = openFaqId === faq.id;
               const IconComponent = faqIcons[faq.id] || HelpCircle;
 
@@ -132,7 +134,7 @@ export default function InfoFaqSection() {
                       {faq.hasMapButton && (
                         <div className="mt-4">
                           <a
-                            href={RACE_CONFIG.googleMapsUrl}
+                            href={raceConfig.googleMapsUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-colors"

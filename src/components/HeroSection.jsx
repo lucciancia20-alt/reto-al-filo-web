@@ -21,17 +21,18 @@ function calculateTimeLeft(targetIso) {
   };
 }
 
-export default function HeroSection({ onOpenModal }) {
+export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
   const [countdown, setCountdown] = useState(() =>
-    calculateTimeLeft(RACE_CONFIG.targetDateIso)
+    calculateTimeLeft(raceConfig.targetDateIso)
   );
 
   useEffect(() => {
+    setCountdown(calculateTimeLeft(raceConfig.targetDateIso));
     const interval = setInterval(() => {
-      setCountdown(calculateTimeLeft(RACE_CONFIG.targetDateIso));
+      setCountdown(calculateTimeLeft(raceConfig.targetDateIso));
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [raceConfig.targetDateIso]);
 
   const timeUnits = [
     { label: 'Días', value: countdown.days },
@@ -47,7 +48,7 @@ export default function HeroSection({ onOpenModal }) {
     >
       {/* Imagen de fondo Unsplash con respaldo de gradiente oscuro para máxima legibilidad en exterior */}
       <img
-        src={RACE_CONFIG.heroImage}
+        src={raceConfig.heroImage}
         alt="Corredor de trail running en el filo de la montaña"
         fetchPriority="high"
         className="absolute inset-0 w-full h-full object-cover object-center scale-105 animate-[pulse_18s_ease-in-out_infinite]"
@@ -59,16 +60,16 @@ export default function HeroSection({ onOpenModal }) {
         {/* Etiqueta superior de aventura */}
         <div className="inline-flex items-center gap-2 rounded-full bg-stone-900/90 border border-amber-500/40 px-4 py-1.5 text-xs sm:text-sm font-semibold text-amber-400 mb-6 shadow-lg">
           <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
-          <span>{RACE_CONFIG.subtitle} · 10 de Abril · 08:00 hs</span>
+          <span>{raceConfig.subtitle} · 10 de Abril · 08:00 hs</span>
         </div>
 
         {/* Título central imponente */}
         <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white uppercase leading-[1.05] drop-shadow-md">
-          {RACE_CONFIG.title}
+          {raceConfig.title}
         </h1>
 
         <p className="mt-3 text-lg sm:text-2xl font-bold uppercase tracking-[0.22em] text-amber-400">
-          {RACE_CONFIG.subtitle}
+          {raceConfig.subtitle}
         </p>
 
         <p className="mt-4 max-w-xl text-sm sm:text-base text-stone-200 leading-relaxed">
@@ -127,7 +128,7 @@ export default function HeroSection({ onOpenModal }) {
         {/* Ubicación rápida */}
         <div className="mt-7 inline-flex items-center gap-2 text-xs sm:text-sm text-stone-300">
           <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
-          <span>{RACE_CONFIG.locationName}</span>
+          <span>{raceConfig.locationName}</span>
         </div>
       </div>
 

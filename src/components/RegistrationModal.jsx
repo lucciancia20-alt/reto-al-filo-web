@@ -2,7 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { X, MessageCircle, Mountain, CheckCircle2, ArrowUpRight } from 'lucide-react';
 import { RACE_CONFIG, buildWhatsAppUrl } from '../data/raceConfig';
 
-export default function RegistrationModal({ isOpen, onClose, initialDistance = '21K' }) {
+export default function RegistrationModal({
+  isOpen,
+  onClose,
+  initialDistance = '21K',
+  raceConfig = RACE_CONFIG,
+}) {
   const [selectedDistance, setSelectedDistance] = useState(initialDistance);
 
   useEffect(() => {
@@ -22,22 +27,21 @@ export default function RegistrationModal({ isOpen, onClose, initialDistance = '
 
   if (!isOpen) return null;
 
-  const distances = [
-    {
-      id: '21K',
-      title: '21K Competitivo',
-      elevation: '+1.150 m D+',
-      details: '4 Puestos de Hidratación · Corte 5 hs',
-    },
-    {
-      id: '10K',
-      title: '10K Montaña',
-      elevation: '+480 m D+',
-      details: '2 Puestos de Hidratación · Corte 3 hs',
-    },
-  ];
+  const circuits = raceConfig?.circuits || RACE_CONFIG.circuits;
+  const distances = ['21K', '10K'].map((id) => {
+    const c = circuits[id];
+    const stationCount = Array.isArray(c.hydrationStations)
+      ? c.hydrationStations.length
+      : c.hydrationCount;
+    return {
+      id,
+      title: c.tabLabel,
+      elevation: `${c.elevationGain} D+`,
+      details: `${stationCount} Puestos de Hidratación · Corte ${c.cutoffTime}`,
+    };
+  });
 
-  const whatsappHref = buildWhatsAppUrl(selectedDistance);
+  const whatsappHref = buildWhatsAppUrl(selectedDistance, raceConfig.whatsappNumber);
   const previewMessage = `Hola! Quiero inscribirme al Reto al Filo - 2da Edición en la distancia de ${selectedDistance}`;
 
   return (
@@ -124,7 +128,7 @@ export default function RegistrationModal({ isOpen, onClose, initialDistance = '
         {/* Vista previa del mensaje pre-armado */}
         <div className="mt-4 rounded-xl bg-stone-950 border border-stone-800 p-3">
           <span className="block text-[10px] font-semibold uppercase tracking-wider text-stone-400">
-            Mensaje pre-armado para WhatsApp (+{RACE_CONFIG.whatsappNumber}):
+            Mensaje pre-armado para WhatsApp (+{raceConfig.whatsappNumber}):
           </span>
           <p className="mt-1 text-xs text-stone-200 italic">"{previewMessage}"</p>
         </div>
