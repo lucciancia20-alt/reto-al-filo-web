@@ -350,7 +350,7 @@ export default function AdminModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-4xl max-h-[92dvh] rounded-3xl bg-stone-900 border border-stone-700 shadow-2xl flex flex-col overflow-hidden text-stone-100"
+        className="w-full max-w-4xl h-[88dvh] sm:h-[680px] max-h-[92dvh] rounded-3xl bg-stone-900 border border-stone-700 shadow-2xl flex flex-col overflow-hidden text-stone-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header del Modal */}
@@ -380,7 +380,7 @@ export default function AdminModal({
         </div>
 
         {!unlocked ? (
-          <form onSubmit={handleUnlock} className="p-8 max-w-sm mx-auto w-full text-center">
+          <form onSubmit={handleUnlock} className="my-auto p-8 max-w-sm mx-auto w-full text-center">
             <Lock className="w-10 h-10 text-amber-400 mx-auto" />
             <h3 className="mt-3 font-display text-xl font-extrabold text-white">
               Acceso Restringido
@@ -792,6 +792,7 @@ export default function AdminModal({
 
               {activeTab === 'photos' && (
                 <form
+                  id="admin-photo-form"
                   onSubmit={handleAddPhoto}
                   className="rounded-2xl bg-stone-950 border border-stone-800 p-5 space-y-4"
                 >
@@ -948,15 +949,6 @@ export default function AdminModal({
                       <span>{photoStatus.message}</span>
                     </div>
                   )}
-
-                  <button
-                    type="submit"
-                    disabled={photoSubmitting}
-                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs uppercase tracking-wider px-5 py-3 cursor-pointer disabled:opacity-50"
-                  >
-                    <Camera className="w-4 h-4" />
-                    {photoSubmitting ? 'Subiendo y publicando...' : 'Subir y Publicar Foto'}
-                  </button>
                 </form>
               )}
 
@@ -978,30 +970,52 @@ export default function AdminModal({
               )}
             </div>
 
-            {/* Footer fijo con botón Guardar */}
-            {activeTab !== 'photos' && (
-              <div className="px-4 sm:px-5 py-3.5 bg-stone-950 border-t border-stone-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  disabled={saving}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold px-4 py-2.5 cursor-pointer"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  Restaurar valores originales
-                </button>
+            {/* Footer fijo con altura constante en todas las pestañas */}
+            <div className="px-4 sm:px-5 py-3.5 bg-stone-950 border-t border-stone-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
+              {activeTab === 'photos' ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold px-4 py-2.5 cursor-pointer"
+                  >
+                    Cerrar Panel
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={handleSaveAll}
-                  disabled={saving}
-                  className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50"
-                >
-                  <Save className="w-4 h-4" />
-                  {saving ? 'Guardando...' : 'Guardar Cambios en Vivo'}
-                </button>
-              </div>
-            )}
+                  <button
+                    type="submit"
+                    form="admin-photo-form"
+                    disabled={photoSubmitting}
+                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
+                  >
+                    <Camera className="w-4 h-4" />
+                    {photoSubmitting ? 'Subiendo y publicando...' : 'Subir y Publicar Foto'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    disabled={saving}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold px-4 py-2.5 cursor-pointer"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    Restaurar valores originales
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSaveAll}
+                    disabled={saving}
+                    className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50"
+                  >
+                    <Save className="w-4 h-4" />
+                    {saving ? 'Guardando...' : 'Guardar Cambios en Vivo'}
+                  </button>
+                </>
+              )}
+            </div>
           </>
         )}
       </div>
