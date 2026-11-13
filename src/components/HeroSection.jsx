@@ -51,7 +51,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
   return (
     <section
       id="inicio"
-      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-stone-950 pt-16"
+      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-stone-950 pt-24"
     >
       {/* Imagen de fondo Unsplash con srcSet responsivo y respaldo oscuro para lectura en exterior */}
       <img

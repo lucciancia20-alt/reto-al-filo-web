@@ -3,8 +3,7 @@ export const RACE_CONFIG = {
   subtitle: 'Abril 2027',
   targetDateIso: '2027-04-10T08:00:00-03:00',
   whatsappNumber: '5492915228310',
-  heroImage:
-    'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1920&q=80',
+  heroImage: '/images/hero-trail-runners.jpg',
   googleMapsUrl: 'https://maps.google.com/?q=-38.079253,-61.965131',
   locationName: 'Base del Cerro Providencia — Tornquist Buenos Aires',
 
@@ -254,9 +253,15 @@ export function mergeRaceConfig(override) {
     };
   };
 
+  const resolvedHeroImage =
+    !override.heroImage || String(override.heroImage).includes('photo-1551632811-561732d1e306')
+      ? RACE_CONFIG.heroImage
+      : override.heroImage;
+
   return {
     ...RACE_CONFIG,
     ...override,
+    heroImage: resolvedHeroImage,
     payment: {
       ...RACE_CONFIG.payment,
       ...(override.payment && typeof override.payment === 'object' ? override.payment : {}),

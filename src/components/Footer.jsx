@@ -1,11 +1,10 @@
 import React from 'react';
-import { Mountain, Flame, Settings } from 'lucide-react';
+import { Mountain, Flame } from 'lucide-react';
 import { RACE_CONFIG } from '../data/raceConfig';
 
 export default function Footer({
   raceConfig = RACE_CONFIG,
   onOpenModal,
-  onOpenAdmin,
 }) {
   return (
     <footer className="bg-stone-950 border-t border-stone-900 py-12 text-stone-400">
@@ -25,15 +24,6 @@ export default function Footer({
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <button
-            type="button"
-            onClick={onOpenAdmin}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-300 border border-stone-800 text-xs font-semibold px-4 py-3 transition-colors cursor-pointer"
-          >
-            <Settings className="w-3.5 h-3.5 text-amber-400" />
-            Panel Admin
-          </button>
-
           <button
             type="button"
             onClick={() => onOpenModal()}

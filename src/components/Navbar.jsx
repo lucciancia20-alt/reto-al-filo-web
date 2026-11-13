@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Mountain, Menu, X, ArrowUpRight } from 'lucide-react';
+import { Mountain, Menu, X, ArrowUpRight, Settings } from 'lucide-react';
 
-export default function Navbar({ onOpenModal }) {
+export default function Navbar({ onOpenModal, onOpenAdmin }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -13,21 +13,32 @@ export default function Navbar({ onOpenModal }) {
 
   return (
     <header className="fixed top-0 inset-x-0 z-40 bg-stone-950/85 backdrop-blur-md border-b border-stone-800/80">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <a
-          href="#inicio"
-          className="flex items-center gap-2.5 text-stone-100 font-display font-extrabold tracking-tight text-lg"
-        >
-          <span className="w-9 h-9 rounded-lg bg-amber-500 text-stone-950 flex items-center justify-center shadow-md shadow-amber-500/20">
-            <Mountain className="w-5 h-5 stroke-[2.5]" />
-          </span>
-          <span className="leading-none">
-            RETO AL FILO
-            <span className="block text-[10px] font-sans font-semibold tracking-widest text-amber-400 uppercase mt-0.5">
-              2da Edición · 2027
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-16 py-2 flex items-center justify-between gap-3">
+        <div className="flex flex-col items-start gap-1.5">
+          <a
+            href="#inicio"
+            className="flex items-center gap-2.5 text-stone-100 font-display font-extrabold tracking-tight text-lg"
+          >
+            <span className="w-9 h-9 rounded-lg bg-amber-500 text-stone-950 flex items-center justify-center shadow-md shadow-amber-500/20">
+              <Mountain className="w-5 h-5 stroke-[2.5]" />
             </span>
-          </span>
-        </a>
+            <span className="leading-none">
+              RETO AL FILO
+              <span className="block text-[10px] font-sans font-semibold tracking-widest text-amber-400 uppercase mt-0.5">
+                2da Edición · 2027
+              </span>
+            </span>
+          </a>
+
+          <button
+            type="button"
+            onClick={onOpenAdmin}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-stone-900/95 hover:bg-stone-800 text-stone-300 hover:text-amber-400 border border-stone-700/80 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer shadow-sm"
+          >
+            <Settings className="w-3 h-3 text-amber-400" />
+            Panel Admin
+          </button>
+        </div>
 
         <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-stone-300">
           {navLinks.map((link) => (
