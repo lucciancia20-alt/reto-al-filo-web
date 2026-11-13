@@ -13,9 +13,22 @@ import {
   Droplets,
   CheckCircle2,
   AlertCircle,
+  LogOut,
+  Mail,
+  KeyRound,
+  ShieldCheck,
 } from 'lucide-react';
 import { GPX_TRACKS, interpolatePointAtKm, parseGpxXml } from '../data/gpxTracks';
-import { addPhotoToFirestore, uploadImageToCloudinary } from '../firebase/config';
+import {
+  addPhotoToFirestore,
+  uploadImageToCloudinary,
+  subscribeToAdminAuth,
+  signInAdminWithGoogle,
+  signInAdminWithEmail,
+  sendAdminPasswordReset,
+  signOutAdmin,
+  isFirebaseConfigured,
+} from '../firebase/config';
 
 const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN || 'reto2027';
 const DEFAULT_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '';
@@ -29,6 +42,14 @@ export default function AdminModal({
   onResetConfig,
 }) {
   const [unlocked, setUnlocked] = useState(false);
+  const [adminUser, setAdminUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
+  const [authInfo, setAuthInfo] = useState('');
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [emailMode, setEmailMode] = useState('login');
+  const [showPinFallback, setShowPinFallback] = useState(false);
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState('');
 
@@ -65,8 +86,28 @@ export default function AdminModal({
       setDraft(structuredClone(raceConfig));
       setSaveFeedback(null);
       setGpxStatus('');
+      setAuthError('');
+      setAuthInfo('');
     }
   }, [isOpen, raceConfig]);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const unsubscribe = subscribeToAdminAuth((user) => {
+      if (user) {
+        setAdminUser(user);
+        setUnlocked(true);
+        setAuthError('');
+      } else {
+        setAdminUser((prev) => {
+          if (prev?.method === 'pin') return prev;
+          setUnlocked(false);
+          return null;
+        });
+      }
+    });
+    return unsubscribe;
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -79,14 +120,83 @@ export default function AdminModal({
 
   if (!isOpen) return null;
 
+  const firebaseReady = isFirebaseConfigured();
+
+  const handleGoogleSignIn = async () => {
+    setAuthLoading(true);
+    setAuthError('');
+    setAuthInfo('');
+    try {
+      const user = await signInAdminWithGoogle();
+      setAdminUser(user);
+      setUnlocked(true);
+    } catch (err) {
+      setAuthError(err.message || 'No se pudo iniciar sesión con Google.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleEmailSignIn = async (e) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError('');
+    setAuthInfo('');
+    try {
+      const user = await signInAdminWithEmail(emailInput, passwordInput, {
+        mode: emailMode,
+      });
+      setAdminUser(user);
+      setUnlocked(true);
+      setPasswordInput('');
+    } catch (err) {
+      setAuthError(err.message || 'No se pudo iniciar sesión con correo.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    setAuthLoading(true);
+    setAuthError('');
+    setAuthInfo('');
+    try {
+      const res = await sendAdminPasswordReset(emailInput);
+      setAuthInfo(
+        `Te enviamos un enlace para crear o restablecer tu clave a ${res.email}. Revisá Recibidos o Spam.`
+      );
+    } catch (err) {
+      setAuthError(err.message || 'No se pudo enviar el correo de recuperación.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
   const handleUnlock = (e) => {
     e.preventDefault();
     if (pinInput.trim() === ADMIN_PIN) {
+      setAdminUser({
+        email: 'PIN local',
+        displayName: 'Organizador (PIN)',
+        method: 'pin',
+      });
       setUnlocked(true);
       setPinError('');
+      setPinInput('');
     } else {
       setPinError('Clave incorrecta. Verificá el PIN de organización.');
     }
+  };
+
+  const handleLogout = async () => {
+    if (adminUser?.method !== 'pin') {
+      await signOutAdmin();
+    }
+    setAdminUser(null);
+    setUnlocked(false);
+    setAuthError('');
+    setAuthInfo('');
+    setPinError('');
   };
 
   const updateCircuitField = (distKey, field, value) => {
@@ -356,56 +466,285 @@ export default function AdminModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header del Modal */}
-        <div className="px-4 sm:px-5 py-3.5 bg-stone-950 border-b border-stone-800 flex items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-2.5">
-            <span className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-center">
-              <Lock className="w-4 h-4" />
+        <div className="px-4 sm:px-5 py-3.5 bg-stone-950 border-b border-stone-800 flex items-center justify-between gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0">
+              {unlocked ? <ShieldCheck className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
             </span>
-            <div>
-              <h2 className="font-display text-lg font-black text-white uppercase">
+            <div className="min-w-0">
+              <h2 className="font-display text-base sm:text-lg font-black text-white uppercase truncate">
                 Panel de Organización · Reto al Filo
               </h2>
-              <p className="text-xs text-stone-400">
-                Editá horarios, puestos de hidratación, GPX y fotos sin tocar código
+              <p className="text-xs text-stone-400 truncate">
+                {unlocked && adminUser?.email
+                  ? `Sesión activa: ${adminUser.email}`
+                  : 'Editá horarios, puestos de hidratación, GPX y fotos sin tocar código'}
               </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Cerrar panel de administración"
-            className="p-2 rounded-xl text-stone-400 hover:text-white hover:bg-stone-800 cursor-pointer"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {unlocked && (
+              <button
+                type="button"
+                onClick={handleLogout}
+                aria-label="Cerrar sesión de administrador"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-xs font-semibold px-3 py-2 cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Salir</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Cerrar panel de administración"
+              className="p-2 rounded-xl text-stone-400 hover:text-white hover:bg-stone-800 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {!unlocked ? (
-          <form onSubmit={handleUnlock} className="my-auto p-8 max-w-sm mx-auto w-full text-center">
-            <Lock className="w-10 h-10 text-amber-400 mx-auto" />
-            <h3 className="mt-3 font-display text-xl font-extrabold text-white">
-              Acceso Restringido
-            </h3>
-            <p className="mt-1.5 text-xs text-stone-400">
-              Ingresá el PIN de organizador para editar la carrera en vivo.
-            </p>
-            <input
-              type="password"
-              value={pinInput}
-              onChange={(e) => setPinInput(e.target.value)}
-              placeholder="PIN de organizador"
-              autoFocus
-              className="mt-5 w-full rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-4 py-3 text-center text-white font-mono tracking-widest"
-            />
-            {pinError && <p className="mt-2 text-xs text-rose-400">{pinError}</p>}
-            <button
-              type="submit"
-              className="mt-4 w-full rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black uppercase text-sm py-3 cursor-pointer"
-            >
-              Ingresar al Panel
-            </button>
-          </form>
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 flex items-start sm:items-center justify-center">
+            <div className="w-full max-w-md py-2 space-y-4">
+              <div className="text-center">
+                <span className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-400 inline-flex items-center justify-center">
+                  <ShieldCheck className="w-6 h-6" />
+                </span>
+                <h3 className="mt-3 font-display text-xl font-extrabold text-white">
+                  Acceso de Organización
+                </h3>
+                <p className="mt-1 text-xs text-stone-400">
+                  Ingresá con tu cuenta autorizada de Google o con correo electrónico y contraseña
+                  para editar la carrera en vivo.
+                </p>
+              </div>
+
+              {!firebaseReady && (
+                <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 text-xs text-amber-200 flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+                  <span>
+                    Firebase no está configurado en este entorno. Podés ingresar usando el PIN de
+                    respaldo al pie.
+                  </span>
+                </div>
+              )}
+
+              {/* Acceso directo con Google */}
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={authLoading || !firebaseReady}
+                className="w-full min-h-[46px] inline-flex items-center justify-center gap-3 rounded-xl bg-white hover:bg-stone-100 text-stone-900 font-bold text-sm px-4 py-3 shadow-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg
+                  className="w-5 h-5 shrink-0"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill="#4285F4"
+                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.14C3.26 21.3 7.31 24 12 24Z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.28 14.24c-.24-.72-.38-1.49-.38-2.24s.14-1.52.38-2.24V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.99-3.14Z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.99 3.14c.95-2.85 3.6-4.96 6.72-4.96Z"
+                  />
+                </svg>
+                <span>
+                  {authLoading ? 'Verificando con Google...' : 'Ingresar con Google'}
+                </span>
+              </button>
+
+              {/* Divisor */}
+              <div className="relative flex items-center py-1">
+                <div className="flex-grow border-t border-stone-800" />
+                <span className="shrink mx-3 text-[11px] uppercase tracking-wider text-stone-500 font-semibold">
+                  o ingresá con tu correo y contraseña
+                </span>
+                <div className="flex-grow border-t border-stone-800" />
+              </div>
+
+              {/* Acceso con Correo electrónico y Contraseña */}
+              <form
+                onSubmit={handleEmailSignIn}
+                className="rounded-2xl bg-stone-950/80 border border-stone-800 p-4 space-y-3"
+              >
+                <div className="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-stone-900 border border-stone-800">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmailMode('login');
+                      setAuthError('');
+                      setAuthInfo('');
+                    }}
+                    className={`py-2 px-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                      emailMode === 'login'
+                        ? 'bg-amber-500 text-stone-950'
+                        : 'text-stone-300 hover:text-white'
+                    }`}
+                  >
+                    Iniciar Sesión
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmailMode('register');
+                      setAuthError('');
+                      setAuthInfo('');
+                    }}
+                    className={`py-2 px-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                      emailMode === 'register'
+                        ? 'bg-amber-500 text-stone-950'
+                        : 'text-stone-300 hover:text-white'
+                    }`}
+                  >
+                    Crear mi clave (1ra vez)
+                  </button>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="admin-email-input"
+                    className="block text-xs font-semibold text-stone-300 mb-1"
+                  >
+                    Correo electrónico autorizado
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      id="admin-email-input"
+                      type="email"
+                      autoComplete="email"
+                      value={emailInput}
+                      onChange={(e) => setEmailInput(e.target.value)}
+                      placeholder="lciancia1972@gmail.com"
+                      required
+                      disabled={!firebaseReady || authLoading}
+                      className="w-full rounded-xl bg-stone-900 border border-stone-700 focus:border-amber-400 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm text-white placeholder:text-stone-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="admin-password-input"
+                    className="block text-xs font-semibold text-stone-300 mb-1"
+                  >
+                    Contraseña
+                  </label>
+                  <div className="relative">
+                    <KeyRound className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      id="admin-password-input"
+                      type="password"
+                      autoComplete={
+                        emailMode === 'register' ? 'new-password' : 'current-password'
+                      }
+                      value={passwordInput}
+                      onChange={(e) => setPasswordInput(e.target.value)}
+                      placeholder={
+                        emailMode === 'register'
+                          ? 'Elegí una clave (mín. 6 caracteres)'
+                          : 'Tu contraseña'
+                      }
+                      required
+                      minLength={6}
+                      disabled={!firebaseReady || authLoading}
+                      className="w-full rounded-xl bg-stone-900 border border-stone-700 focus:border-amber-400 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm text-white placeholder:text-stone-500"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={!firebaseReady || authLoading}
+                  className="w-full min-h-[44px] rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black uppercase text-xs sm:text-sm py-2.5 cursor-pointer transition-colors disabled:opacity-50"
+                >
+                  {authLoading
+                    ? 'Ingresando...'
+                    : emailMode === 'register'
+                      ? 'Crear Cuenta y Entrar'
+                      : 'Ingresar con Correo'}
+                </button>
+
+                {emailMode === 'login' && (
+                  <div className="text-center pt-0.5">
+                    <button
+                      type="button"
+                      onClick={handlePasswordReset}
+                      disabled={!firebaseReady || authLoading}
+                      className="text-xs text-amber-400 hover:text-amber-300 underline underline-offset-2 cursor-pointer disabled:opacity-50"
+                    >
+                      ¿Olvidaste tu contraseña? Enviar enlace por mail
+                    </button>
+                  </div>
+                )}
+              </form>
+
+              {authError && (
+                <div
+                  role="alert"
+                  className="rounded-xl bg-rose-500/15 border border-rose-500/35 p-3 text-xs text-rose-200 flex items-start gap-2"
+                >
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+                  <span>{authError}</span>
+                </div>
+              )}
+
+              {authInfo && (
+                <div className="rounded-xl bg-emerald-500/15 border border-emerald-500/35 p-3 text-xs text-emerald-200 flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+                  <span>{authInfo}</span>
+                </div>
+              )}
+
+              {/* Acceso secundario plegable con PIN de respaldo */}
+              <div className="pt-1 border-t border-stone-800/80 text-center">
+                <button
+                  type="button"
+                  onClick={() => setShowPinFallback((prev) => !prev)}
+                  className="text-xs font-medium text-stone-400 hover:text-stone-200 py-1.5 cursor-pointer"
+                >
+                  {showPinFallback
+                    ? 'Ocultar acceso con PIN de respaldo'
+                    : 'Ingresar con PIN de respaldo'}
+                </button>
+
+                {showPinFallback && (
+                  <form onSubmit={handleUnlock} className="mt-2.5 flex gap-2">
+                    <input
+                      type="password"
+                      value={pinInput}
+                      onChange={(e) => setPinInput(e.target.value)}
+                      placeholder="PIN de organizador"
+                      aria-label="PIN de respaldo de organizador"
+                      className="flex-1 rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-center text-sm text-white font-mono tracking-widest"
+                    />
+                    <button
+                      type="submit"
+                      className="rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-100 font-display font-bold uppercase text-xs px-4 py-2.5 cursor-pointer"
+                    >
+                      Entrar
+                    </button>
+                  </form>
+                )}
+                {pinError && showPinFallback && (
+                  <p className="mt-2 text-xs text-rose-400">{pinError}</p>
+                )}
+              </div>
+            </div>
+          </div>
         ) : (
           <>
             {/* Navegación por pestañas del Admin */}

@@ -17,7 +17,15 @@ const firebaseConfig = {
 };
 
 let firestoreBundlePromise = null;
+let authBundlePromise = null;
 const bibQueryCache = new Map();
+
+const DEFAULT_ADMIN_EMAILS = ['lciancia1972@gmail.com', 'lucianociancia86@gmail.com'];
+
+function resolveFirebaseApp(firebaseAppModule) {
+  const { getApps, getApp, initializeApp } = firebaseAppModule;
+  return getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+}
 
 /**
  * Verifica si existen credenciales configuradas para habilitar consultas a Firestore.
@@ -41,8 +49,7 @@ export async function getFirestoreDb() {
       import('firebase/firestore'),
     ])
       .then(([firebaseAppModule, firestoreModule]) => {
-        const { getApps, getApp, initializeApp } = firebaseAppModule;
-        const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+        const app = resolveFirebaseApp(firebaseAppModule);
         const db = firestoreModule.getFirestore(app);
         return {
           db,
@@ -407,4 +414,260 @@ export async function uploadImageToCloudinary(file, { cloudName, uploadPreset } 
     secureUrl: payload.secure_url,
     publicId: payload.public_id,
   };
+}
+
+/**
+ * Devuelve la lista de correos autorizados para ingresar al Panel de Administración.
+ */
+export function getAllowedAdminEmails() {
+  const rawEnv = import.meta.env.VITE_ADMIN_EMAILS || '';
+  const fromEnv = rawEnv
+    .split(',')
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+
+  return Array.from(new Set([...DEFAULT_ADMIN_EMAILS, ...fromEnv]));
+}
+
+/**
+ * Verifica si un correo está en la lista blanca de administradores autorizados.
+ */
+export function isAuthorizedAdminEmail(email) {
+  if (!email) return false;
+  const cleanEmail = String(email).trim().toLowerCase();
+  return getAllowedAdminEmails().includes(cleanEmail);
+}
+
+/**
+ * Inicializa Firebase Authentication bajo demanda (Lazy Loading) y memoiza la instancia.
+ */
+export async function getFirebaseAuth() {
+  if (!isFirebaseConfigured()) {
+    return null;
+  }
+
+  if (!authBundlePromise) {
+    authBundlePromise = Promise.all([
+      import('firebase/app'),
+      import('firebase/auth'),
+    ])
+      .then(([firebaseAppModule, authModule]) => {
+        const app = resolveFirebaseApp(firebaseAppModule);
+        const auth = authModule.getAuth(app);
+        auth.languageCode = 'es';
+        return {
+          auth,
+          authModule,
+        };
+      })
+      .catch((error) => {
+        authBundlePromise = null;
+        throw error;
+      });
+  }
+
+  return authBundlePromise;
+}
+
+const AUTH_ERROR_MESSAGES = {
+  'auth/operation-not-allowed':
+    'Este método de acceso todavía no está activado en Firebase Console. Entrá a Firebase Console -> Compilación -> Authentication -> Método de acceso y activá Google y/o Correo electrónico/contraseña.',
+  'auth/configuration-not-found':
+    'Firebase Authentication todavía no fue inicializado en este proyecto. Entrá a Firebase Console -> Compilación -> Authentication, hacé clic en "Comenzar" y activá Google y Correo electrónico/contraseña.',
+  'auth/unauthorized-domain':
+    'Este dominio todavía no está autorizado en Firebase Authentication. Agregalo en Firebase Console -> Authentication -> Settings -> Dominios autorizados.',
+  'auth/popup-closed-by-user':
+    'Cerraste la ventana de inicio de sesión antes de completar el ingreso.',
+  'auth/cancelled-popup-request':
+    'Se canceló la solicitud anterior de inicio de sesión. Intentá nuevamente.',
+  'auth/popup-blocked':
+    'El navegador bloqueó la ventana emergente de Google. Permití las ventanas emergentes para este sitio o ingresá con correo y contraseña.',
+  'auth/invalid-credential':
+    'El correo o la contraseña son incorrectos. Verificá los datos o usá "¿Olvidaste tu contraseña?".',
+  'auth/user-not-found':
+    'Todavía no existe un usuario creado con ese correo. Elegí "Crear mi clave (1ra vez)" o ingresá con Google.',
+  'auth/wrong-password':
+    'Contraseña incorrecta. Verificá la clave o usá "¿Olvidaste tu contraseña?".',
+  'auth/invalid-email':
+    'El formato del correo electrónico no es válido.',
+  'auth/email-already-in-use':
+    'Ese correo ya tiene una cuenta creada. Cambiá a "Iniciar Sesión" o ingresá con Google.',
+  'auth/weak-password':
+    'La contraseña es muy débil. Elegí al menos 6 caracteres.',
+  'auth/too-many-requests':
+    'Demasiados intentos fallidos seguidos. Esperá unos minutos antes de volver a intentar.',
+  'auth/network-request-failed':
+    'Sin conexión a internet para verificar tu identidad en Firebase.',
+};
+
+/**
+ * Traduce los errores de Firebase Authentication a mensajes accionables en español.
+ */
+export function formatAuthError(error) {
+  const code = error?.code || '';
+  if (code && AUTH_ERROR_MESSAGES[code]) {
+    return AUTH_ERROR_MESSAGES[code];
+  }
+  return error?.message || 'No se pudo completar la autenticación con Firebase.';
+}
+
+function normalizeAdminUser(user, method = 'firebase') {
+  if (!user) return null;
+  return {
+    uid: user.uid,
+    email: user.email || '',
+    displayName: user.displayName || user.email || 'Organizador',
+    photoURL: user.photoURL || '',
+    method,
+  };
+}
+
+/**
+ * Se suscribe al estado de sesión de Firebase Auth y valida la lista blanca de correos.
+ */
+export function subscribeToAdminAuth(onChange) {
+  if (!isFirebaseConfigured()) {
+    onChange(null);
+    return () => {};
+  }
+
+  let active = true;
+  let unsubscribeInner = null;
+
+  getFirebaseAuth()
+    .then((bundle) => {
+      if (!active || !bundle) {
+        onChange(null);
+        return;
+      }
+      const { auth, authModule } = bundle;
+      unsubscribeInner = authModule.onAuthStateChanged(auth, (user) => {
+        if (!active) return;
+        if (user && isAuthorizedAdminEmail(user.email)) {
+          onChange(normalizeAdminUser(user, 'firebase'));
+        } else {
+          onChange(null);
+        }
+      });
+    })
+    .catch(() => {
+      if (active) onChange(null);
+    });
+
+  return () => {
+    active = false;
+    if (typeof unsubscribeInner === 'function') {
+      unsubscribeInner();
+    }
+  };
+}
+
+/**
+ * Inicia sesión con cuenta de Google y verifica que el correo sea administrador autorizado.
+ */
+export async function signInAdminWithGoogle() {
+  const bundle = await getFirebaseAuth();
+  if (!bundle) {
+    throw new Error('Firebase no está configurado en las variables de entorno.');
+  }
+
+  const { auth, authModule } = bundle;
+  const provider = new authModule.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+
+  try {
+    const credential = await authModule.signInWithPopup(auth, provider);
+    const user = credential.user;
+
+    if (!isAuthorizedAdminEmail(user?.email)) {
+      const attempted = user?.email || 'sin correo';
+      await authModule.signOut(auth);
+      throw new Error(
+        `El correo "${attempted}" no tiene permisos de administrador. Correos habilitados: ${getAllowedAdminEmails().join(', ')}.`
+      );
+    }
+
+    return normalizeAdminUser(user, 'google');
+  } catch (error) {
+    throw new Error(formatAuthError(error));
+  }
+}
+
+/**
+ * Inicia sesión o registra (1ra vez) a un administrador autorizado con correo y contraseña.
+ */
+export async function signInAdminWithEmail(email, password, { mode = 'login' } = {}) {
+  const cleanEmail = String(email || '').trim().toLowerCase();
+  if (!cleanEmail) {
+    throw new Error('Ingresá tu correo electrónico de administrador.');
+  }
+
+  if (!isAuthorizedAdminEmail(cleanEmail)) {
+    throw new Error(
+      `El correo "${cleanEmail}" no está autorizado para administrar Reto al Filo. Correos habilitados: ${getAllowedAdminEmails().join(', ')}.`
+    );
+  }
+
+  if (!password || String(password).length < 6) {
+    throw new Error('Ingresá una contraseña de al menos 6 caracteres.');
+  }
+
+  const bundle = await getFirebaseAuth();
+  if (!bundle) {
+    throw new Error('Firebase no está configurado en las variables de entorno.');
+  }
+
+  const { auth, authModule } = bundle;
+
+  try {
+    const credential =
+      mode === 'register'
+        ? await authModule.createUserWithEmailAndPassword(auth, cleanEmail, password)
+        : await authModule.signInWithEmailAndPassword(auth, cleanEmail, password);
+
+    return normalizeAdminUser(credential.user, 'email');
+  } catch (error) {
+    throw new Error(formatAuthError(error));
+  }
+}
+
+/**
+ * Envía un correo de restablecimiento de contraseña a un administrador autorizado.
+ */
+export async function sendAdminPasswordReset(email) {
+  const cleanEmail = String(email || '').trim().toLowerCase();
+  if (!cleanEmail) {
+    throw new Error('Escribí primero tu correo electrónico para enviarte el enlace de recuperación.');
+  }
+
+  if (!isAuthorizedAdminEmail(cleanEmail)) {
+    throw new Error(`El correo "${cleanEmail}" no está autorizado como administrador.`);
+  }
+
+  const bundle = await getFirebaseAuth();
+  if (!bundle) {
+    throw new Error('Firebase no está configurado en las variables de entorno.');
+  }
+
+  const { auth, authModule } = bundle;
+  try {
+    await authModule.sendPasswordResetEmail(auth, cleanEmail);
+    return { email: cleanEmail };
+  } catch (error) {
+    throw new Error(formatAuthError(error));
+  }
+}
+
+/**
+ * Cierra la sesión actual de Firebase Auth.
+ */
+export async function signOutAdmin() {
+  try {
+    const bundle = await getFirebaseAuth();
+    if (bundle) {
+      await bundle.authModule.signOut(bundle.auth);
+    }
+  } catch (error) {
+    console.warn('[Reto al Filo] Error cerrando sesión:', error?.code || error?.message);
+  }
 }
