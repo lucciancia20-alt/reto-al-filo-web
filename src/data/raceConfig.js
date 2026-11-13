@@ -157,11 +157,11 @@ export const RACE_CONFIG = {
     {
       id: 'demo-6',
       cloudinaryUrl:
-        'https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=1400&q=85',
+        'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?auto=format&fit=crop&w=1400&q=85',
       cloudinaryThumb:
-        'https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?auto=format&fit=crop&w=800&q=80',
       dorsales: ['302'],
-      sector: 'Llegada Arco Principal · Meta',
+      sector: 'Sendero de Montaña · Postales',
       edicion: 1,
       timestamp: 1712749800000,
       visible: true,

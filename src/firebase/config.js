@@ -316,9 +316,9 @@ export async function resetLiveRaceConfig() {
 }
 
 /**
- * Publica una nueva fotografía etiquetada por dorsales en la colección `photos` de Firestore.
+ * Publica una nueva fotografía de muestra en la colección `photos` de Firestore.
  */
-export async function addPhotoToFirestore({ cloudinaryUrl, dorsales, sector, edicion = 1 }) {
+export async function addPhotoToFirestore({ cloudinaryUrl, dorsales = [], sector, edicion = 1 }) {
   if (!isFirebaseConfigured()) {
     throw new Error('Firebase no está configurado en las variables de entorno.');
   }
@@ -335,8 +335,8 @@ export async function addPhotoToFirestore({ cloudinaryUrl, dorsales, sector, edi
         .map((d) => d.trim().replace(/^#/, ''))
         .filter(Boolean);
 
-  if (!cloudinaryUrl || cleanDorsales.length === 0) {
-    throw new Error('Ingresá la URL de la foto y al menos un número de dorsal.');
+  if (!cloudinaryUrl) {
+    throw new Error('Elegí una imagen o ingresá la URL de la foto.');
   }
 
   const { db, firestore } = bundle;
@@ -348,18 +348,113 @@ export async function addPhotoToFirestore({ cloudinaryUrl, dorsales, sector, edi
     cloudinaryUrl: fullUrl,
     cloudinaryThumb: thumbUrl,
     dorsales: cleanDorsales,
-    sector: sector?.trim() || 'Circuito Reto al Filo',
+    sector: sector?.trim() || 'Postales · 1ra Edición',
     edicion: Number(edicion) || 1,
     timestamp: Date.now(),
     visible: true,
   });
 
-  // Limpiar caché de búsquedas para que los dorsales nuevos aparezcan inmediatamente
+  // Limpiar caché de búsquedas y avisar a la galería en vivo
   for (const bib of cleanDorsales) {
     bibQueryCache.delete(`${Number(edicion) || 1}:${bib}`);
   }
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('reto-gallery-updated'));
+  }
 
   return { id: docRef.id, dorsales: cleanDorsales };
+}
+
+/**
+ * Obtiene las fotos de la galería desde Firestore (`photos`), ordenadas de la más reciente
+ * a la más antigua. Si aún no se subieron fotos propias, devuelve las postales demo locales.
+ */
+export async function fetchGalleryPhotos() {
+  const demoPhotos = filterDemoPhotos('', 1);
+
+  if (!isFirebaseConfigured()) {
+    return {
+      photos: demoPhotos,
+      customCount: 0,
+      source: 'demo-showcase',
+      networkError: false,
+    };
+  }
+
+  try {
+    const bundle = await getFirestoreDb();
+    if (!bundle) {
+      return {
+        photos: demoPhotos,
+        customCount: 0,
+        source: 'demo-showcase',
+        networkError: false,
+      };
+    }
+
+    const { db, firestore } = bundle;
+    const { collection, getDocs } = firestore;
+    const snapshot = await getDocs(collection(db, 'photos'));
+
+    const firestorePhotos = snapshot.docs
+      .filter((docSnap) => docSnap.data()?.visible !== false)
+      .map((docSnap) => normalizePhotoRecord(docSnap.id, docSnap.data()))
+      .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+    if (firestorePhotos.length > 0) {
+      return {
+        photos: firestorePhotos,
+        customCount: firestorePhotos.length,
+        source: 'firestore',
+        networkError: false,
+      };
+    }
+
+    return {
+      photos: demoPhotos,
+      customCount: 0,
+      source: 'demo-showcase',
+      networkError: false,
+    };
+  } catch (error) {
+    console.warn(
+      '[Reto al Filo] Fallback a postales demo locales:',
+      error?.code || error?.message
+    );
+    return {
+      photos: demoPhotos,
+      customCount: 0,
+      source: 'demo-fallback',
+      networkError: true,
+    };
+  }
+}
+
+/**
+ * Elimina una fotografía publicada en la colección `photos` de Firestore.
+ */
+export async function deletePhotoFromFirestore(photoId) {
+  if (!photoId) {
+    throw new Error('ID de fotografía inválido.');
+  }
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase no está configurado en las variables de entorno.');
+  }
+
+  const bundle = await getFirestoreDb();
+  if (!bundle) {
+    throw new Error('No se pudo inicializar Firestore.');
+  }
+
+  const { db, firestore } = bundle;
+  const { doc, deleteDoc } = firestore;
+  await deleteDoc(doc(db, 'photos', photoId));
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('reto-gallery-updated'));
+  }
+
+  return { ok: true, id: photoId };
 }
 
 /**

@@ -28,6 +28,8 @@ import {
 import { GPX_TRACKS, interpolatePointAtKm, parseGpxXml } from '../data/gpxTracks';
 import {
   addPhotoToFirestore,
+  fetchGalleryPhotos,
+  deletePhotoFromFirestore,
   uploadImageToCloudinary,
   subscribeToAdminAuth,
   signInAdminWithGoogle,
@@ -71,17 +73,19 @@ export default function AdminModal({
   const [saveFeedback, setSaveFeedback] = useState(null);
   const [gpxStatus, setGpxStatus] = useState('');
 
-  // Estado para carga de nuevas fotos por dorsal en Cloudinary + Firestore
-  const [photoFile, setPhotoFile] = useState(null);
-  const [photoPreview, setPhotoPreview] = useState('');
+  // Estado para carga de fotos de muestra (1ra Edición) en Cloudinary + Firestore
+  const [photoFiles, setPhotoFiles] = useState([]);
+  const [photoPreviews, setPhotoPreviews] = useState([]);
   const [photoUrl, setPhotoUrl] = useState('');
   const [uploadPreset, setUploadPreset] = useState(DEFAULT_UPLOAD_PRESET);
-  const [photoBibs, setPhotoBibs] = useState('');
   const [photoSector, setPhotoSector] = useState('');
-  const [photoEdition, setPhotoEdition] = useState(1);
   const [photoStatus, setPhotoStatus] = useState(null);
   const [photoStepMessage, setPhotoStepMessage] = useState('');
   const [photoSubmitting, setPhotoSubmitting] = useState(false);
+  const [galleryItems, setGalleryItems] = useState([]);
+  const [galleryCustomCount, setGalleryCustomCount] = useState(0);
+  const [galleryLoading, setGalleryLoading] = useState(false);
+  const [photoBusyId, setPhotoBusyId] = useState('');
 
   // Estado para gestión de corredores inscriptos
   const [registrations, setRegistrations] = useState([]);
@@ -170,13 +174,34 @@ export default function AdminModal({
     });
   }, [registrations, regSearch, regDistanceFilter, regStatusFilter]);
 
+  const loadGalleryItems = async () => {
+    setGalleryLoading(true);
+    try {
+      const res = await fetchGalleryPhotos();
+      setGalleryItems(res.photos || []);
+      setGalleryCustomCount(res.customCount || 0);
+    } catch {
+      // Ignorar fallos silenciosos
+    } finally {
+      setGalleryLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && unlocked && activeTab === 'photos') {
+      loadGalleryItems();
+    }
+  }, [isOpen, unlocked, activeTab]);
+
   useEffect(() => {
     return () => {
-      if (photoPreview) {
-        URL.revokeObjectURL(photoPreview);
+      for (const item of photoPreviews) {
+        if (item?.url) {
+          URL.revokeObjectURL(item.url);
+        }
       }
     };
-  }, [photoPreview]);
+  }, [photoPreviews]);
 
   useEffect(() => {
     if (isOpen) {
@@ -632,14 +657,24 @@ export default function AdminModal({
     });
   };
 
-  const handleSelectPhotoFile = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (photoPreview) {
-      URL.revokeObjectURL(photoPreview);
+  const handleClearSelectedPhotos = () => {
+    for (const item of photoPreviews) {
+      if (item?.url) URL.revokeObjectURL(item.url);
     }
-    setPhotoFile(file);
-    setPhotoPreview(URL.createObjectURL(file));
+    setPhotoFiles([]);
+    setPhotoPreviews([]);
+  };
+
+  const handleSelectPhotoFiles = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    handleClearSelectedPhotos();
+    const previews = files.map((file) => ({
+      name: file.name,
+      url: URL.createObjectURL(file),
+    }));
+    setPhotoFiles(files);
+    setPhotoPreviews(previews);
     setPhotoStatus(null);
   };
 
@@ -650,43 +685,61 @@ export default function AdminModal({
     setPhotoStepMessage('');
 
     try {
-      let finalUrl = photoUrl.trim();
+      const sectorText = photoSector.trim();
 
-      if (photoFile) {
-        setPhotoStepMessage(
-          `Subiendo imagen a Cloudinary (${DEFAULT_CLOUD_NAME || 'nube configurada'})...`
-        );
-        const uploaded = await uploadImageToCloudinary(photoFile, {
-          cloudName: DEFAULT_CLOUD_NAME,
-          uploadPreset,
+      if (photoFiles.length > 0) {
+        for (let i = 0; i < photoFiles.length; i += 1) {
+          const file = photoFiles[i];
+          setPhotoStepMessage(
+            `Subiendo foto ${i + 1} de ${photoFiles.length} a Cloudinary (${DEFAULT_CLOUD_NAME || 'nube configurada'})...`
+          );
+          const uploaded = await uploadImageToCloudinary(file, {
+            cloudName: DEFAULT_CLOUD_NAME,
+            uploadPreset,
+            folder: 'reto-al-filo/galeria',
+            resourceType: 'image',
+          });
+          setPhotoStepMessage(
+            `Publicando foto ${i + 1} de ${photoFiles.length} en Firestore...`
+          );
+          await addPhotoToFirestore({
+            cloudinaryUrl: uploaded.secureUrl,
+            sector: sectorText,
+            edicion: 1,
+          });
+        }
+
+        const totalUploaded = photoFiles.length;
+        handleClearSelectedPhotos();
+        setPhotoSector('');
+        await loadGalleryItems();
+        setPhotoStatus({
+          type: 'success',
+          message: `¡${totalUploaded} ${totalUploaded === 1 ? 'foto subida y publicada' : 'fotos subidas y publicadas'} en la Galería de 1ra Edición!`,
         });
-        finalUrl = uploaded.secureUrl;
-      }
+      } else {
+        const finalUrl = photoUrl.trim();
+        if (!finalUrl) {
+          throw new Error(
+            'Elegí al menos una foto de tu dispositivo o pegá una URL de Cloudinary.'
+          );
+        }
 
-      if (!finalUrl) {
-        throw new Error('Elegí una foto de tu dispositivo o pegá una URL de Cloudinary.');
-      }
+        setPhotoStepMessage('Publicando foto en Firestore...');
+        await addPhotoToFirestore({
+          cloudinaryUrl: finalUrl,
+          sector: sectorText,
+          edicion: 1,
+        });
 
-      setPhotoStepMessage('Guardando dorsal en Firestore...');
-      const res = await addPhotoToFirestore({
-        cloudinaryUrl: finalUrl,
-        dorsales: photoBibs,
-        sector: photoSector,
-        edicion: Number(photoEdition),
-      });
-
-      setPhotoStatus({
-        type: 'success',
-        message: `¡Foto subida y publicada! (ID: ${res.id}) · Dorsales: #${res.dorsales.join(', #')}`,
-      });
-      setPhotoFile(null);
-      if (photoPreview) {
-        URL.revokeObjectURL(photoPreview);
+        setPhotoUrl('');
+        setPhotoSector('');
+        await loadGalleryItems();
+        setPhotoStatus({
+          type: 'success',
+          message: '¡Foto publicada en la Galería de 1ra Edición!',
+        });
       }
-      setPhotoPreview('');
-      setPhotoUrl('');
-      setPhotoBibs('');
-      setPhotoSector('');
     } catch (err) {
       setPhotoStatus({
         type: 'error',
@@ -695,6 +748,27 @@ export default function AdminModal({
     } finally {
       setPhotoStepMessage('');
       setPhotoSubmitting(false);
+    }
+  };
+
+  const handleDeleteGalleryPhoto = async (photo) => {
+    if (!window.confirm('¿Quitar esta foto de la galería pública?')) return;
+    setPhotoBusyId(photo.id);
+    setPhotoStatus(null);
+    try {
+      await deletePhotoFromFirestore(photo.id);
+      await loadGalleryItems();
+      setPhotoStatus({
+        type: 'success',
+        message: 'Foto eliminada de la galería pública.',
+      });
+    } catch (err) {
+      setPhotoStatus({
+        type: 'error',
+        message: err?.message || 'No se pudo eliminar la foto.',
+      });
+    } finally {
+      setPhotoBusyId('');
     }
   };
 
@@ -1001,7 +1075,7 @@ export default function AdminModal({
                 { id: 'general', label: 'General & Pagos', icon: MapPin },
                 { id: 'circuits', label: 'Circuitos & GPX', icon: Droplets },
                 { id: 'schedule_faq', label: 'Horarios & FAQ', icon: Clock },
-                { id: 'photos', label: 'Fotos por Dorsal', icon: Camera },
+                { id: 'photos', label: 'Galería 1ra Edición', icon: Camera },
                 { id: 'registrations', label: 'Inscriptos', icon: Users },
               ].map((tab) => {
                 const Icon = tab.icon;
@@ -1485,167 +1559,209 @@ export default function AdminModal({
               )}
 
               {activeTab === 'photos' && (
-                <form
-                  id="admin-photo-form"
-                  onSubmit={handleAddPhoto}
-                  className="rounded-2xl bg-stone-950 border border-stone-800 p-5 space-y-4"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                      <h4 className="font-display text-base font-bold text-white uppercase">
-                        Subir Foto Directa a Cloudinary + Firestore
-                      </h4>
-                      <p className="text-xs text-stone-400 mt-0.5">
-                        Elegí una imagen desde tu celular o PC (se sube a tu nube{' '}
-                        <span className="font-mono text-amber-300">
-                          {DEFAULT_CLOUD_NAME || 'no configurada'}
-                        </span>
-                        ) o pegá un link existente y etiquetá los dorsales.
-                      </p>
+                <div className="space-y-5">
+                  <form
+                    id="admin-photo-form"
+                    onSubmit={handleAddPhoto}
+                    className="rounded-2xl bg-stone-950 border border-stone-800 p-5 space-y-4"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div>
+                        <h4 className="font-display text-base font-bold text-white uppercase">
+                          Subir Fotos de Muestra · 1ra Edición
+                        </h4>
+                        <p className="text-xs text-stone-400 mt-0.5">
+                          Elegí una o varias fotos juntas desde tu celular o PC (se suben a tu nube{' '}
+                          <span className="font-mono text-amber-300">
+                            {DEFAULT_CLOUD_NAME || 'no configurada'}
+                          </span>
+                          ). Apenas subas tu primera foto, reemplazará las de demostración.
+                        </p>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Selector de archivo local */}
-                  <div className="rounded-2xl border border-dashed border-stone-700 bg-stone-900/60 p-4 flex flex-col sm:flex-row items-center gap-4">
-                    {photoPreview ? (
-                      <img
-                        src={photoPreview}
-                        alt="Vista previa de foto seleccionada"
-                        className="w-24 h-24 rounded-xl object-cover border border-stone-700 shrink-0"
-                      />
-                    ) : (
-                      <div className="w-24 h-24 rounded-xl bg-stone-950 border border-stone-800 flex items-center justify-center text-stone-500 shrink-0">
-                        <Camera className="w-8 h-8" />
+                    {/* Selector de uno o múltiples archivos */}
+                    <div className="rounded-2xl border border-dashed border-stone-700 bg-stone-900/60 p-4 space-y-4">
+                      {photoPreviews.length > 0 ? (
+                        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
+                          {photoPreviews.map((item, idx) => (
+                            <div
+                              key={`${item.name}-${idx}`}
+                              className="relative aspect-square rounded-xl overflow-hidden border border-stone-700 bg-stone-950"
+                            >
+                              <img
+                                src={item.url}
+                                alt={item.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center py-4 text-stone-500">
+                          <Camera className="w-9 h-9" />
+                        </div>
+                      )}
+
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                          <p className="text-xs font-semibold text-stone-200">
+                            {photoFiles.length > 0
+                              ? `${photoFiles.length} ${photoFiles.length === 1 ? 'foto lista para subir' : 'fotos listas para subir'}`
+                              : 'Seleccioná una o varias fotos (.jpg, .png, .webp) de paisajes o corredores'}
+                          </p>
+                          <p className="text-[11px] text-stone-400 mt-0.5">
+                            Se optimizan y guardan en la carpeta{' '}
+                            <span className="font-mono">reto-al-filo/galeria</span>.
+                          </p>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2 shrink-0">
+                          <label className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 cursor-pointer transition-colors">
+                            <Upload className="w-4 h-4" />
+                            {photoFiles.length > 0 ? 'Cambiar Fotos' : 'Elegir Fotos'}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              onChange={handleSelectPhotoFiles}
+                              className="hidden"
+                            />
+                          </label>
+                          {photoFiles.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={handleClearSelectedPhotos}
+                              className="text-xs text-stone-400 hover:text-stone-200 px-2 py-1.5 cursor-pointer"
+                            >
+                              Quitar todas
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      <div className="sm:col-span-2">
+                        <label className="block text-xs font-semibold text-stone-300 mb-1">
+                          Lugar o descripción breve (opcional)
+                        </label>
+                        <input
+                          type="text"
+                          value={photoSector}
+                          onChange={(e) => setPhotoSector(e.target.value)}
+                          placeholder="Ej. Cumbre Cerro Providencia · 1ra Edición"
+                          className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2.5 text-sm text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-stone-300 mb-1">
+                          Upload Preset (Unsigned en Cloudinary)
+                        </label>
+                        <input
+                          type="text"
+                          value={uploadPreset}
+                          onChange={(e) => setUploadPreset(e.target.value)}
+                          placeholder="reto_al_filo"
+                          className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2.5 text-sm font-mono text-amber-300"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-stone-300 mb-1">
+                          O pegar URL existente (opcional si subís archivo)
+                        </label>
+                        <input
+                          type="text"
+                          value={photoUrl}
+                          onChange={(e) => setPhotoUrl(e.target.value)}
+                          placeholder="https://res.cloudinary.com/..."
+                          className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2.5 text-sm text-white"
+                        />
+                      </div>
+                    </div>
+
+                    {photoStepMessage && (
+                      <div className="p-3 rounded-xl text-xs bg-amber-500/15 text-amber-200 border border-amber-500/30">
+                        {photoStepMessage}
                       </div>
                     )}
 
-                    <div className="flex-1 text-center sm:text-left">
-                      <p className="text-xs font-semibold text-stone-200">
-                        {photoFile
-                          ? `Archivo seleccionado: ${photoFile.name}`
-                          : 'Seleccioná una foto (.jpg, .png, .webp) desde tu dispositivo'}
-                      </p>
-                      <p className="text-[11px] text-stone-400 mt-0.5">
-                        Se optimiza y almacena automáticamente en la carpeta{' '}
-                        <span className="font-mono">reto-al-filo</span>.
-                      </p>
-
-                      <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                        <label className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2 cursor-pointer transition-colors">
-                          <Upload className="w-4 h-4" />
-                          {photoFile ? 'Cambiar Foto' : 'Elegir Foto del Celular/PC'}
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleSelectPhotoFile}
-                            className="hidden"
-                          />
-                        </label>
-                        {photoFile && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (photoPreview) URL.revokeObjectURL(photoPreview);
-                              setPhotoFile(null);
-                              setPhotoPreview('');
-                            }}
-                            className="text-xs text-stone-400 hover:text-stone-200 px-2 py-1 cursor-pointer"
-                          >
-                            Quitar archivo
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        Upload Preset (Unsigned en Cloudinary)
-                      </label>
-                      <input
-                        type="text"
-                        value={uploadPreset}
-                        onChange={(e) => setUploadPreset(e.target.value)}
-                        placeholder="reto_al_filo"
-                        className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2.5 text-sm font-mono text-amber-300"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        O pegar URL existente (opcional si subís archivo)
-                      </label>
-                      <input
-                        type="text"
-                        value={photoUrl}
-                        onChange={(e) => setPhotoUrl(e.target.value)}
-                        placeholder="https://res.cloudinary.com/..."
-                        className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2.5 text-sm text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        Números de Dorsal (separados por coma)
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={photoBibs}
-                        onChange={(e) => setPhotoBibs(e.target.value)}
-                        placeholder="101, 205"
-                        className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2.5 text-sm font-mono text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        Sector del Circuito
-                      </label>
-                      <input
-                        type="text"
-                        value={photoSector}
-                        onChange={(e) => setPhotoSector(e.target.value)}
-                        placeholder="Cumbre El Filo · KM 12"
-                        className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2.5 text-sm text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        Edición
-                      </label>
-                      <select
-                        value={photoEdition}
-                        onChange={(e) => setPhotoEdition(Number(e.target.value))}
-                        className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2.5 text-sm text-white"
+                    {photoStatus && (
+                      <div
+                        className={`p-3 rounded-xl text-xs flex items-start gap-2 ${
+                          photoStatus.type === 'success'
+                            ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                            : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
+                        }`}
                       >
-                        <option value={1}>1ra Edición (2026)</option>
-                        <option value={2}>2da Edición (Abril 2027)</option>
-                      </select>
+                        {photoStatus.type === 'success' ? (
+                          <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+                        ) : (
+                          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                        )}
+                        <span>{photoStatus.message}</span>
+                      </div>
+                    )}
+                  </form>
+
+                  {/* Fotos publicadas en la galería */}
+                  <div className="rounded-2xl bg-stone-950 border border-stone-800 p-4 space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <h4 className="font-display text-sm font-bold text-white uppercase">
+                          Postales publicadas actualmente ({galleryCustomCount > 0 ? galleryCustomCount : '6 de muestra'})
+                        </h4>
+                        <p className="text-[11px] text-stone-400">
+                          {galleryCustomCount > 0
+                            ? 'Estas son tus fotos cargadas en Firestore visibles en la web.'
+                            : 'Todavía no subiste fotos propias. Mientras tanto la web muestra las 6 postales iniciales de demostración.'}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={loadGalleryItems}
+                        disabled={galleryLoading}
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-xs font-semibold px-3 py-1.5 cursor-pointer"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${galleryLoading ? 'animate-spin' : ''}`} />
+                        Actualizar
+                      </button>
                     </div>
+
+                    {galleryCustomCount > 0 && (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {galleryItems.map((item) => (
+                          <div
+                            key={item.id}
+                            className="rounded-xl overflow-hidden bg-stone-900 border border-stone-800 flex flex-col"
+                          >
+                            <div className="aspect-[4/3] bg-stone-950 overflow-hidden">
+                              <img
+                                src={item.cloudinaryThumb}
+                                alt={item.sector}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="p-2.5 flex items-center justify-between gap-2">
+                              <span className="text-[11px] text-stone-200 truncate">
+                                {item.sector}
+                              </span>
+                              <button
+                                type="button"
+                                disabled={photoBusyId === item.id}
+                                onClick={() => handleDeleteGalleryPhoto(item)}
+                                aria-label={`Eliminar postal ${item.sector}`}
+                                className="p-1.5 rounded-lg text-stone-400 hover:text-rose-400 hover:bg-stone-800 cursor-pointer shrink-0 disabled:opacity-40"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-
-                  {photoStepMessage && (
-                    <div className="p-3 rounded-xl text-xs bg-amber-500/15 text-amber-200 border border-amber-500/30">
-                      {photoStepMessage}
-                    </div>
-                  )}
-
-                  {photoStatus && (
-                    <div
-                      className={`p-3 rounded-xl text-xs flex items-start gap-2 ${
-                        photoStatus.type === 'success'
-                          ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                          : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
-                      }`}
-                    >
-                      {photoStatus.type === 'success' ? (
-                        <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
-                      ) : (
-                        <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                      )}
-                      <span>{photoStatus.message}</span>
-                    </div>
-                  )}
-                </form>
+                </div>
               )}
 
               {activeTab === 'registrations' && (
@@ -1976,7 +2092,11 @@ export default function AdminModal({
                     className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
                   >
                     <Camera className="w-4 h-4" />
-                    {photoSubmitting ? 'Subiendo y publicando...' : 'Subir y Publicar Foto'}
+                    {photoSubmitting
+                      ? 'Subiendo y publicando...'
+                      : photoFiles.length > 1
+                        ? `Subir y Publicar (${photoFiles.length})`
+                        : 'Subir y Publicar'}
                   </button>
                 </>
               ) : activeTab === 'registrations' ? (
