@@ -1,6 +1,7 @@
 import { RACE_CONFIG, mergeRaceConfig } from '../data/raceConfig';
 
 const LOCAL_CONFIG_STORAGE_KEY = 'reto_al_filo_config_v1';
+const LOCAL_REGISTRATIONS_STORAGE_KEY = 'reto_al_filo_registrations_v1';
 
 /**
  * Configuración de Firebase leída desde variables de entorno de Vite (.env.local).
@@ -362,11 +363,15 @@ export async function addPhotoToFirestore({ cloudinaryUrl, dorsales, sector, edi
 }
 
 /**
- * Sube una imagen directamente desde el navegador a Cloudinary usando un Upload Preset sin firma (Unsigned).
+ * Sube una imagen o comprobante (imagen o PDF) directamente desde el navegador a Cloudinary
+ * usando un Upload Preset sin firma (Unsigned).
  */
-export async function uploadImageToCloudinary(file, { cloudName, uploadPreset } = {}) {
+export async function uploadImageToCloudinary(
+  file,
+  { cloudName, uploadPreset, folder = 'reto-al-filo', resourceType = 'auto' } = {}
+) {
   if (!file) {
-    throw new Error('Seleccioná un archivo de imagen para subir.');
+    throw new Error('Seleccioná un archivo para subir.');
   }
 
   const targetCloud = (
@@ -389,10 +394,11 @@ export async function uploadImageToCloudinary(file, { cloudName, uploadPreset } 
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', targetPreset);
-  formData.append('folder', 'reto-al-filo');
+  formData.append('folder', folder || 'reto-al-filo');
 
+  const safeResourceType = encodeURIComponent(resourceType || 'auto');
   const response = await fetch(
-    `https://api.cloudinary.com/v1_1/${encodeURIComponent(targetCloud)}/image/upload`,
+    `https://api.cloudinary.com/v1_1/${encodeURIComponent(targetCloud)}/${safeResourceType}/upload`,
     {
       method: 'POST',
       body: formData,
@@ -413,7 +419,217 @@ export async function uploadImageToCloudinary(file, { cloudName, uploadPreset } 
   return {
     secureUrl: payload.secure_url,
     publicId: payload.public_id,
+    resourceType: payload.resource_type,
+    format: payload.format,
   };
+}
+
+function readLocalRegistrations() {
+  try {
+    const raw = window.localStorage.getItem(LOCAL_REGISTRATIONS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalRegistrations(list) {
+  try {
+    window.localStorage.setItem(LOCAL_REGISTRATIONS_STORAGE_KEY, JSON.stringify(list));
+  } catch {
+    // Ignorar errores de almacenamiento local
+  }
+}
+
+function generateRegistrationCode() {
+  const randomDigits = Math.floor(10000 + Math.random() * 90000);
+  return `RAF-${randomDigits}`;
+}
+
+/**
+ * Registra la inscripción de un corredor junto con el link del comprobante subido.
+ */
+export async function submitRunnerRegistration(payload) {
+  const requiredFields = [
+    ['fullName', 'Nombre y Apellido'],
+    ['dni', 'DNI'],
+    ['birthDate', 'Fecha de Nacimiento'],
+    ['phone', 'Celular / WhatsApp'],
+    ['email', 'Email'],
+    ['city', 'Localidad / Provincia'],
+    ['emergencyContactName', 'Nombre del contacto de emergencia'],
+    ['emergencyContactPhone', 'Teléfono del contacto de emergencia'],
+    ['receiptUrl', 'Comprobante de transferencia'],
+  ];
+
+  for (const [key, label] of requiredFields) {
+    if (!String(payload?.[key] || '').trim()) {
+      throw new Error(`Completá el campo obligatorio: ${label}.`);
+    }
+  }
+
+  const now = Date.now();
+  const record = {
+    code: generateRegistrationCode(),
+    distance: payload.distance === '10K' ? '10K' : '21K',
+    priceSnapshot: String(payload.priceSnapshot || '').trim(),
+    fullName: String(payload.fullName).trim(),
+    dni: String(payload.dni).trim(),
+    birthDate: String(payload.birthDate).trim(),
+    gender: String(payload.gender || 'No especificado').trim(),
+    phone: String(payload.phone).trim(),
+    email: String(payload.email).trim().toLowerCase(),
+    city: String(payload.city).trim(),
+    team: String(payload.team || '').trim(),
+    shirtSize: String(payload.shirtSize || 'M').trim(),
+    emergencyContactName: String(payload.emergencyContactName).trim(),
+    emergencyContactPhone: String(payload.emergencyContactPhone).trim(),
+    medicalNotes: String(payload.medicalNotes || '').trim(),
+    receiptUrl: String(payload.receiptUrl).trim(),
+    receiptPublicId: String(payload.receiptPublicId || '').trim(),
+    receiptFormat: String(payload.receiptFormat || '').trim(),
+    status: 'pendiente',
+    assignedBib: '',
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  let persistedId = `local-${now}`;
+  let persistedTo = 'local-only';
+  let errorCode = '';
+
+  if (isFirebaseConfigured()) {
+    try {
+      const bundle = await getFirestoreDb();
+      if (bundle) {
+        const { db, firestore } = bundle;
+        const { collection, addDoc } = firestore;
+        const docRef = await addDoc(collection(db, 'registrations'), record);
+        persistedId = docRef.id;
+        persistedTo = 'firestore';
+      }
+    } catch (error) {
+      errorCode = error?.code || 'unknown';
+      console.warn('[Reto al Filo] Error guardando inscripción en Firestore:', errorCode);
+    }
+  }
+
+  const savedRecord = { id: persistedId, ...record };
+  const localList = readLocalRegistrations();
+  writeLocalRegistrations([savedRecord, ...localList]);
+
+  return {
+    ...savedRecord,
+    persistedTo,
+    errorCode,
+  };
+}
+
+/**
+ * Obtiene las inscripciones registradas desde Firestore ordenadas de la más reciente a la más antigua.
+ */
+export async function fetchRegistrations() {
+  const localList = readLocalRegistrations().sort(
+    (a, b) => (b.createdAt || 0) - (a.createdAt || 0)
+  );
+
+  if (!isFirebaseConfigured()) {
+    return { registrations: localList, source: 'local' };
+  }
+
+  try {
+    const bundle = await getFirestoreDb();
+    if (!bundle) {
+      return { registrations: localList, source: 'local' };
+    }
+
+    const { db, firestore } = bundle;
+    const { collection, getDocs } = firestore;
+    const snapshot = await getDocs(collection(db, 'registrations'));
+
+    const remoteList = snapshot.docs
+      .map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }))
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+    writeLocalRegistrations(remoteList);
+    return { registrations: remoteList, source: 'firestore' };
+  } catch (error) {
+    console.warn(
+      '[Reto al Filo] No se pudieron leer inscripciones de Firestore:',
+      error?.code || error?.message
+    );
+    return {
+      registrations: localList,
+      source: 'local',
+      errorCode: error?.code || 'unknown',
+    };
+  }
+}
+
+/**
+ * Actualiza el estado o el número de dorsal asignado de una inscripción.
+ */
+export async function updateRegistrationStatus(registrationId, updates) {
+  if (!registrationId) {
+    throw new Error('ID de inscripción inválido.');
+  }
+
+  const cleanUpdates = {
+    ...updates,
+    updatedAt: Date.now(),
+  };
+
+  if (
+    isFirebaseConfigured() &&
+    !String(registrationId).startsWith('local-')
+  ) {
+    const bundle = await getFirestoreDb();
+    if (bundle) {
+      const { db, firestore } = bundle;
+      const { doc, setDoc } = firestore;
+      await setDoc(doc(db, 'registrations', registrationId), cleanUpdates, {
+        merge: true,
+      });
+    }
+  }
+
+  const localList = readLocalRegistrations().map((item) =>
+    item.id === registrationId ? { ...item, ...cleanUpdates } : item
+  );
+  writeLocalRegistrations(localList);
+
+  return { ok: true, id: registrationId, updates: cleanUpdates };
+}
+
+/**
+ * Elimina un registro de inscripción desde el Panel Admin.
+ */
+export async function deleteRegistrationRecord(registrationId) {
+  if (!registrationId) {
+    throw new Error('ID de inscripción inválido.');
+  }
+
+  if (
+    isFirebaseConfigured() &&
+    !String(registrationId).startsWith('local-')
+  ) {
+    const bundle = await getFirestoreDb();
+    if (bundle) {
+      const { db, firestore } = bundle;
+      const { doc, deleteDoc } = firestore;
+      await deleteDoc(doc(db, 'registrations', registrationId));
+    }
+  }
+
+  const localList = readLocalRegistrations().filter((item) => item.id !== registrationId);
+  writeLocalRegistrations(localList);
+
+  return { ok: true, id: registrationId };
 }
 
 /**

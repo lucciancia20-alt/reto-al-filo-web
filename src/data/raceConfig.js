@@ -8,11 +8,21 @@ export const RACE_CONFIG = {
   googleMapsUrl: 'https://maps.google.com/?q=-38.079253,-61.965131',
   locationName: 'Base del Cerro Providencia — Tornquist Buenos Aires',
 
+  payment: {
+    bankAlias: 'RETO.AL.FILO',
+    bankCbu: '0000003100000000000000',
+    bankHolder: 'Organización Reto al Filo',
+    bankEntity: 'Mercado Pago / Banco Provincia',
+    instructions:
+      'Transferí el valor correspondiente a tu distancia y adjuntá la captura o foto del comprobante en este formulario para confirmar tu inscripción.',
+  },
+
   circuits: {
     '21K': {
       id: '21K',
       tabLabel: '21K Competitivo',
       distanceLabel: '21K',
+      price: '$45.000',
       elevationGain: '+1.532 m',
       hydrationCount: 4,
       cutoffTime: '5 hs',
@@ -47,6 +57,7 @@ export const RACE_CONFIG = {
       id: '10K',
       tabLabel: '10K Montaña',
       distanceLabel: '10K',
+      price: '$32.000',
       elevationGain: '+666 m',
       hydrationCount: 2,
       cutoffTime: '3 hs',
@@ -246,6 +257,10 @@ export function mergeRaceConfig(override) {
   return {
     ...RACE_CONFIG,
     ...override,
+    payment: {
+      ...RACE_CONFIG.payment,
+      ...(override.payment && typeof override.payment === 'object' ? override.payment : {}),
+    },
     circuits: {
       '21K': mergeCircuit('21K'),
       '10K': mergeCircuit('10K'),
