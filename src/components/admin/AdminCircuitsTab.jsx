@@ -79,10 +79,10 @@ export default function AdminCircuitsTab({
             Descripción del Circuito
           </label>
           <ResizableTextarea
-            rows={2}
+            rows={1}
             value={activeCircuitDraft.description}
             onChange={(e) => onUpdateCircuitField(editDistance, 'description', e.target.value)}
-            className={`rounded-xl bg-stone-950 ${circuitInputBorderClass} px-3 pt-2 text-sm text-white`}
+            className={`rounded-xl bg-stone-950 ${circuitInputBorderClass} px-3 py-2 text-sm text-white`}
           />
         </div>
       </div>

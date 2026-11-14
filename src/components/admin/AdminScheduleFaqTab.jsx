@@ -76,10 +76,10 @@ export default function AdminScheduleFaqTab({
                 </button>
               </div>
               <ResizableTextarea
-                rows={2}
+                rows={1}
                 value={item.description}
                 onChange={(e) => onScheduleChange(idx, 'description', e.target.value)}
-                className="rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 pt-1.5 text-xs text-stone-200"
+                className="rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-2 text-xs text-stone-200"
               />
             </div>
           ))}
@@ -103,10 +103,10 @@ export default function AdminScheduleFaqTab({
                 className="w-full rounded-lg bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-bold text-white"
               />
               <ResizableTextarea
-                rows={3}
+                rows={1}
                 value={faq.answer}
                 onChange={(e) => onFaqChange(idx, 'answer', e.target.value)}
-                className="rounded-lg bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 pt-1.5 text-xs text-stone-300"
+                className="rounded-lg bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-xs text-stone-300"
               />
             </div>
           ))}

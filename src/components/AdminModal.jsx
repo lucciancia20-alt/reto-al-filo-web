@@ -203,11 +203,16 @@ export default function AdminModal({
 
   useEffect(() => {
     if (isOpen) {
-      setDraft(structuredClone(raceConfig));
       setSaveFeedback(null);
       setGpxStatus('');
       setAuthError('');
       setAuthInfo('');
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setDraft(structuredClone(raceConfig));
     }
   }, [isOpen, raceConfig]);
 
@@ -739,6 +744,9 @@ export default function AdminModal({
     };
     setDraft(syncedDraft);
     const res = await onSaveConfig(syncedDraft);
+    if (res?.config) {
+      setDraft(structuredClone(res.config));
+    }
     setSaving(false);
 
     if (res.persistedTo === 'firestore') {
@@ -1206,11 +1214,24 @@ export default function AdminModal({
                   <button
                     type="button"
                     onClick={handleSaveAll}
-                    disabled={saving}
-                    className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50"
+                    disabled={saving || !hasUnsavedChanges}
+                    className={`inline-flex items-center gap-2 rounded-xl font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 transition-colors ${
+                      hasUnsavedChanges || saving
+                        ? 'bg-amber-400 hover:bg-amber-300 text-black shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50'
+                        : 'bg-zinc-800 border border-zinc-700 text-zinc-500 cursor-default'
+                    }`}
                   >
-                    <Save className="w-4 h-4" />
-                    {saving ? 'Guardando...' : 'Guardar Cambios en Vivo'}
+                    {hasUnsavedChanges || saving ? (
+                      <>
+                        <Save className="w-4 h-4" />
+                        {saving ? 'Guardando...' : 'Guardar Cambios en Vivo'}
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-4 h-4" />
+                        Cambios Guardados ✓
+                      </>
+                    )}
                   </button>
                 </>
               )}

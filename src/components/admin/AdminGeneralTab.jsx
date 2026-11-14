@@ -293,7 +293,7 @@ export default function AdminGeneralTab({
               rows={1}
               value={draft.payment?.instructions || ''}
               onChange={(e) => onUpdatePaymentField('instructions', e.target.value)}
-              className="rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 pt-1.5 text-xs text-stone-200"
+              className="rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-xs text-stone-200"
             />
           </div>
         </div>
