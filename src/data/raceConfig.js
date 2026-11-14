@@ -172,6 +172,7 @@ export const RACE_CONFIG = {
 
   schedule: [
     {
+      day: 'Sábado 10',
       time: '06:00 hs',
       title: 'Acreditación y entrega de kits',
       description:
@@ -179,6 +180,7 @@ export const RACE_CONFIG = {
       tag: 'Carpa Central',
     },
     {
+      day: 'Sábado 10',
       time: '07:30 hs',
       title: 'Charla Técnica obligatoria',
       description:
@@ -186,6 +188,7 @@ export const RACE_CONFIG = {
       tag: 'Arco de Largada',
     },
     {
+      day: 'Sábado 10',
       time: '08:00 hs',
       title: 'Largada 27K y 13K',
       description:
@@ -193,6 +196,7 @@ export const RACE_CONFIG = {
       tag: 'Puntual',
     },
     {
+      day: 'Sábado 10',
       time: '13:30 hs',
       title: 'Premiación y Tercer Tiempo',
       description:
@@ -278,6 +282,7 @@ export function mergeRaceConfig(override) {
 
   const nextSchedule = Array.isArray(override.schedule)
     ? override.schedule.map((item) => ({
+        day: item?.day ?? 'Sábado 10',
         ...item,
         title: normalizeDistanceCopy(item?.title),
         description: normalizeDistanceCopy(item?.description),

@@ -60,9 +60,16 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
               />
 
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="font-mono text-sm sm:text-base font-extrabold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-lg">
-                  {item.time}
-                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  {item.day && (
+                    <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-orange-300 bg-orange-500/15 border border-orange-500/50 px-3 py-1 rounded-lg">
+                      {item.day}
+                    </span>
+                  )}
+                  <span className="font-mono text-sm sm:text-base font-extrabold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-lg">
+                    {item.time}
+                  </span>
+                </div>
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 bg-stone-950 px-2.5 py-1 rounded-md border border-orange-500/60">
                   {item.tag}
                 </span>

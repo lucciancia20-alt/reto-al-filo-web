@@ -575,7 +575,13 @@ export default function AdminModal({
       ...prev,
       schedule: [
         ...prev.schedule,
-        { time: '14:00 hs', title: 'Nuevo hito', tag: 'Predio', description: '' },
+        {
+          day: 'Sábado 10',
+          time: '14:00 hs',
+          title: 'Nuevo hito',
+          tag: 'Predio',
+          description: '',
+        },
       ],
     }));
   };
@@ -1416,7 +1422,7 @@ export default function AdminModal({
                         className="inline-flex items-center gap-1 rounded-xl bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-bold px-3 py-1.5 cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                        Agregar Horario
+                        Agregar Día y Horario
                       </button>
                     </div>
 
@@ -1429,24 +1435,35 @@ export default function AdminModal({
                           <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
                             <input
                               type="text"
+                              value={item.day ?? ''}
+                              onChange={(e) => handleScheduleChange(idx, 'day', e.target.value)}
+                              placeholder="Ej. Sábado 10"
+                              aria-label="Día del cronograma"
+                              className="sm:col-span-3 rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-semibold text-orange-300"
+                            />
+                            <input
+                              type="text"
                               value={item.time}
                               onChange={(e) => handleScheduleChange(idx, 'time', e.target.value)}
                               placeholder="06:00 hs"
-                              className="sm:col-span-3 rounded-lg bg-stone-900 border border-stone-700 px-3 py-1.5 text-xs font-mono text-amber-300"
+                              aria-label="Horario"
+                              className="sm:col-span-2 rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono text-amber-300"
                             />
                             <input
                               type="text"
                               value={item.title}
                               onChange={(e) => handleScheduleChange(idx, 'title', e.target.value)}
                               placeholder="Título"
-                              className="sm:col-span-5 rounded-lg bg-stone-900 border border-stone-700 px-3 py-1.5 text-xs font-bold text-white"
+                              aria-label="Título"
+                              className="sm:col-span-4 rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-bold text-white"
                             />
                             <input
                               type="text"
                               value={item.tag}
                               onChange={(e) => handleScheduleChange(idx, 'tag', e.target.value)}
                               placeholder="Lugar"
-                              className="sm:col-span-3 rounded-lg bg-stone-900 border border-stone-700 px-3 py-1.5 text-xs text-stone-300"
+                              aria-label="Lugar"
+                              className="sm:col-span-2 rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs text-stone-200"
                             />
                             <button
                               type="button"
@@ -1463,7 +1480,7 @@ export default function AdminModal({
                             onChange={(e) =>
                               handleScheduleChange(idx, 'description', e.target.value)
                             }
-                            className="w-full rounded-lg bg-stone-900 border border-stone-700 px-3 py-1.5 text-xs text-stone-300"
+                            className="w-full rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs text-stone-200"
                           />
                         </div>
                       ))}
