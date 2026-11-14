@@ -24,8 +24,8 @@ export default function AdminGeneralTab({
   };
 
   return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         <div>
           <label className="block text-xs font-semibold text-stone-300 mb-1">
             Título de la Carrera
@@ -34,7 +34,7 @@ export default function AdminGeneralTab({
             type="text"
             value={draft.title}
             onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
+            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm text-white"
           />
         </div>
         <div>
@@ -45,12 +45,12 @@ export default function AdminGeneralTab({
             type="text"
             value={draft.subtitle}
             onChange={(e) => setDraft({ ...draft, subtitle: e.target.value })}
-            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
+            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm text-white"
           />
         </div>
         <div>
           <label className="block text-xs font-semibold text-stone-300 mb-1">
-            Fecha y Hora de Largada (Argentina -03:00)
+            Fecha y Hora de Largada <span className="text-[11px] font-normal text-stone-400">(Sincronizado: {formattedTime})</span>
           </label>
           <div className="grid grid-cols-2 gap-2">
             <input
@@ -58,19 +58,16 @@ export default function AdminGeneralTab({
               aria-label="Fecha de largada"
               value={datePart}
               onChange={(e) => handleTargetDateChange(e.target.value, timePart)}
-              className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2.5 text-sm font-mono text-white [color-scheme:dark]"
+              className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-sm font-mono text-white [color-scheme:dark]"
             />
             <input
               type="time"
               aria-label="Hora de largada"
               value={timePart}
               onChange={(e) => handleTargetDateChange(datePart, e.target.value)}
-              className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2.5 text-sm font-mono text-white [color-scheme:dark]"
+              className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-sm font-mono text-white [color-scheme:dark]"
             />
           </div>
-          <p className="mt-1 text-[11px] text-stone-400">
-            Sincronizado automáticamente con la portada y &quot;Largada 27K y 13K&quot; ({formattedTime}).
-          </p>
         </div>
         <div>
           <label className="block text-xs font-semibold text-stone-300 mb-1">
@@ -81,10 +78,10 @@ export default function AdminGeneralTab({
             placeholder="5492915228310"
             value={draft.whatsappNumber ?? ''}
             onChange={(e) => setDraft({ ...draft, whatsappNumber: e.target.value })}
-            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono text-white"
           />
         </div>
-        <div className="sm:col-span-2">
+        <div>
           <label className="block text-xs font-semibold text-stone-300 mb-1">
             Email de Notificaciones
           </label>
@@ -93,11 +90,19 @@ export default function AdminGeneralTab({
             placeholder="lciancia1972@gmail.com"
             value={draft.notificationEmail ?? ''}
             onChange={(e) => setDraft({ ...draft, notificationEmail: e.target.value })}
-            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono text-white"
           />
-          <p className="mt-1 text-[11px] text-stone-400">
-            Recibe automáticamente un aviso por correo cada vez que un corredor completa la inscripción web.
-          </p>
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-stone-300 mb-1">
+            URL de Google Maps del Predio
+          </label>
+          <input
+            type="url"
+            value={draft.googleMapsUrl}
+            onChange={(e) => setDraft({ ...draft, googleMapsUrl: e.target.value })}
+            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono text-white"
+          />
         </div>
         <div className="sm:col-span-2">
           <label className="block text-xs font-semibold text-stone-300 mb-1">
@@ -107,24 +112,13 @@ export default function AdminGeneralTab({
             type="text"
             value={draft.locationName}
             onChange={(e) => setDraft({ ...draft, locationName: e.target.value })}
-            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
-          />
-        </div>
-        <div className="sm:col-span-2">
-          <label className="block text-xs font-semibold text-stone-300 mb-1">
-            URL de Google Maps del Predio
-          </label>
-          <input
-            type="url"
-            value={draft.googleMapsUrl}
-            onChange={(e) => setDraft({ ...draft, googleMapsUrl: e.target.value })}
-            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm text-white"
           />
         </div>
       </div>
 
       {/* Precios y Datos Bancarios de Inscripción */}
-      <div className="rounded-2xl bg-stone-950 border border-stone-800 p-4 space-y-4">
+      <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5">
         <div className="flex items-center gap-2">
           <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
           <div>
@@ -138,7 +132,7 @@ export default function AdminGeneralTab({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <div>
             <label className="block text-xs font-semibold text-stone-300 mb-1">
               Valor Inscripción <span className="text-cyan-400 font-bold">27K</span>
@@ -148,7 +142,7 @@ export default function AdminGeneralTab({
               value={draft.circuits?.['27K']?.price || ''}
               onChange={(e) => onUpdateCircuitField('27K', 'price', e.target.value)}
               placeholder="$45.000"
-              className="w-full rounded-xl bg-stone-900 border border-cyan-500 focus:border-cyan-400 focus:outline-none px-3.5 py-2 text-sm font-bold text-cyan-400"
+              className="w-full rounded-xl bg-stone-900 border border-cyan-500 focus:border-cyan-400 focus:outline-none px-3 py-1.5 text-sm font-bold text-cyan-400"
             />
           </div>
           <div>
@@ -160,7 +154,7 @@ export default function AdminGeneralTab({
               value={draft.circuits?.['13K']?.price || ''}
               onChange={(e) => onUpdateCircuitField('13K', 'price', e.target.value)}
               placeholder="$32.000"
-              className="w-full rounded-xl bg-stone-900 border border-red-500 focus:border-red-500 focus:outline-none px-3.5 py-2 text-sm font-bold text-red-500"
+              className="w-full rounded-xl bg-stone-900 border border-red-500 focus:border-red-500 focus:outline-none px-3 py-1.5 text-sm font-bold text-red-500"
             />
           </div>
           <div>
@@ -172,7 +166,7 @@ export default function AdminGeneralTab({
               value={draft.payment?.bankAlias || ''}
               onChange={(e) => onUpdatePaymentField('bankAlias', e.target.value)}
               placeholder="RETO.AL.FILO"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-mono text-amber-300"
+              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono text-amber-300"
             />
           </div>
           <div>
@@ -182,7 +176,7 @@ export default function AdminGeneralTab({
               value={draft.payment?.bankCbu || ''}
               onChange={(e) => onUpdatePaymentField('bankCbu', e.target.value)}
               placeholder="0000003100000000000000"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-mono text-white"
+              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono text-white"
             />
           </div>
           <div>
@@ -194,7 +188,7 @@ export default function AdminGeneralTab({
               value={draft.payment?.bankHolder || ''}
               onChange={(e) => onUpdatePaymentField('bankHolder', e.target.value)}
               placeholder="Organización Reto al Filo"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm text-white"
+              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm text-white"
             />
           </div>
           <div>
@@ -206,18 +200,18 @@ export default function AdminGeneralTab({
               value={draft.payment?.bankEntity || ''}
               onChange={(e) => onUpdatePaymentField('bankEntity', e.target.value)}
               placeholder="Mercado Pago / Banco Provincia"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm text-white"
+              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm text-white"
             />
           </div>
-          <div className="sm:col-span-2">
+          <div className="sm:col-span-3">
             <label className="block text-xs font-semibold text-stone-300 mb-1">
               Instrucciones para el Corredor
             </label>
             <textarea
-              rows={2}
+              rows={1}
               value={draft.payment?.instructions || ''}
               onChange={(e) => onUpdatePaymentField('instructions', e.target.value)}
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-xs text-stone-200"
+              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs text-stone-200"
             />
           </div>
         </div>

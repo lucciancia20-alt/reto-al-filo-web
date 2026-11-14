@@ -834,7 +834,7 @@ export default function AdminModal({
       onClick={handleSafeClose}
     >
       <div
-        className={`w-full max-w-5xl ${unlocked ? 'h-[88dvh] sm:h-[750px]' : 'h-auto'} max-h-[92dvh] rounded-3xl bg-stone-900 border border-stone-700 shadow-2xl flex flex-col overflow-hidden overscroll-contain text-stone-100`}
+        className={`w-full max-w-5xl ${unlocked ? 'h-[90dvh] sm:h-[780px]' : 'h-auto'} max-h-[90dvh] rounded-3xl bg-stone-900 border border-stone-700 shadow-2xl flex flex-col overflow-hidden overscroll-contain text-stone-100`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header del Modal */}
@@ -924,7 +924,7 @@ export default function AdminModal({
             </div>
 
             {/* Contenido scrolleable */}
-            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-5">
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:px-6 sm:py-4 space-y-4">
               {activeTab === 'general' && (
                 <AdminGeneralTab
                   draft={draft}
