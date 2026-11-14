@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   MessageCircle,
   ChevronDown,
+  Pencil,
 } from 'lucide-react';
 
 export default function AdminRegistrationsTab({
@@ -34,11 +35,34 @@ export default function AdminRegistrationsTab({
   buildRunnerWhatsappUrl,
 }) {
   const [expandedIds, setExpandedIds] = useState({});
+  const [editingBibIds, setEditingBibIds] = useState({});
 
   const toggleExpand = (id) => {
     setExpandedIds((prev) => ({
       ...prev,
       [id]: !prev[id],
+    }));
+  };
+
+  const startEditingBib = (id) => {
+    setEditingBibIds((prev) => ({
+      ...prev,
+      [id]: true,
+    }));
+    window.requestAnimationFrame(() => {
+      const input = document.getElementById(`bib-${id}`);
+      if (input) {
+        input.focus();
+        input.select?.();
+      }
+    });
+  };
+
+  const handleSaveOrConfirm = async (reg) => {
+    await onConfirmRegistration(reg);
+    setEditingBibIds((prev) => ({
+      ...prev,
+      [reg.id]: false,
     }));
   };
 
@@ -205,9 +229,11 @@ export default function AdminRegistrationsTab({
             const isExpanded = Boolean(expandedIds[reg.id]);
             const bibValue = bibDrafts[reg.id] ?? reg.assignedBib ?? '';
             const isConfirmed = reg.status === 'confirmado';
+            const isEditingBib = Boolean(editingBibIds[reg.id]);
+            const isBibLocked = isConfirmed && !isEditingBib;
             const savedBib = String(reg.assignedBib ?? '').trim();
             const currentBib = String(bibValue ?? '').trim();
-            const isAlreadySaved = isConfirmed && currentBib === savedBib;
+            const isAlreadySaved = isConfirmed && !isEditingBib && currentBib === savedBib;
             const statusBadgeClass =
               reg.status === 'confirmado'
                 ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
@@ -266,6 +292,8 @@ export default function AdminRegistrationsTab({
                         id={`bib-${reg.id}`}
                         type="text"
                         inputMode="numeric"
+                        readOnly={isBibLocked}
+                        disabled={isBibLocked}
                         aria-label={`Número de dorsal de ${reg.fullName}`}
                         value={bibValue}
                         onChange={(e) =>
@@ -275,14 +303,30 @@ export default function AdminRegistrationsTab({
                           }))
                         }
                         placeholder="Dorsal"
-                        className="w-16 rounded-lg bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2 py-1 text-xs font-mono text-white text-center"
+                        className={
+                          isBibLocked
+                            ? 'w-16 rounded-lg bg-stone-950 border border-orange-500/40 px-2 py-1 text-xs font-mono font-bold text-orange-400 text-center cursor-default'
+                            : 'w-16 rounded-lg bg-stone-900 border border-orange-500 focus:border-orange-400 focus:outline-none px-2 py-1 text-xs font-mono text-white text-center'
+                        }
                       />
+                      {isBibLocked && (
+                        <button
+                          type="button"
+                          disabled={isBusy}
+                          onClick={() => startEditingBib(reg.id)}
+                          aria-label={`Editar dorsal de ${reg.fullName}`}
+                          title="Editar dorsal"
+                          className="p-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 border border-orange-500/30 hover:border-orange-500/60 text-stone-400 hover:text-orange-400 transition-colors cursor-pointer disabled:opacity-40"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
 
                     <button
                       type="button"
                       disabled={isBusy || isAlreadySaved}
-                      onClick={() => onConfirmRegistration(reg)}
+                      onClick={() => handleSaveOrConfirm(reg)}
                       title={
                         isAlreadySaved
                           ? 'Inscripción confirmada y dorsal guardado'
