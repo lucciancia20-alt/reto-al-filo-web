@@ -247,10 +247,10 @@ export default function AdminRegistrationsTab({
                 className="rounded-xl bg-stone-950 border border-stone-800 hover:border-stone-700 transition-colors overflow-hidden"
               >
                 {/* Fila operativa compacta (1-2 renglones) */}
-                <div className="px-3 py-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                <div className="px-3 py-2.5 flex flex-wrap items-center justify-between gap-x-2.5 gap-y-2">
                   {/* Identificación rápida del corredor (estructura fija en 2 líneas) */}
-                  <div className="min-w-0 flex-1 space-y-1.5">
-                    <div className="flex items-center gap-2 min-w-0">
+                  <div className="min-w-[270px] flex-1 space-y-1.5">
+                    <div className="flex items-center gap-1.5 min-w-0">
                       <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-md bg-stone-900 border border-stone-700 text-amber-300 shrink-0">
                         {reg.code}
                       </span>
@@ -263,7 +263,10 @@ export default function AdminRegistrationsTab({
                       >
                         {reg.distance}
                       </span>
-                      <h4 className="text-sm font-normal text-white whitespace-nowrap truncate min-w-0">
+                      <h4
+                        title={reg.fullName}
+                        className="text-xs sm:text-[13px] font-medium text-white whitespace-nowrap truncate min-w-0"
+                      >
                         {reg.fullName}
                       </h4>
                     </div>
@@ -280,7 +283,7 @@ export default function AdminRegistrationsTab({
                   </div>
 
                   {/* Acciones operativas en línea */}
-                  <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                  <div className="flex flex-wrap items-center gap-1 shrink-0">
                     <div className="flex items-center gap-1">
                       <label
                         htmlFor={`bib-${reg.id}`}
@@ -305,8 +308,8 @@ export default function AdminRegistrationsTab({
                         placeholder="Dorsal"
                         className={
                           isBibLocked
-                            ? 'w-16 rounded-lg bg-stone-950 border border-orange-500/40 px-2 py-1 text-xs font-mono font-bold text-orange-400 text-center cursor-default'
-                            : 'w-16 rounded-lg bg-stone-900 border border-orange-500 focus:border-orange-400 focus:outline-none px-2 py-1 text-xs font-mono text-white text-center'
+                            ? 'w-14 rounded-lg bg-stone-950 border border-orange-500/40 px-1.5 py-1 text-xs font-mono font-bold text-orange-400 text-center cursor-default'
+                            : 'w-14 rounded-lg bg-stone-900 border border-orange-500 focus:border-orange-400 focus:outline-none px-1.5 py-1 text-xs font-mono text-white text-center'
                         }
                       />
                       {isBibLocked && (
@@ -334,7 +337,7 @@ export default function AdminRegistrationsTab({
                             ? 'Guardar nuevo número de dorsal'
                             : 'Guardar número de dorsal y confirmar inscripción'
                       }
-                      className={`inline-flex items-center gap-1 rounded-lg font-display font-black text-[11px] uppercase px-2.5 py-1.5 transition-colors ${
+                      className={`inline-flex items-center gap-1 rounded-lg font-display font-black text-[11px] uppercase px-2 py-1.5 transition-colors ${
                         isAlreadySaved
                           ? 'bg-white/10 text-white/40 border border-white/10 cursor-default'
                           : 'bg-emerald-500 hover:bg-emerald-400 text-stone-950 border border-emerald-400/50 cursor-pointer disabled:opacity-50'
@@ -356,7 +359,7 @@ export default function AdminRegistrationsTab({
                         target="_blank"
                         rel="noopener noreferrer"
                         title="Ver comprobante adjunto"
-                        className="inline-flex items-center gap-1 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/35 text-[11px] font-bold px-2.5 py-1.5"
+                        className="inline-flex items-center gap-1 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/35 text-[11px] font-bold px-2 py-1.5"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">Comprobante</span>
@@ -370,7 +373,7 @@ export default function AdminRegistrationsTab({
                         rel="noopener noreferrer"
                         title="Enviar confirmación por WhatsApp"
                         aria-label={`Enviar WhatsApp a ${reg.fullName}`}
-                        className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 text-[11px] font-bold px-2.5 py-1.5"
+                        className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 text-[11px] font-bold px-2 py-1.5"
                       >
                         <MessageCircle className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">WhatsApp</span>
