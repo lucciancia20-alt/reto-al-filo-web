@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   X,
   Lock,
@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Users,
   RefreshCw,
+  ChevronDown,
 } from 'lucide-react';
 import { GPX_TRACKS, parseGpxXml } from '../data/gpxTracks';
 import { syncScheduleWithTargetDate } from '../data/raceConfig';
@@ -256,6 +257,78 @@ export default function AdminModal({
       window.removeEventListener('keydown', onKey);
     };
   }, [isOpen, handleSafeClose]);
+
+  const scrollContainerRef = useRef(null);
+  const [canScrollMore, setCanScrollMore] = useState(false);
+
+  const checkScrollMore = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (!el) {
+      setCanScrollMore(false);
+      return;
+    }
+    const hasMore =
+      el.scrollHeight > el.clientHeight &&
+      el.scrollTop + el.clientHeight < el.scrollHeight - 20;
+    setCanScrollMore(hasMore);
+  }, []);
+
+  const handleScrollDown = () => {
+    scrollContainerRef.current?.scrollBy({ top: 320, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+    checkScrollMore();
+  }, [activeTab, checkScrollMore]);
+
+  useEffect(() => {
+    if (!isOpen || !unlocked) {
+      setCanScrollMore(false);
+      return undefined;
+    }
+    const el = scrollContainerRef.current;
+    if (!el) return undefined;
+
+    const rafId = window.requestAnimationFrame(checkScrollMore);
+    window.addEventListener('resize', checkScrollMore);
+
+    let resizeObserver;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(checkScrollMore);
+      resizeObserver.observe(el);
+    }
+
+    let mutationObserver;
+    if (typeof MutationObserver !== 'undefined') {
+      mutationObserver = new MutationObserver(checkScrollMore);
+      mutationObserver.observe(el, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+    }
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', checkScrollMore);
+      resizeObserver?.disconnect();
+      mutationObserver?.disconnect();
+    };
+  }, [
+    isOpen,
+    unlocked,
+    activeTab,
+    editDistance,
+    draft,
+    galleryItems.length,
+    filteredRegistrations.length,
+    regsLoading,
+    galleryLoading,
+    checkScrollMore,
+  ]);
 
   if (!isOpen) return null;
 
@@ -924,10 +997,13 @@ export default function AdminModal({
             </div>
 
             {/* Contenido scrolleable */}
-            <div
-              style={{ scrollbarGutter: 'stable' }}
-              className="flex-1 min-h-0 overflow-y-scroll overscroll-contain p-4 sm:px-6 sm:py-4 space-y-4"
-            >
+            <div className="relative flex-1 min-h-0 flex flex-col">
+              <div
+                ref={scrollContainerRef}
+                onScroll={checkScrollMore}
+                style={{ scrollbarGutter: 'stable' }}
+                className="flex-1 min-h-0 overflow-y-scroll overscroll-contain p-4 sm:px-6 sm:py-4 space-y-4"
+              >
               {activeTab === 'general' && (
                 <AdminGeneralTab
                   draft={draft}
@@ -1033,6 +1109,20 @@ export default function AdminModal({
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   )}
                   <span>{saveFeedback.message}</span>
+                </div>
+              )}
+              </div>
+
+              {canScrollMore && (
+                <div className="pointer-events-none absolute inset-x-0 bottom-2.5 flex justify-center z-10">
+                  <button
+                    type="button"
+                    onClick={handleScrollDown}
+                    className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-zinc-950/95 hover:bg-stone-900 border border-amber-500/70 hover:border-amber-400 text-stone-100 text-[11px] font-bold px-3.5 py-1.5 shadow-lg shadow-black/70 transition-all cursor-pointer"
+                  >
+                    <span>Deslizá para ver más</span>
+                    <ChevronDown className="w-3.5 h-3.5 text-amber-400 animate-bounce" />
+                  </button>
                 </div>
               )}
             </div>
