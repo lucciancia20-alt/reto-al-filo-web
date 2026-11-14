@@ -1059,8 +1059,8 @@ export default function AdminModal({
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center justify-center gap-1.5 px-2.5 py-2.5 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wide transition-all cursor-pointer ${
                       active
-                        ? 'bg-amber-500 text-stone-950 shadow-md shadow-amber-500/20'
-                        : 'bg-stone-900 text-stone-300 border border-stone-800 hover:border-stone-700'
+                        ? 'bg-amber-500 border border-orange-500 text-stone-950 shadow-md shadow-amber-500/20'
+                        : 'bg-stone-900 text-stone-300 border border-orange-500/60 hover:border-orange-400'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -1774,19 +1774,31 @@ export default function AdminModal({
                   {/* Resumen de contadores */}
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                     {[
-                      { label: 'Total', value: regStats.total, tone: 'text-white border-stone-800' },
+                      {
+                        label: 'Total',
+                        value: regStats.total,
+                        tone: 'text-stone-100 border-stone-300',
+                      },
                       {
                         label: 'Confirmados',
                         value: regStats.confirmed,
-                        tone: 'text-emerald-300 border-emerald-500/30',
+                        tone: 'text-green-400 border-green-500',
                       },
                       {
                         label: 'Pendientes',
                         value: regStats.pending,
-                        tone: 'text-amber-300 border-amber-500/30',
+                        tone: 'text-yellow-400 border-yellow-500',
                       },
-                      { label: '27K', value: regStats.count27k, tone: 'text-sky-300 border-stone-800' },
-                      { label: '13K', value: regStats.count13k, tone: 'text-stone-200 border-stone-800' },
+                      {
+                        label: '27K',
+                        value: regStats.count27k,
+                        tone: 'text-cyan-400 border-cyan-400',
+                      },
+                      {
+                        label: '13K',
+                        value: regStats.count13k,
+                        tone: 'text-red-500 border-red-500',
+                      },
                     ].map((stat) => (
                       <div
                         key={stat.label}
