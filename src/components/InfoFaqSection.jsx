@@ -30,7 +30,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
     <>
       <section
         id="cronograma"
-        className="py-8 sm:py-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
+        className="scroll-mt-16 py-8 sm:py-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           {/* Parte 1: Línea de Tiempo (Cronograma del Día) */}
@@ -96,7 +96,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
       {/* Parte 2: Acordeón Desplegable de Preguntas Frecuentes */}
       <section
         id="faq"
-        className="py-8 sm:py-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
+        className="scroll-mt-16 py-8 sm:py-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-3xl mx-auto">

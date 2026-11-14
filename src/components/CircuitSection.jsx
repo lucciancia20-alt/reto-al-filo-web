@@ -236,7 +236,7 @@ export default function CircuitSection({
   return (
     <section
       id="circuito"
-      className="py-5 sm:py-6 bg-stone-950 border-t-2 border-orange-500/50 relative"
+      className="scroll-mt-16 min-h-[calc(100dvh-4rem)] pt-6 sm:pt-8 pb-8 sm:pb-10 bg-stone-950 border-t-2 border-orange-500/50 relative flex flex-col justify-center"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Encabezado */}
