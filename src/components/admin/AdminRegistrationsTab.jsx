@@ -169,8 +169,11 @@ export default function AdminRegistrationsTab({
             activeRing: 'border-2 ring-1 ring-emerald-500/60',
             labelClass: 'text-emerald-400',
             isActive: regStatusFilter === 'confirmado',
-            onClick: () =>
-              setRegStatusFilter(regStatusFilter === 'confirmado' ? 'all' : 'confirmado'),
+            onClick: () => {
+              const isAlreadyActive = regStatusFilter === 'confirmado' && regDistanceFilter === 'all';
+              setRegDistanceFilter('all');
+              setRegStatusFilter(isAlreadyActive ? 'all' : 'confirmado');
+            },
           },
           {
             label: 'Pendientes',
@@ -179,8 +182,11 @@ export default function AdminRegistrationsTab({
             activeRing: 'border-2 ring-1 ring-amber-500/60',
             labelClass: 'text-amber-400',
             isActive: regStatusFilter === 'pendiente',
-            onClick: () =>
-              setRegStatusFilter(regStatusFilter === 'pendiente' ? 'all' : 'pendiente'),
+            onClick: () => {
+              const isAlreadyActive = regStatusFilter === 'pendiente' && regDistanceFilter === 'all';
+              setRegDistanceFilter('all');
+              setRegStatusFilter(isAlreadyActive ? 'all' : 'pendiente');
+            },
           },
           {
             label: '27K',
@@ -189,8 +195,11 @@ export default function AdminRegistrationsTab({
             activeRing: 'border-2 ring-1 ring-cyan-500/60',
             labelClass: 'text-cyan-400',
             isActive: regDistanceFilter === '27K',
-            onClick: () =>
-              setRegDistanceFilter(regDistanceFilter === '27K' ? 'all' : '27K'),
+            onClick: () => {
+              const isAlreadyActive = regDistanceFilter === '27K' && regStatusFilter === 'all';
+              setRegStatusFilter('all');
+              setRegDistanceFilter(isAlreadyActive ? 'all' : '27K');
+            },
           },
           {
             label: '13K',
@@ -199,8 +208,11 @@ export default function AdminRegistrationsTab({
             activeRing: 'border-2 ring-1 ring-red-500/60',
             labelClass: 'text-red-500',
             isActive: regDistanceFilter === '13K',
-            onClick: () =>
-              setRegDistanceFilter(regDistanceFilter === '13K' ? 'all' : '13K'),
+            onClick: () => {
+              const isAlreadyActive = regDistanceFilter === '13K' && regStatusFilter === 'all';
+              setRegStatusFilter('all');
+              setRegDistanceFilter(isAlreadyActive ? 'all' : '13K');
+            },
           },
         ].map((stat) => (
           <button
