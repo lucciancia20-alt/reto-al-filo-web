@@ -42,7 +42,6 @@ import {
   deleteRegistrationRecord,
 } from '../firebase/config';
 
-const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN || 'reto2027';
 const DEFAULT_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '';
 const DEFAULT_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'reto_al_filo';
 
@@ -61,9 +60,6 @@ export default function AdminModal({
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [emailMode, setEmailMode] = useState('login');
-  const [showPinFallback, setShowPinFallback] = useState(false);
-  const [pinInput, setPinInput] = useState('');
-  const [pinError, setPinError] = useState('');
 
   const [activeTab, setActiveTab] = useState('general');
   const [editDistance, setEditDistance] = useState('27K');
@@ -221,11 +217,8 @@ export default function AdminModal({
         setUnlocked(true);
         setAuthError('');
       } else {
-        setAdminUser((prev) => {
-          if (prev?.method === 'pin') return prev;
-          setUnlocked(false);
-          return null;
-        });
+        setAdminUser(null);
+        setUnlocked(false);
       }
     });
     return unsubscribe;
@@ -294,31 +287,12 @@ export default function AdminModal({
     }
   };
 
-  const handleUnlock = (e) => {
-    e.preventDefault();
-    if (pinInput.trim() === ADMIN_PIN) {
-      setAdminUser({
-        email: 'PIN local',
-        displayName: 'Organizador (PIN)',
-        method: 'pin',
-      });
-      setUnlocked(true);
-      setPinError('');
-      setPinInput('');
-    } else {
-      setPinError('Clave incorrecta. Verificá el PIN de organización.');
-    }
-  };
-
   const handleLogout = async () => {
-    if (adminUser?.method !== 'pin') {
-      await signOutAdmin();
-    }
+    await signOutAdmin();
     setAdminUser(null);
     setUnlocked(false);
     setAuthError('');
     setAuthInfo('');
-    setPinError('');
   };
 
   const updateCircuitField = (distKey, field, value) => {
@@ -784,7 +758,7 @@ export default function AdminModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-4xl h-[88dvh] sm:h-[680px] max-h-[92dvh] rounded-3xl bg-stone-900 border border-stone-700 shadow-2xl flex flex-col overflow-hidden text-stone-100"
+        className={`w-full max-w-4xl ${unlocked ? 'h-[88dvh] sm:h-[680px]' : 'h-auto'} max-h-[92dvh] rounded-3xl bg-stone-900 border border-stone-700 shadow-2xl flex flex-col overflow-hidden text-stone-100`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header del Modal */}
@@ -829,8 +803,8 @@ export default function AdminModal({
         </div>
 
         {!unlocked ? (
-          <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 flex items-start sm:items-center justify-center">
-            <div className="w-full max-w-md py-2 space-y-4">
+          <div className="flex-1 min-h-0 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 flex items-center justify-center">
+            <div className="w-full max-w-md space-y-4">
               <div className="text-center">
                 <span className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-400 inline-flex items-center justify-center">
                   <ShieldCheck className="w-6 h-6" />
@@ -848,8 +822,8 @@ export default function AdminModal({
                 <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 text-xs text-amber-200 flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
                   <span>
-                    Firebase no está configurado en este entorno. Podés ingresar usando el PIN de
-                    respaldo al pie.
+                    Firebase no está configurado en este entorno. Verificá las variables de entorno
+                    de Firebase.
                   </span>
                 </div>
               )}
@@ -956,7 +930,7 @@ export default function AdminModal({
                       autoComplete="email"
                       value={emailInput}
                       onChange={(e) => setEmailInput(e.target.value)}
-                      placeholder="lciancia1972@gmail.com"
+                      placeholder=""
                       required
                       disabled={!firebaseReady || authLoading}
                       className="w-full rounded-xl bg-stone-900 border border-stone-700 focus:border-amber-400 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm text-white placeholder:text-stone-500"
@@ -981,11 +955,7 @@ export default function AdminModal({
                       }
                       value={passwordInput}
                       onChange={(e) => setPasswordInput(e.target.value)}
-                      placeholder={
-                        emailMode === 'register'
-                          ? 'Elegí una clave (mín. 6 caracteres)'
-                          : 'Tu contraseña'
-                      }
+                      placeholder=""
                       required
                       minLength={6}
                       disabled={!firebaseReady || authLoading}
@@ -1036,41 +1006,6 @@ export default function AdminModal({
                   <span>{authInfo}</span>
                 </div>
               )}
-
-              {/* Acceso secundario plegable con PIN de respaldo */}
-              <div className="pt-1 border-t border-stone-800/80 text-center">
-                <button
-                  type="button"
-                  onClick={() => setShowPinFallback((prev) => !prev)}
-                  className="text-xs font-medium text-stone-400 hover:text-stone-200 py-1.5 cursor-pointer"
-                >
-                  {showPinFallback
-                    ? 'Ocultar acceso con PIN de respaldo'
-                    : 'Ingresar con PIN de respaldo'}
-                </button>
-
-                {showPinFallback && (
-                  <form onSubmit={handleUnlock} className="mt-2.5 flex gap-2">
-                    <input
-                      type="password"
-                      value={pinInput}
-                      onChange={(e) => setPinInput(e.target.value)}
-                      placeholder="PIN de organizador"
-                      aria-label="PIN de respaldo de organizador"
-                      className="flex-1 rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-center text-sm text-white font-mono tracking-widest"
-                    />
-                    <button
-                      type="submit"
-                      className="rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-100 font-display font-bold uppercase text-xs px-4 py-2.5 cursor-pointer"
-                    >
-                      Entrar
-                    </button>
-                  </form>
-                )}
-                {pinError && showPinFallback && (
-                  <p className="mt-2 text-xs text-rose-400">{pinError}</p>
-                )}
-              </div>
             </div>
           </div>
         ) : (
