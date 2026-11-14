@@ -101,7 +101,11 @@ export default function AdminCircuitsTab({
           <button
             type="button"
             onClick={onAddStation}
-            className="inline-flex items-center gap-1 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 text-xs font-bold px-3 py-1.5 cursor-pointer"
+            className={`inline-flex items-center gap-1 rounded-xl border text-xs font-bold px-3 py-1.5 cursor-pointer transition-colors ${
+              editDistance === '13K'
+                ? 'bg-red-500/20 hover:bg-red-500/30 text-red-500 border-red-500'
+                : 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border-cyan-500'
+            }`}
           >
             <Plus className="w-3.5 h-3.5" />
             Agregar Puesto
@@ -137,7 +141,11 @@ export default function AdminCircuitsTab({
                     className={`w-full rounded-lg bg-stone-950 ${circuitInputBorderClass} px-2.5 py-1.5 text-xs text-white`}
                   />
                 </div>
-                <div className="text-[11px] font-mono text-sky-300 px-2 whitespace-nowrap">
+                <div
+                  className={`text-[11px] font-mono px-2 whitespace-nowrap ${
+                    editDistance === '13K' ? 'text-red-500' : 'text-cyan-400'
+                  }`}
+                >
                   {interp.alt} msnm
                 </div>
                 <button
