@@ -56,13 +56,13 @@ export default function AdminRegistrationsTab({
           {
             label: 'Confirmados',
             value: regStats.confirmed,
-            tone: 'text-green-400 border-green-500',
+            tone: 'text-emerald-400 border-emerald-500',
             labelClass: 'text-emerald-400',
           },
           {
             label: 'Pendientes',
             value: regStats.pending,
-            tone: 'text-yellow-400 border-yellow-500',
+            tone: 'text-amber-400 border-amber-500',
             labelClass: 'text-amber-400',
           },
           {
