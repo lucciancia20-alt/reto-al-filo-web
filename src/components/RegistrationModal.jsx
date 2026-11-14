@@ -384,11 +384,11 @@ export default function RegistrationModal({
                     const is13K = item.id === '13K';
                     const cardClass = active
                       ? is13K
-                        ? 'bg-red-500/15 border-red-500 shadow-lg shadow-red-500/15'
-                        : 'bg-cyan-500/15 border-cyan-500 shadow-lg shadow-cyan-500/15'
+                        ? 'bg-stone-950 border-red-500 shadow-lg shadow-red-500/20'
+                        : 'bg-stone-950 border-cyan-500 shadow-lg shadow-cyan-500/20'
                       : is13K
-                        ? 'bg-stone-950/70 border-red-500/40 hover:border-red-500/80'
-                        : 'bg-stone-950/70 border-cyan-500/40 hover:border-cyan-500/80';
+                        ? 'bg-stone-950/80 border-red-500/70 hover:border-red-500'
+                        : 'bg-stone-950/80 border-cyan-500/70 hover:border-cyan-500';
                     const titleClass = is13K ? 'text-red-500' : 'text-cyan-400';
                     const iconClass = active
                       ? is13K

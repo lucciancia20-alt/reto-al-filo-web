@@ -270,7 +270,9 @@ export default function CircuitSection({
                 ? is13K
                   ? 'bg-stone-950 text-red-500 border border-red-500 shadow-lg shadow-red-500/20'
                   : 'bg-stone-950 text-cyan-400 border border-cyan-500 shadow-lg shadow-cyan-500/20'
-                : 'bg-stone-950/60 text-stone-300 border border-stone-700 hover:border-stone-500 hover:text-white';
+                : is13K
+                  ? 'bg-stone-950/60 text-stone-300 border border-stone-700 hover:border-red-500 hover:text-red-500'
+                  : 'bg-stone-950/60 text-stone-300 border border-stone-700 hover:border-cyan-500 hover:text-cyan-400';
               return (
                 <button
                   key={circuit.id}

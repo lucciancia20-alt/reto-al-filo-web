@@ -816,7 +816,7 @@ export default function AdminModal({
   const activeTrack = activeCircuitDraft.customGpx || GPX_TRACKS[editDistance];
   const circuitInputBorderClass =
     editDistance === '13K'
-      ? 'border border-red-500 focus:border-red-400 focus:outline-none'
+      ? 'border border-red-500 focus:border-red-500 focus:outline-none'
       : 'border border-cyan-500 focus:border-cyan-400 focus:outline-none';
 
   return (

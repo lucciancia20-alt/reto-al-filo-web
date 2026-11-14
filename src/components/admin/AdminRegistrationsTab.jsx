@@ -184,8 +184,8 @@ export default function AdminRegistrationsTab({
                       <span
                         className={`text-xs font-black px-2 py-0.5 rounded-md border ${
                           reg.distance === '13K'
-                            ? 'bg-red-500/20 border-red-500 text-red-400'
-                            : 'bg-cyan-500/20 border-cyan-500 text-cyan-300'
+                            ? 'bg-stone-950 border-red-500 text-red-500'
+                            : 'bg-stone-950 border-cyan-500 text-cyan-400'
                         }`}
                       >
                         {reg.distance}

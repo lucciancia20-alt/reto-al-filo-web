@@ -103,19 +103,19 @@ export default function AdminGeneralTab({
               value={draft.circuits?.['27K']?.price || ''}
               onChange={(e) => onUpdateCircuitField('27K', 'price', e.target.value)}
               placeholder="$45.000"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-bold text-cyan-400"
+              className="w-full rounded-xl bg-stone-900 border border-cyan-500 focus:border-cyan-400 focus:outline-none px-3.5 py-2 text-sm font-bold text-cyan-400"
             />
           </div>
           <div>
             <label className="block text-xs font-semibold text-stone-300 mb-1">
-              Valor Inscripción <span className="text-red-400 font-bold">13K</span>
+              Valor Inscripción <span className="text-red-500 font-bold">13K</span>
             </label>
             <input
               type="text"
               value={draft.circuits?.['13K']?.price || ''}
               onChange={(e) => onUpdateCircuitField('13K', 'price', e.target.value)}
               placeholder="$32.000"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-bold text-red-400"
+              className="w-full rounded-xl bg-stone-900 border border-red-500 focus:border-red-500 focus:outline-none px-3.5 py-2 text-sm font-bold text-red-500"
             />
           </div>
           <div>
