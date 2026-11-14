@@ -54,7 +54,7 @@ export const RACE_CONFIG = {
     },
     '13K': {
       id: '13K',
-      tabLabel: '13K Montaña',
+      tabLabel: '13K Competitivo',
       distanceLabel: '13K',
       price: '$32.000',
       elevationGain: '+671 m',
@@ -350,7 +350,10 @@ export function mergeRaceConfig(override) {
 
   const normalizeDistanceCopy = (text) =>
     typeof text === 'string'
-      ? text.replace(/21K/gi, '27K').replace(/10K/gi, '13K')
+      ? text
+          .replace(/21K/gi, '27K')
+          .replace(/10K/gi, '13K')
+          .replace(/13K\s+Montaña/gi, '13K Competitivo')
       : text;
 
   const mergeCircuit = (key, legacyKey) => {

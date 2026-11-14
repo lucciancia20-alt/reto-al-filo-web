@@ -90,7 +90,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         <p className="mt-2.5 max-w-xl text-balance text-sm sm:text-base text-stone-200 leading-relaxed">
           Desafiá las crestas técnicas, el bosque de altura y los senderos serranos en dos
           distancias diseñadas para corredores de montaña: <strong className="text-white">27K Competitivo</strong> y{' '}
-          <strong className="text-white">13K Montaña</strong>.
+          <strong className="text-white">13K Competitivo</strong>.
         </p>
 
         {/* Contador regresivo dinámico hacia la fecha y hora de largada */}

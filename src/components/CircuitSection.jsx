@@ -256,7 +256,7 @@ export default function CircuitSection({
           </p>
         </div>
 
-        {/* Selector de Pestañas (27K Competitivo vs 13K Montaña) */}
+        {/* Selector de Pestañas (27K Competitivo vs 13K Competitivo) */}
         <div
           role="tablist"
           aria-label="Seleccionar distancia del circuito"
