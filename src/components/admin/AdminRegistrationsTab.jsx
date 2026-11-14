@@ -145,6 +145,8 @@ export default function AdminRegistrationsTab({
     }));
   };
 
+  const hasSpecificFilter = regDistanceFilter !== 'all' || regStatusFilter !== 'all';
+
   return (
     <div className="space-y-3">
       {/* Resumen de contadores (filtros rápidos sincronizados) */}
@@ -154,9 +156,10 @@ export default function AdminRegistrationsTab({
             label: 'Total',
             value: regStats.total,
             tone: 'text-stone-100',
-            inactiveBorder: 'border-stone-300/50',
-            activeRing: 'border-stone-200 ring-1 ring-stone-300/60',
+            inactiveClass: 'bg-stone-950 border-stone-400/40',
+            activeClass: 'bg-white/15 border-white ring-1 ring-white/50 shadow-md shadow-white/15',
             labelClass: 'text-white',
+            dotClass: 'bg-white',
             isActive: regDistanceFilter === 'all' && regStatusFilter === 'all',
             onClick: () => {
               setRegDistanceFilter('all');
@@ -167,9 +170,11 @@ export default function AdminRegistrationsTab({
             label: 'Confirmados',
             value: regStats.confirmed,
             tone: 'text-emerald-400',
-            inactiveBorder: 'border-emerald-500/50',
-            activeRing: 'border-emerald-400 ring-1 ring-emerald-500/60',
+            inactiveClass: 'bg-stone-950 border-emerald-500/45',
+            activeClass:
+              'bg-emerald-500/20 border-emerald-400 ring-1 ring-emerald-400/70 shadow-md shadow-emerald-500/25',
             labelClass: 'text-emerald-400',
+            dotClass: 'bg-emerald-400',
             isActive: regStatusFilter === 'confirmado',
             onClick: () => {
               const isAlreadyActive = regStatusFilter === 'confirmado' && regDistanceFilter === 'all';
@@ -181,9 +186,11 @@ export default function AdminRegistrationsTab({
             label: 'Pendientes',
             value: regStats.pending,
             tone: 'text-amber-400',
-            inactiveBorder: 'border-amber-500/50',
-            activeRing: 'border-amber-400 ring-1 ring-amber-500/60',
+            inactiveClass: 'bg-stone-950 border-amber-500/45',
+            activeClass:
+              'bg-amber-500/20 border-amber-400 ring-1 ring-amber-400/70 shadow-md shadow-amber-500/25',
             labelClass: 'text-amber-400',
+            dotClass: 'bg-amber-400',
             isActive: regStatusFilter === 'pendiente',
             onClick: () => {
               const isAlreadyActive = regStatusFilter === 'pendiente' && regDistanceFilter === 'all';
@@ -195,9 +202,11 @@ export default function AdminRegistrationsTab({
             label: '27K',
             value: regStats.count27k,
             tone: 'text-cyan-400',
-            inactiveBorder: 'border-cyan-500/50',
-            activeRing: 'border-cyan-400 ring-1 ring-cyan-500/60',
+            inactiveClass: 'bg-stone-950 border-cyan-500/45',
+            activeClass:
+              'bg-sky-500/20 border-cyan-400 ring-1 ring-cyan-400/70 shadow-md shadow-sky-500/25',
             labelClass: 'text-cyan-400',
+            dotClass: 'bg-cyan-300',
             isActive: regDistanceFilter === '27K',
             onClick: () => {
               const isAlreadyActive = regDistanceFilter === '27K' && regStatusFilter === 'all';
@@ -209,9 +218,11 @@ export default function AdminRegistrationsTab({
             label: '13K',
             value: regStats.count13k,
             tone: 'text-red-500',
-            inactiveBorder: 'border-red-500/50',
-            activeRing: 'border-red-500 ring-1 ring-red-500/60',
+            inactiveClass: 'bg-stone-950 border-red-500/45',
+            activeClass:
+              'bg-rose-500/20 border-red-500 ring-1 ring-red-500/70 shadow-md shadow-rose-500/25',
             labelClass: 'text-red-500',
+            dotClass: 'bg-red-400',
             isActive: regDistanceFilter === '13K',
             onClick: () => {
               const isAlreadyActive = regDistanceFilter === '13K' && regStatusFilter === 'all';
@@ -225,12 +236,17 @@ export default function AdminRegistrationsTab({
             type="button"
             onClick={stat.onClick}
             aria-pressed={stat.isActive}
-            className={`rounded-2xl bg-stone-950 border-2 p-2.5 text-center cursor-pointer hover:brightness-125 transition-colors ${stat.tone} ${
-              stat.isActive ? stat.activeRing : stat.inactiveBorder
-            }`}
+            className={`rounded-2xl border-2 p-2.5 text-center cursor-pointer hover:brightness-125 transition-all ${stat.tone} ${
+              stat.isActive ? stat.activeClass : stat.inactiveClass
+            } ${hasSpecificFilter && !stat.isActive ? 'opacity-55 hover:opacity-100' : 'opacity-100'}`}
           >
-            <span className={`block text-[10px] uppercase tracking-wider font-semibold ${stat.labelClass}`}>
-              {stat.label}
+            <span
+              className={`flex items-center justify-center gap-1.5 text-[10px] leading-4 uppercase tracking-wider font-bold ${
+                stat.isActive ? 'text-white' : stat.labelClass
+              }`}
+            >
+              {stat.isActive && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${stat.dotClass}`} />}
+              <span>{stat.label}</span>
             </span>
             <span className="font-display text-xl font-black">{stat.value}</span>
           </button>
