@@ -224,16 +224,16 @@ export default function CircuitSection({
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Encabezado */}
-        <div className="text-center max-w-2xl mx-auto">
+        <div className="text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
             <Compass className="w-3.5 h-3.5" />
             <span>Circuito GPX Oficial y Altimetría Real</span>
           </div>
 
-          <h2 className="mt-3 font-display text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
+          <h2 className="mt-3 text-balance font-display text-3xl sm:text-5xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
             Dominá el Desnivel
           </h2>
-          <p className="mt-2.5 text-sm sm:text-base text-stone-300">
+          <p className="mt-2.5 max-w-2xl mx-auto text-balance text-sm sm:text-base text-stone-300">
             Trazado GPS real registrado en las sierras de Tornquist. Alterná entre las dos
             distancias para explorar el mapa, la altimetría punto a punto y los puestos de
             abastecimiento.

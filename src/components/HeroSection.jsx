@@ -73,15 +73,15 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         </div>
 
         {/* Título central imponente */}
-        <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white uppercase leading-[1.05] drop-shadow-md">
-          {raceConfig.title}
+        <h1 className="max-w-3xl mx-auto text-balance font-display text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white uppercase leading-[1.05] drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
+          {(raceConfig.title || '').replace(/(\d+[a-zA-Z]+)\s+(Edici[óo]n)/i, '$1\u00A0$2')}
         </h1>
 
         <p className="mt-3 text-lg sm:text-2xl font-bold uppercase tracking-[0.22em] text-amber-400">
           {raceConfig.subtitle}
         </p>
 
-        <p className="mt-4 max-w-xl text-sm sm:text-base text-stone-200 leading-relaxed">
+        <p className="mt-4 max-w-xl text-balance text-sm sm:text-base text-stone-200 leading-relaxed">
           Desafiá las crestas técnicas, el bosque de altura y los senderos serranos en dos
           distancias diseñadas para corredores de montaña: <strong className="text-white">27K Competitivo</strong> y{' '}
           <strong className="text-white">13K Montaña</strong>.

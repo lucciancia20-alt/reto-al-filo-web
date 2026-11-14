@@ -28,16 +28,16 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* Parte 1: Línea de Tiempo (Cronograma del Día) */}
-        <div className="text-center max-w-2xl mx-auto">
+        <div className="text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
             <Clock className="w-3.5 h-3.5" />
             <span>Cronograma Oficial · 10 de Abril 2027</span>
           </div>
 
-          <h2 className="mt-3 font-display text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
+          <h2 className="mt-3 text-balance font-display text-3xl sm:text-5xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
             Horarios del Día de Carrera
           </h2>
-          <p className="mt-2.5 text-sm sm:text-base text-stone-300">
+          <p className="mt-2.5 max-w-2xl mx-auto text-balance text-sm sm:text-base text-stone-300">
             Planificá tu llegada al predio con anticipación. La charla técnica y el control de
             equipamiento son obligatorios para todas las distancias.
           </p>
@@ -80,13 +80,13 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
 
         {/* Parte 2: Acordeón Desplegable de Preguntas Frecuentes (3 ítems) */}
         <div id="faq" className="mt-20 pt-10 border-t border-stone-900">
-          <div className="text-center max-w-2xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Información Clave para el Corredor</span>
             </div>
 
-            <h2 className="mt-3 font-display text-3xl sm:text-4xl font-black text-white uppercase tracking-tight">
+            <h2 className="mt-3 text-balance font-display text-3xl sm:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
               Preguntas Frecuentes (FAQ)
             </h2>
           </div>
