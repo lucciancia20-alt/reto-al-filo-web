@@ -185,6 +185,10 @@ export default function AdminRegistrationsTab({
             const isBusy = regBusyId === reg.id;
             const isExpanded = Boolean(expandedIds[reg.id]);
             const bibValue = bibDrafts[reg.id] ?? reg.assignedBib ?? '';
+            const isConfirmed = reg.status === 'confirmado';
+            const savedBib = String(reg.assignedBib ?? '').trim();
+            const currentBib = String(bibValue ?? '').trim();
+            const isAlreadySaved = isConfirmed && currentBib === savedBib;
             const statusBadgeClass =
               reg.status === 'confirmado'
                 ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
@@ -254,13 +258,27 @@ export default function AdminRegistrationsTab({
 
                     <button
                       type="button"
-                      disabled={isBusy}
+                      disabled={isBusy || isAlreadySaved}
                       onClick={() => onConfirmRegistration(reg)}
-                      title="Guardar número de dorsal y confirmar inscripción"
-                      className="inline-flex items-center gap-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-[11px] uppercase px-2.5 py-1.5 cursor-pointer disabled:opacity-50"
+                      title={
+                        isAlreadySaved
+                          ? 'Inscripción confirmada y dorsal guardado'
+                          : isConfirmed
+                            ? 'Guardar nuevo número de dorsal'
+                            : 'Guardar número de dorsal y confirmar inscripción'
+                      }
+                      className={`inline-flex items-center gap-1 rounded-lg font-display font-black text-[11px] uppercase px-2.5 py-1.5 transition-colors ${
+                        isAlreadySaved
+                          ? 'bg-white/10 text-white/40 border border-white/10 cursor-default'
+                          : 'bg-emerald-500 hover:bg-emerald-400 text-stone-950 border border-emerald-400/50 cursor-pointer disabled:opacity-50'
+                      }`}
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      Confirmar
+                      {isAlreadySaved
+                        ? 'Confirmado'
+                        : isConfirmed
+                          ? 'Guardar Dorsal'
+                          : 'Confirmar'}
                     </button>
 
                     {reg.receiptUrl && (
