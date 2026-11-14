@@ -834,7 +834,7 @@ export default function AdminModal({
       onClick={handleSafeClose}
     >
       <div
-        className={`w-full max-w-5xl ${unlocked ? 'h-[88dvh] sm:h-[680px]' : 'h-auto'} max-h-[92dvh] rounded-3xl bg-stone-900 border border-stone-700 shadow-2xl flex flex-col overflow-hidden overscroll-contain text-stone-100`}
+        className={`w-full max-w-5xl ${unlocked ? 'h-[88dvh] sm:h-[750px]' : 'h-auto'} max-h-[92dvh] rounded-3xl bg-stone-900 border border-stone-700 shadow-2xl flex flex-col overflow-hidden overscroll-contain text-stone-100`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header del Modal */}

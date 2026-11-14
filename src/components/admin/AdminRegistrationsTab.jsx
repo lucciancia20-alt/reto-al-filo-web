@@ -104,10 +104,10 @@ export default function AdminRegistrationsTab({
         type="button"
         onClick={() => handleSort(field)}
         aria-label={`Ordenar por ${label}`}
-        className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[11px] transition-colors cursor-pointer ${
+        className={`inline-flex items-center gap-1 rounded-lg bg-stone-950 border px-2 py-1 text-[11px] transition-colors cursor-pointer ${
           isActive
-            ? 'border-orange-500 text-orange-400 bg-orange-500/10 font-bold'
-            : 'border-stone-700/80 bg-stone-950/70 text-stone-300 hover:border-orange-500/50 hover:text-white font-medium'
+            ? 'border-orange-500 text-orange-400 font-bold'
+            : 'border-orange-500/40 text-white/85 hover:text-white font-medium'
         }`}
       >
         <span>{label}</span>
@@ -146,7 +146,7 @@ export default function AdminRegistrationsTab({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Resumen de contadores */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
         {[
@@ -183,7 +183,7 @@ export default function AdminRegistrationsTab({
         ].map((stat) => (
           <div
             key={stat.label}
-            className={`rounded-2xl bg-stone-950 border p-3 text-center ${stat.tone}`}
+            className={`rounded-2xl bg-stone-950 border p-2.5 text-center ${stat.tone}`}
           >
             <span className={`block text-[10px] uppercase tracking-wider font-semibold ${stat.labelClass}`}>
               {stat.label}
@@ -194,7 +194,7 @@ export default function AdminRegistrationsTab({
       </div>
 
       {/* Controles de búsqueda, filtro y exportación */}
-      <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-3">
+      <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3 space-y-2.5">
         <div className="flex flex-col sm:flex-row gap-2.5">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -304,7 +304,7 @@ export default function AdminRegistrationsTab({
       ) : (
         <div className="space-y-2">
           {/* Barra compacta de encabezados ordenables */}
-          <div className="px-2.5 py-1.5 rounded-xl bg-stone-900/70 border border-stone-800/80 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+          <div className="px-2.5 py-1.5 rounded-xl bg-stone-950 border border-stone-800 flex flex-wrap items-center justify-between gap-2 text-[11px]">
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-[10px] uppercase tracking-wider text-stone-500 font-semibold mr-0.5 hidden sm:inline">
                 Ordenar:
