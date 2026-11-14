@@ -75,13 +75,19 @@ export default function RegistrationModal({
 
   useEffect(() => {
     if (!isOpen) return undefined;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     const handleKeyDown = (event) => {
       if (event.key === 'Escape' && !submitting) {
         onClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isOpen, onClose, submitting]);
 
   if (!isOpen) return null;
@@ -231,7 +237,7 @@ export default function RegistrationModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-4 bg-stone-950/85 backdrop-blur-sm animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-4 bg-stone-950/85 backdrop-blur-sm animate-fadeIn overscroll-contain"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-inscripcion-title"
@@ -240,7 +246,7 @@ export default function RegistrationModal({
       }}
     >
       <div
-        className="w-full max-w-2xl max-h-[92dvh] rounded-3xl bg-stone-900 border border-stone-700/90 shadow-2xl text-stone-100 flex flex-col overflow-hidden"
+        className="w-full max-w-2xl max-h-[92dvh] rounded-3xl bg-stone-900 border border-stone-700/90 shadow-2xl text-stone-100 flex flex-col overflow-hidden overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Cabecera fija */}
@@ -276,7 +282,7 @@ export default function RegistrationModal({
         {confirmedReg ? (
           <>
             {/* Pantalla de Confirmación */}
-            <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-7 space-y-5">
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-7 space-y-5">
               <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/35 p-5 text-center">
                 <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
                 <p className="mt-2 text-xs font-bold uppercase tracking-widest text-emerald-300">
@@ -310,7 +316,11 @@ export default function RegistrationModal({
                 </div>
                 <div className="flex justify-between gap-3 py-1 border-b border-stone-800/80">
                   <span className="text-stone-400">Distancia</span>
-                  <span className="font-bold text-amber-400">
+                  <span
+                    className={`font-bold ${
+                      confirmedReg.distance === '13K' ? 'text-red-500' : 'text-cyan-400'
+                    }`}
+                  >
                     {confirmedReg.distance} ({confirmedReg.priceSnapshot})
                   </span>
                 </div>
@@ -362,7 +372,7 @@ export default function RegistrationModal({
             className="flex-1 min-h-0 flex flex-col overflow-hidden"
           >
             {/* Cuerpo Scrolleable */}
-            <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-6">
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-6">
               {/* 1. Distancia */}
               <section>
                 <span className="block text-[11px] font-bold uppercase tracking-widest text-amber-400 mb-2">
@@ -371,20 +381,33 @@ export default function RegistrationModal({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {distances.map((item) => {
                     const active = selectedDistance === item.id;
+                    const is13K = item.id === '13K';
+                    const cardClass = active
+                      ? is13K
+                        ? 'bg-red-500/15 border-red-500 shadow-lg shadow-red-500/15'
+                        : 'bg-cyan-500/15 border-cyan-500 shadow-lg shadow-cyan-500/15'
+                      : is13K
+                        ? 'bg-stone-950/70 border-red-500/40 hover:border-red-500/80'
+                        : 'bg-stone-950/70 border-cyan-500/40 hover:border-cyan-500/80';
+                    const titleClass = is13K ? 'text-red-500' : 'text-cyan-400';
+                    const iconClass = active
+                      ? is13K
+                        ? 'text-red-500'
+                        : 'text-cyan-400'
+                      : 'text-stone-700';
+
                     return (
                       <button
                         key={item.id}
                         type="button"
                         onClick={() => setSelectedDistance(item.id)}
-                        className={`w-full text-left rounded-2xl p-3.5 border transition-all cursor-pointer flex items-center justify-between gap-2 ${
-                          active
-                            ? 'bg-amber-500/15 border-amber-400 shadow-lg shadow-amber-500/10'
-                            : 'bg-stone-950/70 border-stone-800 hover:border-stone-700'
-                        }`}
+                        className={`w-full text-left rounded-2xl p-3.5 border transition-all cursor-pointer flex items-center justify-between gap-2 ${cardClass}`}
                       >
                         <div className="min-w-0">
                           <div className="flex items-center flex-wrap gap-2">
-                            <span className="font-display text-base sm:text-lg font-black text-white">
+                            <span
+                              className={`font-display text-base sm:text-lg font-black ${titleClass}`}
+                            >
                               {item.title}
                             </span>
                             <span className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
@@ -396,11 +419,7 @@ export default function RegistrationModal({
                           </p>
                         </div>
 
-                        <CheckCircle2
-                          className={`w-5 h-5 shrink-0 ${
-                            active ? 'text-amber-400' : 'text-stone-700'
-                          }`}
-                        />
+                        <CheckCircle2 className={`w-5 h-5 shrink-0 ${iconClass}`} />
                       </button>
                     );
                   })}

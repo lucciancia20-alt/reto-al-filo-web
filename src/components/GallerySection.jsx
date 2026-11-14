@@ -30,16 +30,22 @@ export default function GallerySection() {
     };
   }, []);
 
-  // Cerrar lightbox con tecla Escape
+  // Cerrar lightbox con tecla Escape y bloquear scroll del body
   useEffect(() => {
     if (!selectedPhoto) return undefined;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     const onKeyDown = (e) => {
       if (e.key === 'Escape') {
         setSelectedPhoto(null);
       }
     };
     window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
   }, [selectedPhoto]);
 
   return (
@@ -127,11 +133,11 @@ export default function GallerySection() {
           role="dialog"
           aria-modal="true"
           aria-label="Vista ampliada de fotografía"
-          className="fixed inset-0 z-50 bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-4 overscroll-contain"
           onClick={() => setSelectedPhoto(null)}
         >
           <div
-            className="relative max-w-3xl w-full rounded-3xl overflow-hidden bg-stone-900 border border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
+            className="relative max-w-3xl w-full rounded-3xl overflow-hidden overscroll-contain bg-stone-900 border border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
             onClick={(e) => e.stopPropagation()}
           >
             <button

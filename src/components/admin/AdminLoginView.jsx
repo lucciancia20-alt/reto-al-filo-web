@@ -21,7 +21,7 @@ export default function AdminLoginView({
   onPasswordReset,
 }) {
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 flex items-center justify-center">
+    <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6 sm:py-6 flex items-center justify-center">
       <div className="w-full max-w-md space-y-4">
         <div className="text-center">
           <span className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-400 inline-flex items-center justify-center">

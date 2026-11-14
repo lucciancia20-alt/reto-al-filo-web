@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Compass,
   Droplets,
@@ -134,6 +134,22 @@ export default function CircuitSection({
   onOpenModalWithDistance,
 }) {
   const [hoverPoint, setHoverPoint] = useState(null);
+  const elevationSvgRef = useRef(null);
+
+  useEffect(() => {
+    setHoverPoint(null);
+  }, [activeDistance]);
+
+  useEffect(() => {
+    if (!hoverPoint) return undefined;
+    const handleOutsidePointerDown = (event) => {
+      if (elevationSvgRef.current && !elevationSvgRef.current.contains(event.target)) {
+        setHoverPoint(null);
+      }
+    };
+    document.addEventListener('pointerdown', handleOutsidePointerDown);
+    return () => document.removeEventListener('pointerdown', handleOutsidePointerDown);
+  }, [hoverPoint]);
 
   const circuits = raceConfig?.circuits || RACE_CONFIG.circuits;
   const currentCircuit = circuits[activeDistance] || circuits['27K'];
@@ -246,9 +262,15 @@ export default function CircuitSection({
           aria-label="Seleccionar distancia del circuito"
           className="mt-3 flex justify-center"
         >
-          <div className="inline-grid grid-cols-2 p-1 rounded-2xl bg-stone-900 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.25)] w-full max-w-md">
+          <div className="inline-grid grid-cols-2 gap-1.5 p-1.5 rounded-2xl bg-stone-900 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.25)] w-full max-w-md">
             {Object.values(circuits).map((circuit) => {
               const isSelected = circuit.id === activeDistance;
+              const is13K = circuit.id === '13K';
+              const tabColorClass = isSelected
+                ? is13K
+                  ? 'bg-stone-950 text-red-500 border border-red-500 shadow-lg shadow-red-500/20'
+                  : 'bg-stone-950 text-cyan-400 border border-cyan-500 shadow-lg shadow-cyan-500/20'
+                : 'bg-stone-950/60 text-stone-300 border border-stone-700 hover:border-stone-500 hover:text-white';
               return (
                 <button
                   key={circuit.id}
@@ -259,11 +281,7 @@ export default function CircuitSection({
                     setHoverPoint(null);
                     onSelectDistance(circuit.id);
                   }}
-                  className={`py-1.5 px-3.5 rounded-xl font-display font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-amber-500 text-stone-950 shadow-lg shadow-amber-500/20'
-                      : 'text-stone-300 hover:text-white'
-                  }`}
+                  className={`py-1.5 px-3.5 rounded-xl font-display font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer ${tabColorClass}`}
                 >
                   {circuit.tabLabel}
                 </button>
@@ -464,12 +482,18 @@ export default function CircuitSection({
 
                 <div className="w-full overflow-x-auto">
                   <svg
+                    ref={elevationSvgRef}
                     viewBox={`0 0 ${elevationSvg.width} ${elevationSvg.height}`}
                     className="w-full h-36 sm:h-44 max-h-44 select-none touch-pan-y cursor-crosshair"
                     role="img"
                     aria-label={`Gráfico de altimetría real para ${currentCircuit.tabLabel}`}
+                    onPointerDown={handleSvgPointerMove}
                     onPointerMove={handleSvgPointerMove}
-                    onPointerLeave={() => setHoverPoint(null)}
+                    onPointerLeave={(e) => {
+                      if (e.pointerType === 'mouse') {
+                        setHoverPoint(null);
+                      }
+                    }}
                   >
                     <defs>
                       <linearGradient id="elevationFill" x1="0" y1="0" x2="0" y2="1">

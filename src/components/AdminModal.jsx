@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   X,
   Lock,
@@ -224,14 +224,37 @@ export default function AdminModal({
     return unsubscribe;
   }, [isOpen]);
 
+  const hasUnsavedChanges = useMemo(
+    () => unlocked && JSON.stringify(draft) !== JSON.stringify(raceConfig),
+    [unlocked, draft, raceConfig]
+  );
+
+  const handleSafeClose = useCallback(() => {
+    if (
+      hasUnsavedChanges &&
+      !window.confirm(
+        'Tenés cambios pendientes sin guardar en el borrador. ¿Querés cerrar el panel y descartarlos?'
+      )
+    ) {
+      return;
+    }
+    onClose();
+  }, [hasUnsavedChanges, onClose]);
+
   useEffect(() => {
     if (!isOpen) return undefined;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     const onKey = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') handleSafeClose();
     };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen, onClose]);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [isOpen, handleSafeClose]);
 
   if (!isOpen) return null;
 
@@ -658,6 +681,13 @@ export default function AdminModal({
   };
 
   const handleReset = async () => {
+    if (
+      !window.confirm(
+        '¿Restaurar toda la configuración a los valores originales? Se perderán los cambios personalizados.'
+      )
+    ) {
+      return;
+    }
     setSaving(true);
     await onResetConfig();
     setSaving(false);
@@ -791,14 +821,14 @@ export default function AdminModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-stone-950/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4"
+      className="fixed inset-0 z-50 bg-stone-950/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overscroll-contain"
       role="dialog"
       aria-modal="true"
       aria-label="Panel de Administración Reto al Filo"
-      onClick={onClose}
+      onClick={handleSafeClose}
     >
       <div
-        className={`w-full max-w-4xl ${unlocked ? 'h-[88dvh] sm:h-[680px]' : 'h-auto'} max-h-[92dvh] rounded-3xl bg-stone-900 border border-stone-700 shadow-2xl flex flex-col overflow-hidden text-stone-100`}
+        className={`w-full max-w-4xl ${unlocked ? 'h-[88dvh] sm:h-[680px]' : 'h-auto'} max-h-[92dvh] rounded-3xl bg-stone-900 border border-stone-700 shadow-2xl flex flex-col overflow-hidden overscroll-contain text-stone-100`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header del Modal */}
@@ -833,7 +863,7 @@ export default function AdminModal({
             )}
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleSafeClose}
               aria-label="Cerrar panel de administración"
               className="p-2 rounded-xl text-stone-400 hover:text-white hover:bg-stone-800 cursor-pointer"
             >
@@ -888,7 +918,7 @@ export default function AdminModal({
             </div>
 
             {/* Contenido scrolleable */}
-            <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-5">
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-5">
               {activeTab === 'general' && (
                 <AdminGeneralTab
                   draft={draft}
@@ -1004,7 +1034,7 @@ export default function AdminModal({
                 <>
                   <button
                     type="button"
-                    onClick={onClose}
+                    onClick={handleSafeClose}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold px-4 py-2.5 cursor-pointer"
                   >
                     Cerrar Panel
@@ -1044,7 +1074,7 @@ export default function AdminModal({
                 <>
                   <button
                     type="button"
-                    onClick={onClose}
+                    onClick={handleSafeClose}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold px-4 py-2.5 cursor-pointer"
                   >
                     Cerrar Panel
