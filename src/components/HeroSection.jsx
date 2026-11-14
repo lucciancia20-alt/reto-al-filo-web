@@ -73,8 +73,11 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         </div>
 
         {/* Título central imponente */}
-        <h1 className="max-w-3xl mx-auto text-balance font-display text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white uppercase leading-[1.05] drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
-          {(raceConfig.title || '').replace(/(\d+[a-zA-Z]+)\s+(Edici[óo]n)/i, '$1\u00A0$2')}
+        <h1 className="max-w-3xl mx-auto text-balance font-display text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-white uppercase leading-[1.08] drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
+          RETO AL FILO{' '}
+          <span className="whitespace-nowrap">
+            2<sup className="lowercase text-[0.55em] font-extrabold align-super">da</sup> EDICIÓN
+          </span>
         </h1>
 
         <p className="mt-3 text-lg sm:text-2xl font-bold uppercase tracking-[0.22em] text-amber-400">

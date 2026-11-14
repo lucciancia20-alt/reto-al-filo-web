@@ -55,8 +55,11 @@ export default function GallerySection() {
             <span>Galería · 1ra Edición</span>
           </div>
 
-          <h2 className="mt-3 text-balance font-display text-3xl sm:text-5xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
-            Viví el Reto — Postales de la 1ra{'\u00A0'}Edición
+          <h2 className="mt-3 text-balance font-display text-2xl sm:text-3xl md:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
+            VIVÍ EL RETO: POSTALES DE LA{' '}
+            <span className="whitespace-nowrap">
+              1<sup className="lowercase text-[0.55em] font-extrabold align-super">ra</sup> EDICIÓN
+            </span>
           </h2>
 
           <p className="mt-3 max-w-2xl mx-auto text-balance text-sm sm:text-base text-stone-300">
