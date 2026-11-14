@@ -3,6 +3,7 @@ export const RACE_CONFIG = {
   subtitle: 'Abril 2027',
   targetDateIso: '2027-04-10T08:00:00-03:00',
   whatsappNumber: '5492915228310',
+  notificationEmail: 'lciancia1972@gmail.com',
   heroImage: '/images/hero-trail-runners.jpg',
   googleMapsUrl: 'https://maps.google.com/?q=-38.079253,-61.965131',
   locationName: 'Base del Cerro Providencia — Tornquist Buenos Aires',
@@ -461,6 +462,10 @@ export function mergeRaceConfig(override) {
   return {
     ...RACE_CONFIG,
     ...override,
+    whatsappNumber:
+      String(override.whatsappNumber || '').trim() || RACE_CONFIG.whatsappNumber,
+    notificationEmail:
+      String(override.notificationEmail || '').trim() || RACE_CONFIG.notificationEmail,
     targetDateIso: resolvedTargetDateIso,
     heroImage: resolvedHeroImage,
     payment: {

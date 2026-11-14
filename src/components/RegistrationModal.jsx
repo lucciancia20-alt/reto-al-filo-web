@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import emailjs from '@emailjs/browser';
 import {
   X,
   MessageCircle,
@@ -24,6 +25,43 @@ import {
 
 const SHIRT_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 const GENDERS = ['Femenino', 'Masculino', 'Otro'];
+
+const EMAILJS_SERVICE_ID = 'service_g95to2m';
+const EMAILJS_TEMPLATE_ID = 'template_hvz69he';
+const EMAILJS_PUBLIC_KEY = 'CFqaVqNNdftgIXlYp';
+
+/**
+ * Envía en segundo plano una notificación por correo al email configurado en Firestore sin bloquear al corredor.
+ */
+async function sendAdminNotificationEmail(created, uploadedUrl, raceConfig) {
+  try {
+    const toEmail =
+      String(raceConfig?.notificationEmail || '').trim() ||
+      RACE_CONFIG.notificationEmail ||
+      'lciancia1972@gmail.com';
+
+    await emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      {
+        to_email: toEmail,
+        codigo: created.code,
+        nombre: created.fullName,
+        distancia: created.distance,
+        dni: created.dni,
+        categoria: created.gender,
+        celular: created.phone,
+        localidad: created.city,
+        team: String(created.team || '').trim() || 'Sin agrupación',
+        remera: created.shirtSize || '-',
+        comprobante_url: created.receiptUrl || uploadedUrl || 'Pendiente de adjuntar',
+      },
+      { publicKey: EMAILJS_PUBLIC_KEY }
+    );
+  } catch (err) {
+    console.warn('[Reto al Filo] Fallo silencioso enviando notificación EmailJS:', err);
+  }
+}
 
 const INITIAL_FORM = {
   fullName: '',
@@ -241,6 +279,7 @@ export default function RegistrationModal({
         receiptFormat: uploaded.format || '',
       });
 
+      void sendAdminNotificationEmail(created, uploaded.secureUrl, raceConfig);
       setConfirmedReg(created);
     } catch (err) {
       setSubmitError(
@@ -252,13 +291,13 @@ export default function RegistrationModal({
     }
   };
 
-  const cleanPhone = String(
-    raceConfig.whatsappNumber || RACE_CONFIG.whatsappNumber
-  ).replace(/[^\d]/g, '');
+  const cleanPhone =
+    String(raceConfig?.whatsappNumber || RACE_CONFIG.whatsappNumber).replace(/[^\d]/g, '') ||
+    RACE_CONFIG.whatsappNumber;
 
   const confirmationWhatsappHref = confirmedReg
     ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-        `Hola! Ya completé mi inscripción web en Reto al Filo - 2da Edición.\nCódigo: ${confirmedReg.code}\nCorredor/a: ${confirmedReg.fullName} (DNI ${confirmedReg.dni})\nDistancia: ${confirmedReg.distance} (${confirmedReg.priceSnapshot})\nTalle remera: ${confirmedReg.shirtSize}`
+        `¡Hola! Acabo de inscribirme a Reto al Filo 2027. Mi código es *${confirmedReg.code}* - *${confirmedReg.fullName}* (*${confirmedReg.distance}*). Ya adjunté el comprobante en la web.`
       )}`
     : buildWhatsAppUrl(selectedDistance, raceConfig.whatsappNumber);
 
@@ -295,7 +334,7 @@ export default function RegistrationModal({
                 id="modal-inscripcion-title"
                 className="font-display text-lg sm:text-xl font-black text-white truncate"
               >
-                {confirmedReg ? '¡Inscripción Enviada!' : 'Formulario de Inscripción'}
+                {confirmedReg ? '¡Inscripción Recibida!' : 'Formulario de Inscripción'}
               </h3>
             </div>
           </div>
@@ -383,7 +422,7 @@ export default function RegistrationModal({
                 className="flex-1 min-h-[46px] inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wide px-4 py-3 shadow-lg shadow-emerald-500/20"
               >
                 <MessageCircle className="w-4 h-4 fill-stone-950 shrink-0" />
-                Enviar código por WhatsApp (opcional)
+                Avisar por WhatsApp a la Organización
               </a>
               <button
                 type="button"

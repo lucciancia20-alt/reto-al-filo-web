@@ -74,14 +74,30 @@ export default function AdminGeneralTab({
         </div>
         <div>
           <label className="block text-xs font-semibold text-stone-300 mb-1">
-            Número WhatsApp Inscripciones (con código país)
+            WhatsApp de la Organización (internacional sin signos)
           </label>
           <input
             type="text"
-            value={draft.whatsappNumber}
+            placeholder="5492915228310"
+            value={draft.whatsappNumber ?? ''}
             onChange={(e) => setDraft({ ...draft, whatsappNumber: e.target.value })}
             className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
           />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-xs font-semibold text-stone-300 mb-1">
+            Email de Notificaciones
+          </label>
+          <input
+            type="email"
+            placeholder="lciancia1972@gmail.com"
+            value={draft.notificationEmail ?? ''}
+            onChange={(e) => setDraft({ ...draft, notificationEmail: e.target.value })}
+            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+          />
+          <p className="mt-1 text-[11px] text-stone-400">
+            Recibe automáticamente un aviso por correo cada vez que un corredor completa la inscripción web.
+          </p>
         </div>
         <div className="sm:col-span-2">
           <label className="block text-xs font-semibold text-stone-300 mb-1">
