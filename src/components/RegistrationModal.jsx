@@ -400,7 +400,7 @@ export default function RegistrationModal({
         ) : (
           <form
             id="runner-registration-form"
-            autoComplete="off"
+            autoComplete="on"
             onSubmit={handleSubmit}
             className="flex-1 min-h-0 flex flex-col overflow-hidden"
           >
@@ -550,13 +550,14 @@ export default function RegistrationModal({
                       htmlFor="reg-fullname"
                       className="block text-xs font-semibold text-stone-300 mb-1"
                     >
-                      Nombre y Apellido completos *
+                      Nombre y Apellido completos <span className="text-red-500">*</span>
                     </label>
                     <input
                       id="reg-fullname"
+                      name="fullName"
                       type="text"
                       required
-                      autoComplete="off"
+                      autoComplete="name"
                       value={form.fullName}
                       onChange={(e) => handleFieldChange('fullName', e.target.value)}
                       placeholder="Ej. María Gómez"
@@ -569,14 +570,15 @@ export default function RegistrationModal({
                       htmlFor="reg-dni"
                       className="block text-xs font-semibold text-stone-300 mb-1"
                     >
-                      DNI *
+                      DNI <span className="text-red-500">*</span>
                     </label>
                     <input
                       id="reg-dni"
+                      name="dni"
                       type="text"
                       inputMode="numeric"
                       required
-                      autoComplete="off"
+                      autoComplete="on"
                       value={form.dni}
                       onChange={(e) => handleFieldChange('dni', e.target.value)}
                       placeholder="Ej. 34567890"
@@ -589,15 +591,16 @@ export default function RegistrationModal({
                       htmlFor="reg-birthdate"
                       className="block text-xs font-semibold text-stone-300 mb-1"
                     >
-                      Fecha de Nacimiento *
+                      Fecha de Nacimiento <span className="text-red-500">*</span>
                     </label>
                     <input
                       id="reg-birthdate"
+                      name="birthDate"
                       type="text"
                       inputMode="numeric"
                       maxLength={10}
                       required
-                      autoComplete="off"
+                      autoComplete="bday"
                       value={form.birthDate}
                       onChange={(e) =>
                         handleFieldChange('birthDate', formatBirthDateInput(e.target.value))
@@ -612,11 +615,12 @@ export default function RegistrationModal({
                       htmlFor="reg-gender"
                       className="block text-xs font-semibold text-stone-300 mb-1"
                     >
-                      Categoría / Género *
+                      Categoría / Género <span className="text-red-500">*</span>
                     </label>
                     <select
                       id="reg-gender"
-                      autoComplete="off"
+                      name="gender"
+                      autoComplete="sex"
                       value={form.gender}
                       onChange={(e) => handleFieldChange('gender', e.target.value)}
                       className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
@@ -634,13 +638,14 @@ export default function RegistrationModal({
                       htmlFor="reg-phone"
                       className="block text-xs font-semibold text-stone-300 mb-1"
                     >
-                      Celular / WhatsApp *
+                      Celular / WhatsApp <span className="text-red-500">*</span>
                     </label>
                     <input
                       id="reg-phone"
+                      name="phone"
                       type="tel"
                       required
-                      autoComplete="off"
+                      autoComplete="tel"
                       value={form.phone}
                       onChange={(e) => handleFieldChange('phone', e.target.value)}
                       placeholder="Ej. 291 4000000"
@@ -653,13 +658,14 @@ export default function RegistrationModal({
                       htmlFor="reg-email"
                       className="block text-xs font-semibold text-stone-300 mb-1"
                     >
-                      Email *
+                      Email <span className="text-red-500">*</span>
                     </label>
                     <input
                       id="reg-email"
+                      name="email"
                       type="email"
                       required
-                      autoComplete="off"
+                      autoComplete="email"
                       value={form.email}
                       onChange={(e) => handleFieldChange('email', e.target.value)}
                       placeholder="corredor@mail.com"
@@ -672,13 +678,14 @@ export default function RegistrationModal({
                       htmlFor="reg-city"
                       className="block text-xs font-semibold text-stone-300 mb-1"
                     >
-                      Localidad / Provincia *
+                      Localidad / Provincia <span className="text-red-500">*</span>
                     </label>
                     <input
                       id="reg-city"
+                      name="city"
                       type="text"
                       required
-                      autoComplete="off"
+                      autoComplete="address-level2"
                       value={form.city}
                       onChange={(e) => handleFieldChange('city', e.target.value)}
                       placeholder="Ej. Bahía Blanca, Bs. As."
@@ -695,8 +702,9 @@ export default function RegistrationModal({
                     </label>
                     <input
                       id="reg-team"
+                      name="organization"
                       type="text"
-                      autoComplete="off"
+                      autoComplete="organization"
                       value={form.team}
                       onChange={(e) => handleFieldChange('team', e.target.value)}
                       placeholder="Ej. Sierra Trail Runners o Libre"
@@ -707,7 +715,7 @@ export default function RegistrationModal({
                   {/* Talle de Remera */}
                   <div className="sm:col-span-2">
                     <span className="block text-xs font-semibold text-stone-300 mb-1.5">
-                      Talle de Remera Oficial *
+                      Talle de Remera Oficial <span className="text-red-500">*</span>
                     </span>
                     <div className="grid grid-cols-6 gap-1.5">
                       {SHIRT_SIZES.map((size) => {
@@ -743,13 +751,14 @@ export default function RegistrationModal({
                         htmlFor="reg-emergency-name"
                         className="block text-xs font-semibold text-stone-300 mb-1"
                       >
-                        Nombre del Contacto *
+                        Nombre del Contacto <span className="text-red-500">*</span>
                       </label>
                       <input
                         id="reg-emergency-name"
+                        name="emergencyContactName"
                         type="text"
                         required
-                        autoComplete="off"
+                        autoComplete="on"
                         value={form.emergencyContactName}
                         onChange={(e) =>
                           handleFieldChange('emergencyContactName', e.target.value)
@@ -763,13 +772,14 @@ export default function RegistrationModal({
                         htmlFor="reg-emergency-phone"
                         className="block text-xs font-semibold text-stone-300 mb-1"
                       >
-                        Teléfono de Emergencia *
+                        Teléfono de Emergencia <span className="text-red-500">*</span>
                       </label>
                       <input
                         id="reg-emergency-phone"
+                        name="emergencyContactPhone"
                         type="tel"
                         required
-                        autoComplete="off"
+                        autoComplete="on"
                         value={form.emergencyContactPhone}
                         onChange={(e) =>
                           handleFieldChange('emergencyContactPhone', e.target.value)
@@ -787,8 +797,9 @@ export default function RegistrationModal({
                       </label>
                       <input
                         id="reg-medical"
+                        name="medicalNotes"
                         type="text"
-                        autoComplete="off"
+                        autoComplete="on"
                         value={form.medicalNotes}
                         onChange={(e) =>
                           handleFieldChange('medicalNotes', e.target.value)
@@ -804,7 +815,7 @@ export default function RegistrationModal({
               {/* 4. Adjuntar Comprobante */}
               <section className="space-y-2.5">
                 <span className="block text-xs font-bold uppercase tracking-wider text-white">
-                  4 · Adjuntar Comprobante de Pago *
+                  4 · Adjuntar Comprobante de Pago <span className="text-red-500">*</span>
                 </span>
                 <div className="rounded-2xl border border-dashed border-orange-500/40 hover:border-orange-500 transition-colors bg-stone-950/70 p-4 flex flex-col sm:flex-row items-center gap-4">
                   {receiptPreview ? (
