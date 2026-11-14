@@ -53,7 +53,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
   return (
     <section
       id="inicio"
-      className="relative min-h-[95dvh] md:min-h-[108dvh] flex items-center justify-center overflow-hidden bg-stone-950 py-24 md:py-32"
+      className="relative min-h-[92dvh] md:min-h-[100dvh] flex items-center justify-center overflow-hidden bg-stone-950 pt-16 pb-12 md:pt-20 md:pb-16"
     >
       {/* Imagen de fondo con srcSet responsivo y respaldo oscuro para lectura en exterior */}
       <img
@@ -62,11 +62,11 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         sizes="100vw"
         alt="Corredor de trail running en el filo de la montaña"
         fetchPriority="high"
-        className="absolute inset-0 w-full h-full object-cover object-top sm:object-[center_15%]"
+        className="absolute inset-0 w-full h-full object-cover object-[center_28%]"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/80" />
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 text-center flex flex-col items-center">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-2 pb-8 sm:pt-3 sm:pb-10 -mt-2 md:-mt-4 text-center flex flex-col items-center">
         {/* Etiqueta superior de aventura */}
         <div className="inline-flex items-center gap-2 rounded-full bg-stone-900/90 border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-amber-400 mb-3.5 shadow-[0_0_14px_rgba(249,115,22,0.3)]">
           <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
@@ -150,7 +150,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
       <a
         href="#circuito"
         aria-label="Desplazarse al circuito"
-        className="absolute bottom-2.5 left-1/2 -translate-x-1/2 text-stone-400 hover:text-amber-400 transition-colors animate-bounce"
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 text-stone-400 hover:text-amber-400 transition-colors animate-bounce"
       >
         <ChevronDown className="w-6 h-6" />
       </a>
