@@ -74,12 +74,20 @@ export default function AdminScheduleFaqTab({
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
-              <textarea
-                rows={2}
-                value={item.description}
-                onChange={(e) => onScheduleChange(idx, 'description', e.target.value)}
-                className="w-full rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs text-stone-200"
-              />
+              <div className="relative">
+                <textarea
+                  rows={2}
+                  value={item.description}
+                  onChange={(e) => onScheduleChange(idx, 'description', e.target.value)}
+                  className="block w-full resize-y admin-textarea rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 pt-1.5 pb-5 text-xs text-stone-200"
+                />
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none select-none absolute bottom-1 right-5 text-[10px] leading-none text-zinc-500/70"
+                >
+                  ↕ Agrandar / achicar
+                </span>
+              </div>
             </div>
           ))}
         </div>
@@ -101,12 +109,20 @@ export default function AdminScheduleFaqTab({
                 onChange={(e) => onFaqChange(idx, 'question', e.target.value)}
                 className="w-full rounded-lg bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-bold text-white"
               />
-              <textarea
-                rows={3}
-                value={faq.answer}
-                onChange={(e) => onFaqChange(idx, 'answer', e.target.value)}
-                className="w-full rounded-lg bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs text-stone-300"
-              />
+              <div className="relative">
+                <textarea
+                  rows={3}
+                  value={faq.answer}
+                  onChange={(e) => onFaqChange(idx, 'answer', e.target.value)}
+                  className="block w-full resize-y admin-textarea rounded-lg bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 pt-1.5 pb-5 text-xs text-stone-300"
+                />
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none select-none absolute bottom-1 right-5 text-[10px] leading-none text-zinc-500/70"
+                >
+                  ↕ Agrandar / achicar
+                </span>
+              </div>
             </div>
           ))}
         </div>

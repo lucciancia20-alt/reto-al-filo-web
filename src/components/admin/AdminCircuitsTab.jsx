@@ -77,12 +77,20 @@ export default function AdminCircuitsTab({
           <label className="block text-xs font-semibold text-stone-300 mb-1">
             Descripción del Circuito
           </label>
-          <textarea
-            rows={2}
-            value={activeCircuitDraft.description}
-            onChange={(e) => onUpdateCircuitField(editDistance, 'description', e.target.value)}
-            className={`w-full rounded-xl bg-stone-950 ${circuitInputBorderClass} px-3 py-2 text-sm text-white`}
-          />
+          <div className="relative">
+            <textarea
+              rows={2}
+              value={activeCircuitDraft.description}
+              onChange={(e) => onUpdateCircuitField(editDistance, 'description', e.target.value)}
+              className={`block w-full resize-y admin-textarea rounded-xl bg-stone-950 ${circuitInputBorderClass} px-3 pt-2 pb-5 text-sm text-white`}
+            />
+            <span
+              aria-hidden="true"
+              className="pointer-events-none select-none absolute bottom-1 right-5 text-[10px] leading-none text-zinc-500/70"
+            >
+              ↕ Agrandar / achicar
+            </span>
+          </div>
         </div>
       </div>
 

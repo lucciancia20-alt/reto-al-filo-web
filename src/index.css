@@ -36,4 +36,19 @@
   .date-input::-webkit-calendar-picker-indicator:hover {
     opacity: 1;
   }
+
+  /* Manija nativa de redimensionamiento en textareas del panel admin */
+  .admin-textarea::-webkit-resizer {
+    background: linear-gradient(
+      135deg,
+      transparent 45%,
+      rgba(249, 115, 22, 0.75) 45%,
+      rgba(249, 115, 22, 0.75) 55%,
+      transparent 55%,
+      transparent 72%,
+      rgba(249, 115, 22, 0.75) 72%,
+      rgba(249, 115, 22, 0.75) 82%,
+      transparent 82%
+    );
+  }
 }

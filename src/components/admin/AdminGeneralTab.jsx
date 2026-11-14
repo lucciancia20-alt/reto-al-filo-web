@@ -288,12 +288,20 @@ export default function AdminGeneralTab({
             <label className="block text-xs font-semibold text-stone-300 mb-1">
               Instrucciones para el Corredor
             </label>
-            <textarea
-              rows={1}
-              value={draft.payment?.instructions || ''}
-              onChange={(e) => onUpdatePaymentField('instructions', e.target.value)}
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs text-stone-200"
-            />
+            <div className="relative">
+              <textarea
+                rows={1}
+                value={draft.payment?.instructions || ''}
+                onChange={(e) => onUpdatePaymentField('instructions', e.target.value)}
+                className="block w-full resize-y admin-textarea rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 pt-1.5 pb-5 text-xs text-stone-200"
+              />
+              <span
+                aria-hidden="true"
+                className="pointer-events-none select-none absolute bottom-1 right-5 text-[10px] leading-none text-zinc-500/70"
+              >
+                ↕ Agrandar / achicar
+              </span>
+            </div>
           </div>
         </div>
       </div>
