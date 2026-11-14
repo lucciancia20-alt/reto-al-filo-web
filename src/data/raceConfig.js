@@ -334,6 +334,54 @@ export function syncScheduleWithTargetDate(schedule, targetDateIso) {
   });
 }
 
+/**
+ * Convierte un texto de tiempo de corte ("5 hs", "4,5 hs", "5:30 hs", "5 hs 30 min") a minutos.
+ */
+export function parseCutoffMinutes(cutoffTime) {
+  const raw = String(cutoffTime || '').toLowerCase().trim();
+  if (!raw) return null;
+
+  const hhmm = raw.match(/(\d{1,2})\s*:\s*(\d{2})/);
+  if (hhmm) return Number(hhmm[1]) * 60 + Number(hhmm[2]);
+
+  const hours = raw.match(/(\d+(?:[.,]\d+)?)\s*(?:h|hs|hrs?|horas?)?/);
+  if (!hours) return null;
+  let minutes = Math.round(Number(hours[1].replace(',', '.')) * 60);
+
+  const extraMin = raw.match(/(\d+)\s*(?:m|min|minutos?)\b/);
+  if (extraMin && raw.indexOf(extraMin[0]) > raw.indexOf(hours[0])) {
+    minutes += Number(extraMin[1]);
+  }
+  return Number.isFinite(minutes) && minutes > 0 ? minutes : null;
+}
+
+/**
+ * Obtiene la hora de largada (HH:MM) desde el cronograma sincronizado, con fallback a targetDateIso.
+ */
+export function getStartTime(schedule, targetDateIso) {
+  const synced = syncScheduleWithTargetDate(schedule || [], targetDateIso) || [];
+  const startItem = synced.find(
+    (item) => item && typeof item.title === 'string' && /largada/i.test(item.title)
+  );
+  const match = String(startItem?.time || '').match(/(\d{1,2}):(\d{2})/);
+  if (match) return `${match[1].padStart(2, '0')}:${match[2]}`;
+  return parseTargetDateParts(targetDateIso).timePart;
+}
+
+/**
+ * Calcula el horario de cierre general: hora de largada + tiempo de corte. Devuelve "HH:MM hs" o null.
+ */
+export function computeClosingTime(startTime, cutoffTime) {
+  const start = String(startTime || '').match(/(\d{1,2}):(\d{2})/);
+  const cutoffMinutes = parseCutoffMinutes(cutoffTime);
+  if (!start || cutoffMinutes == null) return null;
+
+  const total = (Number(start[1]) * 60 + Number(start[2]) + cutoffMinutes) % (24 * 60);
+  const hh = String(Math.floor(total / 60)).padStart(2, '0');
+  const mm = String(total % 60).padStart(2, '0');
+  return `${hh}:${mm} hs`;
+}
+
 export function buildWhatsAppUrl(distance = '27K', whatsappNumber = RACE_CONFIG.whatsappNumber) {
   const cleanPhone = String(whatsappNumber || RACE_CONFIG.whatsappNumber).replace(/[^\d]/g, '');
   const message = `Hola! Quiero inscribirme al Reto al Filo - 2da Edición en la distancia de ${distance}`;

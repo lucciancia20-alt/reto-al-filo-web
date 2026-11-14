@@ -10,7 +10,7 @@ import {
   Download,
   Mountain,
 } from 'lucide-react';
-import { RACE_CONFIG } from '../data/raceConfig';
+import { RACE_CONFIG, computeClosingTime, getStartTime } from '../data/raceConfig';
 import { GPX_TRACKS, interpolatePointAtKm } from '../data/gpxTracks';
 
 function buildElevationSvg(points, totalKm, minAltRaw, maxAltRaw) {
@@ -212,6 +212,9 @@ export default function CircuitSection({
 
   const cardIcons = [TrendingUp, Droplets, Clock];
 
+  const startTime = getStartTime(raceConfig?.schedule, raceConfig?.targetDateIso);
+  const closingTime = computeClosingTime(startTime, currentCircuit.cutoffTime);
+
   const dynamicStats = [
     {
       label: 'Distancia y Desnivel',
@@ -229,7 +232,9 @@ export default function CircuitSection({
     {
       label: 'Tiempo de Corte',
       value: currentCircuit.cutoffTime,
-      sub: currentCircuit.stats?.[2]?.sub || 'Control de paso obligatorio',
+      sub: closingTime
+        ? `Cierre general a las ${closingTime}`
+        : currentCircuit.stats?.[2]?.sub || 'Control de paso obligatorio',
     },
   ];
 
