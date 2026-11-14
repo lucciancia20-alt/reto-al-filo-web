@@ -103,8 +103,8 @@ export default function AdminCircuitsTab({
             onClick={onAddStation}
             className={`inline-flex items-center gap-1 rounded-xl border text-xs font-bold px-3 py-1.5 cursor-pointer transition-colors ${
               editDistance === '13K'
-                ? 'bg-red-500/20 hover:bg-red-500/30 text-red-500 border-red-500'
-                : 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border-cyan-500'
+                ? 'bg-black/40 hover:bg-red-500/10 text-red-500 border-red-500'
+                : 'bg-black/40 hover:bg-cyan-500/10 text-cyan-400 border-cyan-400'
             }`}
           >
             <Plus className="w-3.5 h-3.5" />
