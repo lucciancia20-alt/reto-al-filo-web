@@ -40,6 +40,31 @@ const INITIAL_FORM = {
   medicalNotes: '',
 };
 
+function formatBirthDateInput(rawValue) {
+  const digits = String(rawValue || '').replace(/\D/g, '').slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+}
+
+function isValidBirthDate(value) {
+  const match = String(value || '').trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) return false;
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
+  const maxYear = new Date().getFullYear() - 5;
+  if (year < 1920 || year > maxYear || month < 1 || month > 12 || day < 1) {
+    return false;
+  }
+  const date = new Date(year, month - 1, day);
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+}
+
 export default function RegistrationModal({
   isOpen,
   onClose,
@@ -102,7 +127,7 @@ export default function RegistrationModal({
       : c.hydrationCount;
     return {
       id,
-      title: c.tabLabel,
+      title: id === '13K' ? '13K Competitivo' : '27K Competitivo',
       price: c.price || RACE_CONFIG.circuits[id].price,
       elevation: `${c.elevationGain} D+`,
       details: `${stationCount} Puestos de Hidratación · Corte ${c.cutoffTime}`,
@@ -183,6 +208,13 @@ export default function RegistrationModal({
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError('');
+
+    if (!isValidBirthDate(form.birthDate)) {
+      setSubmitError(
+        'Ingresá una Fecha de Nacimiento válida en formato DD/MM/AAAA (por ejemplo 15/06/1987).'
+      );
+      return;
+    }
 
     if (!receiptFile) {
       setSubmitError(
@@ -368,6 +400,7 @@ export default function RegistrationModal({
         ) : (
           <form
             id="runner-registration-form"
+            autoComplete="off"
             onSubmit={handleSubmit}
             className="flex-1 min-h-0 flex flex-col overflow-hidden"
           >
@@ -528,6 +561,7 @@ export default function RegistrationModal({
                       id="reg-fullname"
                       type="text"
                       required
+                      autoComplete="off"
                       value={form.fullName}
                       onChange={(e) => handleFieldChange('fullName', e.target.value)}
                       placeholder="Ej. María Gómez"
@@ -547,6 +581,7 @@ export default function RegistrationModal({
                       type="text"
                       inputMode="numeric"
                       required
+                      autoComplete="off"
                       value={form.dni}
                       onChange={(e) => handleFieldChange('dni', e.target.value)}
                       placeholder="Ej. 34567890"
@@ -563,22 +598,17 @@ export default function RegistrationModal({
                     </label>
                     <input
                       id="reg-birthdate"
-                      type="date"
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={10}
                       required
-                      min="1920-01-01"
-                      max={new Date().toISOString().split('T')[0]}
+                      autoComplete="off"
                       value={form.birthDate}
-                      onChange={(e) => handleFieldChange('birthDate', e.target.value)}
-                      onClick={(e) => {
-                        // Abre el selector nativo al tocar cualquier parte del campo
-                        // (por defecto Chrome/Edge solo lo abren desde el ícono).
-                        try {
-                          e.currentTarget.showPicker?.();
-                        } catch {
-                          /* navegador sin soporte: queda el comportamiento nativo */
-                        }
-                      }}
-                      className="date-input block w-full min-h-[42px] appearance-none rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm text-white cursor-pointer [color-scheme:dark]"
+                      onChange={(e) =>
+                        handleFieldChange('birthDate', formatBirthDateInput(e.target.value))
+                      }
+                      placeholder="DD/MM/AAAA"
+                      className="w-full rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
                     />
                   </div>
 
@@ -591,6 +621,7 @@ export default function RegistrationModal({
                     </label>
                     <select
                       id="reg-gender"
+                      autoComplete="off"
                       value={form.gender}
                       onChange={(e) => handleFieldChange('gender', e.target.value)}
                       className="w-full rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
@@ -614,9 +645,10 @@ export default function RegistrationModal({
                       id="reg-phone"
                       type="tel"
                       required
+                      autoComplete="off"
                       value={form.phone}
                       onChange={(e) => handleFieldChange('phone', e.target.value)}
-                      placeholder="Ej. 291 5228310"
+                      placeholder="Ej. 291 4000000"
                       className="w-full rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
                     />
                   </div>
@@ -632,6 +664,7 @@ export default function RegistrationModal({
                       id="reg-email"
                       type="email"
                       required
+                      autoComplete="off"
                       value={form.email}
                       onChange={(e) => handleFieldChange('email', e.target.value)}
                       placeholder="corredor@mail.com"
@@ -650,6 +683,7 @@ export default function RegistrationModal({
                       id="reg-city"
                       type="text"
                       required
+                      autoComplete="off"
                       value={form.city}
                       onChange={(e) => handleFieldChange('city', e.target.value)}
                       placeholder="Ej. Bahía Blanca, Bs. As."
@@ -667,6 +701,7 @@ export default function RegistrationModal({
                     <input
                       id="reg-team"
                       type="text"
+                      autoComplete="off"
                       value={form.team}
                       onChange={(e) => handleFieldChange('team', e.target.value)}
                       placeholder="Ej. Sierra Trail Runners o Libre"
@@ -702,8 +737,8 @@ export default function RegistrationModal({
                 </div>
 
                 {/* Contacto de Emergencia y Datos Médicos */}
-                <div className="rounded-2xl bg-stone-950/70 border border-stone-800 p-3.5 space-y-3">
-                  <div className="flex items-center gap-2 text-xs font-bold text-rose-300">
+                <div className="rounded-2xl bg-orange-500/10 border border-orange-500/40 p-3.5 space-y-3">
+                  <div className="flex items-center gap-2 text-xs font-bold text-orange-400">
                     <ShieldAlert className="w-4 h-4 shrink-0" />
                     <span>Seguridad en Montaña (Contacto de Emergencia)</span>
                   </div>
@@ -719,6 +754,7 @@ export default function RegistrationModal({
                         id="reg-emergency-name"
                         type="text"
                         required
+                        autoComplete="off"
                         value={form.emergencyContactName}
                         onChange={(e) =>
                           handleFieldChange('emergencyContactName', e.target.value)
@@ -738,6 +774,7 @@ export default function RegistrationModal({
                         id="reg-emergency-phone"
                         type="tel"
                         required
+                        autoComplete="off"
                         value={form.emergencyContactPhone}
                         onChange={(e) =>
                           handleFieldChange('emergencyContactPhone', e.target.value)
@@ -756,6 +793,7 @@ export default function RegistrationModal({
                       <input
                         id="reg-medical"
                         type="text"
+                        autoComplete="off"
                         value={form.medicalNotes}
                         onChange={(e) =>
                           handleFieldChange('medicalNotes', e.target.value)
