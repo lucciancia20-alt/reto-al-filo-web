@@ -16,6 +16,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { GPX_TRACKS, parseGpxXml } from '../data/gpxTracks';
+import { syncScheduleWithTargetDate } from '../data/raceConfig';
 import {
   addPhotoToFirestore,
   fetchGalleryPhotos,
@@ -657,7 +658,12 @@ export default function AdminModal({
   const handleSaveAll = async () => {
     setSaving(true);
     setSaveFeedback(null);
-    const res = await onSaveConfig(draft);
+    const syncedDraft = {
+      ...draft,
+      schedule: syncScheduleWithTargetDate(draft.schedule, draft.targetDateIso),
+    };
+    setDraft(syncedDraft);
+    const res = await onSaveConfig(syncedDraft);
     setSaving(false);
 
     if (res.persistedTo === 'firestore') {

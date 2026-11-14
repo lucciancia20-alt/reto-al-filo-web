@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Flame, ChevronDown, Timer } from 'lucide-react';
-import { RACE_CONFIG } from '../data/raceConfig';
+import { RACE_CONFIG, parseTargetDateParts } from '../data/raceConfig';
 
 function calculateTimeLeft(targetIso) {
   const targetMs = Date.parse(targetIso);
@@ -48,6 +48,8 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
           .join(', ')
       : undefined;
 
+  const targetDateParts = parseTargetDateParts(raceConfig.targetDateIso);
+
   return (
     <section
       id="inicio"
@@ -68,7 +70,9 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         {/* Etiqueta superior de aventura */}
         <div className="inline-flex items-center gap-2 rounded-full bg-stone-900/90 border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-amber-400 mb-3.5 shadow-[0_0_14px_rgba(249,115,22,0.3)]">
           <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
-          <span>{raceConfig.subtitle} · 10 de Abril · 08:00 hs</span>
+          <span>
+            {raceConfig.subtitle} · {targetDateParts.formattedDayMonth} · {targetDateParts.formattedTime}
+          </span>
         </div>
 
         {/* Título central imponente */}
@@ -89,14 +93,14 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
           <strong className="text-white">13K Montaña</strong>.
         </p>
 
-        {/* Contador regresivo dinámico hacia el 10 de abril de 2027 */}
+        {/* Contador regresivo dinámico hacia la fecha y hora de largada */}
         <div className="mt-5 w-full max-w-md">
           <div className="flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-stone-300 mb-2">
             <Timer className="w-3.5 h-3.5 text-amber-400" />
             <span>
               {countdown.expired
                 ? '¡Largada en curso!'
-                : 'Cuenta regresiva hacia la largada (10 Abr 2027)'}
+                : `Cuenta regresiva hacia la largada (${targetDateParts.formattedShortDate})`}
             </span>
           </div>
 

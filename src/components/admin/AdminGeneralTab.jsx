@@ -1,5 +1,10 @@
 import React from 'react';
 import { Landmark } from 'lucide-react';
+import {
+  parseTargetDateParts,
+  buildTargetDateIso,
+  syncScheduleWithTargetDate,
+} from '../../data/raceConfig';
 
 export default function AdminGeneralTab({
   draft,
@@ -7,6 +12,17 @@ export default function AdminGeneralTab({
   onUpdateCircuitField,
   onUpdatePaymentField,
 }) {
+  const { datePart, timePart, formattedTime } = parseTargetDateParts(draft.targetDateIso);
+
+  const handleTargetDateChange = (nextDate, nextTime) => {
+    const nextIso = buildTargetDateIso(nextDate, nextTime);
+    setDraft((prev) => ({
+      ...prev,
+      targetDateIso: nextIso,
+      schedule: syncScheduleWithTargetDate(prev.schedule, nextIso),
+    }));
+  };
+
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -34,14 +50,27 @@ export default function AdminGeneralTab({
         </div>
         <div>
           <label className="block text-xs font-semibold text-stone-300 mb-1">
-            Fecha y Hora Largada (Formato ISO)
+            Fecha y Hora de Largada (Argentina -03:00)
           </label>
-          <input
-            type="text"
-            value={draft.targetDateIso}
-            onChange={(e) => setDraft({ ...draft, targetDateIso: e.target.value })}
-            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
-          />
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="date"
+              aria-label="Fecha de largada"
+              value={datePart}
+              onChange={(e) => handleTargetDateChange(e.target.value, timePart)}
+              className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2.5 text-sm font-mono text-white [color-scheme:dark]"
+            />
+            <input
+              type="time"
+              aria-label="Hora de largada"
+              value={timePart}
+              onChange={(e) => handleTargetDateChange(datePart, e.target.value)}
+              className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2.5 text-sm font-mono text-white [color-scheme:dark]"
+            />
+          </div>
+          <p className="mt-1 text-[11px] text-stone-400">
+            Sincronizado automáticamente con la portada y &quot;Largada 27K y 13K&quot; ({formattedTime}).
+          </p>
         </div>
         <div>
           <label className="block text-xs font-semibold text-stone-300 mb-1">

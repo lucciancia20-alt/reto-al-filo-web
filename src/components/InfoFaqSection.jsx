@@ -8,11 +8,16 @@ import {
   ShieldCheck,
   FileText,
 } from 'lucide-react';
-import { RACE_CONFIG } from '../data/raceConfig';
+import { RACE_CONFIG, parseTargetDateParts, syncScheduleWithTargetDate } from '../data/raceConfig';
 
 export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
   const [openFaqId, setOpenFaqId] = useState(
     raceConfig?.faqs?.[0]?.id || RACE_CONFIG.faqs[0].id
+  );
+  const { formattedFullDate } = parseTargetDateParts(raceConfig.targetDateIso);
+  const syncedSchedule = syncScheduleWithTargetDate(
+    raceConfig.schedule || [],
+    raceConfig.targetDateIso
   );
 
   const faqIcons = {
@@ -32,7 +37,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
           <div className="text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
               <Clock className="w-3.5 h-3.5" />
-              <span>Cronograma Oficial · 10 de Abril 2027</span>
+              <span>Cronograma Oficial · {formattedFullDate}</span>
             </div>
 
             <h2 className="mt-2 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
@@ -46,7 +51,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
 
           {/* Línea de tiempo vertical con los horarios del día */}
           <div className="mt-5 sm:mt-6 max-w-2xl mx-auto relative pl-6 sm:pl-8 before:content-[''] before:absolute before:left-2.5 sm:before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-amber-500 before:via-amber-500/50 before:to-stone-800 space-y-3.5">
-            {(raceConfig.schedule || []).map((item, idx) => (
+            {syncedSchedule.map((item, idx) => (
               <div
                 key={`${item.time}-${idx}`}
                 className="relative rounded-2xl bg-stone-900/80 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] p-4 sm:p-5 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"

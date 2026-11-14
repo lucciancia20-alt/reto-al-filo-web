@@ -220,6 +220,120 @@ export const RACE_CONFIG = {
   ],
 };
 
+const ARGENTINA_TIMEZONE = 'America/Argentina/Buenos_Aires';
+const MONTHS_ES = [
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
+];
+const MONTHS_SHORT_ES = [
+  'Ene',
+  'Feb',
+  'Mar',
+  'Abr',
+  'May',
+  'Jun',
+  'Jul',
+  'Ago',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dic',
+];
+
+/**
+ * Extrae fecha y hora local de Argentina (-03:00) y sus textos formateados desde un string ISO.
+ */
+export function parseTargetDateParts(isoString = RACE_CONFIG.targetDateIso) {
+  const raw = String(isoString || RACE_CONFIG.targetDateIso || '2027-04-10T08:00:00-03:00').trim();
+  let datePart = '2027-04-10';
+  let timePart = '08:00';
+
+  const parsedMs = Date.parse(raw);
+  if (!Number.isNaN(parsedMs)) {
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: ARGENTINA_TIMEZONE,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    });
+    const parts = Object.fromEntries(
+      formatter
+        .formatToParts(new Date(parsedMs))
+        .filter((p) => p.type !== 'literal')
+        .map((p) => [p.type, p.value])
+    );
+    if (parts.year && parts.month && parts.day && parts.hour && parts.minute) {
+      datePart = `${parts.year}-${parts.month}-${parts.day}`;
+      timePart = `${parts.hour}:${parts.minute}`;
+    }
+  } else {
+    const match = raw.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/);
+    if (match) {
+      datePart = match[1];
+      timePart = match[2];
+    }
+  }
+
+  const [yearStr, monthStr, dayStr] = datePart.split('-');
+  const dayNum = Number(dayStr) || 10;
+  const monthIdx = Math.max(0, Math.min(11, (Number(monthStr) || 4) - 1));
+  const monthFull = MONTHS_ES[monthIdx] || 'Abril';
+  const monthShort = MONTHS_SHORT_ES[monthIdx] || 'Abr';
+
+  return {
+    datePart,
+    timePart,
+    formattedTime: `${timePart} hs`,
+    formattedDayMonth: `${dayNum} de ${monthFull}`,
+    formattedShortDate: `${dayNum} ${monthShort} ${yearStr || '2027'}`,
+    formattedFullDate: `${dayNum} de ${monthFull} ${yearStr || '2027'}`,
+  };
+}
+
+/**
+ * Construye un timestamp ISO válido con huso horario de Argentina (-03:00).
+ */
+export function buildTargetDateIso(datePart, timePart) {
+  const fallback = parseTargetDateParts(RACE_CONFIG.targetDateIso);
+  const safeDate = /^\d{4}-\d{2}-\d{2}$/.test(String(datePart || '').trim())
+    ? String(datePart).trim()
+    : fallback.datePart;
+  const safeTime = /^\d{2}:\d{2}$/.test(String(timePart || '').trim())
+    ? String(timePart).trim()
+    : fallback.timePart;
+  return `${safeDate}T${safeTime}:00-03:00`;
+}
+
+/**
+ * Sincroniza el horario del hito de Largada en el cronograma con la hora de targetDateIso.
+ */
+export function syncScheduleWithTargetDate(schedule, targetDateIso) {
+  if (!Array.isArray(schedule)) return schedule;
+  const { formattedTime } = parseTargetDateParts(targetDateIso);
+  return schedule.map((item) => {
+    if (item && typeof item.title === 'string' && /largada/i.test(item.title)) {
+      return {
+        ...item,
+        time: formattedTime,
+      };
+    }
+    return item;
+  });
+}
+
 export function buildWhatsAppUrl(distance = '27K', whatsappNumber = RACE_CONFIG.whatsappNumber) {
   const cleanPhone = String(whatsappNumber || RACE_CONFIG.whatsappNumber).replace(/[^\d]/g, '');
   const message = `Hola! Quiero inscribirme al Reto al Filo - 2da Edición en la distancia de ${distance}`;
@@ -272,7 +386,9 @@ export function mergeRaceConfig(override) {
       ? RACE_CONFIG.heroImage
       : override.heroImage;
 
-  const nextSchedule = Array.isArray(override.schedule)
+  const resolvedTargetDateIso = override.targetDateIso || RACE_CONFIG.targetDateIso;
+
+  const rawSchedule = Array.isArray(override.schedule)
     ? override.schedule.map((item) => ({
         day: item?.day ?? 'Sábado 10',
         ...item,
@@ -280,6 +396,8 @@ export function mergeRaceConfig(override) {
         description: normalizeDistanceCopy(item?.description),
       }))
     : RACE_CONFIG.schedule;
+
+  const nextSchedule = syncScheduleWithTargetDate(rawSchedule, resolvedTargetDateIso);
 
   const nextFaqs = Array.isArray(override.faqs)
     ? override.faqs.map((faq) => ({
@@ -292,6 +410,7 @@ export function mergeRaceConfig(override) {
   return {
     ...RACE_CONFIG,
     ...override,
+    targetDateIso: resolvedTargetDateIso,
     heroImage: resolvedHeroImage,
     payment: {
       ...RACE_CONFIG.payment,
