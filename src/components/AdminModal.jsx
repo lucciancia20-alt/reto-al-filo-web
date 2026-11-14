@@ -924,7 +924,10 @@ export default function AdminModal({
             </div>
 
             {/* Contenido scrolleable */}
-            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:px-6 sm:py-4 space-y-4">
+            <div
+              style={{ scrollbarGutter: 'stable' }}
+              className="flex-1 min-h-0 overflow-y-scroll overscroll-contain p-4 sm:px-6 sm:py-4 space-y-4"
+            >
               {activeTab === 'general' && (
                 <AdminGeneralTab
                   draft={draft}

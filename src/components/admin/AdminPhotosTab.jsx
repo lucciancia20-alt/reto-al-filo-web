@@ -32,11 +32,11 @@ export default function AdminPhotosTab({
   onDeleteGalleryPhoto,
 }) {
   return (
-    <div className="space-y-5">
+    <div className="space-y-3">
       <form
         id="admin-photo-form"
         onSubmit={onAddPhoto}
-        className="rounded-2xl bg-stone-950 border border-stone-800 p-5 space-y-4"
+        className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 sm:p-4 space-y-2.5"
       >
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
@@ -54,43 +54,27 @@ export default function AdminPhotosTab({
         </div>
 
         {/* Selector de uno o múltiples archivos */}
-        <div className="rounded-2xl border border-dashed border-stone-700 bg-stone-900/60 p-4 space-y-4">
-          {photoPreviews.length > 0 ? (
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
-              {photoPreviews.map((item, idx) => (
-                <div
-                  key={`${item.name}-${idx}`}
-                  className="relative aspect-square rounded-xl overflow-hidden border border-stone-700 bg-stone-950"
-                >
-                  <img
-                    src={item.url}
-                    alt={item.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex items-center justify-center py-4 text-stone-500">
-              <Camera className="w-9 h-9" />
-            </div>
-          )}
-
+        <div className="rounded-xl border border-dashed border-stone-700 bg-stone-900/60 px-3.5 py-3 space-y-2.5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold text-stone-200">
-                {photoFiles.length > 0
-                  ? `${photoFiles.length} ${photoFiles.length === 1 ? 'foto lista para subir' : 'fotos listas para subir'}`
-                  : 'Seleccioná una o varias fotos (.jpg, .png, .webp) de paisajes o corredores'}
-              </p>
-              <p className="text-[11px] text-stone-400 mt-0.5">
-                Se optimizan y guardan en la carpeta{' '}
-                <span className="font-mono">reto-al-filo/galeria</span>.
-              </p>
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-xl bg-stone-950 border border-stone-800 flex items-center justify-center text-stone-400 shrink-0">
+                <Camera className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-stone-200">
+                  {photoFiles.length > 0
+                    ? `${photoFiles.length} ${photoFiles.length === 1 ? 'foto lista para subir' : 'fotos listas para subir'}`
+                    : 'Seleccioná una o varias fotos (.jpg, .png, .webp) de paisajes o corredores'}
+                </p>
+                <p className="text-[11px] text-stone-400 mt-0.5">
+                  Se optimizan y guardan en la carpeta{' '}
+                  <span className="font-mono">reto-al-filo/galeria</span>.
+                </p>
+              </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 shrink-0">
-              <label className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 cursor-pointer transition-colors">
+              <label className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 cursor-pointer transition-colors">
                 <Upload className="w-4 h-4" />
                 {photoFiles.length > 0 ? 'Cambiar Fotos' : 'Elegir Fotos'}
                 <input
@@ -112,9 +96,26 @@ export default function AdminPhotosTab({
               )}
             </div>
           </div>
+
+          {photoPreviews.length > 0 && (
+            <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 pt-1">
+              {photoPreviews.map((item, idx) => (
+                <div
+                  key={`${item.name}-${idx}`}
+                  className="relative aspect-square rounded-xl overflow-hidden border border-stone-700 bg-stone-950"
+                >
+                  <img
+                    src={item.url}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div className="sm:col-span-2">
             <label className="block text-xs font-semibold text-stone-300 mb-1">
               Lugar o descripción breve (opcional)
@@ -124,7 +125,7 @@ export default function AdminPhotosTab({
               value={photoSector}
               onChange={(e) => setPhotoSector(e.target.value)}
               placeholder="Ej. Cumbre Cerro Providencia · 1ra Edición"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
+              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs sm:text-sm text-white"
             />
           </div>
           <div>
@@ -136,7 +137,7 @@ export default function AdminPhotosTab({
               value={uploadPreset}
               onChange={(e) => setUploadPreset(e.target.value)}
               placeholder="reto_al_filo"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-amber-300"
+              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs sm:text-sm font-mono text-amber-300"
             />
           </div>
           <div>
@@ -148,7 +149,7 @@ export default function AdminPhotosTab({
               value={photoUrl}
               onChange={(e) => setPhotoUrl(e.target.value)}
               placeholder="https://res.cloudinary.com/..."
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
+              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs sm:text-sm text-white"
             />
           </div>
         </div>
@@ -191,7 +192,7 @@ export default function AdminPhotosTab({
       </form>
 
       {/* Fotos publicadas en la galería */}
-      <div className="rounded-2xl bg-stone-950 border border-stone-800 p-4 space-y-3">
+      <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h4 className="font-display text-sm font-bold text-white uppercase">
@@ -225,7 +226,7 @@ export default function AdminPhotosTab({
                 key={item.id}
                 className="rounded-xl overflow-hidden bg-stone-900 border border-stone-800 flex flex-col"
               >
-                <div className="relative aspect-[4/3] bg-stone-950 overflow-hidden">
+                <div className="relative aspect-[16/10] bg-stone-950 overflow-hidden">
                   <img
                     src={item.cloudinaryThumb}
                     alt={item.sector}
@@ -235,7 +236,7 @@ export default function AdminPhotosTab({
                     ✓ Publicada en la web
                   </span>
                 </div>
-                <div className="p-2.5 flex items-center justify-between gap-2">
+                <div className="p-2 flex items-center justify-between gap-2">
                   <span className="text-[11px] text-stone-200 truncate">{item.sector}</span>
                   <button
                     type="button"
