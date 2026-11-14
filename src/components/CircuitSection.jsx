@@ -15,11 +15,11 @@ import { GPX_TRACKS, interpolatePointAtKm } from '../data/gpxTracks';
 
 function buildElevationSvg(points, totalKm, minAltRaw, maxAltRaw) {
   const width = 800;
-  const height = 260;
+  const height = 210;
   const padLeft = 48;
   const padRight = 24;
-  const padTop = 34;
-  const padBottom = 34;
+  const padTop = 26;
+  const padBottom = 26;
 
   const plotW = width - padLeft - padRight;
   const plotH = height - padTop - padBottom;
@@ -77,8 +77,8 @@ function buildElevationSvg(points, totalKm, minAltRaw, maxAltRaw) {
 
 function buildGpsMapSvg(points) {
   const width = 460;
-  const height = 320;
-  const pad = 34;
+  const height = 240;
+  const pad = 26;
 
   if (!points || points.length === 0) {
     return { width, height, path: '', project: () => ({ x: 0, y: 0 }) };
@@ -220,20 +220,20 @@ export default function CircuitSection({
   return (
     <section
       id="circuito"
-      className="py-8 sm:py-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
+      className="py-5 sm:py-6 bg-stone-950 border-t-2 border-orange-500/50 relative"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Encabezado */}
         <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
+          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3 py-0.5 text-[11px] font-bold uppercase tracking-widest text-amber-400">
             <Compass className="w-3.5 h-3.5" />
             <span>Circuito GPX Oficial y Altimetría Real</span>
           </div>
 
-          <h2 className="mt-2 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
+          <h2 className="mt-1.5 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
             Dominá el Desnivel
           </h2>
-          <p className="mt-1.5 max-w-2xl mx-auto text-balance text-sm sm:text-base text-stone-300">
+          <p className="mt-1 max-w-2xl mx-auto text-balance text-xs sm:text-sm text-stone-300">
             Trazado GPS real registrado en las sierras de Tornquist. Alterná entre las dos
             distancias para explorar el mapa, la altimetría punto a punto y los puestos de
             abastecimiento.
@@ -244,9 +244,9 @@ export default function CircuitSection({
         <div
           role="tablist"
           aria-label="Seleccionar distancia del circuito"
-          className="mt-4 sm:mt-5 flex justify-center"
+          className="mt-3 flex justify-center"
         >
-          <div className="inline-grid grid-cols-2 p-1.5 rounded-2xl bg-stone-900 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.25)] w-full max-w-md">
+          <div className="inline-grid grid-cols-2 p-1 rounded-2xl bg-stone-900 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.25)] w-full max-w-md">
             {Object.values(circuits).map((circuit) => {
               const isSelected = circuit.id === activeDistance;
               return (
@@ -259,7 +259,7 @@ export default function CircuitSection({
                     setHoverPoint(null);
                     onSelectDistance(circuit.id);
                   }}
-                  className={`py-2.5 px-4 rounded-xl font-display font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer ${
+                  className={`py-1.5 px-3.5 rounded-xl font-display font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer ${
                     isSelected
                       ? 'bg-amber-500 text-stone-950 shadow-lg shadow-amber-500/20'
                       : 'text-stone-300 hover:text-white'
@@ -273,11 +273,11 @@ export default function CircuitSection({
         </div>
 
         {/* Contenedor principal del Circuito GPX + Altimetría */}
-        <div className="mt-4 sm:mt-5 rounded-3xl bg-stone-900/90 border border-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.22)] overflow-hidden">
+        <div className="mt-3 rounded-3xl bg-stone-900/90 border border-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.22)] overflow-hidden">
           {/* Barra superior */}
-          <div className="px-4 sm:px-6 py-3 bg-stone-950/75 border-b border-orange-500/40 flex flex-wrap items-center justify-between gap-3">
+          <div className="px-3.5 sm:px-5 py-2 bg-stone-950/75 border-b border-orange-500/40 flex flex-wrap items-center justify-between gap-2.5">
             <div className="flex items-center gap-2.5">
-              <span className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0">
+              <span className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0">
                 <MapIcon className="w-4 h-4" />
               </span>
               <div>
@@ -316,11 +316,11 @@ export default function CircuitSection({
           </div>
 
           {/* Grilla 2 columnas: Mapa GPS 2D + Altimetría Real */}
-          <div className="p-3.5 sm:p-4 bg-gradient-to-b from-stone-950/50 to-stone-900">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+          <div className="p-2.5 sm:p-3.5 bg-gradient-to-b from-stone-950/50 to-stone-900">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
               {/* Columna Izquierda: Recorrido GPS Vectorial */}
-              <div className="lg:col-span-5 rounded-2xl bg-stone-950/90 border border-orange-500/80 shadow-[0_0_14px_rgba(249,115,22,0.18)] p-3 sm:p-4 flex flex-col justify-between">
-                <div className="flex items-center justify-between text-xs mb-2">
+              <div className="lg:col-span-5 rounded-2xl bg-stone-950/90 border border-orange-500/80 shadow-[0_0_14px_rgba(249,115,22,0.18)] p-2.5 sm:p-3 flex flex-col justify-between">
+                <div className="flex items-center justify-between text-xs mb-1.5">
                   <span className="font-display font-bold uppercase tracking-wider text-stone-200 flex items-center gap-1.5">
                     <Compass className="w-3.5 h-3.5 text-amber-400" />
                     Trazado GPS ({String(track.totalKm).replace('.', ',')} km)
@@ -332,7 +332,7 @@ export default function CircuitSection({
 
                 <svg
                   viewBox={`0 0 ${mapSvg.width} ${mapSvg.height}`}
-                  className="w-full h-56 sm:h-64 rounded-xl bg-[radial-gradient(#292524_1px,transparent_1px)] [background-size:16px_16px] bg-stone-950"
+                  className="w-full h-36 sm:h-44 max-h-44 rounded-xl bg-[radial-gradient(#292524_1px,transparent_1px)] [background-size:16px_16px] bg-stone-950"
                   role="img"
                   aria-label={`Mapa del recorrido GPS para ${currentCircuit.tabLabel}`}
                 >
@@ -432,7 +432,7 @@ export default function CircuitSection({
                   })()}
                 </svg>
 
-                <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-[11px] text-stone-400">
+                <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-[11px] text-stone-400">
                   <span className="inline-flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
                     Largada / Meta
@@ -449,8 +449,8 @@ export default function CircuitSection({
               </div>
 
               {/* Columna Derecha: Perfil de Altimetría Real SVG */}
-              <div className="lg:col-span-7 rounded-2xl bg-stone-950/90 border border-orange-500/80 shadow-[0_0_14px_rgba(249,115,22,0.18)] p-3 sm:p-4 flex flex-col justify-between">
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-2 text-xs">
+              <div className="lg:col-span-7 rounded-2xl bg-stone-950/90 border border-orange-500/80 shadow-[0_0_14px_rgba(249,115,22,0.18)] p-2.5 sm:p-3 flex flex-col justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5 text-xs">
                   <span className="font-display font-bold uppercase tracking-wider text-stone-200 flex items-center gap-1.5">
                     <Mountain className="w-3.5 h-3.5 text-amber-400" />
                     Perfil de Altimetría Real ({track.minAlt}m – {track.maxAlt}m)
@@ -465,7 +465,7 @@ export default function CircuitSection({
                 <div className="w-full overflow-x-auto">
                   <svg
                     viewBox={`0 0 ${elevationSvg.width} ${elevationSvg.height}`}
-                    className="w-full h-56 sm:h-64 select-none touch-pan-y cursor-crosshair"
+                    className="w-full h-36 sm:h-44 max-h-44 select-none touch-pan-y cursor-crosshair"
                     role="img"
                     aria-label={`Gráfico de altimetría real para ${currentCircuit.tabLabel}`}
                     onPointerMove={handleSvgPointerMove}
@@ -633,7 +633,7 @@ export default function CircuitSection({
                   </svg>
                 </div>
 
-                <div className="mt-2.5 flex items-center justify-between text-[11px] text-stone-400">
+                <div className="mt-1.5 flex items-center justify-between text-[10px] sm:text-[11px] text-stone-400">
                   <span>Mín: {track.minAlt} msnm</span>
                   <span>Desnivel positivo acumulado: {currentCircuit.elevationGain}</span>
                   <span>Máx: {track.maxAlt} msnm</span>
@@ -642,12 +642,12 @@ export default function CircuitSection({
             </div>
 
             {/* Lista de Puestos de Hidratación + CTA */}
-            <div className="mt-3.5 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-orange-500/30">
-              <div className="flex flex-wrap gap-2">
+            <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-orange-500/30">
+              <div className="flex flex-wrap gap-1.5">
                 {stations.map((st) => (
                   <span
                     key={st.id || st.shortCode}
-                    className="inline-flex items-center gap-1.5 text-xs bg-stone-950 border border-orange-500/70 text-stone-200 px-3 py-1.5 rounded-xl"
+                    className="inline-flex items-center gap-1.5 text-[11px] bg-stone-950 border border-orange-500/70 text-stone-200 px-2.5 py-1 rounded-xl"
                   >
                     <Droplets className="w-3.5 h-3.5 text-sky-400" />
                     {st.label} (KM {st.km}) · {st.alt}m
@@ -658,7 +658,7 @@ export default function CircuitSection({
               <button
                 type="button"
                 onClick={() => onOpenModalWithDistance(activeDistance)}
-                className="inline-flex items-center gap-2 rounded-xl bg-amber-500/15 hover:bg-amber-500 text-amber-300 hover:text-stone-950 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.3)] font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 rounded-xl bg-amber-500/15 hover:bg-amber-500 text-amber-300 hover:text-stone-950 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.3)] font-display font-bold text-xs uppercase tracking-wider px-3.5 py-1.5 transition-all cursor-pointer"
               >
                 <Flame className="w-4 h-4" />
                 Inscribirme en {activeDistance}
@@ -668,25 +668,25 @@ export default function CircuitSection({
         </div>
 
         {/* 3 Tarjetas de Estadísticas Minimalistas */}
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           {dynamicStats.map((stat, idx) => {
             const IconComponent = cardIcons[idx] || TrendingUp;
             return (
               <div
                 key={stat.label}
-                className="rounded-2xl bg-stone-900/75 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] p-4 flex items-start gap-4 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
+                className="rounded-2xl bg-stone-900/75 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] px-3.5 py-2.5 flex items-center gap-3 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
               >
-                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
-                  <IconComponent className="w-6 h-6" />
+                <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
+                  <IconComponent className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-stone-400">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-400">
                     {stat.label}
                   </span>
-                  <div className="mt-1 font-display text-2xl sm:text-3xl font-black text-white">
+                  <div className="mt-0.5 font-display text-lg sm:text-xl font-black leading-tight text-white">
                     {stat.value}
                   </div>
-                  <p className="mt-1 text-xs text-stone-400">{stat.sub}</p>
+                  <p className="mt-0.5 text-[11px] leading-snug text-stone-400">{stat.sub}</p>
                 </div>
               </div>
             );
