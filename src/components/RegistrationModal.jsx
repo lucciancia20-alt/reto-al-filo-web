@@ -461,15 +461,10 @@ export default function RegistrationModal({
 
               {/* 2. Datos Bancarios para Transferir */}
               <section className="rounded-2xl bg-stone-950 border border-stone-800 p-4 space-y-3">
-                <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span className="text-xs font-bold uppercase tracking-wider text-white">
-                      2 · Transferencia Bancaria ({activeDistanceInfo.price})
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/30 px-2.5 py-0.5 rounded-full">
-                    {payment.bankEntity}
+                <div className="flex items-center gap-2">
+                  <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-white">
+                    2 · Transferencia Bancaria / Mercado Pago ({activeDistanceInfo.price})
                   </span>
                 </div>
 
