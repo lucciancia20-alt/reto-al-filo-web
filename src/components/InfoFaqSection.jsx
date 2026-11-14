@@ -30,7 +30,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
     <>
       <section
         id="cronograma"
-        className="scroll-mt-16 py-8 sm:py-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
+        className="scroll-mt-14 pt-4 sm:pt-5 pb-8 bg-stone-950 border-t-2 border-orange-500/50 relative"
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           {/* Parte 1: Línea de Tiempo (Cronograma del Día) */}
@@ -40,7 +40,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
               <span>Cronograma Oficial · {formattedFullDate}</span>
             </div>
 
-            <h2 className="mt-2 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
+            <h2 className="mt-1.5 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
               Horarios del Día de Carrera
             </h2>
             <p className="mt-1.5 max-w-2xl mx-auto text-balance text-sm sm:text-base text-stone-300">
@@ -50,11 +50,11 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
           </div>
 
           {/* Línea de tiempo vertical con los horarios del día */}
-          <div className="mt-5 sm:mt-6 max-w-2xl mx-auto relative pl-6 sm:pl-8 before:content-[''] before:absolute before:left-2.5 sm:before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-amber-500 before:via-amber-500/50 before:to-stone-800 space-y-3.5">
+          <div className="mt-3.5 sm:mt-4 max-w-2xl mx-auto relative pl-6 sm:pl-8 before:content-[''] before:absolute before:left-2.5 sm:before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-amber-500 before:via-amber-500/50 before:to-stone-800 space-y-2.5">
             {syncedSchedule.map((item, idx) => (
               <div
                 key={`${item.time}-${idx}`}
-                className="relative rounded-2xl bg-stone-900/80 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] p-4 sm:p-5 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
+                className="relative rounded-2xl bg-stone-900/80 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] p-3.5 sm:p-4 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
               >
                 {/* Punto indicador en la línea vertical */}
                 <span
@@ -81,10 +81,10 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   </span>
                 </div>
 
-                <h3 className="mt-2 font-display text-lg sm:text-xl font-extrabold text-white">
+                <h3 className="mt-1.5 font-display text-lg sm:text-xl font-extrabold text-white">
                   {item.title}
                 </h3>
-                <p className="mt-1 text-xs sm:text-sm text-stone-300 leading-relaxed">
+                <p className="mt-0.5 text-xs sm:text-sm text-stone-300 leading-relaxed">
                   {item.description}
                 </p>
               </div>
