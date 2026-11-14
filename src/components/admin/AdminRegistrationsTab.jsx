@@ -222,31 +222,35 @@ export default function AdminRegistrationsTab({
               >
                 {/* Fila operativa compacta (1-2 renglones) */}
                 <div className="px-3 py-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-                  {/* Identificación rápida del corredor */}
-                  <div className="flex flex-wrap items-center gap-2 min-w-0 flex-1">
-                    <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-md bg-stone-900 border border-stone-700 text-amber-300 shrink-0">
-                      {reg.code}
-                    </span>
-                    <span
-                      className={`text-[11px] font-black px-2 py-0.5 rounded-md border shrink-0 ${
-                        reg.distance === '13K'
-                          ? 'bg-stone-950 border-red-500 text-red-500'
-                          : 'bg-stone-950 border-cyan-500 text-cyan-400'
-                      }`}
-                    >
-                      {reg.distance}
-                    </span>
-                    <h4 className="font-display text-sm font-extrabold text-white truncate max-w-[200px] sm:max-w-[240px]">
-                      {reg.fullName}
-                    </h4>
-                    <span className="font-mono text-[11px] text-stone-400 shrink-0">
-                      DNI {reg.dni}
-                    </span>
-                    <span
-                      className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shrink-0 ${statusBadgeClass}`}
-                    >
-                      {reg.status}
-                    </span>
+                  {/* Identificación rápida del corredor (estructura fija en 2 líneas) */}
+                  <div className="min-w-0 flex-1 space-y-1.5">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-md bg-stone-900 border border-stone-700 text-amber-300 shrink-0">
+                        {reg.code}
+                      </span>
+                      <span
+                        className={`text-[11px] font-black px-2 py-0.5 rounded-md border shrink-0 ${
+                          reg.distance === '13K'
+                            ? 'bg-stone-950 border-red-500 text-red-500'
+                            : 'bg-stone-950 border-cyan-500 text-cyan-400'
+                        }`}
+                      >
+                        {reg.distance}
+                      </span>
+                      <h4 className="text-sm font-normal text-white whitespace-nowrap truncate min-w-0">
+                        {reg.fullName}
+                      </h4>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[11px] text-stone-400 shrink-0">
+                        DNI {reg.dni}
+                      </span>
+                      <span
+                        className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shrink-0 ${statusBadgeClass}`}
+                      >
+                        {reg.status}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Acciones operativas en línea */}
