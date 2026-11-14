@@ -127,12 +127,26 @@ export default function AdminRegistrationsTab({
               aria-label="Filtrar por estado"
               value={regStatusFilter}
               onChange={(e) => setRegStatusFilter(e.target.value)}
-              className="rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-xs text-white"
+              className={`rounded-xl bg-stone-900 border focus:outline-none px-3 py-2 text-xs transition-colors ${
+                regStatusFilter === 'pendiente'
+                  ? 'text-amber-400 border-amber-500/60 focus:border-amber-400 font-bold'
+                  : regStatusFilter === 'confirmado'
+                    ? 'text-emerald-400 border-emerald-500/60 focus:border-emerald-400 font-bold'
+                    : 'text-white border-white/15 focus:border-orange-400'
+              }`}
             >
-              <option value="all">Todos los estados</option>
-              <option value="pendiente">Pendientes</option>
-              <option value="confirmado">Confirmados</option>
-              <option value="rechazado">Rechazados</option>
+              <option value="all" className="bg-stone-900 text-white font-normal">
+                Todos los estados
+              </option>
+              <option value="pendiente" className="bg-stone-900 text-amber-400 font-bold">
+                Pendientes
+              </option>
+              <option value="confirmado" className="bg-stone-900 text-emerald-400 font-bold">
+                Confirmados
+              </option>
+              <option value="rechazado" className="bg-stone-900 text-white font-normal">
+                Rechazados
+              </option>
             </select>
 
             <button
