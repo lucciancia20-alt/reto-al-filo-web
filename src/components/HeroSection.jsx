@@ -53,14 +53,14 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
       id="inicio"
       className="relative min-h-[85dvh] sm:min-h-[88dvh] flex items-center justify-center overflow-hidden bg-stone-950 pt-20 pb-6"
     >
-      {/* Imagen de fondo Unsplash con srcSet responsivo y respaldo oscuro para lectura en exterior */}
+      {/* Imagen de fondo con srcSet responsivo y respaldo oscuro para lectura en exterior */}
       <img
         src={raceConfig.heroImage}
         srcSet={heroSrcSet}
         sizes="100vw"
         alt="Corredor de trail running en el filo de la montaña"
         fetchPriority="high"
-        className="absolute inset-0 w-full h-full object-cover object-center scale-105 animate-[pulse_18s_ease-in-out_infinite]"
+        className="absolute inset-0 w-full h-full object-cover object-center"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-950/65 to-stone-950" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,rgba(12,10,9,0.85)_100%)]" />

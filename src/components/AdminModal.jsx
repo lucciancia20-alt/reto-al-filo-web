@@ -4,9 +4,6 @@ import {
   Lock,
   Save,
   RotateCcw,
-  Plus,
-  Trash2,
-  Upload,
   Camera,
   Clock,
   MapPin,
@@ -14,19 +11,11 @@ import {
   CheckCircle2,
   AlertCircle,
   LogOut,
-  Mail,
-  KeyRound,
   ShieldCheck,
   Users,
-  Search,
-  Download,
-  ExternalLink,
-  MessageCircle,
   RefreshCw,
-  Landmark,
 } from 'lucide-react';
-import * as XLSX from 'xlsx';
-import { GPX_TRACKS, interpolatePointAtKm, parseGpxXml } from '../data/gpxTracks';
+import { GPX_TRACKS, parseGpxXml } from '../data/gpxTracks';
 import {
   addPhotoToFirestore,
   fetchGalleryPhotos,
@@ -42,9 +31,20 @@ import {
   updateRegistrationStatus,
   deleteRegistrationRecord,
 } from '../firebase/config';
+import AdminLoginView from './admin/AdminLoginView';
+import AdminGeneralTab from './admin/AdminGeneralTab';
+import AdminCircuitsTab from './admin/AdminCircuitsTab';
+import AdminScheduleFaqTab from './admin/AdminScheduleFaqTab';
+import AdminPhotosTab from './admin/AdminPhotosTab';
+import AdminRegistrationsTab from './admin/AdminRegistrationsTab';
 
 const DEFAULT_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '';
 const DEFAULT_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'reto_al_filo';
+
+const sanitizeExcelCell = (value) => {
+  const str = String(value ?? '');
+  return /^\s*[=+\-@]/.test(str) ? `'${str}` : str;
+};
 
 export default function AdminModal({
   isOpen,
@@ -392,100 +392,101 @@ export default function AdminModal({
     return `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`;
   };
 
-  const sanitizeExcelCell = (value) => {
-    const str = String(value ?? '');
-    return /^\s*[=+\-@]/.test(str) ? `'${str}` : str;
-  };
+  const handleExportExcel = async () => {
+    try {
+      const XLSX = await import('xlsx');
 
-  const handleExportExcel = () => {
-    const headers = [
-      'Código',
-      'Estado',
-      'Dorsal',
-      'Distancia',
-      'Valor',
-      'Nombre y Apellido',
-      'DNI',
-      'Fecha de Nacimiento',
-      'Género',
-      'Teléfono',
-      'Email',
-      'Localidad',
-      'Team',
-      'Talle Remera',
-      'Contacto Emergencia',
-      'Tel. Emergencia',
-      'Observaciones Médicas',
-      'Comprobante URL',
-      'Fecha Inscripción',
-    ];
+      const headers = [
+        'Código',
+        'Estado',
+        'Dorsal',
+        'Distancia',
+        'Valor',
+        'Nombre y Apellido',
+        'DNI',
+        'Fecha de Nacimiento',
+        'Género',
+        'Teléfono',
+        'Email',
+        'Localidad',
+        'Team',
+        'Talle Remera',
+        'Contacto Emergencia',
+        'Tel. Emergencia',
+        'Observaciones Médicas',
+        'Comprobante URL',
+        'Fecha Inscripción',
+      ];
 
-    const rows = registrations.map((r) =>
-      [
-        r.code || '',
-        (r.status || '').toUpperCase(),
-        bibDrafts[r.id] ?? r.assignedBib ?? '',
-        r.distance || '',
-        r.priceSnapshot || '',
-        r.fullName || '',
-        r.dni || '',
-        r.birthDate || '',
-        r.gender || '',
-        r.phone || '',
-        r.email || '',
-        r.city || '',
-        r.team || '',
-        r.shirtSize || '',
-        r.emergencyContactName || '',
-        r.emergencyContactPhone || '',
-        r.medicalNotes || '',
-        r.receiptUrl || '',
-        r.createdAt ? new Date(r.createdAt).toLocaleString('es-AR') : '',
-      ].map(sanitizeExcelCell)
-    );
+      const rows = registrations.map((r) =>
+        [
+          r.code || '',
+          (r.status || '').toUpperCase(),
+          bibDrafts[r.id] ?? r.assignedBib ?? '',
+          r.distance || '',
+          r.priceSnapshot || '',
+          r.fullName || '',
+          r.dni || '',
+          r.birthDate || '',
+          r.gender || '',
+          r.phone || '',
+          r.email || '',
+          r.city || '',
+          r.team || '',
+          r.shirtSize || '',
+          r.emergencyContactName || '',
+          r.emergencyContactPhone || '',
+          r.medicalNotes || '',
+          r.receiptUrl || '',
+          r.createdAt ? new Date(r.createdAt).toLocaleString('es-AR') : '',
+        ].map(sanitizeExcelCell)
+      );
 
-    const titleRow = [
-      'RETO AL FILO - 2DA EDICIÓN (2027) · PLANILLA DE CORREDORES INSCRIPTOS',
-    ];
-    const subtitleRow = [
-      `Exportado el ${new Date().toLocaleString('es-AR')} · Total: ${registrations.length} inscriptos`,
-    ];
+      const titleRow = [
+        'RETO AL FILO - 2DA EDICIÓN (2027) · PLANILLA DE CORREDORES INSCRIPTOS',
+      ];
+      const subtitleRow = [
+        `Exportado el ${new Date().toLocaleString('es-AR')} · Total: ${registrations.length} inscriptos`,
+      ];
 
-    const sheetData = [titleRow, subtitleRow, headers, ...rows];
-    const ws = XLSX.utils.aoa_to_sheet(sheetData);
+      const sheetData = [titleRow, subtitleRow, headers, ...rows];
+      const ws = XLSX.utils.aoa_to_sheet(sheetData);
 
-    const lastColIdx = headers.length - 1;
-    const lastColLetter = XLSX.utils.encode_col(lastColIdx);
-    const lastRowNumber = 3 + rows.length;
+      const lastColIdx = headers.length - 1;
+      const lastColLetter = XLSX.utils.encode_col(lastColIdx);
+      const lastRowNumber = 3 + rows.length;
 
-    // Título y subtítulo combinados a lo ancho de todas las columnas de la tabla
-    ws['!merges'] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: lastColIdx } },
-      { s: { r: 1, c: 0 }, e: { r: 1, c: lastColIdx } },
-    ];
+      // Título y subtítulo combinados a lo ancho de todas las columnas de la tabla
+      ws['!merges'] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: lastColIdx } },
+        { s: { r: 1, c: 0 }, e: { r: 1, c: lastColIdx } },
+      ];
 
-    // Autofiltro de tabla en la fila de encabezados (fila 3)
-    ws['!autofilter'] = { ref: `A3:${lastColLetter}${lastRowNumber}` };
+      // Autofiltro de tabla en la fila de encabezados (fila 3)
+      ws['!autofilter'] = { ref: `A3:${lastColLetter}${lastRowNumber}` };
 
-    // Alturas de filas para título, subtítulo y encabezados
-    ws['!rows'] = [{ hpt: 26 }, { hpt: 20 }, { hpt: 24 }];
+      // Alturas de filas para título, subtítulo y encabezados
+      ws['!rows'] = [{ hpt: 26 }, { hpt: 20 }, { hpt: 24 }];
 
-    // Autoajuste de ancho de columnas según encabezados y contenido
-    ws['!cols'] = headers.map((header, colIdx) => {
-      let maxLen = String(header).length;
-      for (const row of rows) {
-        const len = String(row[colIdx] ?? '').length;
-        if (len > maxLen) maxLen = len;
-      }
-      return { wch: Math.min(Math.max(maxLen + 3, 12), 48) };
-    });
+      // Autoajuste de ancho de columnas según encabezados y contenido
+      ws['!cols'] = headers.map((header, colIdx) => {
+        let maxLen = String(header).length;
+        for (const row of rows) {
+          const len = String(row[colIdx] ?? '').length;
+          if (len > maxLen) maxLen = len;
+        }
+        return { wch: Math.min(Math.max(maxLen + 3, 12), 48) };
+      });
 
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Inscriptos');
-    XLSX.writeFile(
-      wb,
-      `reto-al-filo-inscriptos-${new Date().toISOString().slice(0, 10)}.xlsx`
-    );
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Inscriptos');
+      XLSX.writeFile(
+        wb,
+        `reto-al-filo-inscriptos-${new Date().toISOString().slice(0, 10)}.xlsx`
+      );
+    } catch (err) {
+      setRegsError(err?.message || 'No se pudo generar la planilla Excel.');
+    }
   };
 
   const handleStationChange = (index, field, value) => {
@@ -842,165 +843,19 @@ export default function AdminModal({
         </div>
 
         {!unlocked ? (
-          <div className="flex-1 min-h-0 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 flex items-center justify-center">
-            <div className="w-full max-w-md space-y-4">
-              <div className="text-center">
-                <span className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-400 inline-flex items-center justify-center">
-                  <ShieldCheck className="w-6 h-6" />
-                </span>
-                <h3 className="mt-3 font-display text-xl font-extrabold text-white">
-                  Acceso de Organización
-                </h3>
-                <p className="mt-1 text-xs text-stone-400">
-                  Ingresá con tu cuenta autorizada de Google o con correo electrónico y contraseña
-                  para editar la carrera en vivo.
-                </p>
-              </div>
-
-              {!firebaseReady && (
-                <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 text-xs text-amber-200 flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
-                  <span>
-                    Firebase no está configurado en este entorno. Verificá las variables de entorno
-                    de Firebase.
-                  </span>
-                </div>
-              )}
-
-              {/* Acceso directo con Google */}
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={authLoading || !firebaseReady}
-                className="w-full min-h-[46px] inline-flex items-center justify-center gap-3 rounded-xl bg-white hover:bg-stone-100 text-stone-900 font-bold text-sm px-4 py-3 shadow-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg
-                  className="w-5 h-5 shrink-0"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    fill="#4285F4"
-                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.14C3.26 21.3 7.31 24 12 24Z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.28 14.24c-.24-.72-.38-1.49-.38-2.24s.14-1.52.38-2.24V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.99-3.14Z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.99 3.14c.95-2.85 3.6-4.96 6.72-4.96Z"
-                  />
-                </svg>
-                <span>
-                  {authLoading ? 'Verificando con Google...' : 'Ingresar con Google'}
-                </span>
-              </button>
-
-              {/* Divisor */}
-              <div className="relative flex items-center py-1">
-                <div className="flex-grow border-t border-stone-800" />
-                <span className="shrink mx-3 text-[11px] uppercase tracking-wider text-stone-500 font-semibold">
-                  o ingresá con tu correo y contraseña
-                </span>
-                <div className="flex-grow border-t border-stone-800" />
-              </div>
-
-              {/* Acceso con Correo electrónico y Contraseña */}
-              <form
-                onSubmit={handleEmailSignIn}
-                autoComplete="off"
-                className="rounded-2xl bg-stone-950/80 border border-stone-800 p-4 space-y-3"
-              >
-                <div>
-                  <label
-                    htmlFor="admin-email-input"
-                    className="block text-xs font-semibold text-stone-300 mb-1"
-                  >
-                    Correo electrónico autorizado
-                  </label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input
-                      id="admin-email-input"
-                      type="email"
-                      autoComplete="off"
-                      value={emailInput}
-                      onChange={(e) => setEmailInput(e.target.value)}
-                      placeholder=""
-                      required
-                      disabled={!firebaseReady || authLoading}
-                      className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm text-white placeholder:text-stone-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="admin-password-input"
-                    className="block text-xs font-semibold text-stone-300 mb-1"
-                  >
-                    Contraseña
-                  </label>
-                  <div className="relative">
-                    <KeyRound className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input
-                      id="admin-password-input"
-                      type="password"
-                      autoComplete="new-password"
-                      value={passwordInput}
-                      onChange={(e) => setPasswordInput(e.target.value)}
-                      placeholder=""
-                      required
-                      minLength={6}
-                      disabled={!firebaseReady || authLoading}
-                      className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm text-white placeholder:text-stone-500"
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={!firebaseReady || authLoading}
-                  className="w-full min-h-[44px] rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black uppercase text-xs sm:text-sm py-2.5 cursor-pointer transition-colors disabled:opacity-50"
-                >
-                  {authLoading ? 'Ingresando...' : 'Ingresar con Correo'}
-                </button>
-
-                <div className="text-center pt-0.5">
-                  <button
-                    type="button"
-                    onClick={handlePasswordReset}
-                    disabled={!firebaseReady || authLoading}
-                    className="text-xs text-amber-400 hover:text-amber-300 underline underline-offset-2 cursor-pointer disabled:opacity-50"
-                  >
-                    ¿Olvidaste tu contraseña? Enviar enlace por mail
-                  </button>
-                </div>
-              </form>
-
-              {authError && (
-                <div
-                  role="alert"
-                  className="rounded-xl bg-rose-500/15 border border-rose-500/35 p-3 text-xs text-rose-200 flex items-start gap-2"
-                >
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
-                  <span>{authError}</span>
-                </div>
-              )}
-
-              {authInfo && (
-                <div className="rounded-xl bg-emerald-500/15 border border-emerald-500/35 p-3 text-xs text-emerald-200 flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
-                  <span>{authInfo}</span>
-                </div>
-              )}
-            </div>
-          </div>
+          <AdminLoginView
+            firebaseReady={firebaseReady}
+            authLoading={authLoading}
+            emailInput={emailInput}
+            setEmailInput={setEmailInput}
+            passwordInput={passwordInput}
+            setPasswordInput={setPasswordInput}
+            authError={authError}
+            authInfo={authInfo}
+            onGoogleSignIn={handleGoogleSignIn}
+            onEmailSignIn={handleEmailSignIn}
+            onPasswordReset={handlePasswordReset}
+          />
         ) : (
           <>
             {/* Navegación por pestañas del Admin */}
@@ -1035,1022 +890,94 @@ export default function AdminModal({
             {/* Contenido scrolleable */}
             <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-5">
               {activeTab === 'general' && (
-                <div className="space-y-5">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        Título de la Carrera
-                      </label>
-                      <input
-                        type="text"
-                        value={draft.title}
-                        onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        Subtítulo / Mes y Año
-                      </label>
-                      <input
-                        type="text"
-                        value={draft.subtitle}
-                        onChange={(e) => setDraft({ ...draft, subtitle: e.target.value })}
-                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        Fecha y Hora Largada (Formato ISO)
-                      </label>
-                      <input
-                        type="text"
-                        value={draft.targetDateIso}
-                        onChange={(e) => setDraft({ ...draft, targetDateIso: e.target.value })}
-                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        Número WhatsApp Inscripciones (con código país)
-                      </label>
-                      <input
-                        type="text"
-                        value={draft.whatsappNumber}
-                        onChange={(e) => setDraft({ ...draft, whatsappNumber: e.target.value })}
-                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
-                      />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        Nombre del Predio / Localidad
-                      </label>
-                      <input
-                        type="text"
-                        value={draft.locationName}
-                        onChange={(e) => setDraft({ ...draft, locationName: e.target.value })}
-                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
-                      />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        URL de Google Maps del Predio
-                      </label>
-                      <input
-                        type="url"
-                        value={draft.googleMapsUrl}
-                        onChange={(e) => setDraft({ ...draft, googleMapsUrl: e.target.value })}
-                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Precios y Datos Bancarios de Inscripción */}
-                  <div className="rounded-2xl bg-stone-950 border border-stone-800 p-4 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
-                      <div>
-                        <h4 className="font-display text-sm font-bold text-white uppercase">
-                          Valores y Cuenta Bancaria para Inscripciones
-                        </h4>
-                        <p className="text-[11px] text-stone-400">
-                          Estos datos se muestran dentro del formulario de inscripción web antes de
-                          subir el comprobante.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                      <div>
-                        <label className="block text-xs font-semibold text-stone-300 mb-1">
-                          Valor Inscripción <span className="text-cyan-400 font-bold">27K</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={draft.circuits?.['27K']?.price || ''}
-                          onChange={(e) => updateCircuitField('27K', 'price', e.target.value)}
-                          placeholder="$45.000"
-                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-bold text-cyan-400"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-stone-300 mb-1">
-                          Valor Inscripción <span className="text-red-400 font-bold">13K</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={draft.circuits?.['13K']?.price || ''}
-                          onChange={(e) => updateCircuitField('13K', 'price', e.target.value)}
-                          placeholder="$32.000"
-                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-bold text-red-400"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-stone-300 mb-1">
-                          Alias (Banco / Mercado Pago)
-                        </label>
-                        <input
-                          type="text"
-                          value={draft.payment?.bankAlias || ''}
-                          onChange={(e) => updatePaymentField('bankAlias', e.target.value)}
-                          placeholder="RETO.AL.FILO"
-                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-mono text-amber-300"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-stone-300 mb-1">
-                          CBU / CVU
-                        </label>
-                        <input
-                          type="text"
-                          value={draft.payment?.bankCbu || ''}
-                          onChange={(e) => updatePaymentField('bankCbu', e.target.value)}
-                          placeholder="0000003100000000000000"
-                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-mono text-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-stone-300 mb-1">
-                          Titular de la Cuenta
-                        </label>
-                        <input
-                          type="text"
-                          value={draft.payment?.bankHolder || ''}
-                          onChange={(e) => updatePaymentField('bankHolder', e.target.value)}
-                          placeholder="Organización Reto al Filo"
-                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm text-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-stone-300 mb-1">
-                          Banco / Billetera
-                        </label>
-                        <input
-                          type="text"
-                          value={draft.payment?.bankEntity || ''}
-                          onChange={(e) => updatePaymentField('bankEntity', e.target.value)}
-                          placeholder="Mercado Pago / Banco Provincia"
-                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm text-white"
-                        />
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="block text-xs font-semibold text-stone-300 mb-1">
-                          Instrucciones para el Corredor
-                        </label>
-                        <textarea
-                          rows={2}
-                          value={draft.payment?.instructions || ''}
-                          onChange={(e) => updatePaymentField('instructions', e.target.value)}
-                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-xs text-stone-200"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <AdminGeneralTab
+                  draft={draft}
+                  setDraft={setDraft}
+                  onUpdateCircuitField={updateCircuitField}
+                  onUpdatePaymentField={updatePaymentField}
+                />
               )}
 
               {activeTab === 'circuits' && (
-                <div className="space-y-5">
-                  <div className="flex items-center gap-2">
-                    {['27K', '13K'].map((d) => {
-                      const active = editDistance === d;
-                      const colorClass = !active
-                        ? 'bg-stone-950 text-stone-300 border border-stone-600 hover:border-stone-400 hover:text-white'
-                        : d === '27K'
-                          ? 'bg-stone-950 text-cyan-400 border border-cyan-500 shadow-sm shadow-cyan-500/20'
-                          : 'bg-stone-950 text-red-500 border border-red-500 shadow-sm shadow-red-500/20';
-
-                      return (
-                        <button
-                          key={d}
-                          type="button"
-                          onClick={() => {
-                            setEditDistance(d);
-                            setGpxStatus('');
-                          }}
-                          className={`px-4 py-2 rounded-xl font-display font-bold text-xs uppercase cursor-pointer transition-all ${colorClass}`}
-                        >
-                          Circuito {d}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        Desnivel Positivo
-                      </label>
-                      <input
-                        type="text"
-                        value={activeCircuitDraft.elevationGain}
-                        onChange={(e) =>
-                          updateCircuitField(editDistance, 'elevationGain', e.target.value)
-                        }
-                        className={`w-full rounded-xl bg-stone-950 ${circuitInputBorderClass} px-3 py-2 text-sm text-white`}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        Tiempo de Corte
-                      </label>
-                      <input
-                        type="text"
-                        value={activeCircuitDraft.cutoffTime}
-                        onChange={(e) =>
-                          updateCircuitField(editDistance, 'cutoffTime', e.target.value)
-                        }
-                        className={`w-full rounded-xl bg-stone-950 ${circuitInputBorderClass} px-3 py-2 text-sm text-white`}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        Etiqueta Nivel
-                      </label>
-                      <input
-                        type="text"
-                        value={activeCircuitDraft.summaryBadge}
-                        onChange={(e) =>
-                          updateCircuitField(editDistance, 'summaryBadge', e.target.value)
-                        }
-                        className={`w-full rounded-xl bg-stone-950 ${circuitInputBorderClass} px-3 py-2 text-sm text-white`}
-                      />
-                    </div>
-                    <div className="sm:col-span-3">
-                      <label className="block text-xs font-semibold text-stone-300 mb-1">
-                        Descripción del Circuito
-                      </label>
-                      <textarea
-                        rows={2}
-                        value={activeCircuitDraft.description}
-                        onChange={(e) =>
-                          updateCircuitField(editDistance, 'description', e.target.value)
-                        }
-                        className={`w-full rounded-xl bg-stone-950 ${circuitInputBorderClass} px-3 py-2 text-sm text-white`}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Puestos de Hidratación dinámicos sobre el GPX */}
-                  <div className="rounded-2xl bg-stone-950 border border-stone-800 p-4 space-y-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <div>
-                        <h4 className="font-display text-sm font-bold text-white uppercase">
-                          Puestos de Hidratación (
-                          <span className={editDistance === '13K' ? 'text-red-500' : 'text-cyan-400'}>
-                            {editDistance}
-                          </span>
-                          )
-                        </h4>
-                        <p className="text-[11px] text-stone-400">
-                          Ingresá el kilómetro y se ubican automáticamente sobre la altura y mapa
-                          GPS real.
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleAddStation}
-                        className="inline-flex items-center gap-1 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 text-xs font-bold px-3 py-1.5 cursor-pointer"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        Agregar Puesto
-                      </button>
-                    </div>
-
-                    <div className="space-y-2">
-                      {(activeCircuitDraft.hydrationStations || []).map((st, idx) => {
-                        const interp = interpolatePointAtKm(activeTrack.points, st.km);
-                        return (
-                          <div
-                            key={st.id || idx}
-                            className="flex flex-wrap sm:flex-nowrap items-center gap-2 bg-stone-900 p-2.5 rounded-xl border border-stone-800"
-                          >
-                            <div className="w-24 shrink-0">
-                              <label className="block text-[10px] text-stone-400">KM</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                min="0"
-                                max={activeTrack.totalKm}
-                                value={st.km}
-                                onChange={(e) => handleStationChange(idx, 'km', e.target.value)}
-                                className={`w-full rounded-lg bg-stone-950 ${circuitInputBorderClass} px-2.5 py-1.5 text-xs font-mono text-white`}
-                              />
-                            </div>
-                            <div className="flex-1 min-w-[140px]">
-                              <label className="block text-[10px] text-stone-400">
-                                Nombre del Puesto
-                              </label>
-                              <input
-                                type="text"
-                                value={st.label}
-                                onChange={(e) => handleStationChange(idx, 'label', e.target.value)}
-                                className={`w-full rounded-lg bg-stone-950 ${circuitInputBorderClass} px-2.5 py-1.5 text-xs text-white`}
-                              />
-                            </div>
-                            <div className="text-[11px] font-mono text-sky-300 px-2 whitespace-nowrap">
-                              {interp.alt} msnm
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveStation(idx)}
-                              aria-label="Eliminar puesto"
-                              className="p-2 text-stone-400 hover:text-rose-400 cursor-pointer"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Cargar nuevo archivo .GPX */}
-                  <div className="rounded-2xl bg-stone-950 border border-stone-800 p-4 flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <h4 className="font-display text-sm font-bold text-white uppercase">
-                        Reemplazar Track .GPX (
-                        <span className={editDistance === '13K' ? 'text-red-500' : 'text-cyan-400'}>
-                          {editDistance}
-                        </span>
-                        )
-                      </h4>
-                      <p className="text-[11px] text-stone-400">
-                        Subí un archivo .gpx exportado de Garmin, COROS, Strava o Wikiloc para
-                        actualizar el mapa y la altimetría.
-                      </p>
-                      {gpxStatus && (
-                        <p className="mt-1 text-xs text-amber-300 font-medium">{gpxStatus}</p>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {activeCircuitDraft.customGpx && (
-                        <button
-                          type="button"
-                          onClick={handleClearCustomGpx}
-                          className="rounded-xl bg-stone-800 hover:bg-stone-700 text-xs text-stone-200 px-3 py-2 cursor-pointer"
-                        >
-                          Usar GPX original
-                        </button>
-                      )}
-                      <label className="inline-flex items-center gap-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 text-xs font-bold px-3.5 py-2 cursor-pointer">
-                        <Upload className="w-4 h-4" />
-                        Subir archivo .GPX
-                        <input
-                          type="file"
-                          accept=".gpx"
-                          onChange={handleGpxFileUpload}
-                          className="hidden"
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
+                <AdminCircuitsTab
+                  editDistance={editDistance}
+                  onSelectDistance={(d) => {
+                    setEditDistance(d);
+                    setGpxStatus('');
+                  }}
+                  activeCircuitDraft={activeCircuitDraft}
+                  activeTrack={activeTrack}
+                  circuitInputBorderClass={circuitInputBorderClass}
+                  gpxStatus={gpxStatus}
+                  onUpdateCircuitField={updateCircuitField}
+                  onStationChange={handleStationChange}
+                  onAddStation={handleAddStation}
+                  onRemoveStation={handleRemoveStation}
+                  onGpxFileUpload={handleGpxFileUpload}
+                  onClearCustomGpx={handleClearCustomGpx}
+                />
               )}
 
               {activeTab === 'schedule_faq' && (
-                <div className="space-y-6">
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-display text-sm font-bold text-white uppercase">
-                        Cronograma del Día de Carrera
-                      </h4>
-                      <button
-                        type="button"
-                        onClick={handleAddSchedule}
-                        className="inline-flex items-center gap-1 rounded-xl bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-bold px-3 py-1.5 cursor-pointer"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        Agregar Día y Horario
-                      </button>
-                    </div>
-
-                    <div className="space-y-3">
-                      {draft.schedule.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5"
-                        >
-                          <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-                            <input
-                              type="text"
-                              value={item.day ?? ''}
-                              onChange={(e) => handleScheduleChange(idx, 'day', e.target.value)}
-                              placeholder="Ej. Sábado 10"
-                              aria-label="Día del cronograma"
-                              className="sm:col-span-3 rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-semibold text-orange-300"
-                            />
-                            <input
-                              type="text"
-                              value={item.time}
-                              onChange={(e) => handleScheduleChange(idx, 'time', e.target.value)}
-                              placeholder="06:00 hs"
-                              aria-label="Horario"
-                              className="sm:col-span-2 rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono text-amber-300"
-                            />
-                            <input
-                              type="text"
-                              value={item.title}
-                              onChange={(e) => handleScheduleChange(idx, 'title', e.target.value)}
-                              placeholder="Título"
-                              aria-label="Título"
-                              className="sm:col-span-4 rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-bold text-white"
-                            />
-                            <input
-                              type="text"
-                              value={item.tag}
-                              onChange={(e) => handleScheduleChange(idx, 'tag', e.target.value)}
-                              placeholder="Lugar"
-                              aria-label="Lugar"
-                              className="sm:col-span-2 rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs text-stone-200"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveSchedule(idx)}
-                              aria-label="Quitar horario"
-                              className="sm:col-span-1 justify-self-end p-1.5 text-stone-400 hover:text-rose-400 cursor-pointer"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                          <textarea
-                            rows={2}
-                            value={item.description}
-                            onChange={(e) =>
-                              handleScheduleChange(idx, 'description', e.target.value)
-                            }
-                            className="w-full rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs text-stone-200"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-display text-sm font-bold text-white uppercase mb-3">
-                      Preguntas Frecuentes (FAQ)
-                    </h4>
-                    <div className="space-y-3">
-                      {draft.faqs.map((faq, idx) => (
-                        <div
-                          key={faq.id}
-                          className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2"
-                        >
-                          <input
-                            type="text"
-                            value={faq.question}
-                            onChange={(e) => handleFaqChange(idx, 'question', e.target.value)}
-                            className="w-full rounded-lg bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-bold text-white"
-                          />
-                          <textarea
-                            rows={3}
-                            value={faq.answer}
-                            onChange={(e) => handleFaqChange(idx, 'answer', e.target.value)}
-                            className="w-full rounded-lg bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs text-stone-300"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <AdminScheduleFaqTab
+                  schedule={draft.schedule}
+                  faqs={draft.faqs}
+                  onScheduleChange={handleScheduleChange}
+                  onAddSchedule={handleAddSchedule}
+                  onRemoveSchedule={handleRemoveSchedule}
+                  onFaqChange={handleFaqChange}
+                />
               )}
 
               {activeTab === 'photos' && (
-                <div className="space-y-5">
-                  <form
-                    id="admin-photo-form"
-                    onSubmit={handleAddPhoto}
-                    className="rounded-2xl bg-stone-950 border border-stone-800 p-5 space-y-4"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <div>
-                        <h4 className="font-display text-base font-bold text-white uppercase">
-                          Subir Fotos de Muestra · 1ra Edición
-                        </h4>
-                        <p className="text-xs text-stone-400 mt-0.5">
-                          Elegí una o varias fotos juntas desde tu celular o PC (se suben a tu nube{' '}
-                          <span className="font-mono text-amber-300">
-                            {DEFAULT_CLOUD_NAME || 'no configurada'}
-                          </span>
-                          ). Apenas subas tu primera foto, reemplazará las de demostración.
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Selector de uno o múltiples archivos */}
-                    <div className="rounded-2xl border border-dashed border-stone-700 bg-stone-900/60 p-4 space-y-4">
-                      {photoPreviews.length > 0 ? (
-                        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
-                          {photoPreviews.map((item, idx) => (
-                            <div
-                              key={`${item.name}-${idx}`}
-                              className="relative aspect-square rounded-xl overflow-hidden border border-stone-700 bg-stone-950"
-                            >
-                              <img
-                                src={item.url}
-                                alt={item.name}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center py-4 text-stone-500">
-                          <Camera className="w-9 h-9" />
-                        </div>
-                      )}
-
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div>
-                          <p className="text-xs font-semibold text-stone-200">
-                            {photoFiles.length > 0
-                              ? `${photoFiles.length} ${photoFiles.length === 1 ? 'foto lista para subir' : 'fotos listas para subir'}`
-                              : 'Seleccioná una o varias fotos (.jpg, .png, .webp) de paisajes o corredores'}
-                          </p>
-                          <p className="text-[11px] text-stone-400 mt-0.5">
-                            Se optimizan y guardan en la carpeta{' '}
-                            <span className="font-mono">reto-al-filo/galeria</span>.
-                          </p>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-2 shrink-0">
-                          <label className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 cursor-pointer transition-colors">
-                            <Upload className="w-4 h-4" />
-                            {photoFiles.length > 0 ? 'Cambiar Fotos' : 'Elegir Fotos'}
-                            <input
-                              type="file"
-                              accept="image/*"
-                              multiple
-                              onChange={handleSelectPhotoFiles}
-                              className="hidden"
-                            />
-                          </label>
-                          {photoFiles.length > 0 && (
-                            <button
-                              type="button"
-                              onClick={handleClearSelectedPhotos}
-                              className="text-xs text-stone-400 hover:text-stone-200 px-2 py-1.5 cursor-pointer"
-                            >
-                              Quitar todas
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                      <div className="sm:col-span-2">
-                        <label className="block text-xs font-semibold text-stone-300 mb-1">
-                          Lugar o descripción breve (opcional)
-                        </label>
-                        <input
-                          type="text"
-                          value={photoSector}
-                          onChange={(e) => setPhotoSector(e.target.value)}
-                          placeholder="Ej. Cumbre Cerro Providencia · 1ra Edición"
-                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-stone-300 mb-1">
-                          Upload Preset (Unsigned en Cloudinary)
-                        </label>
-                        <input
-                          type="text"
-                          value={uploadPreset}
-                          onChange={(e) => setUploadPreset(e.target.value)}
-                          placeholder="reto_al_filo"
-                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-amber-300"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-stone-300 mb-1">
-                          O pegar URL existente (opcional si subís archivo)
-                        </label>
-                        <input
-                          type="text"
-                          value={photoUrl}
-                          onChange={(e) => setPhotoUrl(e.target.value)}
-                          placeholder="https://res.cloudinary.com/..."
-                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
-                        />
-                      </div>
-                    </div>
-
-                    {(photoFiles.length > 0 || photoUrl.trim().length > 0) && (
-                      <button
-                        type="submit"
-                        disabled={photoSubmitting}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-5 py-3 shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
-                      >
-                        <Upload className="w-4 h-4" />
-                        {photoSubmitting
-                          ? 'Subiendo y publicando...'
-                          : `Subir y Publicar ahora (${photoFiles.length || 1})`}
-                      </button>
-                    )}
-
-                    {photoStepMessage && (
-                      <div className="p-3 rounded-xl text-xs bg-amber-500/15 text-amber-200 border border-amber-500/30">
-                        {photoStepMessage}
-                      </div>
-                    )}
-
-                    {photoStatus && (
-                      <div
-                        className={`p-3 rounded-xl text-xs flex items-start gap-2 ${
-                          photoStatus.type === 'success'
-                            ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                            : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
-                        }`}
-                      >
-                        {photoStatus.type === 'success' ? (
-                          <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
-                        ) : (
-                          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                        )}
-                        <span>{photoStatus.message}</span>
-                      </div>
-                    )}
-                  </form>
-
-                  {/* Fotos publicadas en la galería */}
-                  <div className="rounded-2xl bg-stone-950 border border-stone-800 p-4 space-y-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div>
-                        <h4 className="font-display text-sm font-bold text-white uppercase">
-                          Postales publicadas actualmente ({galleryCustomCount > 0 ? galleryCustomCount : '6 de muestra'})
-                        </h4>
-                        <p
-                          className={`text-[11px] mt-0.5 ${
-                            galleryCustomCount > 0
-                              ? 'text-emerald-300 font-medium'
-                              : 'text-stone-400'
-                          }`}
-                        >
-                          {galleryCustomCount > 0
-                            ? 'Estas fotos ya están cargadas en Cloudinary/Firestore y visibles en vivo en la web. No necesitás volver a subirlas.'
-                            : 'Todavía no subiste fotos propias. Mientras tanto la web muestra las 6 postales iniciales de demostración.'}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={loadGalleryItems}
-                        disabled={galleryLoading}
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-xs font-semibold px-3 py-1.5 cursor-pointer"
-                      >
-                        <RefreshCw className={`w-3.5 h-3.5 ${galleryLoading ? 'animate-spin' : ''}`} />
-                        Actualizar
-                      </button>
-                    </div>
-
-                    {galleryCustomCount > 0 && (
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {galleryItems.map((item) => (
-                          <div
-                            key={item.id}
-                            className="rounded-xl overflow-hidden bg-stone-900 border border-stone-800 flex flex-col"
-                          >
-                            <div className="relative aspect-[4/3] bg-stone-950 overflow-hidden">
-                              <img
-                                src={item.cloudinaryThumb}
-                                alt={item.sector}
-                                className="w-full h-full object-cover"
-                              />
-                              <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-emerald-500 text-stone-950 font-bold text-[10px] px-2 py-0.5 shadow-md">
-                                ✓ Publicada en la web
-                              </span>
-                            </div>
-                            <div className="p-2.5 flex items-center justify-between gap-2">
-                              <span className="text-[11px] text-stone-200 truncate">
-                                {item.sector}
-                              </span>
-                              <button
-                                type="button"
-                                disabled={photoBusyId === item.id}
-                                onClick={() => handleDeleteGalleryPhoto(item)}
-                                aria-label={`Eliminar postal ${item.sector}`}
-                                className="p-1.5 rounded-lg text-stone-400 hover:text-rose-400 hover:bg-stone-800 cursor-pointer shrink-0 disabled:opacity-40"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <AdminPhotosTab
+                  defaultCloudName={DEFAULT_CLOUD_NAME}
+                  photoFiles={photoFiles}
+                  photoPreviews={photoPreviews}
+                  photoUrl={photoUrl}
+                  setPhotoUrl={setPhotoUrl}
+                  uploadPreset={uploadPreset}
+                  setUploadPreset={setUploadPreset}
+                  photoSector={photoSector}
+                  setPhotoSector={setPhotoSector}
+                  photoStatus={photoStatus}
+                  photoStepMessage={photoStepMessage}
+                  photoSubmitting={photoSubmitting}
+                  galleryItems={galleryItems}
+                  galleryCustomCount={galleryCustomCount}
+                  galleryLoading={galleryLoading}
+                  photoBusyId={photoBusyId}
+                  onSelectPhotoFiles={handleSelectPhotoFiles}
+                  onClearSelectedPhotos={handleClearSelectedPhotos}
+                  onAddPhoto={handleAddPhoto}
+                  onLoadGalleryItems={loadGalleryItems}
+                  onDeleteGalleryPhoto={handleDeleteGalleryPhoto}
+                />
               )}
 
               {activeTab === 'registrations' && (
-                <div className="space-y-4">
-                  {/* Resumen de contadores */}
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-                    {[
-                      {
-                        label: 'Total',
-                        value: regStats.total,
-                        tone: 'text-stone-100 border-stone-300',
-                      },
-                      {
-                        label: 'Confirmados',
-                        value: regStats.confirmed,
-                        tone: 'text-green-400 border-green-500',
-                      },
-                      {
-                        label: 'Pendientes',
-                        value: regStats.pending,
-                        tone: 'text-yellow-400 border-yellow-500',
-                      },
-                      {
-                        label: '27K',
-                        value: regStats.count27k,
-                        tone: 'text-cyan-400 border-cyan-500',
-                      },
-                      {
-                        label: '13K',
-                        value: regStats.count13k,
-                        tone: 'text-red-500 border-red-500',
-                      },
-                    ].map((stat) => (
-                      <div
-                        key={stat.label}
-                        className={`rounded-2xl bg-stone-950 border p-3 text-center ${stat.tone}`}
-                      >
-                        <span className="block text-[10px] uppercase tracking-wider text-stone-400 font-semibold">
-                          {stat.label}
-                        </span>
-                        <span className="font-display text-xl font-black">{stat.value}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Controles de búsqueda, filtro y exportación */}
-                  <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-3">
-                    <div className="flex flex-col sm:flex-row gap-2.5">
-                      <div className="relative flex-1">
-                        <Search className="w-4 h-4 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                        <input
-                          type="text"
-                          value={regSearch}
-                          onChange={(e) => setRegSearch(e.target.value)}
-                          placeholder="Buscar por nombre, DNI, código RAF, dorsal, localidad..."
-                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-9 pr-3 py-2 text-xs sm:text-sm text-white"
-                        />
-                      </div>
-
-                      <div className="flex flex-wrap gap-2">
-                        <select
-                          aria-label="Filtrar por distancia"
-                          value={regDistanceFilter}
-                          onChange={(e) => setRegDistanceFilter(e.target.value)}
-                          className="rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-xs text-white"
-                        >
-                          <option value="all">Todas las distancias</option>
-                          <option value="27K">Solo 27K</option>
-                          <option value="13K">Solo 13K</option>
-                        </select>
-
-                        <select
-                          aria-label="Filtrar por estado"
-                          value={regStatusFilter}
-                          onChange={(e) => setRegStatusFilter(e.target.value)}
-                          className="rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-xs text-white"
-                        >
-                          <option value="all">Todos los estados</option>
-                          <option value="pendiente">Pendientes</option>
-                          <option value="confirmado">Confirmados</option>
-                          <option value="rechazado">Rechazados</option>
-                        </select>
-
-                        <button
-                          type="button"
-                          onClick={handleExportExcel}
-                          disabled={registrations.length === 0}
-                          className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 text-xs font-bold px-3.5 py-2 cursor-pointer disabled:opacity-40"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          Exportar Excel (.XLSX)
-                        </button>
-                      </div>
-                    </div>
-
-                    <p className="text-[11px] text-stone-400">
-                      Mostrando <strong className="text-stone-200">{filteredRegistrations.length}</strong> de{' '}
-                      <strong className="text-stone-200">{registrations.length}</strong> inscripciones · Fuente:{' '}
-                      <span className="font-mono text-amber-300">
-                        {regsSource === 'firestore' ? 'Firestore en vivo' : 'Respaldo local'}
-                      </span>
-                    </p>
-                  </div>
-
-                  {regsError && (
-                    <div className="rounded-xl bg-rose-500/15 border border-rose-500/35 p-3 text-xs text-rose-200 flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
-                      <span>{regsError}</span>
-                    </div>
-                  )}
-
-                  {regsLoading ? (
-                    <div className="rounded-2xl bg-stone-950 border border-stone-800 p-8 text-center text-xs text-stone-400">
-                      Cargando listado de corredores inscriptos...
-                    </div>
-                  ) : filteredRegistrations.length === 0 ? (
-                    <div className="rounded-2xl bg-stone-950 border border-stone-800 p-8 text-center space-y-1.5">
-                      <Users className="w-8 h-8 text-stone-600 mx-auto" />
-                      <p className="text-sm font-bold text-stone-200">
-                        {registrations.length === 0
-                          ? 'Todavía no hay corredores inscriptos desde el formulario web.'
-                          : 'Ningún inscripto coincide con tu filtro actual.'}
-                      </p>
-                      <p className="text-xs text-stone-400">
-                        Apenas alguien complete el formulario y suba su comprobante, aparecerá aquí al
-                        instante.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {filteredRegistrations.map((reg) => {
-                        const isBusy = regBusyId === reg.id;
-                        const bibValue = bibDrafts[reg.id] ?? reg.assignedBib ?? '';
-                        const statusBadgeClass =
-                          reg.status === 'confirmado'
-                            ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
-                            : reg.status === 'rechazado'
-                              ? 'bg-rose-500/15 text-rose-300 border-rose-500/40'
-                              : 'bg-amber-500/15 text-amber-300 border-amber-500/40';
-
-                        return (
-                          <div
-                            key={reg.id}
-                            className="rounded-2xl bg-stone-950 border border-stone-800 p-4 space-y-3"
-                          >
-                            {/* Encabezado de la ficha */}
-                            <div className="flex flex-wrap items-start justify-between gap-2">
-                              <div className="min-w-0">
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-stone-900 border border-stone-700 text-amber-300">
-                                    {reg.code}
-                                  </span>
-                                  <span
-                                    className={`text-xs font-black px-2 py-0.5 rounded-md border ${
-                                      reg.distance === '13K'
-                                        ? 'bg-red-500/20 border-red-500 text-red-400'
-                                        : 'bg-cyan-500/20 border-cyan-500 text-cyan-300'
-                                    }`}
-                                  >
-                                    {reg.distance}
-                                  </span>
-                                  <span
-                                    className={`text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-full border ${statusBadgeClass}`}
-                                  >
-                                    {reg.status}
-                                  </span>
-                                  {reg.assignedBib && (
-                                    <span className="font-mono text-xs font-black px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                                      Dorsal #{reg.assignedBib}
-                                    </span>
-                                  )}
-                                </div>
-                                <h4 className="mt-1.5 font-display text-base font-extrabold text-white">
-                                  {reg.fullName}
-                                </h4>
-                              </div>
-
-                              <div className="flex items-center gap-2">
-                                {reg.receiptUrl && (
-                                  <a
-                                    href={reg.receiptUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/35 text-xs font-bold px-3 py-2"
-                                  >
-                                    Ver Comprobante
-                                    <ExternalLink className="w-3.5 h-3.5" />
-                                  </a>
-                                )}
-                                <button
-                                  type="button"
-                                  disabled={isBusy}
-                                  onClick={() => handleDeleteRegistration(reg)}
-                                  aria-label={`Eliminar inscripción de ${reg.fullName}`}
-                                  className="p-2 rounded-xl text-stone-400 hover:text-rose-400 hover:bg-stone-900 cursor-pointer disabled:opacity-40"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Datos detallados */}
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-stone-300 bg-stone-900/70 border border-stone-800/80 rounded-xl p-3">
-                              <div>
-                                <span className="text-stone-500">DNI: </span>
-                                <span className="font-mono text-stone-100">{reg.dni}</span>
-                              </div>
-                              <div>
-                                <span className="text-stone-500">Nac.: </span>
-                                <span>{reg.birthDate}</span>
-                                <span className="text-stone-500"> ({reg.gender})</span>
-                              </div>
-                              <div>
-                                <span className="text-stone-500">Remera: </span>
-                                <strong className="text-amber-300">{reg.shirtSize}</strong>
-                              </div>
-                              <div>
-                                <span className="text-stone-500">Localidad: </span>
-                                <span>{reg.city}</span>
-                              </div>
-                              <div>
-                                <span className="text-stone-500">Team: </span>
-                                <span>{reg.team || 'Libre'}</span>
-                              </div>
-                              <div>
-                                <span className="text-stone-500">Tel: </span>
-                                <span className="font-mono">{reg.phone}</span>
-                              </div>
-                              <div className="sm:col-span-2 truncate">
-                                <span className="text-stone-500">Email: </span>
-                                <span>{reg.email}</span>
-                              </div>
-                              <div>
-                                <span className="text-stone-500">Emergencia: </span>
-                                <span>
-                                  {reg.emergencyContactName} ({reg.emergencyContactPhone})
-                                </span>
-                              </div>
-                              {reg.medicalNotes && (
-                                <div className="sm:col-span-3 text-rose-200/90">
-                                  <span className="text-stone-400">Observaciones médicas: </span>
-                                  {reg.medicalNotes}
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Acciones de dorsal, aprobación y WhatsApp */}
-                            <div className="flex flex-wrap items-center gap-2 pt-1">
-                              <div className="flex items-center gap-1.5">
-                                <label
-                                  htmlFor={`bib-${reg.id}`}
-                                  className="text-[11px] font-semibold text-stone-400"
-                                >
-                                  Dorsal #
-                                </label>
-                                <input
-                                  id={`bib-${reg.id}`}
-                                  type="text"
-                                  value={bibValue}
-                                  onChange={(e) =>
-                                    setBibDrafts((prev) => ({
-                                      ...prev,
-                                      [reg.id]: e.target.value,
-                                    }))
-                                  }
-                                  placeholder="105"
-                                  className="w-20 rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-2 text-xs font-mono text-white text-center"
-                                />
-                              </div>
-
-                              <button
-                                type="button"
-                                disabled={isBusy}
-                                onClick={() => handleConfirmRegistration(reg)}
-                                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs uppercase px-3.5 py-2 cursor-pointer disabled:opacity-50"
-                              >
-                                <CheckCircle2 className="w-3.5 h-3.5" />
-                                Confirmar y Guardar Dorsal
-                              </button>
-
-                              {reg.status !== 'pendiente' && (
-                                <button
-                                  type="button"
-                                  disabled={isBusy}
-                                  onClick={() => handleChangeRegStatus(reg, 'pendiente')}
-                                  className="rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold px-3 py-2 cursor-pointer disabled:opacity-50"
-                                >
-                                  Pasar a Pendiente
-                                </button>
-                              )}
-
-                              {reg.phone && (
-                                <a
-                                  href={buildRunnerWhatsappUrl(reg)}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 text-xs font-bold px-3 py-2 ml-auto"
-                                >
-                                  <MessageCircle className="w-3.5 h-3.5" />
-                                  Confirmar por WhatsApp
-                                </a>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                <AdminRegistrationsTab
+                  regStats={regStats}
+                  registrationsCount={registrations.length}
+                  filteredRegistrations={filteredRegistrations}
+                  regsLoading={regsLoading}
+                  regsError={regsError}
+                  regsSource={regsSource}
+                  regSearch={regSearch}
+                  setRegSearch={setRegSearch}
+                  regDistanceFilter={regDistanceFilter}
+                  setRegDistanceFilter={setRegDistanceFilter}
+                  regStatusFilter={regStatusFilter}
+                  setRegStatusFilter={setRegStatusFilter}
+                  bibDrafts={bibDrafts}
+                  setBibDrafts={setBibDrafts}
+                  regBusyId={regBusyId}
+                  onExportExcel={handleExportExcel}
+                  onConfirmRegistration={handleConfirmRegistration}
+                  onChangeRegStatus={handleChangeRegStatus}
+                  onDeleteRegistration={handleDeleteRegistration}
+                  buildRunnerWhatsappUrl={buildRunnerWhatsappUrl}
+                />
               )}
 
               {saveFeedback && activeTab !== 'photos' && activeTab !== 'registrations' && (

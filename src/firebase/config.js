@@ -19,7 +19,6 @@ const firebaseConfig = {
 
 let firestoreBundlePromise = null;
 let authBundlePromise = null;
-const bibQueryCache = new Map();
 
 const DEFAULT_ADMIN_EMAILS = ['lciancia1972@gmail.com', 'lucianociancia86@gmail.com'];
 
@@ -108,7 +107,6 @@ function normalizePhotoRecord(docId, data) {
     id: docId,
     cloudinaryUrl: fullUrl,
     cloudinaryThumb: thumbUrl,
-    dorsales: Array.isArray(data.dorsales) ? data.dorsales.map(String) : [],
     sector: data.sector || 'Circuito Reto al Filo',
     edicion: Number(data.edicion) || 1,
     timestamp: data.timestamp || Date.now(),
@@ -118,102 +116,12 @@ function normalizePhotoRecord(docId, data) {
 }
 
 /**
- * Filtra el dataset local de demostración (6 fotos de la 1ra Edición).
+ * Devuelve las postales locales de demostración filtradas por visibilidad y edición.
  */
-export function filterDemoPhotos(cleanBib, edicion = 1) {
-  const basePhotos = RACE_CONFIG.demoPhotos.filter(
-    (item) => item.visible !== false && (item.edicion || 1) === edicion
-  );
-
-  if (!cleanBib) {
-    return basePhotos.map((item) => normalizePhotoRecord(item.id, item));
-  }
-
-  return basePhotos
-    .filter((item) =>
-      item.dorsales.some((dorsal) => dorsal === cleanBib || dorsal.includes(cleanBib))
-    )
+export function filterDemoPhotos(_cleanBib = '', edicion = 1) {
+  return RACE_CONFIG.demoPhotos
+    .filter((item) => item.visible !== false && (item.edicion || 1) === edicion)
     .map((item) => normalizePhotoRecord(item.id, item));
-}
-
-/**
- * Busca fotografías por número de dorsal:
- * - Si el input está vacío, devuelve las 6 fotos destacadas sin gastar lecturas de Firestore.
- * - Si Firestore está configurado, ejecuta una query indexada:
- *   where("visible", "==", true), where("edicion", "==", edicion),
- *   where("dorsales", "array-contains", cleanBib), limit(20)
- * - Incluye caché en memoria por dorsal y fallback transparente al dataset local
- *   si la colección de Firestore aún no tiene documentos o si no hay señal móvil.
- */
-export async function searchPhotosByBib(rawBib, { edicion = 1 } = {}) {
-  const cleanBib = String(rawBib || '').trim().replace(/^#/, '');
-
-  if (!cleanBib) {
-    return {
-      photos: filterDemoPhotos('', edicion),
-      source: 'demo-showcase',
-      networkError: false,
-    };
-  }
-
-  const cacheKey = `${edicion}:${cleanBib}`;
-  if (bibQueryCache.has(cacheKey)) {
-    return bibQueryCache.get(cacheKey);
-  }
-
-  let networkError = false;
-
-  if (isFirebaseConfigured()) {
-    try {
-      const bundle = await getFirestoreDb();
-      if (bundle) {
-        const { db, firestore } = bundle;
-        const { collection, query, where, limit, getDocs } = firestore;
-
-        const photosQuery = query(
-          collection(db, 'photos'),
-          where('visible', '==', true),
-          where('edicion', '==', edicion),
-          where('dorsales', 'array-contains', cleanBib),
-          limit(20)
-        );
-
-        const snapshot = await getDocs(photosQuery);
-        if (!snapshot.empty) {
-          const firestorePhotos = snapshot.docs.map((docSnap) =>
-            normalizePhotoRecord(docSnap.id, docSnap.data())
-          );
-          const result = {
-            photos: firestorePhotos,
-            source: 'firestore',
-            networkError: false,
-          };
-          bibQueryCache.set(cacheKey, result);
-          return result;
-        }
-      }
-    } catch (error) {
-      networkError = true;
-      console.warn(
-        '[Reto al Filo] Fallback a galería demo local para dorsal:',
-        cleanBib,
-        error?.code || error?.message
-      );
-    }
-  }
-
-  const demoMatches = filterDemoPhotos(cleanBib, edicion);
-  const fallbackResult = {
-    photos: demoMatches,
-    source: 'demo-fallback',
-    networkError,
-  };
-
-  // No envenenar la caché si falló la red para permitir reintento cuando vuelva la señal
-  if (!networkError) {
-    bibQueryCache.set(cacheKey, fallbackResult);
-  }
-  return fallbackResult;
 }
 
 /**
@@ -318,7 +226,7 @@ export async function resetLiveRaceConfig() {
 /**
  * Publica una nueva fotografía de muestra en la colección `photos` de Firestore.
  */
-export async function addPhotoToFirestore({ cloudinaryUrl, dorsales = [], sector, edicion = 1 }) {
+export async function addPhotoToFirestore({ cloudinaryUrl, sector, edicion = 1 }) {
   if (!isFirebaseConfigured()) {
     throw new Error('Firebase no está configurado en las variables de entorno.');
   }
@@ -327,13 +235,6 @@ export async function addPhotoToFirestore({ cloudinaryUrl, dorsales = [], sector
   if (!bundle) {
     throw new Error('No se pudo inicializar Firestore.');
   }
-
-  const cleanDorsales = Array.isArray(dorsales)
-    ? dorsales.map((d) => String(d).trim().replace(/^#/, '')).filter(Boolean)
-    : String(dorsales || '')
-        .split(',')
-        .map((d) => d.trim().replace(/^#/, ''))
-        .filter(Boolean);
 
   if (!cloudinaryUrl) {
     throw new Error('Elegí una imagen o ingresá la URL de la foto.');
@@ -347,22 +248,17 @@ export async function addPhotoToFirestore({ cloudinaryUrl, dorsales = [], sector
   const docRef = await addDoc(collection(db, 'photos'), {
     cloudinaryUrl: fullUrl,
     cloudinaryThumb: thumbUrl,
-    dorsales: cleanDorsales,
     sector: sector?.trim() || 'Postales · 1ra Edición',
     edicion: Number(edicion) || 1,
     timestamp: Date.now(),
     visible: true,
   });
 
-  // Limpiar caché de búsquedas y avisar a la galería en vivo
-  for (const bib of cleanDorsales) {
-    bibQueryCache.delete(`${Number(edicion) || 1}:${bib}`);
-  }
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('reto-gallery-updated'));
   }
 
-  return { id: docRef.id, dorsales: cleanDorsales };
+  return { id: docRef.id };
 }
 
 /**

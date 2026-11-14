@@ -94,7 +94,6 @@ export const RACE_CONFIG = {
         'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1400&q=85',
       cloudinaryThumb:
         'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=800&q=80',
-      dorsales: ['101', '205'],
       sector: 'Cumbre El Filo · 937 msnm',
       edicion: 1,
       timestamp: 1712746800000,
@@ -107,7 +106,6 @@ export const RACE_CONFIG = {
         'https://images.unsplash.com/photo-1502224562085-639556652f33?auto=format&fit=crop&w=1400&q=85',
       cloudinaryThumb:
         'https://images.unsplash.com/photo-1502224562085-639556652f33?auto=format&fit=crop&w=800&q=80',
-      dorsales: ['205'],
       sector: 'Filo Norte · KM 9.5',
       edicion: 1,
       timestamp: 1712747400000,
@@ -120,7 +118,6 @@ export const RACE_CONFIG = {
         'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=85',
       cloudinaryThumb:
         'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80',
-      dorsales: ['302'],
       sector: 'Cruce de Arroyo · KM 18',
       edicion: 1,
       timestamp: 1712748000000,
@@ -133,7 +130,6 @@ export const RACE_CONFIG = {
         'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&q=85',
       cloudinaryThumb:
         'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80',
-      dorsales: ['101'],
       sector: 'Ascenso Quebrada · KM 4.5',
       edicion: 1,
       timestamp: 1712748600000,
@@ -146,7 +142,6 @@ export const RACE_CONFIG = {
         'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=1400&q=85',
       cloudinaryThumb:
         'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=800&q=80',
-      dorsales: ['205', '302'],
       sector: 'Bajada Técnica del Valle · KM 14.5',
       edicion: 1,
       timestamp: 1712749200000,
@@ -159,7 +154,6 @@ export const RACE_CONFIG = {
         'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?auto=format&fit=crop&w=1400&q=85',
       cloudinaryThumb:
         'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?auto=format&fit=crop&w=800&q=80',
-      dorsales: ['302'],
       sector: 'Sendero de Montaña · Postales',
       edicion: 1,
       timestamp: 1712749800000,
@@ -167,8 +161,6 @@ export const RACE_CONFIG = {
       aspectClass: 'aspect-[16/10]',
     },
   ],
-
-  quickBibs: ['101', '205', '302'],
 
   schedule: [
     {
@@ -254,7 +246,7 @@ export function mergeRaceConfig(override) {
     if (!incoming) {
       return legacy?.price ? { ...base, price: legacy.price } : base;
     }
-    // Sin GPX personalizado, distancia/desnivel/descripción salen siempre del track oficial (Strava)
+    // El desnivel y la descripción siempre respetan los valores guardados del circuito
     const usesOfficialTrack = !incoming.customGpx;
     const incomingStats = Array.isArray(incoming.stats) ? incoming.stats : base.stats;
     return {
@@ -263,8 +255,8 @@ export function mergeRaceConfig(override) {
       id: base.id,
       tabLabel: base.tabLabel,
       distanceLabel: base.distanceLabel,
-      elevationGain: usesOfficialTrack ? base.elevationGain : incoming.elevationGain || base.elevationGain,
-      description: usesOfficialTrack ? base.description : incoming.description || base.description,
+      elevationGain: incoming.elevationGain || base.elevationGain,
+      description: incoming.description || base.description,
       stats: usesOfficialTrack
         ? [base.stats[0], ...incomingStats.slice(1)]
         : incomingStats,
