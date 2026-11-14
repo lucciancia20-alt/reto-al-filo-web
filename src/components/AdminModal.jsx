@@ -1161,26 +1161,26 @@ export default function AdminModal({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       <div>
                         <label className="block text-xs font-semibold text-stone-300 mb-1">
-                          Valor Inscripción 27K
+                          Valor Inscripción <span className="text-cyan-400 font-bold">27K</span>
                         </label>
                         <input
                           type="text"
                           value={draft.circuits?.['27K']?.price || ''}
                           onChange={(e) => updateCircuitField('27K', 'price', e.target.value)}
                           placeholder="$45.000"
-                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-bold text-emerald-300"
+                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-bold text-cyan-400"
                         />
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-stone-300 mb-1">
-                          Valor Inscripción 13K
+                          Valor Inscripción <span className="text-red-400 font-bold">13K</span>
                         </label>
                         <input
                           type="text"
                           value={draft.circuits?.['13K']?.price || ''}
                           onChange={(e) => updateCircuitField('13K', 'price', e.target.value)}
                           placeholder="$32.000"
-                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-bold text-emerald-300"
+                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-bold text-red-400"
                         />
                       </div>
                       <div>
@@ -1250,23 +1250,31 @@ export default function AdminModal({
               {activeTab === 'circuits' && (
                 <div className="space-y-5">
                   <div className="flex items-center gap-2">
-                    {['27K', '13K'].map((d) => (
-                      <button
-                        key={d}
-                        type="button"
-                        onClick={() => {
-                          setEditDistance(d);
-                          setGpxStatus('');
-                        }}
-                        className={`px-4 py-2 rounded-xl font-display font-bold text-xs uppercase cursor-pointer ${
-                          editDistance === d
-                            ? 'bg-amber-500 text-stone-950'
-                            : 'bg-stone-950 text-stone-300 border border-stone-800'
-                        }`}
-                      >
-                        Circuito {d}
-                      </button>
-                    ))}
+                    {['27K', '13K'].map((d) => {
+                      const active = editDistance === d;
+                      const colorClass =
+                        d === '27K'
+                          ? active
+                            ? 'bg-cyan-500 border border-cyan-400 text-stone-950 shadow-md shadow-cyan-500/25'
+                            : 'bg-stone-950 text-cyan-400 border border-cyan-500/50 hover:border-cyan-400'
+                          : active
+                            ? 'bg-red-500 border border-red-400 text-white shadow-md shadow-red-500/25'
+                            : 'bg-stone-950 text-red-400 border border-red-500/50 hover:border-red-400';
+
+                      return (
+                        <button
+                          key={d}
+                          type="button"
+                          onClick={() => {
+                            setEditDistance(d);
+                            setGpxStatus('');
+                          }}
+                          className={`px-4 py-2 rounded-xl font-display font-bold text-xs uppercase cursor-pointer transition-all ${colorClass}`}
+                        >
+                          Circuito {d}
+                        </button>
+                      );
+                    })}
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1329,7 +1337,11 @@ export default function AdminModal({
                     <div className="flex items-center justify-between gap-2">
                       <div>
                         <h4 className="font-display text-sm font-bold text-white uppercase">
-                          Puestos de Hidratación ({editDistance})
+                          Puestos de Hidratación (
+                          <span className={editDistance === '13K' ? 'text-red-500' : 'text-cyan-400'}>
+                            {editDistance}
+                          </span>
+                          )
                         </h4>
                         <p className="text-[11px] text-stone-400">
                           Ingresá el kilómetro y se ubican automáticamente sobre la altura y mapa
@@ -1398,7 +1410,11 @@ export default function AdminModal({
                   <div className="rounded-2xl bg-stone-950 border border-stone-800 p-4 flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <h4 className="font-display text-sm font-bold text-white uppercase">
-                        Reemplazar Track .GPX ({editDistance})
+                        Reemplazar Track .GPX (
+                        <span className={editDistance === '13K' ? 'text-red-500' : 'text-cyan-400'}>
+                          {editDistance}
+                        </span>
+                        )
                       </h4>
                       <p className="text-[11px] text-stone-400">
                         Subí un archivo .gpx exportado de Garmin, COROS, Strava o Wikiloc para
@@ -1792,7 +1808,7 @@ export default function AdminModal({
                       {
                         label: '27K',
                         value: regStats.count27k,
-                        tone: 'text-cyan-400 border-cyan-400',
+                        tone: 'text-cyan-400 border-cyan-500',
                       },
                       {
                         label: '13K',
@@ -1919,7 +1935,13 @@ export default function AdminModal({
                                   <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-stone-900 border border-stone-700 text-amber-300">
                                     {reg.code}
                                   </span>
-                                  <span className="text-xs font-black px-2 py-0.5 rounded-md bg-sky-500/15 border border-sky-500/30 text-sky-300">
+                                  <span
+                                    className={`text-xs font-black px-2 py-0.5 rounded-md border ${
+                                      reg.distance === '13K'
+                                        ? 'bg-red-500/20 border-red-500 text-red-400'
+                                        : 'bg-cyan-500/20 border-cyan-500 text-cyan-300'
+                                    }`}
+                                  >
                                     {reg.distance}
                                   </span>
                                   <span
