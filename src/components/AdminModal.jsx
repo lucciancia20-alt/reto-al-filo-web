@@ -1120,7 +1120,7 @@ export default function AdminModal({
                   <button
                     type="button"
                     onClick={handleScrollDown}
-                    className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-zinc-950 hover:bg-stone-900 border border-orange-500 text-orange-400 text-[11px] font-bold px-3.5 py-1.5 transition-colors cursor-pointer"
+                    className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-stone-900 hover:bg-stone-800 border border-orange-500/80 text-orange-400 text-[11px] font-bold px-3.5 py-1.5 shadow-none transition-colors cursor-pointer"
                   >
                     <span>Deslizá para ver más</span>
                     <ChevronDown className="w-3.5 h-3.5 text-orange-400 animate-bounce" />
