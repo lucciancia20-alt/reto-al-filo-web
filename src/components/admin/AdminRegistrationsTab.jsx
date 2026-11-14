@@ -10,6 +10,7 @@ import {
   MessageCircle,
   ChevronDown,
   Pencil,
+  Wallet,
 } from 'lucide-react';
 
 export default function AdminRegistrationsTab({
@@ -255,8 +256,8 @@ export default function AdminRegistrationsTab({
 
       {/* Controles de búsqueda, filtro y exportación */}
       <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3 space-y-2.5">
-        <div className="flex flex-col sm:flex-row gap-2.5">
-          <div className="relative flex-1">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-2.5">
+          <div className="relative flex-1 min-w-0">
             <Search className="w-4 h-4 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
@@ -267,7 +268,7 @@ export default function AdminRegistrationsTab({
             />
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 shrink-0">
             <select
               aria-label="Filtrar por distancia"
               value={regDistanceFilter}
@@ -321,11 +322,23 @@ export default function AdminRegistrationsTab({
               type="button"
               onClick={onExportExcel}
               disabled={registrationsCount === 0}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 text-xs font-bold px-3.5 py-2 cursor-pointer disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 text-xs font-bold px-3.5 py-2 cursor-pointer disabled:opacity-40 whitespace-nowrap"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 shrink-0" />
               Exportar Excel (.XLSX)
             </button>
+
+            <a
+              href="https://www.mercadopago.com.ar/activities"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Abrir actividad y transferencias recibidas en Mercado Pago"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/60 text-xs font-bold px-3.5 py-2 transition-colors whitespace-nowrap"
+            >
+              <Wallet className="w-3.5 h-3.5 shrink-0" />
+              <span>Mercado Pago</span>
+              <ExternalLink className="w-3 h-3 opacity-80 shrink-0" />
+            </a>
           </div>
         </div>
 
