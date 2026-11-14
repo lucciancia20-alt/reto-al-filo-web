@@ -14,7 +14,7 @@ export default function Navbar({ onOpenModal, onOpenAdmin }) {
   return (
     <header className="fixed top-0 inset-x-0 z-40 bg-stone-950/85 backdrop-blur-md border-b border-orange-500/40">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-16 py-2 flex items-center justify-between gap-3">
-        <div className="flex flex-col items-start gap-1.5">
+        <div className="flex flex-col items-center gap-1.5">
           <a
             href="#inicio"
             className="flex items-center gap-2.5 text-stone-100 font-display font-extrabold tracking-tight text-lg"
@@ -35,7 +35,7 @@ export default function Navbar({ onOpenModal, onOpenAdmin }) {
           <button
             type="button"
             onClick={onOpenAdmin}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-stone-900/95 hover:bg-stone-800 text-stone-300 hover:text-amber-400 border border-orange-500/70 shadow-[0_0_10px_rgba(249,115,22,0.2)] hover:border-orange-400 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer"
+            className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-stone-900/95 hover:bg-stone-800 text-stone-300 hover:text-amber-400 border border-orange-500/70 shadow-[0_0_10px_rgba(249,115,22,0.2)] hover:border-orange-400 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer"
           >
             <Settings className="w-3 h-3 text-amber-400" />
             Panel Admin

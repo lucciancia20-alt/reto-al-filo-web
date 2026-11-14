@@ -230,7 +230,7 @@ export default function CircuitSection({
             <span>Circuito GPX Oficial y Altimetría Real</span>
           </div>
 
-          <h2 className="mt-3 text-balance font-display text-2xl sm:text-3xl md:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
+          <h2 className="mt-3 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
             Dominá el Desnivel
           </h2>
           <p className="mt-2.5 max-w-2xl mx-auto text-balance text-sm sm:text-base text-stone-300">
