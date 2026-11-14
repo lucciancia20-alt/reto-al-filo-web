@@ -21,11 +21,14 @@ export default function AdminCircuitsTab({
       <div className="flex items-center gap-2">
         {['27K', '13K'].map((d) => {
           const active = editDistance === d;
-          const colorClass = !active
-            ? 'bg-stone-950 text-stone-300 border border-stone-600 hover:border-stone-400 hover:text-white'
-            : d === '27K'
-              ? 'bg-stone-950 text-cyan-400 border border-cyan-500 shadow-sm shadow-cyan-500/20'
-              : 'bg-stone-950 text-red-500 border border-red-500 shadow-sm shadow-red-500/20';
+          const colorClass =
+            d === '27K'
+              ? active
+                ? 'bg-stone-950 text-cyan-400 border-2 border-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.3)]'
+                : 'bg-stone-950 text-cyan-400 border border-cyan-500/40 opacity-80 hover:opacity-100'
+              : active
+                ? 'bg-stone-950 text-red-500 border-2 border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.3)]'
+                : 'bg-stone-950 text-red-500 border border-red-500/40 opacity-80 hover:opacity-100';
 
           return (
             <button
