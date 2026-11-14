@@ -45,7 +45,7 @@ export default function GallerySection() {
   return (
     <section
       id="galeria"
-      className="py-16 sm:py-24 bg-stone-950 border-t border-stone-900 relative"
+      className="py-8 sm:py-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Encabezado limpio de muestra fotográfica de la 1ra Edición */}
@@ -55,21 +55,21 @@ export default function GallerySection() {
             <span>Galería · 1ra Edición</span>
           </div>
 
-          <h2 className="mt-3 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
+          <h2 className="mt-2 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
             VIVÍ EL RETO: POSTALES DE LA{' '}
             <span className="whitespace-nowrap">
               1<sup className="lowercase text-sm md:text-base font-extrabold align-super -top-2 relative">ra</sup> EDICIÓN
             </span>
           </h2>
 
-          <p className="mt-3 max-w-2xl mx-auto text-balance text-sm sm:text-base text-stone-300">
+          <p className="mt-1.5 max-w-2xl mx-auto text-balance text-sm sm:text-base text-stone-300">
             Recorré los paisajes del Cerro Providencia, los senderos del filo y el paso de los
             corredores en nuestra edición inaugural.
           </p>
         </div>
 
         {/* Grilla Masonry de postales */}
-        <div className="mt-10 columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+        <div className="mt-5 sm:mt-6 columns-1 sm:columns-2 lg:columns-3 gap-3.5 space-y-3.5">
           {photos.map((photo) => (
             <article
               key={photo.id}

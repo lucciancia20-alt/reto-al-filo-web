@@ -220,7 +220,7 @@ export default function CircuitSection({
   return (
     <section
       id="circuito"
-      className="py-16 sm:py-24 bg-stone-950 border-t border-stone-900 relative"
+      className="py-8 sm:py-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Encabezado */}
@@ -230,10 +230,10 @@ export default function CircuitSection({
             <span>Circuito GPX Oficial y Altimetría Real</span>
           </div>
 
-          <h2 className="mt-3 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
+          <h2 className="mt-2 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
             Dominá el Desnivel
           </h2>
-          <p className="mt-2.5 max-w-2xl mx-auto text-balance text-sm sm:text-base text-stone-300">
+          <p className="mt-1.5 max-w-2xl mx-auto text-balance text-sm sm:text-base text-stone-300">
             Trazado GPS real registrado en las sierras de Tornquist. Alterná entre las dos
             distancias para explorar el mapa, la altimetría punto a punto y los puestos de
             abastecimiento.
@@ -244,7 +244,7 @@ export default function CircuitSection({
         <div
           role="tablist"
           aria-label="Seleccionar distancia del circuito"
-          className="mt-8 flex justify-center"
+          className="mt-4 sm:mt-5 flex justify-center"
         >
           <div className="inline-grid grid-cols-2 p-1.5 rounded-2xl bg-stone-900 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.25)] w-full max-w-md">
             {Object.values(circuits).map((circuit) => {
@@ -259,7 +259,7 @@ export default function CircuitSection({
                     setHoverPoint(null);
                     onSelectDistance(circuit.id);
                   }}
-                  className={`py-3 px-4 rounded-xl font-display font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer ${
+                  className={`py-2.5 px-4 rounded-xl font-display font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer ${
                     isSelected
                       ? 'bg-amber-500 text-stone-950 shadow-lg shadow-amber-500/20'
                       : 'text-stone-300 hover:text-white'
@@ -273,9 +273,9 @@ export default function CircuitSection({
         </div>
 
         {/* Contenedor principal del Circuito GPX + Altimetría */}
-        <div className="mt-8 rounded-3xl bg-stone-900/90 border border-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.22)] overflow-hidden">
+        <div className="mt-4 sm:mt-5 rounded-3xl bg-stone-900/90 border border-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.22)] overflow-hidden">
           {/* Barra superior */}
-          <div className="px-4 sm:px-6 py-4 bg-stone-950/75 border-b border-orange-500/40 flex flex-wrap items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 bg-stone-950/75 border-b border-orange-500/40 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <span className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0">
                 <MapIcon className="w-4 h-4" />
@@ -316,8 +316,8 @@ export default function CircuitSection({
           </div>
 
           {/* Grilla 2 columnas: Mapa GPS 2D + Altimetría Real */}
-          <div className="p-4 sm:p-6 bg-gradient-to-b from-stone-950/50 to-stone-900">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+          <div className="p-3.5 sm:p-4 bg-gradient-to-b from-stone-950/50 to-stone-900">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
               {/* Columna Izquierda: Recorrido GPS Vectorial */}
               <div className="lg:col-span-5 rounded-2xl bg-stone-950/90 border border-orange-500/80 shadow-[0_0_14px_rgba(249,115,22,0.18)] p-3 sm:p-4 flex flex-col justify-between">
                 <div className="flex items-center justify-between text-xs mb-2">
@@ -642,7 +642,7 @@ export default function CircuitSection({
             </div>
 
             {/* Lista de Puestos de Hidratación + CTA */}
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-orange-500/30">
+            <div className="mt-3.5 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-orange-500/30">
               <div className="flex flex-wrap gap-2">
                 {stations.map((st) => (
                   <span
@@ -668,13 +668,13 @@ export default function CircuitSection({
         </div>
 
         {/* 3 Tarjetas de Estadísticas Minimalistas */}
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
           {dynamicStats.map((stat, idx) => {
             const IconComponent = cardIcons[idx] || TrendingUp;
             return (
               <div
                 key={stat.label}
-                className="rounded-2xl bg-stone-900/75 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] p-5 sm:p-6 flex items-start gap-4 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
+                className="rounded-2xl bg-stone-900/75 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] p-4 flex items-start gap-4 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
               >
                 <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
                   <IconComponent className="w-6 h-6" />

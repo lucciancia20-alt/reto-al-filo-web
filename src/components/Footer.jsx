@@ -7,8 +7,8 @@ export default function Footer({
   onOpenModal,
 }) {
   return (
-    <footer className="bg-stone-950 border-t border-orange-500/40 py-12 text-stone-400">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+    <footer className="bg-stone-950 border-t-2 border-orange-500/50 py-6 sm:py-8 text-stone-400">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <img
             src="/logo-raf.png"

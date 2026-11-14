@@ -51,7 +51,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
   return (
     <section
       id="inicio"
-      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-stone-950 pt-24"
+      className="relative min-h-[85dvh] sm:min-h-[88dvh] flex items-center justify-center overflow-hidden bg-stone-950 pt-20 pb-6"
     >
       {/* Imagen de fondo Unsplash con srcSet responsivo y respaldo oscuro para lectura en exterior */}
       <img
@@ -65,9 +65,9 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
       <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-950/65 to-stone-950" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,rgba(12,10,9,0.85)_100%)]" />
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-12 text-center flex flex-col items-center">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 text-center flex flex-col items-center">
         {/* Etiqueta superior de aventura */}
-        <div className="inline-flex items-center gap-2 rounded-full bg-stone-900/90 border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-amber-400 mb-6 shadow-[0_0_14px_rgba(249,115,22,0.3)]">
+        <div className="inline-flex items-center gap-2 rounded-full bg-stone-900/90 border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-amber-400 mb-3.5 shadow-[0_0_14px_rgba(249,115,22,0.3)]">
           <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
           <span>{raceConfig.subtitle} · 10 de Abril · 08:00 hs</span>
         </div>
@@ -80,19 +80,19 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
           </span>
         </h1>
 
-        <p className="mt-3 text-lg sm:text-2xl font-bold uppercase tracking-[0.22em] text-amber-400">
+        <p className="mt-2 text-lg sm:text-2xl font-bold uppercase tracking-[0.22em] text-amber-400">
           {raceConfig.subtitle}
         </p>
 
-        <p className="mt-4 max-w-xl text-balance text-sm sm:text-base text-stone-200 leading-relaxed">
+        <p className="mt-2.5 max-w-xl text-balance text-sm sm:text-base text-stone-200 leading-relaxed">
           Desafiá las crestas técnicas, el bosque de altura y los senderos serranos en dos
           distancias diseñadas para corredores de montaña: <strong className="text-white">27K Competitivo</strong> y{' '}
           <strong className="text-white">13K Montaña</strong>.
         </p>
 
         {/* Contador regresivo dinámico hacia el 10 de abril de 2027 */}
-        <div className="mt-8 w-full max-w-md">
-          <div className="flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-stone-300 mb-2.5">
+        <div className="mt-5 w-full max-w-md">
+          <div className="flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-stone-300 mb-2">
             <Timer className="w-3.5 h-3.5 text-amber-400" />
             <span>
               {countdown.expired
@@ -105,7 +105,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
             {timeUnits.map((unit) => (
               <div
                 key={unit.label}
-                className="rounded-2xl bg-stone-900/90 backdrop-blur-md border border-orange-500 py-3 px-2 sm:py-4 shadow-[0_0_16px_rgba(249,115,22,0.35)]"
+                className="rounded-2xl bg-stone-900/90 backdrop-blur-md border border-orange-500 py-2.5 px-2 sm:py-3 shadow-[0_0_16px_rgba(249,115,22,0.35)]"
               >
                 <div className="font-display text-2xl sm:text-4xl font-black text-white tabular-nums tracking-tight">
                   {unit.value}
@@ -119,11 +119,11 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         </div>
 
         {/* Botón CTA principal */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full sm:w-auto">
+        <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
           <button
             type="button"
             onClick={() => onOpenModal()}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 active:scale-[0.99] text-stone-950 font-display font-black text-base sm:text-lg uppercase tracking-wider px-8 py-4 shadow-xl shadow-amber-500/25 transition-all cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 active:scale-[0.99] text-stone-950 font-display font-black text-base sm:text-lg uppercase tracking-wider px-8 py-3 sm:py-3.5 shadow-xl shadow-amber-500/25 transition-all cursor-pointer"
           >
             <Flame className="w-5 h-5 fill-stone-950" />
             Quiero Inscribirme
@@ -131,14 +131,14 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
           <a
             href="#circuito"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-stone-900/85 hover:bg-stone-800 text-stone-100 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.45)] font-semibold text-sm sm:text-base px-6 py-4 transition-all"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-stone-900/85 hover:bg-stone-800 text-stone-100 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.45)] font-semibold text-sm sm:text-base px-6 py-3 sm:py-3.5 transition-all"
           >
             Ver Circuito y Altimetría
           </a>
         </div>
 
         {/* Ubicación rápida */}
-        <div className="mt-7 inline-flex items-center gap-2 text-xs sm:text-sm text-stone-300">
+        <div className="mt-4 inline-flex items-center gap-2 text-xs sm:text-sm text-stone-300">
           <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
           <span>{raceConfig.locationName}</span>
         </div>
@@ -147,7 +147,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
       <a
         href="#circuito"
         aria-label="Desplazarse al circuito"
-        className="absolute bottom-5 left-1/2 -translate-x-1/2 text-stone-400 hover:text-amber-400 transition-colors animate-bounce"
+        className="absolute bottom-2.5 left-1/2 -translate-x-1/2 text-stone-400 hover:text-amber-400 transition-colors animate-bounce"
       >
         <ChevronDown className="w-6 h-6" />
       </a>

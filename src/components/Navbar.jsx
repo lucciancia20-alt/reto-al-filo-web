@@ -12,7 +12,7 @@ export default function Navbar({ onOpenModal, onOpenAdmin }) {
   ];
 
   return (
-    <header className="fixed top-0 inset-x-0 z-40 bg-stone-950/85 backdrop-blur-md border-b border-orange-500/40">
+    <header className="fixed top-0 inset-x-0 z-40 bg-stone-950/85 backdrop-blur-md border-b-2 border-orange-500/50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-16 py-2 flex items-center justify-between gap-3">
         <div className="flex flex-col items-center gap-1.5">
           <a
