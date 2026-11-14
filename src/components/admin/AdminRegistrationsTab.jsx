@@ -51,33 +51,38 @@ export default function AdminRegistrationsTab({
             label: 'Total',
             value: regStats.total,
             tone: 'text-stone-100 border-stone-300',
+            labelClass: 'text-white',
           },
           {
             label: 'Confirmados',
             value: regStats.confirmed,
             tone: 'text-green-400 border-green-500',
+            labelClass: 'text-emerald-400',
           },
           {
             label: 'Pendientes',
             value: regStats.pending,
             tone: 'text-yellow-400 border-yellow-500',
+            labelClass: 'text-amber-400',
           },
           {
             label: '27K',
             value: regStats.count27k,
             tone: 'text-cyan-400 border-cyan-500',
+            labelClass: 'text-cyan-400',
           },
           {
             label: '13K',
             value: regStats.count13k,
             tone: 'text-red-500 border-red-500',
+            labelClass: 'text-red-500',
           },
         ].map((stat) => (
           <div
             key={stat.label}
             className={`rounded-2xl bg-stone-950 border p-3 text-center ${stat.tone}`}
           >
-            <span className="block text-[10px] uppercase tracking-wider text-stone-400 font-semibold">
+            <span className={`block text-[10px] uppercase tracking-wider font-semibold ${stat.labelClass}`}>
               {stat.label}
             </span>
             <span className="font-display text-xl font-black">{stat.value}</span>
