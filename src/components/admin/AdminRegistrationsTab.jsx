@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Search,
   Download,
@@ -8,6 +8,7 @@ import {
   Trash2,
   CheckCircle2,
   MessageCircle,
+  ChevronDown,
 } from 'lucide-react';
 
 export default function AdminRegistrationsTab({
@@ -32,6 +33,15 @@ export default function AdminRegistrationsTab({
   onDeleteRegistration,
   buildRunnerWhatsappUrl,
 }) {
+  const [expandedIds, setExpandedIds] = useState({});
+
+  const toggleExpand = (id) => {
+    setExpandedIds((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   return (
     <div className="space-y-4">
       {/* Resumen de contadores */}
@@ -158,9 +168,10 @@ export default function AdminRegistrationsTab({
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {filteredRegistrations.map((reg) => {
             const isBusy = regBusyId === reg.id;
+            const isExpanded = Boolean(expandedIds[reg.id]);
             const bibValue = bibDrafts[reg.id] ?? reg.assignedBib ?? '';
             const statusBadgeClass =
               reg.status === 'confirmado'
@@ -172,166 +183,194 @@ export default function AdminRegistrationsTab({
             return (
               <div
                 key={reg.id}
-                className="rounded-2xl bg-stone-950 border border-stone-800 p-4 space-y-3"
+                className="rounded-xl bg-stone-950 border border-stone-800 hover:border-stone-700 transition-colors overflow-hidden"
               >
-                {/* Encabezado de la ficha */}
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-stone-900 border border-stone-700 text-amber-300">
-                        {reg.code}
-                      </span>
-                      <span
-                        className={`text-xs font-black px-2 py-0.5 rounded-md border ${
-                          reg.distance === '13K'
-                            ? 'bg-stone-950 border-red-500 text-red-500'
-                            : 'bg-stone-950 border-cyan-500 text-cyan-400'
-                        }`}
-                      >
-                        {reg.distance}
-                      </span>
-                      <span
-                        className={`text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-full border ${statusBadgeClass}`}
-                      >
-                        {reg.status}
-                      </span>
-                      {reg.assignedBib && (
-                        <span className="font-mono text-xs font-black px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                          Dorsal #{reg.assignedBib}
-                        </span>
-                      )}
-                    </div>
-                    <h4 className="mt-1.5 font-display text-base font-extrabold text-white">
+                {/* Fila operativa compacta (1-2 renglones) */}
+                <div className="px-3 py-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                  {/* Identificación rápida del corredor */}
+                  <div className="flex flex-wrap items-center gap-2 min-w-0 flex-1">
+                    <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-md bg-stone-900 border border-stone-700 text-amber-300 shrink-0">
+                      {reg.code}
+                    </span>
+                    <span
+                      className={`text-[11px] font-black px-2 py-0.5 rounded-md border shrink-0 ${
+                        reg.distance === '13K'
+                          ? 'bg-stone-950 border-red-500 text-red-500'
+                          : 'bg-stone-950 border-cyan-500 text-cyan-400'
+                      }`}
+                    >
+                      {reg.distance}
+                    </span>
+                    <h4 className="font-display text-sm font-extrabold text-white truncate max-w-[200px] sm:max-w-[240px]">
                       {reg.fullName}
                     </h4>
+                    <span className="font-mono text-[11px] text-stone-400 shrink-0">
+                      DNI {reg.dni}
+                    </span>
+                    <span
+                      className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shrink-0 ${statusBadgeClass}`}
+                    >
+                      {reg.status}
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  {/* Acciones operativas en línea */}
+                  <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-1">
+                      <label
+                        htmlFor={`bib-${reg.id}`}
+                        className="text-[11px] font-semibold text-stone-400"
+                      >
+                        #
+                      </label>
+                      <input
+                        id={`bib-${reg.id}`}
+                        type="text"
+                        inputMode="numeric"
+                        aria-label={`Número de dorsal de ${reg.fullName}`}
+                        value={bibValue}
+                        onChange={(e) =>
+                          setBibDrafts((prev) => ({
+                            ...prev,
+                            [reg.id]: e.target.value,
+                          }))
+                        }
+                        placeholder="Dorsal"
+                        className="w-16 rounded-lg bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2 py-1 text-xs font-mono text-white text-center"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={isBusy}
+                      onClick={() => onConfirmRegistration(reg)}
+                      title="Guardar número de dorsal y confirmar inscripción"
+                      className="inline-flex items-center gap-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-[11px] uppercase px-2.5 py-1.5 cursor-pointer disabled:opacity-50"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Confirmar
+                    </button>
+
                     {reg.receiptUrl && (
                       <a
                         href={reg.receiptUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/35 text-xs font-bold px-3 py-2"
+                        title="Ver comprobante adjunto"
+                        className="inline-flex items-center gap-1 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/35 text-[11px] font-bold px-2.5 py-1.5"
                       >
-                        Ver Comprobante
                         <ExternalLink className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Comprobante</span>
                       </a>
                     )}
+
+                    {reg.phone && (
+                      <a
+                        href={buildRunnerWhatsappUrl(reg)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Enviar confirmación por WhatsApp"
+                        aria-label={`Enviar WhatsApp a ${reg.fullName}`}
+                        className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 text-[11px] font-bold px-2.5 py-1.5"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">WhatsApp</span>
+                      </a>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => toggleExpand(reg.id)}
+                      aria-expanded={isExpanded}
+                      aria-label={`${isExpanded ? 'Ocultar' : 'Ver'} detalles de ${reg.fullName}`}
+                      title="Ver detalles completos"
+                      className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition-colors cursor-pointer ${
+                        isExpanded
+                          ? 'bg-orange-500/15 border-orange-500 text-orange-300'
+                          : 'bg-stone-900 border-stone-700 text-stone-300 hover:border-orange-500/60 hover:text-white'
+                      }`}
+                    >
+                      <span className="hidden md:inline">Detalles</span>
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                          isExpanded ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
+
                     <button
                       type="button"
                       disabled={isBusy}
                       onClick={() => onDeleteRegistration(reg)}
                       aria-label={`Eliminar inscripción de ${reg.fullName}`}
-                      className="p-2 rounded-xl text-stone-400 hover:text-rose-400 hover:bg-stone-900 cursor-pointer disabled:opacity-40"
+                      title="Eliminar inscripción"
+                      className="p-1.5 rounded-lg text-stone-400 hover:text-rose-400 hover:bg-stone-900 cursor-pointer disabled:opacity-40"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
 
-                {/* Datos detallados */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-stone-300 bg-stone-900/70 border border-stone-800/80 rounded-xl p-3">
-                  <div>
-                    <span className="text-stone-500">DNI: </span>
-                    <span className="font-mono text-stone-100">{reg.dni}</span>
-                  </div>
-                  <div>
-                    <span className="text-stone-500">Nac.: </span>
-                    <span>{reg.birthDate}</span>
-                    <span className="text-stone-500"> ({reg.gender})</span>
-                  </div>
-                  <div>
-                    <span className="text-stone-500">Remera: </span>
-                    <strong className="text-amber-300">{reg.shirtSize}</strong>
-                  </div>
-                  <div>
-                    <span className="text-stone-500">Localidad: </span>
-                    <span>{reg.city}</span>
-                  </div>
-                  <div>
-                    <span className="text-stone-500">Team: </span>
-                    <span>{reg.team || 'Libre'}</span>
-                  </div>
-                  <div>
-                    <span className="text-stone-500">Tel: </span>
-                    <span className="font-mono">{reg.phone}</span>
-                  </div>
-                  <div className="sm:col-span-2 truncate">
-                    <span className="text-stone-500">Email: </span>
-                    <span>{reg.email}</span>
-                  </div>
-                  <div>
-                    <span className="text-stone-500">Emergencia: </span>
-                    <span>
-                      {reg.emergencyContactName} ({reg.emergencyContactPhone})
-                    </span>
-                  </div>
-                  {reg.medicalNotes && (
-                    <div className="sm:col-span-3 text-rose-200/90">
-                      <span className="text-stone-400">Observaciones médicas: </span>
-                      {reg.medicalNotes}
+                {/* Panel expandible (Acordeón con datos complementarios) */}
+                {isExpanded && (
+                  <div className="border-t border-stone-800/90 bg-stone-900/60 px-3.5 py-2.5 space-y-2 text-xs text-stone-300">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1.5">
+                      <div className="truncate">
+                        <span className="text-stone-500">Email: </span>
+                        <span className="text-stone-100">{reg.email}</span>
+                      </div>
+                      <div>
+                        <span className="text-stone-500">Nacimiento: </span>
+                        <span className="text-stone-100">{reg.birthDate}</span>
+                      </div>
+                      <div>
+                        <span className="text-stone-500">Género: </span>
+                        <span className="text-stone-100">{reg.gender}</span>
+                      </div>
+                      <div>
+                        <span className="text-stone-500">Talle remera: </span>
+                        <strong className="text-amber-300">{reg.shirtSize}</strong>
+                      </div>
+                      <div>
+                        <span className="text-stone-500">Localidad: </span>
+                        <span className="text-stone-100">{reg.city}</span>
+                      </div>
+                      <div>
+                        <span className="text-stone-500">Team: </span>
+                        <span className="text-stone-100">{reg.team || 'Libre'}</span>
+                      </div>
+                      <div>
+                        <span className="text-stone-500">Teléfono: </span>
+                        <span className="font-mono text-stone-100">{reg.phone}</span>
+                      </div>
+                      <div>
+                        <span className="text-stone-500">Emergencia: </span>
+                        <span className="text-stone-100">
+                          {reg.emergencyContactName} ({reg.emergencyContactPhone})
+                        </span>
+                      </div>
+                      <div className="sm:col-span-2 md:col-span-4 text-stone-200">
+                        <span className="text-stone-500">Observaciones médicas: </span>
+                        <span className={reg.medicalNotes ? 'text-amber-200' : 'text-stone-400'}>
+                          {reg.medicalNotes || 'Sin observaciones médicas'}
+                        </span>
+                      </div>
                     </div>
-                  )}
-                </div>
 
-                {/* Acciones de dorsal, aprobación y WhatsApp */}
-                <div className="flex flex-wrap items-center gap-2 pt-1">
-                  <div className="flex items-center gap-1.5">
-                    <label
-                      htmlFor={`bib-${reg.id}`}
-                      className="text-[11px] font-semibold text-stone-400"
-                    >
-                      Dorsal #
-                    </label>
-                    <input
-                      id={`bib-${reg.id}`}
-                      type="text"
-                      value={bibValue}
-                      onChange={(e) =>
-                        setBibDrafts((prev) => ({
-                          ...prev,
-                          [reg.id]: e.target.value,
-                        }))
-                      }
-                      placeholder="105"
-                      className="w-20 rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-2 text-xs font-mono text-white text-center"
-                    />
+                    {reg.status !== 'pendiente' && (
+                      <div className="pt-1 flex justify-end border-t border-stone-800/60">
+                        <button
+                          type="button"
+                          disabled={isBusy}
+                          onClick={() => onChangeRegStatus(reg, 'pendiente')}
+                          className="rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-[11px] font-semibold px-2.5 py-1 cursor-pointer disabled:opacity-50"
+                        >
+                          Pasar a Pendiente
+                        </button>
+                      </div>
+                    )}
                   </div>
-
-                  <button
-                    type="button"
-                    disabled={isBusy}
-                    onClick={() => onConfirmRegistration(reg)}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs uppercase px-3.5 py-2 cursor-pointer disabled:opacity-50"
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Confirmar y Guardar Dorsal
-                  </button>
-
-                  {reg.status !== 'pendiente' && (
-                    <button
-                      type="button"
-                      disabled={isBusy}
-                      onClick={() => onChangeRegStatus(reg, 'pendiente')}
-                      className="rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold px-3 py-2 cursor-pointer disabled:opacity-50"
-                    >
-                      Pasar a Pendiente
-                    </button>
-                  )}
-
-                  {reg.phone && (
-                    <a
-                      href={buildRunnerWhatsappUrl(reg)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 text-xs font-bold px-3 py-2 ml-auto"
-                    >
-                      <MessageCircle className="w-3.5 h-3.5" />
-                      Confirmar por WhatsApp
-                    </a>
-                  )}
-                </div>
+                )}
               </div>
             );
           })}
