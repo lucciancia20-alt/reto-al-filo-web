@@ -51,7 +51,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
   return (
     <section
       id="inicio"
-      className="relative min-h-[85dvh] sm:min-h-[88dvh] flex items-center justify-center overflow-hidden bg-stone-950 pt-20 pb-6"
+      className="relative min-h-[95dvh] md:min-h-[108dvh] flex items-center justify-center overflow-hidden bg-stone-950 py-24 md:py-32"
     >
       {/* Imagen de fondo con srcSet responsivo y respaldo oscuro para lectura en exterior */}
       <img
@@ -60,10 +60,9 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         sizes="100vw"
         alt="Corredor de trail running en el filo de la montaña"
         fetchPriority="high"
-        className="absolute inset-0 w-full h-full object-cover object-bottom"
+        className="absolute inset-0 w-full h-full object-cover object-top sm:object-[center_15%]"
       />
-      <div className="absolute inset-0 bg-black/40" />
-      <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/35 to-stone-950/60" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/80" />
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 text-center flex flex-col items-center">
         {/* Etiqueta superior de aventura */}
