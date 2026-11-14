@@ -274,7 +274,9 @@ export default function AdminModal({
   }, []);
 
   const handleScrollDown = () => {
-    scrollContainerRef.current?.scrollBy({ top: 320, behavior: 'smooth' });
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -1118,10 +1120,10 @@ export default function AdminModal({
                   <button
                     type="button"
                     onClick={handleScrollDown}
-                    className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-zinc-950/95 hover:bg-stone-900 border border-amber-500/70 hover:border-amber-400 text-stone-100 text-[11px] font-bold px-3.5 py-1.5 shadow-lg shadow-black/70 transition-all cursor-pointer"
+                    className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-zinc-950 hover:bg-stone-900 border border-orange-500 text-orange-400 text-[11px] font-bold px-3.5 py-1.5 transition-colors cursor-pointer"
                   >
                     <span>Deslizá para ver más</span>
-                    <ChevronDown className="w-3.5 h-3.5 text-amber-400 animate-bounce" />
+                    <ChevronDown className="w-3.5 h-3.5 text-orange-400 animate-bounce" />
                   </button>
                 </div>
               )}
