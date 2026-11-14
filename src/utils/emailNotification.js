@@ -1,8 +1,8 @@
 import emailjs from '@emailjs/browser';
 
 export const EMAILJS_SERVICE_ID = 'service_g95to2m';
-export const EMAILJS_TEMPLATE_ID = 'template_hvz69he';
-export const EMAILJS_PUBLIC_KEY = 'CFqaVqNNdftgIXlYp';
+export const EMAILJS_TEMPLATE_ID = 'template_huzo9hw';
+export const EMAILJS_PUBLIC_KEY = 'CFqaVqNNdftgIXIYp';
 export const DEFAULT_NOTIFICATION_EMAIL = 'lciancia1972@gmail.com';
 
 if (EMAILJS_PUBLIC_KEY) {
