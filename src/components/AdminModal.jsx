@@ -779,6 +779,10 @@ export default function AdminModal({
 
   const activeCircuitDraft = draft.circuits[editDistance];
   const activeTrack = activeCircuitDraft.customGpx || GPX_TRACKS[editDistance];
+  const circuitInputBorderClass =
+    editDistance === '13K'
+      ? 'border border-red-500 focus:border-red-400 focus:outline-none'
+      : 'border border-cyan-500 focus:border-cyan-400 focus:outline-none';
 
   return (
     <div
@@ -1252,14 +1256,11 @@ export default function AdminModal({
                   <div className="flex items-center gap-2">
                     {['27K', '13K'].map((d) => {
                       const active = editDistance === d;
-                      const colorClass =
-                        d === '27K'
-                          ? active
-                            ? 'bg-cyan-500 border border-cyan-400 text-stone-950 shadow-md shadow-cyan-500/25'
-                            : 'bg-stone-950 text-cyan-400 border border-cyan-500/50 hover:border-cyan-400'
-                          : active
-                            ? 'bg-red-500 border border-red-400 text-white shadow-md shadow-red-500/25'
-                            : 'bg-stone-950 text-red-400 border border-red-500/50 hover:border-red-400';
+                      const colorClass = !active
+                        ? 'bg-stone-950 text-stone-300 border border-stone-600 hover:border-stone-400 hover:text-white'
+                        : d === '27K'
+                          ? 'bg-stone-950 text-cyan-400 border border-cyan-500 shadow-sm shadow-cyan-500/20'
+                          : 'bg-stone-950 text-red-500 border border-red-500 shadow-sm shadow-red-500/20';
 
                       return (
                         <button
@@ -1288,7 +1289,7 @@ export default function AdminModal({
                         onChange={(e) =>
                           updateCircuitField(editDistance, 'elevationGain', e.target.value)
                         }
-                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-sm text-white"
+                        className={`w-full rounded-xl bg-stone-950 ${circuitInputBorderClass} px-3 py-2 text-sm text-white`}
                       />
                     </div>
                     <div>
@@ -1301,7 +1302,7 @@ export default function AdminModal({
                         onChange={(e) =>
                           updateCircuitField(editDistance, 'cutoffTime', e.target.value)
                         }
-                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-sm text-white"
+                        className={`w-full rounded-xl bg-stone-950 ${circuitInputBorderClass} px-3 py-2 text-sm text-white`}
                       />
                     </div>
                     <div>
@@ -1314,7 +1315,7 @@ export default function AdminModal({
                         onChange={(e) =>
                           updateCircuitField(editDistance, 'summaryBadge', e.target.value)
                         }
-                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-sm text-white"
+                        className={`w-full rounded-xl bg-stone-950 ${circuitInputBorderClass} px-3 py-2 text-sm text-white`}
                       />
                     </div>
                     <div className="sm:col-span-3">
@@ -1327,7 +1328,7 @@ export default function AdminModal({
                         onChange={(e) =>
                           updateCircuitField(editDistance, 'description', e.target.value)
                         }
-                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-sm text-white"
+                        className={`w-full rounded-xl bg-stone-950 ${circuitInputBorderClass} px-3 py-2 text-sm text-white`}
                       />
                     </div>
                   </div>
@@ -1375,7 +1376,7 @@ export default function AdminModal({
                                 max={activeTrack.totalKm}
                                 value={st.km}
                                 onChange={(e) => handleStationChange(idx, 'km', e.target.value)}
-                                className="w-full rounded-lg bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-xs font-mono text-white"
+                                className={`w-full rounded-lg bg-stone-950 ${circuitInputBorderClass} px-2.5 py-1.5 text-xs font-mono text-white`}
                               />
                             </div>
                             <div className="flex-1 min-w-[140px]">
@@ -1386,7 +1387,7 @@ export default function AdminModal({
                                 type="text"
                                 value={st.label}
                                 onChange={(e) => handleStationChange(idx, 'label', e.target.value)}
-                                className="w-full rounded-lg bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-xs text-white"
+                                className={`w-full rounded-lg bg-stone-950 ${circuitInputBorderClass} px-2.5 py-1.5 text-xs text-white`}
                               />
                             </div>
                             <div className="text-[11px] font-mono text-sky-300 px-2 whitespace-nowrap">
