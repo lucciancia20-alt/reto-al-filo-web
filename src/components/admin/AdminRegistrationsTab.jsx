@@ -147,49 +147,76 @@ export default function AdminRegistrationsTab({
 
   return (
     <div className="space-y-3">
-      {/* Resumen de contadores */}
+      {/* Resumen de contadores (filtros rápidos sincronizados) */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
         {[
           {
             label: 'Total',
             value: regStats.total,
             tone: 'text-stone-100 border-stone-300',
+            activeRing: 'border-2 ring-1 ring-stone-300/60',
             labelClass: 'text-white',
+            isActive: regDistanceFilter === 'all' && regStatusFilter === 'all',
+            onClick: () => {
+              setRegDistanceFilter('all');
+              setRegStatusFilter('all');
+            },
           },
           {
             label: 'Confirmados',
             value: regStats.confirmed,
             tone: 'text-emerald-400 border-emerald-500',
+            activeRing: 'border-2 ring-1 ring-emerald-500/60',
             labelClass: 'text-emerald-400',
+            isActive: regStatusFilter === 'confirmado',
+            onClick: () =>
+              setRegStatusFilter(regStatusFilter === 'confirmado' ? 'all' : 'confirmado'),
           },
           {
             label: 'Pendientes',
             value: regStats.pending,
             tone: 'text-amber-400 border-amber-500',
+            activeRing: 'border-2 ring-1 ring-amber-500/60',
             labelClass: 'text-amber-400',
+            isActive: regStatusFilter === 'pendiente',
+            onClick: () =>
+              setRegStatusFilter(regStatusFilter === 'pendiente' ? 'all' : 'pendiente'),
           },
           {
             label: '27K',
             value: regStats.count27k,
             tone: 'text-cyan-400 border-cyan-500',
+            activeRing: 'border-2 ring-1 ring-cyan-500/60',
             labelClass: 'text-cyan-400',
+            isActive: regDistanceFilter === '27K',
+            onClick: () =>
+              setRegDistanceFilter(regDistanceFilter === '27K' ? 'all' : '27K'),
           },
           {
             label: '13K',
             value: regStats.count13k,
             tone: 'text-red-500 border-red-500',
+            activeRing: 'border-2 ring-1 ring-red-500/60',
             labelClass: 'text-red-500',
+            isActive: regDistanceFilter === '13K',
+            onClick: () =>
+              setRegDistanceFilter(regDistanceFilter === '13K' ? 'all' : '13K'),
           },
         ].map((stat) => (
-          <div
+          <button
             key={stat.label}
-            className={`rounded-2xl bg-stone-950 border p-2.5 text-center ${stat.tone}`}
+            type="button"
+            onClick={stat.onClick}
+            aria-pressed={stat.isActive}
+            className={`rounded-2xl bg-stone-950 p-2.5 text-center cursor-pointer hover:brightness-125 hover:scale-[1.01] transition-all ${stat.tone} ${
+              stat.isActive ? stat.activeRing : 'border'
+            }`}
           >
             <span className={`block text-[10px] uppercase tracking-wider font-semibold ${stat.labelClass}`}>
               {stat.label}
             </span>
             <span className="font-display text-xl font-black">{stat.value}</span>
-          </div>
+          </button>
         ))}
       </div>
 
