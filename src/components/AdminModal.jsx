@@ -895,7 +895,7 @@ export default function AdminModal({
         ) : (
           <>
             {/* Navegación por pestañas del Admin */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 p-3 bg-stone-950/90 border-b border-stone-800 shrink-0">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 p-3 bg-stone-950 border-b border-stone-800 shrink-0">
               {[
                 { id: 'general', label: 'General & Pagos', icon: MapPin },
                 { id: 'circuits', label: 'Circuitos & GPX', icon: Droplets },
@@ -910,10 +910,10 @@ export default function AdminModal({
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center justify-center gap-1.5 px-2.5 py-2.5 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wide transition-all cursor-pointer ${
+                    className={`flex items-center justify-center gap-1.5 px-2.5 py-2.5 rounded-xl text-[11px] sm:text-xs uppercase tracking-wide transition-colors cursor-pointer ${
                       active
-                        ? 'bg-orange-500/10 text-orange-400 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.2)]'
-                        : 'bg-stone-900 text-stone-300 border border-white/15 hover:border-orange-500/50 hover:text-white'
+                        ? 'bg-stone-950 border border-orange-500 text-orange-400 font-bold'
+                        : 'bg-stone-950 border border-orange-500/40 text-white/80 hover:text-white font-bold'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5 shrink-0" />
