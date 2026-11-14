@@ -532,9 +532,20 @@ export default function RegistrationModal({
                       id="reg-birthdate"
                       type="date"
                       required
+                      min="1920-01-01"
+                      max={new Date().toISOString().split('T')[0]}
                       value={form.birthDate}
                       onChange={(e) => handleFieldChange('birthDate', e.target.value)}
-                      className="w-full rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      onClick={(e) => {
+                        // Abre el selector nativo al tocar cualquier parte del campo
+                        // (por defecto Chrome/Edge solo lo abren desde el ícono).
+                        try {
+                          e.currentTarget.showPicker?.();
+                        } catch {
+                          /* navegador sin soporte: queda el comportamiento nativo */
+                        }
+                      }}
+                      className="date-input block w-full min-h-[42px] appearance-none rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm text-white cursor-pointer [color-scheme:dark]"
                     />
                   </div>
 

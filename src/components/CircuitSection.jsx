@@ -225,7 +225,7 @@ export default function CircuitSection({
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Encabezado */}
         <div className="text-center max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-500/30 px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
+          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
             <Compass className="w-3.5 h-3.5" />
             <span>Circuito GPX Oficial y Altimetría Real</span>
           </div>
@@ -246,7 +246,7 @@ export default function CircuitSection({
           aria-label="Seleccionar distancia del circuito"
           className="mt-8 flex justify-center"
         >
-          <div className="inline-grid grid-cols-2 p-1.5 rounded-2xl bg-stone-900 border border-stone-800 w-full max-w-md">
+          <div className="inline-grid grid-cols-2 p-1.5 rounded-2xl bg-stone-900 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.25)] w-full max-w-md">
             {Object.values(circuits).map((circuit) => {
               const isSelected = circuit.id === activeDistance;
               return (
@@ -273,9 +273,9 @@ export default function CircuitSection({
         </div>
 
         {/* Contenedor principal del Circuito GPX + Altimetría */}
-        <div className="mt-8 rounded-3xl bg-stone-900/90 border border-stone-800 overflow-hidden shadow-2xl">
+        <div className="mt-8 rounded-3xl bg-stone-900/90 border border-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.22)] overflow-hidden">
           {/* Barra superior */}
-          <div className="px-4 sm:px-6 py-4 bg-stone-950/75 border-b border-stone-800 flex flex-wrap items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-4 bg-stone-950/75 border-b border-orange-500/40 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <span className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0">
                 <MapIcon className="w-4 h-4" />
@@ -298,7 +298,7 @@ export default function CircuitSection({
                 <a
                   href={track.gpxDownloadUrl}
                   download={`reto-al-filo-${activeDistance.toLowerCase()}.gpx`}
-                  className="inline-flex items-center gap-1.5 bg-stone-800 hover:bg-stone-700 text-stone-100 border border-stone-700 px-3 py-1.5 rounded-xl transition-colors"
+                  className="inline-flex items-center gap-1.5 bg-stone-800 hover:bg-stone-700 text-stone-100 border border-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.25)] hover:border-orange-400 px-3 py-1.5 rounded-xl transition-colors"
                 >
                   <Download className="w-3.5 h-3.5 text-amber-400" />
                   Descargar .GPX
@@ -319,13 +319,13 @@ export default function CircuitSection({
           <div className="p-4 sm:p-6 bg-gradient-to-b from-stone-950/50 to-stone-900">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
               {/* Columna Izquierda: Recorrido GPS Vectorial */}
-              <div className="lg:col-span-5 rounded-2xl bg-stone-950/90 border border-stone-800/90 p-3 sm:p-4 flex flex-col justify-between">
+              <div className="lg:col-span-5 rounded-2xl bg-stone-950/90 border border-orange-500/80 shadow-[0_0_14px_rgba(249,115,22,0.18)] p-3 sm:p-4 flex flex-col justify-between">
                 <div className="flex items-center justify-between text-xs mb-2">
                   <span className="font-display font-bold uppercase tracking-wider text-stone-200 flex items-center gap-1.5">
                     <Compass className="w-3.5 h-3.5 text-amber-400" />
                     Trazado GPS ({String(track.totalKm).replace('.', ',')} km)
                   </span>
-                  <span className="font-mono text-[10px] text-stone-400 bg-stone-900 px-2 py-0.5 rounded border border-stone-800">
+                  <span className="font-mono text-[10px] text-stone-400 bg-stone-900 px-2 py-0.5 rounded border border-orange-500/50">
                     N ↑
                   </span>
                 </div>
@@ -449,13 +449,13 @@ export default function CircuitSection({
               </div>
 
               {/* Columna Derecha: Perfil de Altimetría Real SVG */}
-              <div className="lg:col-span-7 rounded-2xl bg-stone-950/90 border border-stone-800/90 p-3 sm:p-4 flex flex-col justify-between">
+              <div className="lg:col-span-7 rounded-2xl bg-stone-950/90 border border-orange-500/80 shadow-[0_0_14px_rgba(249,115,22,0.18)] p-3 sm:p-4 flex flex-col justify-between">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2 text-xs">
                   <span className="font-display font-bold uppercase tracking-wider text-stone-200 flex items-center gap-1.5">
                     <Mountain className="w-3.5 h-3.5 text-amber-400" />
                     Perfil de Altimetría Real ({track.minAlt}m – {track.maxAlt}m)
                   </span>
-                  <span className="font-mono text-[11px] text-amber-300 bg-stone-900 px-2.5 py-0.5 rounded border border-stone-800">
+                  <span className="font-mono text-[11px] text-amber-300 bg-stone-900 px-2.5 py-0.5 rounded border border-orange-500/50">
                     {hoverPoint
                       ? `KM ${hoverPoint.km.toFixed(1)} · ${hoverPoint.alt} msnm`
                       : `Pasá el dedo o mouse para ver altitud`}
@@ -642,12 +642,12 @@ export default function CircuitSection({
             </div>
 
             {/* Lista de Puestos de Hidratación + CTA */}
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-stone-800/80">
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-orange-500/30">
               <div className="flex flex-wrap gap-2">
                 {stations.map((st) => (
                   <span
                     key={st.id || st.shortCode}
-                    className="inline-flex items-center gap-1.5 text-xs bg-stone-950 border border-stone-800 text-stone-200 px-3 py-1.5 rounded-xl"
+                    className="inline-flex items-center gap-1.5 text-xs bg-stone-950 border border-orange-500/70 text-stone-200 px-3 py-1.5 rounded-xl"
                   >
                     <Droplets className="w-3.5 h-3.5 text-sky-400" />
                     {st.label} (KM {st.km}) · {st.alt}m
@@ -658,7 +658,7 @@ export default function CircuitSection({
               <button
                 type="button"
                 onClick={() => onOpenModalWithDistance(activeDistance)}
-                className="inline-flex items-center gap-2 rounded-xl bg-amber-500/15 hover:bg-amber-500 text-amber-300 hover:text-stone-950 border border-amber-500/40 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 rounded-xl bg-amber-500/15 hover:bg-amber-500 text-amber-300 hover:text-stone-950 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.3)] font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-all cursor-pointer"
               >
                 <Flame className="w-4 h-4" />
                 Inscribirme en {activeDistance}
@@ -674,7 +674,7 @@ export default function CircuitSection({
             return (
               <div
                 key={stat.label}
-                className="rounded-2xl bg-stone-900/75 border border-stone-800/90 p-5 sm:p-6 flex items-start gap-4 hover:border-amber-500/40 transition-colors"
+                className="rounded-2xl bg-stone-900/75 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] p-5 sm:p-6 flex items-start gap-4 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
               >
                 <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
                   <IconComponent className="w-6 h-6" />

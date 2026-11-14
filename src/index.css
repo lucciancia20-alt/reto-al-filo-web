@@ -9,3 +9,27 @@
     font-family: 'Outfit', 'Inter', system-ui, sans-serif;
   }
 }
+
+/* Input de fecha nativo con estética oscura (desktop + mobile) */
+@layer components {
+  .date-input {
+    -webkit-appearance: none;
+    color-scheme: dark;
+  }
+
+  /* iOS Safari: evita que el campo vacío colapse y alinea el texto a la izquierda */
+  .date-input::-webkit-date-and-time-value {
+    text-align: left;
+    min-height: 1.25rem;
+  }
+
+  /* Ícono de calendario: con color-scheme dark Chrome/Edge lo pintan claro */
+  .date-input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+  }
+
+  .date-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+}

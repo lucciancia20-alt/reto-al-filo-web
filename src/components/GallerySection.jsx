@@ -50,7 +50,7 @@ export default function GallerySection() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Encabezado limpio de muestra fotográfica de la 1ra Edición */}
         <div className="text-center max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-500/30 px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
+          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
             <Camera className="w-3.5 h-3.5" />
             <span>Galería · 1ra Edición</span>
           </div>
@@ -80,7 +80,7 @@ export default function GallerySection() {
                   setSelectedPhoto(photo);
                 }
               }}
-              className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-stone-900 border border-stone-800/90 shadow-xl cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+              className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-stone-900 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
             >
               <div className={`w-full overflow-hidden bg-stone-900 ${photo.aspectClass}`}>
                 <img
@@ -128,7 +128,7 @@ export default function GallerySection() {
           onClick={() => setSelectedPhoto(null)}
         >
           <div
-            className="relative max-w-3xl w-full rounded-3xl overflow-hidden bg-stone-900 border border-stone-700 shadow-2xl"
+            className="relative max-w-3xl w-full rounded-3xl overflow-hidden bg-stone-900 border border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
             onClick={(e) => e.stopPropagation()}
           >
             <button

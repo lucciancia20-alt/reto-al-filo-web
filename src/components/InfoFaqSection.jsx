@@ -29,7 +29,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* Parte 1: Línea de Tiempo (Cronograma del Día) */}
         <div className="text-center max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-500/30 px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
+          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
             <Clock className="w-3.5 h-3.5" />
             <span>Cronograma Oficial · 10 de Abril 2027</span>
           </div>
@@ -48,7 +48,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
           {(raceConfig.schedule || []).map((item, idx) => (
             <div
               key={`${item.time}-${idx}`}
-              className="relative rounded-2xl bg-stone-900/80 border border-stone-800/90 p-5 sm:p-6 hover:border-amber-500/40 transition-colors"
+              className="relative rounded-2xl bg-stone-900/80 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] p-5 sm:p-6 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
             >
               {/* Punto indicador en la línea vertical */}
               <span
@@ -63,7 +63,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 <span className="font-mono text-sm sm:text-base font-extrabold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-lg">
                   {item.time}
                 </span>
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 bg-stone-950 px-2.5 py-1 rounded-md border border-stone-800">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 bg-stone-950 px-2.5 py-1 rounded-md border border-orange-500/60">
                   {item.tag}
                 </span>
               </div>
@@ -81,7 +81,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
         {/* Parte 2: Acordeón Desplegable de Preguntas Frecuentes (3 ítems) */}
         <div id="faq" className="mt-20 pt-10 border-t border-stone-900">
           <div className="text-center max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-500/30 px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
+            <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Información Clave para el Corredor</span>
             </div>
@@ -99,10 +99,10 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
               return (
                 <div
                   key={faq.id}
-                  className={`rounded-2xl border transition-colors overflow-hidden ${
+                  className={`rounded-2xl border transition-all overflow-hidden ${
                     isOpen
-                      ? 'bg-stone-900 border-amber-500/50 shadow-xl'
-                      : 'bg-stone-900/60 border-stone-800 hover:border-stone-700'
+                      ? 'bg-stone-900 border-orange-500 shadow-[0_0_18px_rgba(249,115,22,0.3)]'
+                      : 'bg-stone-900/60 border-orange-500/80 shadow-[0_0_12px_rgba(249,115,22,0.18)] hover:border-orange-400'
                   }`}
                 >
                   <button
@@ -131,7 +131,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   {isOpen && (
                     <div
                       id={`faq-panel-${faq.id}`}
-                      className="px-5 sm:px-6 pb-6 pt-1 text-xs sm:text-sm text-stone-300 leading-relaxed border-t border-stone-800/80"
+                      className="px-5 sm:px-6 pb-6 pt-1 text-xs sm:text-sm text-stone-300 leading-relaxed border-t border-orange-500/30"
                     >
                       <p className="mt-3">{faq.answer}</p>
 

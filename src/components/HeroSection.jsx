@@ -67,7 +67,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-12 text-center flex flex-col items-center">
         {/* Etiqueta superior de aventura */}
-        <div className="inline-flex items-center gap-2 rounded-full bg-stone-900/90 border border-amber-500/40 px-4 py-1.5 text-xs sm:text-sm font-semibold text-amber-400 mb-6 shadow-lg">
+        <div className="inline-flex items-center gap-2 rounded-full bg-stone-900/90 border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-amber-400 mb-6 shadow-[0_0_14px_rgba(249,115,22,0.3)]">
           <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
           <span>{raceConfig.subtitle} · 10 de Abril · 08:00 hs</span>
         </div>
@@ -102,7 +102,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
             {timeUnits.map((unit) => (
               <div
                 key={unit.label}
-                className="rounded-2xl bg-stone-900/90 backdrop-blur-md border border-stone-700/80 py-3 px-2 sm:py-4 shadow-xl"
+                className="rounded-2xl bg-stone-900/90 backdrop-blur-md border border-orange-500 py-3 px-2 sm:py-4 shadow-[0_0_16px_rgba(249,115,22,0.35)]"
               >
                 <div className="font-display text-2xl sm:text-4xl font-black text-white tabular-nums tracking-tight">
                   {unit.value}
@@ -128,7 +128,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
           <a
             href="#circuito"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-stone-900/85 hover:bg-stone-800 text-stone-100 border border-stone-700 font-semibold text-sm sm:text-base px-6 py-4 transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-stone-900/85 hover:bg-stone-800 text-stone-100 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.45)] font-semibold text-sm sm:text-base px-6 py-4 transition-all"
           >
             Ver Circuito y Altimetría
           </a>

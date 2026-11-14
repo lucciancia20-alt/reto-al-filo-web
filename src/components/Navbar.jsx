@@ -12,7 +12,7 @@ export default function Navbar({ onOpenModal, onOpenAdmin }) {
   ];
 
   return (
-    <header className="fixed top-0 inset-x-0 z-40 bg-stone-950/85 backdrop-blur-md border-b border-stone-800/80">
+    <header className="fixed top-0 inset-x-0 z-40 bg-stone-950/85 backdrop-blur-md border-b border-orange-500/40">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-16 py-2 flex items-center justify-between gap-3">
         <div className="flex flex-col items-start gap-1.5">
           <a
@@ -35,19 +35,19 @@ export default function Navbar({ onOpenModal, onOpenAdmin }) {
           <button
             type="button"
             onClick={onOpenAdmin}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-stone-900/95 hover:bg-stone-800 text-stone-300 hover:text-amber-400 border border-stone-700/80 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer shadow-sm"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-stone-900/95 hover:bg-stone-800 text-stone-300 hover:text-amber-400 border border-orange-500/70 shadow-[0_0_10px_rgba(249,115,22,0.2)] hover:border-orange-400 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer"
           >
             <Settings className="w-3 h-3 text-amber-400" />
             Panel Admin
           </button>
         </div>
 
-        <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-stone-300">
+        <nav className="hidden md:flex items-center gap-7 text-sm font-semibold text-orange-400">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="hover:text-amber-400 transition-colors"
+              className="text-orange-400 hover:text-orange-300 transition-colors"
             >
               {link.label}
             </a>
@@ -70,20 +70,20 @@ export default function Navbar({ onOpenModal, onOpenAdmin }) {
           onClick={() => setMobileMenuOpen((prev) => !prev)}
           aria-expanded={mobileMenuOpen}
           aria-label="Abrir menú de navegación"
-          className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-lg text-stone-200 hover:bg-stone-800/80 transition-colors"
+          className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-lg border border-orange-500/60 text-orange-400 hover:bg-stone-800/80 transition-colors"
         >
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden bg-stone-950/98 border-b border-stone-800 px-4 pt-2 pb-5 space-y-3">
+        <div className="md:hidden bg-stone-950/98 border-b border-orange-500/40 px-4 pt-2 pb-5 space-y-3">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-base font-medium text-stone-200 hover:text-amber-400 border-b border-stone-900"
+              className="block py-2 text-base font-semibold text-orange-400 hover:text-orange-300 border-b border-orange-500/20"
             >
               {link.label}
             </a>

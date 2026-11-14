@@ -7,7 +7,7 @@ export default function Footer({
   onOpenModal,
 }) {
   return (
-    <footer className="bg-stone-950 border-t border-stone-900 py-12 text-stone-400">
+    <footer className="bg-stone-950 border-t border-orange-500/40 py-12 text-stone-400">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-3">
           <img
