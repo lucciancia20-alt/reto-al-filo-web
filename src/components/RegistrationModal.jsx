@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import emailjs from '@emailjs/browser';
 import {
   X,
   MessageCircle,
@@ -22,46 +21,10 @@ import {
   uploadImageToCloudinary,
   submitRunnerRegistration,
 } from '../firebase/config';
+import { sendRegistrationNotificationEmail } from '../utils/emailNotification';
 
 const SHIRT_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 const GENDERS = ['Femenino', 'Masculino', 'Otro'];
-
-const EMAILJS_SERVICE_ID = 'service_g95to2m';
-const EMAILJS_TEMPLATE_ID = 'template_hvz69he';
-const EMAILJS_PUBLIC_KEY = 'CFqaVqNNdftgIXlYp';
-
-/**
- * Envía en segundo plano una notificación por correo al email configurado en Firestore sin bloquear al corredor.
- */
-async function sendAdminNotificationEmail(created, uploadedUrl, raceConfig) {
-  try {
-    const toEmail =
-      String(raceConfig?.notificationEmail || '').trim() ||
-      RACE_CONFIG.notificationEmail ||
-      'lciancia1972@gmail.com';
-
-    await emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID,
-      {
-        to_email: toEmail,
-        codigo: created.code,
-        nombre: created.fullName,
-        distancia: created.distance,
-        dni: created.dni,
-        categoria: created.gender,
-        celular: created.phone,
-        localidad: created.city,
-        team: String(created.team || '').trim() || 'Sin agrupación',
-        remera: created.shirtSize || '-',
-        comprobante_url: created.receiptUrl || uploadedUrl || 'Pendiente de adjuntar',
-      },
-      { publicKey: EMAILJS_PUBLIC_KEY }
-    );
-  } catch (err) {
-    console.warn('[Reto al Filo] Fallo silencioso enviando notificación EmailJS:', err);
-  }
-}
 
 const INITIAL_FORM = {
   fullName: '',
@@ -279,7 +242,21 @@ export default function RegistrationModal({
         receiptFormat: uploaded.format || '',
       });
 
-      void sendAdminNotificationEmail(created, uploaded.secureUrl, raceConfig);
+      void (async () => {
+        try {
+          await sendRegistrationNotificationEmail({
+            notificationEmail: raceConfig?.notificationEmail,
+            registration: created,
+            uploadedUrl: uploaded.secureUrl,
+          });
+        } catch (err) {
+          console.error('[Reto al Filo] Error enviando notificación EmailJS en segundo plano:', {
+            status: err?.status,
+            text: err?.text,
+            err,
+          });
+        }
+      })();
       setConfirmedReg(created);
     } catch (err) {
       setSubmitError(

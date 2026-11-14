@@ -1,10 +1,14 @@
-import React from 'react';
-import { Landmark } from 'lucide-react';
+import React, { useState } from 'react';
+import { Landmark, Send, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import {
   parseTargetDateParts,
   buildTargetDateIso,
   syncScheduleWithTargetDate,
 } from '../../data/raceConfig';
+import {
+  resolveNotificationEmail,
+  sendRegistrationNotificationEmail,
+} from '../../utils/emailNotification';
 
 export default function AdminGeneralTab({
   draft,
@@ -13,6 +17,49 @@ export default function AdminGeneralTab({
   onUpdatePaymentField,
 }) {
   const { datePart, timePart, formattedTime } = parseTargetDateParts(draft.targetDateIso);
+  const [testingEmail, setTestingEmail] = useState(false);
+  const [emailTestStatus, setEmailTestStatus] = useState(null);
+
+  const handleTestEmailSend = async () => {
+    const targetEmail = resolveNotificationEmail(draft.notificationEmail);
+    setTestingEmail(true);
+    setEmailTestStatus(null);
+    try {
+      const response = await sendRegistrationNotificationEmail({
+        notificationEmail: targetEmail,
+        registration: {
+          code: 'RAF-PRUEBA',
+          fullName: 'Prueba Panel Organización',
+          distance: '27K',
+          dni: '00000000',
+          gender: 'Prueba',
+          phone: draft.whatsappNumber || '5492915228310',
+          email: targetEmail,
+          city: 'Tornquist, Buenos Aires',
+          team: 'Reto al Filo',
+          shirtSize: 'M',
+          receiptUrl: 'Envío de prueba desde Panel de Organización',
+        },
+      });
+      setEmailTestStatus({
+        type: 'success',
+        message: `OK (${response?.status ?? 200}): Correo de prueba enviado a ${targetEmail}.`,
+      });
+    } catch (err) {
+      const detail = [
+        err?.status ? `HTTP ${err.status}` : '',
+        err?.text || err?.message || 'Error desconocido al enviar',
+      ]
+        .filter(Boolean)
+        .join(' - ');
+      setEmailTestStatus({
+        type: 'error',
+        message: `Error EmailJS: ${detail}`,
+      });
+    } finally {
+      setTestingEmail(false);
+    }
+  };
 
   const handleTargetDateChange = (nextDate, nextTime) => {
     const nextIso = buildTargetDateIso(nextDate, nextTime);
@@ -85,13 +132,47 @@ export default function AdminGeneralTab({
           <label className="block text-xs font-semibold text-stone-300 mb-1">
             Email de Notificaciones
           </label>
-          <input
-            type="email"
-            placeholder="lciancia1972@gmail.com"
-            value={draft.notificationEmail ?? ''}
-            onChange={(e) => setDraft({ ...draft, notificationEmail: e.target.value })}
-            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono text-white"
-          />
+          <div className="flex items-center gap-1.5">
+            <input
+              type="email"
+              placeholder="lciancia1972@gmail.com"
+              value={draft.notificationEmail ?? ''}
+              onChange={(e) => {
+                setDraft({ ...draft, notificationEmail: e.target.value });
+                if (emailTestStatus) setEmailTestStatus(null);
+              }}
+              className="flex-1 min-w-0 rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono text-white"
+            />
+            <button
+              type="button"
+              disabled={testingEmail}
+              onClick={handleTestEmailSend}
+              title="Enviar correo de prueba real a esta dirección con EmailJS"
+              className="inline-flex items-center gap-1 rounded-xl bg-stone-950 hover:bg-stone-800 border border-orange-500/60 hover:border-orange-400 text-orange-400 font-bold text-xs px-2.5 py-1.5 shrink-0 cursor-pointer transition-colors disabled:opacity-50"
+            >
+              {testingEmail ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Send className="w-3.5 h-3.5" />
+              )}
+              <span>{testingEmail ? 'Enviando...' : 'Probar envío'}</span>
+            </button>
+          </div>
+          {emailTestStatus && (
+            <p
+              role="status"
+              className={`mt-1 text-[11px] flex items-center gap-1 ${
+                emailTestStatus.type === 'success' ? 'text-emerald-400' : 'text-rose-400'
+              }`}
+            >
+              {emailTestStatus.type === 'success' ? (
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+              ) : (
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+              )}
+              <span>{emailTestStatus.message}</span>
+            </p>
+          )}
         </div>
         <div>
           <label className="block text-xs font-semibold text-stone-300 mb-1">
