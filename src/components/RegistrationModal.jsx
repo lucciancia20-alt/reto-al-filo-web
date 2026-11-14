@@ -460,7 +460,7 @@ export default function RegistrationModal({
               </section>
 
               {/* 2. Datos Bancarios para Transferir */}
-              <section className="rounded-2xl bg-stone-950 border border-stone-800 p-4 space-y-3">
+              <section className="rounded-2xl bg-stone-950 border border-orange-500/40 p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
                   <span className="text-xs font-bold uppercase tracking-wider text-white">
@@ -473,7 +473,7 @@ export default function RegistrationModal({
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                  <div className="rounded-xl bg-stone-900 border border-stone-800 p-2.5 flex items-center justify-between gap-2">
+                  <div className="rounded-xl bg-stone-900 border border-orange-500/40 p-2.5 flex items-center justify-between gap-2">
                     <div className="min-w-0">
                       <span className="block text-[10px] uppercase text-stone-400">
                         Alias
@@ -501,7 +501,7 @@ export default function RegistrationModal({
                     </button>
                   </div>
 
-                  <div className="rounded-xl bg-stone-900 border border-stone-800 p-2.5 flex items-center justify-between gap-2">
+                  <div className="rounded-xl bg-stone-900 border border-orange-500/40 p-2.5 flex items-center justify-between gap-2">
                     <div className="min-w-0">
                       <span className="block text-[10px] uppercase text-stone-400">
                         CBU / CVU
@@ -560,7 +560,7 @@ export default function RegistrationModal({
                       value={form.fullName}
                       onChange={(e) => handleFieldChange('fullName', e.target.value)}
                       placeholder="Ej. María Gómez"
-                      className="w-full rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                     />
                   </div>
 
@@ -580,7 +580,7 @@ export default function RegistrationModal({
                       value={form.dni}
                       onChange={(e) => handleFieldChange('dni', e.target.value)}
                       placeholder="Ej. 34567890"
-                      className="w-full rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
                     />
                   </div>
 
@@ -603,7 +603,7 @@ export default function RegistrationModal({
                         handleFieldChange('birthDate', formatBirthDateInput(e.target.value))
                       }
                       placeholder="DD/MM/AAAA"
-                      className="w-full rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
                     />
                   </div>
 
@@ -619,7 +619,7 @@ export default function RegistrationModal({
                       autoComplete="off"
                       value={form.gender}
                       onChange={(e) => handleFieldChange('gender', e.target.value)}
-                      className="w-full rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                     >
                       {GENDERS.map((g) => (
                         <option key={g} value={g}>
@@ -644,7 +644,7 @@ export default function RegistrationModal({
                       value={form.phone}
                       onChange={(e) => handleFieldChange('phone', e.target.value)}
                       placeholder="Ej. 291 4000000"
-                      className="w-full rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                     />
                   </div>
 
@@ -663,7 +663,7 @@ export default function RegistrationModal({
                       value={form.email}
                       onChange={(e) => handleFieldChange('email', e.target.value)}
                       placeholder="corredor@mail.com"
-                      className="w-full rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                     />
                   </div>
 
@@ -682,7 +682,7 @@ export default function RegistrationModal({
                       value={form.city}
                       onChange={(e) => handleFieldChange('city', e.target.value)}
                       placeholder="Ej. Bahía Blanca, Bs. As."
-                      className="w-full rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                     />
                   </div>
 
@@ -700,7 +700,7 @@ export default function RegistrationModal({
                       value={form.team}
                       onChange={(e) => handleFieldChange('team', e.target.value)}
                       placeholder="Ej. Sierra Trail Runners o Libre"
-                      className="w-full rounded-xl bg-stone-950 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                     />
                   </div>
 
@@ -719,8 +719,8 @@ export default function RegistrationModal({
                             onClick={() => handleFieldChange('shirtSize', size)}
                             className={`min-h-[42px] rounded-xl font-display font-bold text-xs sm:text-sm border transition-colors cursor-pointer ${
                               active
-                                ? 'bg-amber-500 text-stone-950 border-amber-400'
-                                : 'bg-stone-950 text-stone-300 border-stone-800 hover:border-stone-600'
+                                ? 'bg-amber-500 text-stone-950 border-orange-500'
+                                : 'bg-stone-950 text-stone-300 border-orange-500/40 hover:border-orange-500'
                             }`}
                           >
                             {size}
@@ -755,7 +755,7 @@ export default function RegistrationModal({
                           handleFieldChange('emergencyContactName', e.target.value)
                         }
                         placeholder="Ej. Carlos Gómez (Familiar)"
-                        className="w-full rounded-xl bg-stone-900 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                        className="w-full rounded-xl bg-stone-900 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                       />
                     </div>
                     <div>
@@ -775,7 +775,7 @@ export default function RegistrationModal({
                           handleFieldChange('emergencyContactPhone', e.target.value)
                         }
                         placeholder="Ej. 291 4001122"
-                        className="w-full rounded-xl bg-stone-900 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                        className="w-full rounded-xl bg-stone-900 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                       />
                     </div>
                     <div className="sm:col-span-2">
@@ -794,7 +794,7 @@ export default function RegistrationModal({
                           handleFieldChange('medicalNotes', e.target.value)
                         }
                         placeholder="Ej. OSDE · Sin alergias"
-                        className="w-full rounded-xl bg-stone-900 border border-stone-700 focus:border-amber-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                        className="w-full rounded-xl bg-stone-900 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                       />
                     </div>
                   </div>
@@ -806,15 +806,15 @@ export default function RegistrationModal({
                 <span className="block text-xs font-bold uppercase tracking-wider text-white">
                   4 · Adjuntar Comprobante de Pago *
                 </span>
-                <div className="rounded-2xl border border-dashed border-stone-700 bg-stone-950/70 p-4 flex flex-col sm:flex-row items-center gap-4">
+                <div className="rounded-2xl border border-dashed border-orange-500/40 hover:border-orange-500 transition-colors bg-stone-950/70 p-4 flex flex-col sm:flex-row items-center gap-4">
                   {receiptPreview ? (
                     <img
                       src={receiptPreview}
                       alt="Vista previa del comprobante de pago"
-                      className="w-20 h-20 rounded-xl object-cover border border-stone-700 shrink-0"
+                      className="w-20 h-20 rounded-xl object-cover border border-orange-500/40 shrink-0"
                     />
                   ) : (
-                    <div className="w-20 h-20 rounded-xl bg-stone-900 border border-stone-800 flex items-center justify-center text-stone-500 shrink-0">
+                    <div className="w-20 h-20 rounded-xl bg-stone-900 border border-orange-500/40 flex items-center justify-center text-stone-500 shrink-0">
                       <FileText className="w-8 h-8" />
                     </div>
                   )}
