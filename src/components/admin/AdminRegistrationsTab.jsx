@@ -104,11 +104,23 @@ export default function AdminRegistrationsTab({
               aria-label="Filtrar por distancia"
               value={regDistanceFilter}
               onChange={(e) => setRegDistanceFilter(e.target.value)}
-              className="rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-xs text-white"
+              className={`rounded-xl bg-stone-900 border focus:outline-none px-3 py-2 text-xs transition-colors ${
+                regDistanceFilter === '27K'
+                  ? 'text-cyan-400 font-bold border-cyan-500/60 focus:border-cyan-400'
+                  : regDistanceFilter === '13K'
+                    ? 'text-red-500 font-bold border-red-500/60 focus:border-red-500'
+                    : 'text-white border-white/15 focus:border-orange-400'
+              }`}
             >
-              <option value="all">Todas las distancias</option>
-              <option value="27K">Solo 27K</option>
-              <option value="13K">Solo 13K</option>
+              <option value="all" className="bg-stone-900 text-white font-normal">
+                Todas las distancias
+              </option>
+              <option value="27K" className="bg-stone-900 text-cyan-400 font-bold">
+                Solo 27K
+              </option>
+              <option value="13K" className="bg-stone-900 text-red-500 font-bold">
+                Solo 13K
+              </option>
             </select>
 
             <select
