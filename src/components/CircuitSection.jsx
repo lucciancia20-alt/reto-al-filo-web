@@ -268,11 +268,11 @@ export default function CircuitSection({
               const is13K = circuit.id === '13K';
               const tabColorClass = isSelected
                 ? is13K
-                  ? 'bg-stone-950 text-red-500 border border-red-500 shadow-lg shadow-red-500/20'
-                  : 'bg-stone-950 text-cyan-400 border border-cyan-500 shadow-lg shadow-cyan-500/20'
+                  ? 'bg-red-950/80 text-red-500 border border-red-500 shadow-[0_0_18px_rgba(239,68,68,0.45)]'
+                  : 'bg-cyan-950/80 text-cyan-400 border border-cyan-500 shadow-[0_0_18px_rgba(6,182,212,0.45)]'
                 : is13K
-                  ? 'bg-stone-950/60 text-stone-300 border border-stone-700 hover:border-red-500 hover:text-red-500'
-                  : 'bg-stone-950/60 text-stone-300 border border-stone-700 hover:border-cyan-500 hover:text-cyan-400';
+                  ? 'bg-stone-950/65 text-red-500 border border-red-500/70 opacity-85 hover:opacity-100 hover:bg-red-950/40 hover:border-red-500 hover:brightness-110'
+                  : 'bg-stone-950/65 text-cyan-400 border border-cyan-500/70 opacity-85 hover:opacity-100 hover:bg-cyan-950/40 hover:border-cyan-400 hover:brightness-110';
               return (
                 <button
                   key={circuit.id}
@@ -309,7 +309,9 @@ export default function CircuitSection({
                     {currentCircuit.summaryBadge}
                   </span>
                 </div>
-                <p className="text-xs text-stone-400 mt-0.5">{currentCircuit.description}</p>
+                <p className="text-xs leading-relaxed text-stone-400 mt-0.5 min-h-[3rem] md:min-h-[2.75rem]">
+                  {currentCircuit.description}
+                </p>
               </div>
             </div>
 
