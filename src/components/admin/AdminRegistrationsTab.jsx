@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Search,
   Download,
@@ -36,6 +36,85 @@ export default function AdminRegistrationsTab({
 }) {
   const [expandedIds, setExpandedIds] = useState({});
   const [editingBibIds, setEditingBibIds] = useState({});
+  const [sortConfig, setSortConfig] = useState({ field: null, direction: 'asc' });
+
+  const handleSort = (field) => {
+    setSortConfig((prev) =>
+      prev.field === field
+        ? { field, direction: prev.direction === 'asc' ? 'desc' : 'asc' }
+        : { field, direction: 'asc' }
+    );
+  };
+
+  const sortedRegistrations = useMemo(() => {
+    if (!sortConfig.field) return filteredRegistrations;
+    const dir = sortConfig.direction === 'asc' ? 1 : -1;
+    const compareNames = (a, b) =>
+      String(a.fullName || '').localeCompare(String(b.fullName || ''), 'es', {
+        sensitivity: 'base',
+      });
+
+    return [...filteredRegistrations].sort((a, b) => {
+      if (sortConfig.field === 'fullName') {
+        return compareNames(a, b) * dir;
+      }
+      if (sortConfig.field === 'dni') {
+        const digitsA = String(a.dni || '').replace(/\D/g, '');
+        const digitsB = String(b.dni || '').replace(/\D/g, '');
+        const numA = digitsA ? Number(digitsA) : NaN;
+        const numB = digitsB ? Number(digitsB) : NaN;
+        if (Number.isFinite(numA) && Number.isFinite(numB) && numA !== numB) {
+          return (numA - numB) * dir;
+        }
+        return (
+          String(a.dni || '').localeCompare(String(b.dni || ''), 'es', { numeric: true }) * dir ||
+          compareNames(a, b)
+        );
+      }
+      if (sortConfig.field === 'status') {
+        const rankMap =
+          sortConfig.direction === 'asc'
+            ? { pendiente: 0, confirmado: 1, rechazado: 2 }
+            : { confirmado: 0, pendiente: 1, rechazado: 2 };
+        const diff = (rankMap[a.status] ?? 9) - (rankMap[b.status] ?? 9);
+        return diff !== 0 ? diff : compareNames(a, b);
+      }
+      if (sortConfig.field === 'bib') {
+        const rawA = String(bibDrafts[a.id] ?? a.assignedBib ?? '').trim();
+        const rawB = String(bibDrafts[b.id] ?? b.assignedBib ?? '').trim();
+        const numA = rawA !== '' ? Number(rawA) : NaN;
+        const numB = rawB !== '' ? Number(rawB) : NaN;
+        const hasA = rawA !== '' && Number.isFinite(numA);
+        const hasB = rawB !== '' && Number.isFinite(numB);
+        if (!hasA && !hasB) return compareNames(a, b);
+        if (!hasA) return 1;
+        if (!hasB) return -1;
+        return numA !== numB ? (numA - numB) * dir : compareNames(a, b);
+      }
+      return 0;
+    });
+  }, [filteredRegistrations, sortConfig, bibDrafts]);
+
+  const renderSortButton = (field, label) => {
+    const isActive = sortConfig.field === field;
+    const arrow = isActive ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '⇅';
+    return (
+      <button
+        key={field}
+        type="button"
+        onClick={() => handleSort(field)}
+        aria-label={`Ordenar por ${label}`}
+        className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[11px] transition-colors cursor-pointer ${
+          isActive
+            ? 'border-orange-500 text-orange-400 bg-orange-500/10 font-bold'
+            : 'border-stone-700/80 bg-stone-950/70 text-stone-300 hover:border-orange-500/50 hover:text-white font-medium'
+        }`}
+      >
+        <span>{label}</span>
+        <span className="text-[9px] leading-none">{arrow}</span>
+      </button>
+    );
+  };
 
   const toggleExpand = (id) => {
     setExpandedIds((prev) => ({
@@ -224,7 +303,23 @@ export default function AdminRegistrationsTab({
         </div>
       ) : (
         <div className="space-y-2">
-          {filteredRegistrations.map((reg) => {
+          {/* Barra compacta de encabezados ordenables */}
+          <div className="px-2.5 py-1.5 rounded-xl bg-stone-900/70 border border-stone-800/80 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[10px] uppercase tracking-wider text-stone-500 font-semibold mr-0.5 hidden sm:inline">
+                Ordenar:
+              </span>
+              {renderSortButton('fullName', 'Nombre y Apellido')}
+              {renderSortButton('dni', 'DNI')}
+              {renderSortButton('status', 'Estado')}
+            </div>
+
+            <div className="flex items-center shrink-0 lg:mr-[378px]">
+              {renderSortButton('bib', 'Dorsal #')}
+            </div>
+          </div>
+
+          {sortedRegistrations.map((reg) => {
             const isBusy = regBusyId === reg.id;
             const isExpanded = Boolean(expandedIds[reg.id]);
             const bibValue = bibDrafts[reg.id] ?? reg.assignedBib ?? '';
@@ -247,15 +342,15 @@ export default function AdminRegistrationsTab({
                 className="rounded-xl bg-stone-950 border border-stone-800 hover:border-stone-700 transition-colors overflow-hidden"
               >
                 {/* Fila operativa compacta (1-2 renglones) */}
-                <div className="px-3 py-2.5 flex flex-wrap items-center justify-between gap-x-2.5 gap-y-2">
+                <div className="px-2.5 py-2.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-2">
                   {/* Identificación rápida del corredor (estructura fija en 2 líneas) */}
                   <div className="min-w-[270px] flex-1 space-y-1.5">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-md bg-stone-900 border border-stone-700 text-amber-300 shrink-0">
+                      <span className="font-mono text-[10px] sm:text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-stone-900 border border-stone-700 text-amber-300 shrink-0">
                         {reg.code}
                       </span>
                       <span
-                        className={`text-[11px] font-black px-2 py-0.5 rounded-md border shrink-0 ${
+                        className={`text-[10px] sm:text-[11px] font-black px-1.5 py-0.5 rounded-md border shrink-0 ${
                           reg.distance === '13K'
                             ? 'bg-stone-950 border-red-500 text-red-500'
                             : 'bg-stone-950 border-cyan-500 text-cyan-400'
@@ -265,7 +360,7 @@ export default function AdminRegistrationsTab({
                       </span>
                       <h4
                         title={reg.fullName}
-                        className="text-xs sm:text-[13px] font-medium text-white whitespace-nowrap truncate min-w-0"
+                        className="text-[13px] font-medium text-white whitespace-nowrap truncate min-w-0"
                       >
                         {reg.fullName}
                       </h4>
@@ -308,8 +403,8 @@ export default function AdminRegistrationsTab({
                         placeholder="Dorsal"
                         className={
                           isBibLocked
-                            ? 'w-14 rounded-lg bg-stone-950 border border-orange-500/40 px-1.5 py-1 text-xs font-mono font-bold text-orange-400 text-center cursor-default'
-                            : 'w-14 rounded-lg bg-stone-900 border border-orange-500 focus:border-orange-400 focus:outline-none px-1.5 py-1 text-xs font-mono text-white text-center'
+                            ? 'w-12 rounded-lg bg-stone-950 border border-orange-500/40 px-1 py-1 text-xs font-mono font-bold text-orange-400 text-center cursor-default'
+                            : 'w-12 rounded-lg bg-stone-900 border border-orange-500 focus:border-orange-400 focus:outline-none px-1 py-1 text-xs font-mono text-white text-center'
                         }
                       />
                       {isBibLocked && (
@@ -319,7 +414,7 @@ export default function AdminRegistrationsTab({
                           onClick={() => startEditingBib(reg.id)}
                           aria-label={`Editar dorsal de ${reg.fullName}`}
                           title="Editar dorsal"
-                          className="p-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 border border-orange-500/30 hover:border-orange-500/60 text-stone-400 hover:text-orange-400 transition-colors cursor-pointer disabled:opacity-40"
+                          className="p-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-orange-500/30 hover:border-orange-500/60 text-stone-400 hover:text-orange-400 transition-colors cursor-pointer disabled:opacity-40"
                         >
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
@@ -337,7 +432,7 @@ export default function AdminRegistrationsTab({
                             ? 'Guardar nuevo número de dorsal'
                             : 'Guardar número de dorsal y confirmar inscripción'
                       }
-                      className={`inline-flex items-center gap-1 rounded-lg font-display font-black text-[11px] uppercase px-2 py-1.5 transition-colors ${
+                      className={`inline-flex items-center gap-1 rounded-lg font-display font-black text-[10px] sm:text-[11px] uppercase px-2 py-1 transition-colors ${
                         isAlreadySaved
                           ? 'bg-white/10 text-white/40 border border-white/10 cursor-default'
                           : 'bg-emerald-500 hover:bg-emerald-400 text-stone-950 border border-emerald-400/50 cursor-pointer disabled:opacity-50'
@@ -359,7 +454,7 @@ export default function AdminRegistrationsTab({
                         target="_blank"
                         rel="noopener noreferrer"
                         title="Ver comprobante adjunto"
-                        className="inline-flex items-center gap-1 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/35 text-[11px] font-bold px-2 py-1.5"
+                        className="inline-flex items-center gap-1 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/35 text-[10px] sm:text-[11px] font-bold px-2 py-1"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">Comprobante</span>
@@ -373,7 +468,7 @@ export default function AdminRegistrationsTab({
                         rel="noopener noreferrer"
                         title="Enviar confirmación por WhatsApp"
                         aria-label={`Enviar WhatsApp a ${reg.fullName}`}
-                        className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 text-[11px] font-bold px-2 py-1.5"
+                        className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 text-[10px] sm:text-[11px] font-bold px-2 py-1"
                       >
                         <MessageCircle className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">WhatsApp</span>
@@ -386,7 +481,7 @@ export default function AdminRegistrationsTab({
                       aria-expanded={isExpanded}
                       aria-label={`${isExpanded ? 'Ocultar' : 'Ver'} detalles de ${reg.fullName}`}
                       title="Ver detalles completos"
-                      className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition-colors cursor-pointer ${
+                      className={`inline-flex items-center gap-1 rounded-lg border px-1.5 py-1 text-[10px] sm:text-[11px] font-semibold transition-colors cursor-pointer ${
                         isExpanded
                           ? 'bg-orange-500/15 border-orange-500 text-orange-300'
                           : 'bg-stone-900 border-stone-700 text-stone-300 hover:border-orange-500/60 hover:text-white'
@@ -406,7 +501,7 @@ export default function AdminRegistrationsTab({
                       onClick={() => onDeleteRegistration(reg)}
                       aria-label={`Eliminar inscripción de ${reg.fullName}`}
                       title="Eliminar inscripción"
-                      className="p-1.5 rounded-lg text-stone-400 hover:text-rose-400 hover:bg-stone-900 cursor-pointer disabled:opacity-40"
+                      className="p-1 rounded-lg text-stone-400 hover:text-rose-400 hover:bg-stone-900 cursor-pointer disabled:opacity-40"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
