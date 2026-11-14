@@ -8,9 +8,8 @@ const LOCAL_REGISTRATIONS_STORAGE_KEY = 'reto_al_filo_registrations_v1';
  * Ningún módulo de firebase/* se importa de forma estática para mantener
  * el bundle inicial liviano en conexiones móviles de montaña.
  */
-const rawApiKey = (import.meta.env.VITE_FIREBASE_API_KEY || '').trim();
 const firebaseConfig = {
-  apiKey: rawApiKey.replace('_ExMBY74qz_', '_ErMBY74qz_'),
+  apiKey: (import.meta.env.VITE_FIREBASE_API_KEY || '').trim(),
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'reto-al-filo.firebaseapp.com',
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'reto-al-filo',
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'reto-al-filo.firebasestorage.app',
@@ -458,6 +457,34 @@ export async function deletePhotoFromFirestore(photoId) {
   return { ok: true, id: photoId };
 }
 
+export const MAX_UPLOAD_SIZE_BYTES = 8 * 1024 * 1024;
+export const ALLOWED_UPLOAD_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'application/pdf',
+];
+
+/**
+ * Valida en cliente tipo MIME y tamaño máximo (8 MB) antes de subir a Cloudinary.
+ */
+export function validateUploadFile(file) {
+  if (!file) {
+    throw new Error('Seleccioná un archivo para subir.');
+  }
+
+  const mimeType = String(file.type || '').toLowerCase();
+  if (!ALLOWED_UPLOAD_MIME_TYPES.includes(mimeType)) {
+    throw new Error('Formato no permitido. Solo se aceptan archivos JPG, PNG, WEBP o PDF.');
+  }
+
+  if (typeof file.size === 'number' && file.size > MAX_UPLOAD_SIZE_BYTES) {
+    throw new Error('El archivo supera el tamaño máximo permitido de 8 MB.');
+  }
+
+  return file;
+}
+
 /**
  * Sube una imagen o comprobante (imagen o PDF) directamente desde el navegador a Cloudinary
  * usando un Upload Preset sin firma (Unsigned).
@@ -466,9 +493,7 @@ export async function uploadImageToCloudinary(
   file,
   { cloudName, uploadPreset, folder = 'reto-al-filo', resourceType = 'auto' } = {}
 ) {
-  if (!file) {
-    throw new Error('Seleccioná un archivo para subir.');
-  }
+  validateUploadFile(file);
 
   const targetCloud = (
     cloudName ||
@@ -799,13 +824,13 @@ const AUTH_ERROR_MESSAGES = {
   'auth/invalid-credential':
     'El correo o la contraseña son incorrectos. Verificá los datos o usá "¿Olvidaste tu contraseña?".',
   'auth/user-not-found':
-    'Todavía no existe un usuario creado con ese correo. Elegí "Crear mi clave (1ra vez)" o ingresá con Google.',
+    'No existe una cuenta de administrador registrada con ese correo. Verificá los datos o ingresá con Google.',
   'auth/wrong-password':
     'Contraseña incorrecta. Verificá la clave o usá "¿Olvidaste tu contraseña?".',
   'auth/invalid-email':
     'El formato del correo electrónico no es válido.',
   'auth/email-already-in-use':
-    'Ese correo ya tiene una cuenta creada. Cambiá a "Iniciar Sesión" o ingresá con Google.',
+    'Ese correo ya tiene una cuenta registrada. Iniciá sesión o ingresá con Google.',
   'auth/weak-password':
     'La contraseña es muy débil. Elegí al menos 6 caracteres.',
   'auth/too-many-requests':
@@ -894,11 +919,8 @@ export async function signInAdminWithGoogle() {
     const user = credential.user;
 
     if (!isAuthorizedAdminEmail(user?.email)) {
-      const attempted = user?.email || 'sin correo';
       await authModule.signOut(auth);
-      throw new Error(
-        `El correo "${attempted}" no tiene permisos de administrador. Correos habilitados: ${getAllowedAdminEmails().join(', ')}.`
-      );
+      throw new Error('La cuenta seleccionada no tiene permisos de administrador.');
     }
 
     return normalizeAdminUser(user, 'google');
@@ -908,18 +930,16 @@ export async function signInAdminWithGoogle() {
 }
 
 /**
- * Inicia sesión o registra (1ra vez) a un administrador autorizado con correo y contraseña.
+ * Inicia sesión a un administrador autorizado con correo y contraseña.
  */
-export async function signInAdminWithEmail(email, password, { mode = 'login' } = {}) {
+export async function signInAdminWithEmail(email, password) {
   const cleanEmail = String(email || '').trim().toLowerCase();
   if (!cleanEmail) {
     throw new Error('Ingresá tu correo electrónico de administrador.');
   }
 
   if (!isAuthorizedAdminEmail(cleanEmail)) {
-    throw new Error(
-      `El correo "${cleanEmail}" no está autorizado para administrar Reto al Filo. Correos habilitados: ${getAllowedAdminEmails().join(', ')}.`
-    );
+    throw new Error('El correo ingresado no está autorizado para administrar Reto al Filo.');
   }
 
   if (!password || String(password).length < 6) {
@@ -934,11 +954,7 @@ export async function signInAdminWithEmail(email, password, { mode = 'login' } =
   const { auth, authModule } = bundle;
 
   try {
-    const credential =
-      mode === 'register'
-        ? await authModule.createUserWithEmailAndPassword(auth, cleanEmail, password)
-        : await authModule.signInWithEmailAndPassword(auth, cleanEmail, password);
-
+    const credential = await authModule.signInWithEmailAndPassword(auth, cleanEmail, password);
     return normalizeAdminUser(credential.user, 'email');
   } catch (error) {
     throw new Error(formatAuthError(error));
@@ -955,7 +971,7 @@ export async function sendAdminPasswordReset(email) {
   }
 
   if (!isAuthorizedAdminEmail(cleanEmail)) {
-    throw new Error(`El correo "${cleanEmail}" no está autorizado como administrador.`);
+    throw new Error('El correo ingresado no está autorizado como administrador.');
   }
 
   const bundle = await getFirebaseAuth();
@@ -973,9 +989,17 @@ export async function sendAdminPasswordReset(email) {
 }
 
 /**
- * Cierra la sesión actual de Firebase Auth.
+ * Cierra la sesión actual de Firebase Auth y elimina datos locales sensibles.
  */
 export async function signOutAdmin() {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      window.localStorage.removeItem(LOCAL_REGISTRATIONS_STORAGE_KEY);
+    } catch {
+      // Ignorar si localStorage no está disponible
+    }
+  }
+
   try {
     const bundle = await getFirebaseAuth();
     if (bundle) {

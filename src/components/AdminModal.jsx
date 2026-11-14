@@ -60,7 +60,6 @@ export default function AdminModal({
   const [authInfo, setAuthInfo] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
-  const [emailMode, setEmailMode] = useState('login');
 
   const [activeTab, setActiveTab] = useState('general');
   const [editDistance, setEditDistance] = useState('27K');
@@ -259,9 +258,7 @@ export default function AdminModal({
     setAuthError('');
     setAuthInfo('');
     try {
-      const user = await signInAdminWithEmail(emailInput, passwordInput, {
-        mode: emailMode,
-      });
+      const user = await signInAdminWithEmail(emailInput, passwordInput);
       setAdminUser(user);
       setUnlocked(true);
       setPasswordInput('');
@@ -395,6 +392,11 @@ export default function AdminModal({
     return `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`;
   };
 
+  const sanitizeExcelCell = (value) => {
+    const str = String(value ?? '');
+    return /^\s*[=+\-@]/.test(str) ? `'${str}` : str;
+  };
+
   const handleExportExcel = () => {
     const headers = [
       'Código',
@@ -418,27 +420,29 @@ export default function AdminModal({
       'Fecha Inscripción',
     ];
 
-    const rows = registrations.map((r) => [
-      r.code || '',
-      (r.status || '').toUpperCase(),
-      bibDrafts[r.id] ?? r.assignedBib ?? '',
-      r.distance || '',
-      r.priceSnapshot || '',
-      r.fullName || '',
-      r.dni || '',
-      r.birthDate || '',
-      r.gender || '',
-      r.phone || '',
-      r.email || '',
-      r.city || '',
-      r.team || '',
-      r.shirtSize || '',
-      r.emergencyContactName || '',
-      r.emergencyContactPhone || '',
-      r.medicalNotes || '',
-      r.receiptUrl || '',
-      r.createdAt ? new Date(r.createdAt).toLocaleString('es-AR') : '',
-    ]);
+    const rows = registrations.map((r) =>
+      [
+        r.code || '',
+        (r.status || '').toUpperCase(),
+        bibDrafts[r.id] ?? r.assignedBib ?? '',
+        r.distance || '',
+        r.priceSnapshot || '',
+        r.fullName || '',
+        r.dni || '',
+        r.birthDate || '',
+        r.gender || '',
+        r.phone || '',
+        r.email || '',
+        r.city || '',
+        r.team || '',
+        r.shirtSize || '',
+        r.emergencyContactName || '',
+        r.emergencyContactPhone || '',
+        r.medicalNotes || '',
+        r.receiptUrl || '',
+        r.createdAt ? new Date(r.createdAt).toLocaleString('es-AR') : '',
+      ].map(sanitizeExcelCell)
+    );
 
     const titleRow = [
       'RETO AL FILO - 2DA EDICIÓN (2027) · PLANILLA DE CORREDORES INSCRIPTOS',
@@ -911,45 +915,6 @@ export default function AdminModal({
                 onSubmit={handleEmailSignIn}
                 className="rounded-2xl bg-stone-950/80 border border-stone-800 p-4 space-y-3"
               >
-                <div className="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-stone-900 border border-stone-800">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmailMode('login');
-                      setAuthError('');
-                      setAuthInfo('');
-                    }}
-                    className={`py-2 px-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                      emailMode === 'login'
-                        ? 'bg-amber-500 text-stone-950'
-                        : 'text-stone-300 hover:text-white'
-                    }`}
-                  >
-                    Iniciar Sesión
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmailMode('register');
-                      setAuthError('');
-                      setAuthInfo('');
-                    }}
-                    className={`py-2 px-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                      emailMode === 'register'
-                        ? 'bg-amber-500 text-stone-950'
-                        : 'text-stone-300 hover:text-white'
-                    }`}
-                  >
-                    Crear mi clave (1ra vez)
-                  </button>
-                </div>
-
-                {emailMode === 'register' && (
-                  <p className="text-[11px] leading-relaxed text-amber-200/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-3 py-2">
-                    Elegí e inventá tu propia contraseña nueva (mínimo 6 caracteres) para tu correo autorizado (<span className="font-mono">lciancia1972@gmail.com</span> o <span className="font-mono">lucianociancia86@gmail.com</span>), o ingresá con 1 clic arriba usando <strong>Ingresar con Google</strong>.
-                  </p>
-                )}
-
                 <div>
                   <label
                     htmlFor="admin-email-input"
@@ -985,9 +950,7 @@ export default function AdminModal({
                     <input
                       id="admin-password-input"
                       type="password"
-                      autoComplete={
-                        emailMode === 'register' ? 'new-password' : 'current-password'
-                      }
+                      autoComplete="current-password"
                       value={passwordInput}
                       onChange={(e) => setPasswordInput(e.target.value)}
                       placeholder=""
@@ -1004,25 +967,19 @@ export default function AdminModal({
                   disabled={!firebaseReady || authLoading}
                   className="w-full min-h-[44px] rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black uppercase text-xs sm:text-sm py-2.5 cursor-pointer transition-colors disabled:opacity-50"
                 >
-                  {authLoading
-                    ? 'Ingresando...'
-                    : emailMode === 'register'
-                      ? 'Crear Cuenta y Entrar'
-                      : 'Ingresar con Correo'}
+                  {authLoading ? 'Ingresando...' : 'Ingresar con Correo'}
                 </button>
 
-                {emailMode === 'login' && (
-                  <div className="text-center pt-0.5">
-                    <button
-                      type="button"
-                      onClick={handlePasswordReset}
-                      disabled={!firebaseReady || authLoading}
-                      className="text-xs text-amber-400 hover:text-amber-300 underline underline-offset-2 cursor-pointer disabled:opacity-50"
-                    >
-                      ¿Olvidaste tu contraseña? Enviar enlace por mail
-                    </button>
-                  </div>
-                )}
+                <div className="text-center pt-0.5">
+                  <button
+                    type="button"
+                    onClick={handlePasswordReset}
+                    disabled={!firebaseReady || authLoading}
+                    className="text-xs text-amber-400 hover:text-amber-300 underline underline-offset-2 cursor-pointer disabled:opacity-50"
+                  >
+                    ¿Olvidaste tu contraseña? Enviar enlace por mail
+                  </button>
+                </div>
               </form>
 
               {authError && (

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { RACE_CONFIG, buildWhatsAppUrl } from '../data/raceConfig';
 import {
+  validateUploadFile,
   uploadImageToCloudinary,
   submitRunnerRegistration,
 } from '../firebase/config';
@@ -130,6 +131,19 @@ export default function RegistrationModal({
   const handleSelectReceipt = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    try {
+      validateUploadFile(file);
+    } catch (err) {
+      e.target.value = '';
+      if (receiptPreview) {
+        URL.revokeObjectURL(receiptPreview);
+      }
+      setReceiptFile(null);
+      setReceiptPreview('');
+      setSubmitError(err.message || 'Archivo de comprobante no válido.');
+      return;
+    }
 
     if (receiptPreview) {
       URL.revokeObjectURL(receiptPreview);
@@ -760,7 +774,7 @@ export default function RegistrationModal({
                         : 'Subí la captura de pantalla, foto o PDF del comprobante'}
                     </p>
                     <p className="text-[11px] text-stone-400 mt-0.5">
-                      Formatos aceptados: JPG, PNG, WEBP o PDF.
+                      Formatos aceptados: JPG, PNG, WEBP o PDF (máx. 8 MB).
                     </p>
                     <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-2">
                       <label className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 cursor-pointer transition-colors">
@@ -768,7 +782,7 @@ export default function RegistrationModal({
                         {receiptFile ? 'Cambiar Comprobante' : 'Adjuntar Comprobante'}
                         <input
                           type="file"
-                          accept="image/*,application/pdf"
+                          accept="image/jpeg,image/png,image/webp,application/pdf"
                           onChange={handleSelectReceipt}
                           className="hidden"
                         />

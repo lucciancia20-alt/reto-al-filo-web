@@ -1,0 +1,73 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email is string
+        && request.auth.token.email.lower() in [
+          'lciancia1972@gmail.com',
+          'lucianociancia86@gmail.com'
+        ];
+    }
+
+    function hasNonEmptyString(data, field) {
+      return field in data
+        && data[field] is string
+        && data[field].trim().size() > 0;
+    }
+
+    function isValidRegistrationCreate(data) {
+      return data.keys().hasAll([
+          'code',
+          'distance',
+          'fullName',
+          'dni',
+          'birthDate',
+          'phone',
+          'email',
+          'city',
+          'emergencyContactName',
+          'emergencyContactPhone',
+          'receiptUrl',
+          'status',
+          'createdAt',
+          'updatedAt'
+        ])
+        && hasNonEmptyString(data, 'code')
+        && data.distance in ['27K', '13K']
+        && hasNonEmptyString(data, 'fullName')
+        && hasNonEmptyString(data, 'dni')
+        && hasNonEmptyString(data, 'birthDate')
+        && hasNonEmptyString(data, 'phone')
+        && hasNonEmptyString(data, 'email')
+        && hasNonEmptyString(data, 'city')
+        && hasNonEmptyString(data, 'emergencyContactName')
+        && hasNonEmptyString(data, 'emergencyContactPhone')
+        && hasNonEmptyString(data, 'receiptUrl')
+        && data.status == 'pendiente'
+        && (!('assignedBib' in data) || data.assignedBib == '')
+        && data.createdAt is int
+        && data.updatedAt is int;
+    }
+
+    match /settings/raceConfig {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /photos/{photoId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /registrations/{registrationId} {
+      allow create: if isValidRegistrationCreate(request.resource.data);
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
