@@ -287,7 +287,9 @@ export default function AdminRegistrationsTab({
                           : 'bg-emerald-500 hover:bg-emerald-400 text-stone-950 border border-emerald-400/50 cursor-pointer disabled:opacity-50'
                       }`}
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <CheckCircle2
+                        className={`w-3.5 h-3.5 ${isAlreadySaved ? 'text-emerald-400' : ''}`}
+                      />
                       {isAlreadySaved
                         ? 'Confirmado'
                         : isConfirmed
