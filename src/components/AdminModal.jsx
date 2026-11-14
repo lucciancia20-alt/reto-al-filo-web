@@ -964,7 +964,7 @@ export default function AdminModal({
                       placeholder=""
                       required
                       disabled={!firebaseReady || authLoading}
-                      className="w-full rounded-xl bg-stone-900 border border-stone-700 focus:border-amber-400 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm text-white placeholder:text-stone-500"
+                      className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm text-white placeholder:text-stone-500"
                     />
                   </div>
                 </div>
@@ -990,7 +990,7 @@ export default function AdminModal({
                       required
                       minLength={6}
                       disabled={!firebaseReady || authLoading}
-                      className="w-full rounded-xl bg-stone-900 border border-stone-700 focus:border-amber-400 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm text-white placeholder:text-stone-500"
+                      className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm text-white placeholder:text-stone-500"
                     />
                   </div>
                 </div>
@@ -1059,8 +1059,8 @@ export default function AdminModal({
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center justify-center gap-1.5 px-2.5 py-2.5 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wide transition-all cursor-pointer ${
                       active
-                        ? 'bg-amber-500 border border-orange-500 text-stone-950 shadow-md shadow-amber-500/20'
-                        : 'bg-stone-900 text-stone-300 border border-orange-500/60 hover:border-orange-400'
+                        ? 'bg-amber-500 text-stone-950 shadow-md shadow-amber-500/20'
+                        : 'bg-stone-900 text-stone-300 border border-stone-800 hover:border-stone-700'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -1083,7 +1083,7 @@ export default function AdminModal({
                         type="text"
                         value={draft.title}
                         onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                        className="w-full rounded-xl bg-stone-950 border border-stone-700 px-3.5 py-2.5 text-sm text-white"
+                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
                       />
                     </div>
                     <div>
@@ -1094,7 +1094,7 @@ export default function AdminModal({
                         type="text"
                         value={draft.subtitle}
                         onChange={(e) => setDraft({ ...draft, subtitle: e.target.value })}
-                        className="w-full rounded-xl bg-stone-950 border border-stone-700 px-3.5 py-2.5 text-sm text-white"
+                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
                       />
                     </div>
                     <div>
@@ -1105,7 +1105,7 @@ export default function AdminModal({
                         type="text"
                         value={draft.targetDateIso}
                         onChange={(e) => setDraft({ ...draft, targetDateIso: e.target.value })}
-                        className="w-full rounded-xl bg-stone-950 border border-stone-700 px-3.5 py-2.5 text-sm font-mono text-white"
+                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
                       />
                     </div>
                     <div>
@@ -1116,7 +1116,7 @@ export default function AdminModal({
                         type="text"
                         value={draft.whatsappNumber}
                         onChange={(e) => setDraft({ ...draft, whatsappNumber: e.target.value })}
-                        className="w-full rounded-xl bg-stone-950 border border-stone-700 px-3.5 py-2.5 text-sm font-mono text-white"
+                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
                       />
                     </div>
                     <div className="sm:col-span-2">
@@ -1127,7 +1127,7 @@ export default function AdminModal({
                         type="text"
                         value={draft.locationName}
                         onChange={(e) => setDraft({ ...draft, locationName: e.target.value })}
-                        className="w-full rounded-xl bg-stone-950 border border-stone-700 px-3.5 py-2.5 text-sm text-white"
+                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
                       />
                     </div>
                     <div className="sm:col-span-2">
@@ -1138,7 +1138,7 @@ export default function AdminModal({
                         type="url"
                         value={draft.googleMapsUrl}
                         onChange={(e) => setDraft({ ...draft, googleMapsUrl: e.target.value })}
-                        className="w-full rounded-xl bg-stone-950 border border-stone-700 px-3.5 py-2.5 text-sm font-mono text-white"
+                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
                       />
                     </div>
                   </div>
@@ -1168,7 +1168,7 @@ export default function AdminModal({
                           value={draft.circuits?.['27K']?.price || ''}
                           onChange={(e) => updateCircuitField('27K', 'price', e.target.value)}
                           placeholder="$45.000"
-                          className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2 text-sm font-bold text-emerald-300"
+                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-bold text-emerald-300"
                         />
                       </div>
                       <div>
@@ -1180,7 +1180,7 @@ export default function AdminModal({
                           value={draft.circuits?.['13K']?.price || ''}
                           onChange={(e) => updateCircuitField('13K', 'price', e.target.value)}
                           placeholder="$32.000"
-                          className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2 text-sm font-bold text-emerald-300"
+                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-bold text-emerald-300"
                         />
                       </div>
                       <div>
@@ -1192,7 +1192,7 @@ export default function AdminModal({
                           value={draft.payment?.bankAlias || ''}
                           onChange={(e) => updatePaymentField('bankAlias', e.target.value)}
                           placeholder="RETO.AL.FILO"
-                          className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2 text-sm font-mono text-amber-300"
+                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-mono text-amber-300"
                         />
                       </div>
                       <div>
@@ -1204,7 +1204,7 @@ export default function AdminModal({
                           value={draft.payment?.bankCbu || ''}
                           onChange={(e) => updatePaymentField('bankCbu', e.target.value)}
                           placeholder="0000003100000000000000"
-                          className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2 text-sm font-mono text-white"
+                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm font-mono text-white"
                         />
                       </div>
                       <div>
@@ -1216,7 +1216,7 @@ export default function AdminModal({
                           value={draft.payment?.bankHolder || ''}
                           onChange={(e) => updatePaymentField('bankHolder', e.target.value)}
                           placeholder="Organización Reto al Filo"
-                          className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2 text-sm text-white"
+                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm text-white"
                         />
                       </div>
                       <div>
@@ -1228,7 +1228,7 @@ export default function AdminModal({
                           value={draft.payment?.bankEntity || ''}
                           onChange={(e) => updatePaymentField('bankEntity', e.target.value)}
                           placeholder="Mercado Pago / Banco Provincia"
-                          className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2 text-sm text-white"
+                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-sm text-white"
                         />
                       </div>
                       <div className="sm:col-span-2">
@@ -1239,7 +1239,7 @@ export default function AdminModal({
                           rows={2}
                           value={draft.payment?.instructions || ''}
                           onChange={(e) => updatePaymentField('instructions', e.target.value)}
-                          className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2 text-xs text-stone-200"
+                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2 text-xs text-stone-200"
                         />
                       </div>
                     </div>
@@ -1280,7 +1280,7 @@ export default function AdminModal({
                         onChange={(e) =>
                           updateCircuitField(editDistance, 'elevationGain', e.target.value)
                         }
-                        className="w-full rounded-xl bg-stone-950 border border-stone-700 px-3 py-2 text-sm text-white"
+                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-sm text-white"
                       />
                     </div>
                     <div>
@@ -1293,7 +1293,7 @@ export default function AdminModal({
                         onChange={(e) =>
                           updateCircuitField(editDistance, 'cutoffTime', e.target.value)
                         }
-                        className="w-full rounded-xl bg-stone-950 border border-stone-700 px-3 py-2 text-sm text-white"
+                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-sm text-white"
                       />
                     </div>
                     <div>
@@ -1306,7 +1306,7 @@ export default function AdminModal({
                         onChange={(e) =>
                           updateCircuitField(editDistance, 'summaryBadge', e.target.value)
                         }
-                        className="w-full rounded-xl bg-stone-950 border border-stone-700 px-3 py-2 text-sm text-white"
+                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-sm text-white"
                       />
                     </div>
                     <div className="sm:col-span-3">
@@ -1319,7 +1319,7 @@ export default function AdminModal({
                         onChange={(e) =>
                           updateCircuitField(editDistance, 'description', e.target.value)
                         }
-                        className="w-full rounded-xl bg-stone-950 border border-stone-700 px-3 py-2 text-sm text-white"
+                        className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-sm text-white"
                       />
                     </div>
                   </div>
@@ -1363,7 +1363,7 @@ export default function AdminModal({
                                 max={activeTrack.totalKm}
                                 value={st.km}
                                 onChange={(e) => handleStationChange(idx, 'km', e.target.value)}
-                                className="w-full rounded-lg bg-stone-950 border border-stone-700 px-2.5 py-1.5 text-xs font-mono text-white"
+                                className="w-full rounded-lg bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-xs font-mono text-white"
                               />
                             </div>
                             <div className="flex-1 min-w-[140px]">
@@ -1374,7 +1374,7 @@ export default function AdminModal({
                                 type="text"
                                 value={st.label}
                                 onChange={(e) => handleStationChange(idx, 'label', e.target.value)}
-                                className="w-full rounded-lg bg-stone-950 border border-stone-700 px-2.5 py-1.5 text-xs text-white"
+                                className="w-full rounded-lg bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-xs text-white"
                               />
                             </div>
                             <div className="text-[11px] font-mono text-sky-300 px-2 whitespace-nowrap">
@@ -1526,13 +1526,13 @@ export default function AdminModal({
                             type="text"
                             value={faq.question}
                             onChange={(e) => handleFaqChange(idx, 'question', e.target.value)}
-                            className="w-full rounded-lg bg-stone-900 border border-stone-700 px-3 py-1.5 text-xs font-bold text-white"
+                            className="w-full rounded-lg bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-bold text-white"
                           />
                           <textarea
                             rows={3}
                             value={faq.answer}
                             onChange={(e) => handleFaqChange(idx, 'answer', e.target.value)}
-                            className="w-full rounded-lg bg-stone-900 border border-stone-700 px-3 py-1.5 text-xs text-stone-300"
+                            className="w-full rounded-lg bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs text-stone-300"
                           />
                         </div>
                       ))}
@@ -1634,7 +1634,7 @@ export default function AdminModal({
                           value={photoSector}
                           onChange={(e) => setPhotoSector(e.target.value)}
                           placeholder="Ej. Cumbre Cerro Providencia · 1ra Edición"
-                          className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2.5 text-sm text-white"
+                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
                         />
                       </div>
                       <div>
@@ -1646,7 +1646,7 @@ export default function AdminModal({
                           value={uploadPreset}
                           onChange={(e) => setUploadPreset(e.target.value)}
                           placeholder="reto_al_filo"
-                          className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2.5 text-sm font-mono text-amber-300"
+                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm font-mono text-amber-300"
                         />
                       </div>
                       <div>
@@ -1658,7 +1658,7 @@ export default function AdminModal({
                           value={photoUrl}
                           onChange={(e) => setPhotoUrl(e.target.value)}
                           placeholder="https://res.cloudinary.com/..."
-                          className="w-full rounded-xl bg-stone-900 border border-stone-700 px-3.5 py-2.5 text-sm text-white"
+                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3.5 py-2.5 text-sm text-white"
                         />
                       </div>
                     </div>
@@ -1822,7 +1822,7 @@ export default function AdminModal({
                           value={regSearch}
                           onChange={(e) => setRegSearch(e.target.value)}
                           placeholder="Buscar por nombre, DNI, código RAF, dorsal, localidad..."
-                          className="w-full rounded-xl bg-stone-900 border border-stone-700 focus:border-amber-400 focus:outline-none pl-9 pr-3 py-2 text-xs sm:text-sm text-white"
+                          className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-9 pr-3 py-2 text-xs sm:text-sm text-white"
                         />
                       </div>
 
@@ -1831,7 +1831,7 @@ export default function AdminModal({
                           aria-label="Filtrar por distancia"
                           value={regDistanceFilter}
                           onChange={(e) => setRegDistanceFilter(e.target.value)}
-                          className="rounded-xl bg-stone-900 border border-stone-700 px-3 py-2 text-xs text-white"
+                          className="rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-xs text-white"
                         >
                           <option value="all">Todas las distancias</option>
                           <option value="27K">Solo 27K</option>
@@ -1842,7 +1842,7 @@ export default function AdminModal({
                           aria-label="Filtrar por estado"
                           value={regStatusFilter}
                           onChange={(e) => setRegStatusFilter(e.target.value)}
-                          className="rounded-xl bg-stone-900 border border-stone-700 px-3 py-2 text-xs text-white"
+                          className="rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-xs text-white"
                         >
                           <option value="all">Todos los estados</option>
                           <option value="pendiente">Pendientes</option>
@@ -2027,7 +2027,7 @@ export default function AdminModal({
                                     }))
                                   }
                                   placeholder="105"
-                                  className="w-20 rounded-xl bg-stone-900 border border-stone-700 px-2.5 py-2 text-xs font-mono text-white text-center"
+                                  className="w-20 rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-2 text-xs font-mono text-white text-center"
                                 />
                               </div>
 
