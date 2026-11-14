@@ -913,6 +913,7 @@ export default function AdminModal({
               {/* Acceso con Correo electrónico y Contraseña */}
               <form
                 onSubmit={handleEmailSignIn}
+                autoComplete="off"
                 className="rounded-2xl bg-stone-950/80 border border-stone-800 p-4 space-y-3"
               >
                 <div>
@@ -927,7 +928,7 @@ export default function AdminModal({
                     <input
                       id="admin-email-input"
                       type="email"
-                      autoComplete="email"
+                      autoComplete="off"
                       value={emailInput}
                       onChange={(e) => setEmailInput(e.target.value)}
                       placeholder=""
@@ -950,7 +951,7 @@ export default function AdminModal({
                     <input
                       id="admin-password-input"
                       type="password"
-                      autoComplete="current-password"
+                      autoComplete="new-password"
                       value={passwordInput}
                       onChange={(e) => setPasswordInput(e.target.value)}
                       placeholder=""
