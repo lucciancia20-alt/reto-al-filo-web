@@ -25,6 +25,7 @@ import {
   RefreshCw,
   Landmark,
 } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { GPX_TRACKS, interpolatePointAtKm, parseGpxXml } from '../data/gpxTracks';
 import {
   addPhotoToFirestore,
@@ -394,69 +395,93 @@ export default function AdminModal({
     return `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`;
   };
 
-  const handleExportCsv = () => {
-    const escapeCsv = (val) => {
-      const str = String(val ?? '').replace(/\r?\n/g, ' ');
-      return `"${str.replace(/"/g, '""')}"`;
-    };
-
+  const handleExportExcel = () => {
     const headers = [
-      'Codigo',
+      'Código',
       'Estado',
       'Dorsal',
       'Distancia',
       'Valor',
-      'Nombre_Apellido',
+      'Nombre y Apellido',
       'DNI',
-      'Fecha_Nacimiento',
-      'Genero',
-      'Telefono',
+      'Fecha de Nacimiento',
+      'Género',
+      'Teléfono',
       'Email',
       'Localidad',
       'Team',
-      'Talle_Remera',
-      'Contacto_Emergencia',
-      'Tel_Emergencia',
-      'Observaciones_Medicas',
-      'Comprobante_URL',
-      'Fecha_Inscripcion',
+      'Talle Remera',
+      'Contacto Emergencia',
+      'Tel. Emergencia',
+      'Observaciones Médicas',
+      'Comprobante URL',
+      'Fecha Inscripción',
     ];
 
     const rows = registrations.map((r) => [
-      r.code,
-      r.status,
-      r.assignedBib || '',
-      r.distance,
+      r.code || '',
+      (r.status || '').toUpperCase(),
+      bibDrafts[r.id] ?? r.assignedBib ?? '',
+      r.distance || '',
       r.priceSnapshot || '',
-      r.fullName,
-      r.dni,
-      r.birthDate,
-      r.gender,
-      r.phone,
-      r.email,
-      r.city,
+      r.fullName || '',
+      r.dni || '',
+      r.birthDate || '',
+      r.gender || '',
+      r.phone || '',
+      r.email || '',
+      r.city || '',
       r.team || '',
-      r.shirtSize,
-      r.emergencyContactName,
-      r.emergencyContactPhone,
+      r.shirtSize || '',
+      r.emergencyContactName || '',
+      r.emergencyContactPhone || '',
       r.medicalNotes || '',
-      r.receiptUrl,
+      r.receiptUrl || '',
       r.createdAt ? new Date(r.createdAt).toLocaleString('es-AR') : '',
     ]);
 
-    const csvContent =
-      '\uFEFF' +
-      [headers, ...rows].map((row) => row.map(escapeCsv).join(',')).join('\n');
+    const titleRow = [
+      'RETO AL FILO - 2DA EDICIÓN (2027) · PLANILLA DE CORREDORES INSCRIPTOS',
+    ];
+    const subtitleRow = [
+      `Exportado el ${new Date().toLocaleString('es-AR')} · Total: ${registrations.length} inscriptos`,
+    ];
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `reto-al-filo-inscriptos-${new Date().toISOString().slice(0, 10)}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    const sheetData = [titleRow, subtitleRow, headers, ...rows];
+    const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+    const lastColIdx = headers.length - 1;
+    const lastColLetter = XLSX.utils.encode_col(lastColIdx);
+    const lastRowNumber = 3 + rows.length;
+
+    // Título y subtítulo combinados a lo ancho de todas las columnas de la tabla
+    ws['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: lastColIdx } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: lastColIdx } },
+    ];
+
+    // Autofiltro de tabla en la fila de encabezados (fila 3)
+    ws['!autofilter'] = { ref: `A3:${lastColLetter}${lastRowNumber}` };
+
+    // Alturas de filas para título, subtítulo y encabezados
+    ws['!rows'] = [{ hpt: 26 }, { hpt: 20 }, { hpt: 24 }];
+
+    // Autoajuste de ancho de columnas según encabezados y contenido
+    ws['!cols'] = headers.map((header, colIdx) => {
+      let maxLen = String(header).length;
+      for (const row of rows) {
+        const len = String(row[colIdx] ?? '').length;
+        if (len > maxLen) maxLen = len;
+      }
+      return { wch: Math.min(Math.max(maxLen + 3, 12), 48) };
+    });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Inscriptos');
+    XLSX.writeFile(
+      wb,
+      `reto-al-filo-inscriptos-${new Date().toISOString().slice(0, 10)}.xlsx`
+    );
   };
 
   const handleStationChange = (index, field, value) => {
@@ -1815,12 +1840,12 @@ export default function AdminModal({
 
                         <button
                           type="button"
-                          onClick={handleExportCsv}
+                          onClick={handleExportExcel}
                           disabled={registrations.length === 0}
                           className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 text-xs font-bold px-3.5 py-2 cursor-pointer disabled:opacity-40"
                         >
                           <Download className="w-3.5 h-3.5" />
-                          Exportar Excel (CSV)
+                          Exportar Excel (.XLSX)
                         </button>
                       </div>
                     </div>
