@@ -159,8 +159,8 @@ export default function AdminRegistrationsTab({
         aria-pressed={isActive}
         className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] transition-colors cursor-pointer ${
           isActive
-            ? 'bg-stone-950 border-red-500 ring-1 ring-red-500/70 text-white font-bold'
-            : 'bg-zinc-900/80 border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white font-medium'
+            ? 'bg-stone-950 border-red-500 ring-1 ring-red-500/50 text-white font-bold'
+            : 'bg-zinc-900/80 border-amber-500/60 text-zinc-200 hover:border-amber-400 hover:text-white font-medium'
         }`}
       >
         {hasDuplicates && (
@@ -665,7 +665,7 @@ export default function AdminRegistrationsTab({
                         placeholder="Dorsal"
                         className={
                           isDuplicateBib
-                            ? `w-12 rounded-lg bg-stone-950 border border-red-500 px-1 py-1 text-xs font-mono font-bold text-white text-center ${
+                            ? `w-12 rounded-lg bg-stone-950 border border-red-500 px-1 py-1 text-xs font-mono font-bold text-red-500 text-center ${
                                 isBibLocked
                                   ? 'cursor-default'
                                   : 'focus:border-red-400 focus:outline-none'
