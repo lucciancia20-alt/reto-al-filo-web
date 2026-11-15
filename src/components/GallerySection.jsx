@@ -70,6 +70,20 @@ export default function GallerySection() {
     };
   }, [selectedIndex, photos.length]);
 
+  // Precargar en segundo plano las fotos vecinas mientras el Lightbox está abierto
+  useEffect(() => {
+    if (selectedIndex === null || photos.length <= 1) return;
+    const prevIdx = (selectedIndex - 1 + photos.length) % photos.length;
+    const nextIdx = (selectedIndex + 1) % photos.length;
+    [prevIdx, nextIdx].forEach((idx) => {
+      const url = photos[idx]?.cloudinaryUrl;
+      if (url) {
+        const img = new Image();
+        img.src = url;
+      }
+    });
+  }, [selectedIndex, photos]);
+
   return (
     <section
       id="galeria"
@@ -182,48 +196,50 @@ export default function GallerySection() {
           onClick={() => setSelectedIndex(null)}
         >
           <div
-            className="relative max-w-3xl w-full rounded-3xl overflow-hidden overscroll-contain bg-stone-900 border border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
+            className="relative w-[90vw] max-w-4xl rounded-3xl overflow-hidden overscroll-contain bg-stone-900 border border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              type="button"
-              onClick={() => setSelectedIndex(null)}
-              aria-label="Cerrar vista previa"
-              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="relative w-full aspect-[4/3] min-h-[320px] sm:min-h-[480px] md:min-h-[560px] max-h-[75vh] bg-zinc-950/60 flex items-center justify-center">
+              <button
+                type="button"
+                onClick={() => setSelectedIndex(null)}
+                aria-label="Cerrar vista previa"
+                className="absolute top-3 right-3 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
 
-            {photos.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSelectedIndex((prev) => (prev - 1 + photos.length) % photos.length)
-                  }
-                  aria-label="Foto anterior"
-                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSelectedIndex((prev) => (prev + 1) % photos.length)
-                  }
-                  aria-label="Foto siguiente"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </>
-            )}
+              {photos.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSelectedIndex((prev) => (prev - 1 + photos.length) % photos.length)
+                    }
+                    aria-label="Foto anterior"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSelectedIndex((prev) => (prev + 1) % photos.length)
+                    }
+                    aria-label="Foto siguiente"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
 
-            <img
-              src={selectedPhoto.cloudinaryUrl}
-              alt={selectedPhoto.sector}
-              className="w-full max-h-[78vh] object-contain bg-stone-950"
-            />
+              <img
+                src={selectedPhoto.cloudinaryUrl}
+                alt={selectedPhoto.sector}
+                className="w-full h-full object-contain"
+              />
+            </div>
 
             <div className="p-4 sm:p-5 bg-zinc-900/55 backdrop-blur-md border-t border-stone-800/80 flex items-center justify-between gap-2">
               <div>

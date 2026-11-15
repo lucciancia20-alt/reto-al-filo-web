@@ -63,6 +63,19 @@ export default function AdminPhotosTab({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [previewIndex, galleryItems.length]);
 
+  useEffect(() => {
+    if (previewIndex === null || galleryItems.length <= 1) return;
+    const prevIdx = (previewIndex - 1 + galleryItems.length) % galleryItems.length;
+    const nextIdx = (previewIndex + 1) % galleryItems.length;
+    [prevIdx, nextIdx].forEach((idx) => {
+      const url = galleryItems[idx]?.cloudinaryUrl || galleryItems[idx]?.cloudinaryThumb;
+      if (url) {
+        const img = new Image();
+        img.src = url;
+      }
+    });
+  }, [previewIndex, galleryItems]);
+
   const handlePhotoDeleteClick = (item) => {
     if (confirmDeleteId !== item.id) {
       setConfirmDeleteId(item.id);
@@ -299,48 +312,50 @@ export default function AdminPhotosTab({
           onClick={() => setPreviewIndex(null)}
         >
           <div
-            className="relative max-w-3xl w-full rounded-3xl overflow-hidden overscroll-contain bg-stone-900 border border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
+            className="relative w-[90vw] max-w-4xl rounded-3xl overflow-hidden overscroll-contain bg-stone-900 border border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              type="button"
-              onClick={() => setPreviewIndex(null)}
-              aria-label="Cerrar vista previa"
-              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="relative w-full aspect-[4/3] min-h-[320px] sm:min-h-[480px] md:min-h-[560px] max-h-[75vh] bg-zinc-950/60 flex items-center justify-center">
+              <button
+                type="button"
+                onClick={() => setPreviewIndex(null)}
+                aria-label="Cerrar vista previa"
+                className="absolute top-3 right-3 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
 
-            {galleryItems.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setPreviewIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length)
-                  }
-                  aria-label="Foto anterior"
-                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setPreviewIndex((prev) => (prev + 1) % galleryItems.length)
-                  }
-                  aria-label="Foto siguiente"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </>
-            )}
+              {galleryItems.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPreviewIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length)
+                    }
+                    aria-label="Foto anterior"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPreviewIndex((prev) => (prev + 1) % galleryItems.length)
+                    }
+                    aria-label="Foto siguiente"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
 
-            <img
-              src={galleryItems[previewIndex].cloudinaryUrl || galleryItems[previewIndex].cloudinaryThumb}
-              alt={galleryItems[previewIndex].sector}
-              className="w-full max-h-[78vh] object-contain bg-stone-950"
-            />
+              <img
+                src={galleryItems[previewIndex].cloudinaryUrl || galleryItems[previewIndex].cloudinaryThumb}
+                alt={galleryItems[previewIndex].sector}
+                className="w-full h-full object-contain"
+              />
+            </div>
 
             <div className="p-4 sm:p-5 bg-zinc-900/55 backdrop-blur-md border-t border-stone-800/80 flex items-center justify-between gap-2">
               <div>
