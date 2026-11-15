@@ -43,6 +43,12 @@ export default function AdminRegistrationsTab({
   const [sortConfig, setSortConfig] = useState({ field: null, direction: 'asc' });
 
   const handleSort = (field) => {
+    if (
+      (regStatusFilter === 'duplicados_dorsal' || regStatusFilter === 'duplicados_dni') &&
+      filteredRegistrations.length === 0
+    ) {
+      setRegStatusFilter('all');
+    }
     setSortConfig((prev) =>
       prev.field === field
         ? { field, direction: prev.direction === 'asc' ? 'desc' : 'asc' }
@@ -576,13 +582,11 @@ export default function AdminRegistrationsTab({
                       }
                       className={`inline-flex items-center gap-1 rounded-lg font-display font-black text-[10px] sm:text-[11px] uppercase px-2 py-1 transition-colors ${
                         isAlreadySaved
-                          ? 'bg-stone-950 text-emerald-400/70 border border-emerald-500/40 cursor-default'
+                          ? 'bg-zinc-950 text-zinc-400 border border-emerald-500/70 cursor-default'
                           : 'bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/70 cursor-pointer disabled:opacity-50'
                       }`}
                     >
-                      <CheckCircle2
-                        className={`w-3.5 h-3.5 ${isAlreadySaved ? 'text-emerald-400' : ''}`}
-                      />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                       {isAlreadySaved
                         ? 'Confirmado'
                         : isConfirmed
