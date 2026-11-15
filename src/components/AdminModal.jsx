@@ -1445,7 +1445,7 @@ export default function AdminModal({
                 <button
                   type="button"
                   onClick={handleSafeClose}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold px-4 py-2.5 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 text-xs font-semibold px-4 py-2.5 transition-colors cursor-pointer"
                 >
                   Cerrar Panel
                 </button>

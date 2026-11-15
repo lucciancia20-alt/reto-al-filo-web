@@ -312,41 +312,42 @@ export default function AdminPhotosTab({
                   onDragLeave={() => handleDragLeave(item)}
                   onDrop={(e) => handleDrop(e, item)}
                   onDragEnd={handleDragEnd}
-                  className={`rounded-xl overflow-hidden bg-stone-900 border border-stone-800 flex flex-col cursor-grab active:cursor-grabbing transition-all ${
+                  onClick={() => setPreviewIndex(idx)}
+                  className={`relative aspect-[4/3] rounded-xl overflow-hidden bg-zinc-950 border border-orange-500/75 hover:border-orange-400 cursor-grab active:cursor-grabbing transition-all group ${
                     isDragOver ? 'ring-2 ring-orange-400 scale-[1.02]' : ''
                   } ${isDragged ? 'opacity-60' : ''}`}
                 >
-                  <div
-                    onClick={() => setPreviewIndex(idx)}
-                    className="relative aspect-[16/10] bg-stone-950 overflow-hidden cursor-pointer group"
+                  <img
+                    src={item.cloudinaryThumb}
+                    alt={item.sector}
+                    draggable={false}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 rounded-full bg-orange-500 text-zinc-950 font-bold text-[10px] px-2 py-0.5 shadow-md">
+                    ✓ Publicada en la web
+                  </span>
+                  <button
+                    type="button"
+                    draggable={false}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPreviewIndex(idx);
+                    }}
+                    aria-label={`Ampliar postal ${item.sector}`}
+                    className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-md border border-orange-500/70 hover:border-orange-400 text-orange-400 flex items-center justify-center cursor-pointer transition-all"
                   >
-                    <img
-                      src={item.cloudinaryThumb}
-                      alt={item.sector}
-                      draggable={false}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-orange-500 text-zinc-950 font-bold text-[10px] px-2 py-0.5 shadow-md">
-                      ✓ Publicada en la web
-                    </span>
-                    <button
-                      type="button"
-                      draggable={false}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setPreviewIndex(idx);
-                      }}
-                      aria-label={`Ampliar postal ${item.sector}`}
-                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-md border border-orange-500/70 hover:border-orange-400 text-orange-400 flex items-center justify-center cursor-pointer transition-all"
-                    >
-                      <Maximize2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  <div className="p-2 flex items-center justify-between gap-2">
+                    <Maximize2 className="w-3.5 h-3.5" />
+                  </button>
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute bottom-0 inset-x-0 z-10 px-2.5 py-2 bg-zinc-950/20 backdrop-blur-sm border-t-2 border-orange-500/80 flex items-center justify-between gap-2"
+                  >
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <GripVertical className="w-3.5 h-3.5 text-stone-500 shrink-0" />
-                      <span className="text-[11px] text-stone-200 truncate">{item.sector}</span>
+                      <GripVertical className="w-3.5 h-3.5 text-stone-200 shrink-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
+                      <span className="text-[11px] font-medium text-white truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                        {item.sector}
+                      </span>
                     </div>
                     <button
                       type="button"
@@ -365,7 +366,7 @@ export default function AdminPhotosTab({
                       className={`rounded-lg cursor-pointer shrink-0 transition-colors disabled:opacity-40 ${
                         confirmDeleteId === item.id
                           ? 'px-2 py-1 text-[10px] font-bold bg-zinc-950 border border-red-500 text-red-400'
-                          : 'p-1.5 text-stone-400 hover:text-red-500 hover:bg-stone-800'
+                          : 'p-1.5 text-stone-100 hover:text-red-400 hover:bg-zinc-900/40 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]'
                       }`}
                     >
                       {confirmDeleteId === item.id ? '¿Borrar?' : <Trash2 className="w-3.5 h-3.5" />}
