@@ -68,7 +68,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-2 pb-8 sm:pt-3 sm:pb-10 -mt-2 md:-mt-4 text-center flex flex-col items-center">
         {/* Etiqueta superior de aventura */}
-        <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950/30 backdrop-blur-[2px] border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-orange-400 mb-3.5 shadow-[0_0_14px_rgba(249,115,22,0.3)]">
+        <div className="inline-flex items-center gap-2 rounded-full bg-zinc-900/35 backdrop-blur-sm border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-orange-400 mb-3.5 shadow-[0_0_14px_rgba(249,115,22,0.3)]">
           <Calendar className="w-4 h-4 text-orange-500 shrink-0" />
           <span>
             {raceConfig.subtitle} · {targetDateParts.formattedDayMonth} · {targetDateParts.formattedTime}
@@ -76,22 +76,26 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         </div>
 
         {/* Título central imponente */}
-        <h1 className="max-w-3xl mx-auto text-balance font-display text-3xl md:text-4xl font-black tracking-tight text-white uppercase leading-[1.08] section-title-stroke">
-          RETO AL FILO{' '}
-          <span className="whitespace-nowrap">
-            2<span className="lowercase text-2xl md:text-4xl font-black align-baseline">da</span> EDICIÓN
-          </span>
-        </h1>
+        <div className="max-w-3xl mx-auto px-6 py-4 rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.28)]">
+          <h1 className="text-balance font-display text-3xl md:text-4xl font-black tracking-tight text-white uppercase leading-[1.08] section-title-stroke">
+            RETO AL FILO{' '}
+            <span className="whitespace-nowrap">
+              2<span className="lowercase text-2xl md:text-4xl font-black align-baseline">da</span> EDICIÓN
+            </span>
+          </h1>
 
-        <p className="mt-2 text-lg sm:text-2xl font-bold uppercase tracking-[0.22em] text-orange-500">
-          {raceConfig.subtitle}
-        </p>
+          <p className="mt-2 text-lg sm:text-2xl font-bold uppercase tracking-[0.22em] text-orange-500">
+            {raceConfig.subtitle}
+          </p>
+        </div>
 
-        <p className="mt-2.5 max-w-xl text-balance text-sm sm:text-base text-stone-200 leading-relaxed">
-          Desafiá las crestas técnicas, el bosque de altura y los senderos serranos en dos
-          distancias diseñadas para corredores de montaña: <strong className="text-white">27K Competitivo</strong> y{' '}
-          <strong className="text-white">13K Competitivo</strong>.
-        </p>
+        <div className="mt-3 max-w-2xl mx-auto px-6 py-3.5 rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.28)]">
+          <p className="text-balance text-sm sm:text-base text-white leading-relaxed">
+            Desafiá las crestas técnicas, el bosque de altura y los senderos serranos en dos
+            distancias diseñadas para corredores de montaña: <strong className="text-white">27K Competitivo</strong> y{' '}
+            <strong className="text-white">13K Competitivo</strong>.
+          </p>
+        </div>
 
         {/* Contador regresivo dinámico hacia la fecha y hora de largada */}
         <div className="mt-5 w-full max-w-md">
@@ -108,7 +112,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
             {timeUnits.map((unit) => (
               <div
                 key={unit.label}
-                className="rounded-2xl bg-zinc-950/30 backdrop-blur-[2px] border border-orange-500 py-2.5 px-2 sm:py-3 shadow-[0_0_16px_rgba(249,115,22,0.35)]"
+                className="rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500 py-2.5 px-2 sm:py-3 shadow-[0_0_16px_rgba(249,115,22,0.35)]"
               >
                 <div className="font-display text-2xl sm:text-4xl font-black text-white tabular-nums tracking-tight">
                   {unit.value}
@@ -134,7 +138,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
           <a
             href="#circuito"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-zinc-950/30 hover:bg-zinc-950/45 backdrop-blur-[2px] text-orange-400 hover:text-orange-300 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.45)] font-semibold text-sm sm:text-base px-6 py-3 sm:py-3.5 transition-all"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm text-orange-400 hover:text-orange-300 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.45)] font-semibold text-sm sm:text-base px-6 py-3 sm:py-3.5 transition-all"
           >
             Ver Circuito y Altimetría
           </a>
@@ -142,7 +146,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
         <a
           href="#consultar-dorsal"
-          className="mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-zinc-950/30 hover:bg-zinc-950/45 backdrop-blur-[2px] border border-orange-500/70 hover:border-orange-400 px-3.5 py-1.5 text-xs font-semibold text-orange-400 hover:text-orange-300 transition-colors"
+          className="mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm border border-orange-500/70 hover:border-orange-400 px-3.5 py-1.5 text-xs font-semibold text-orange-400 hover:text-orange-300 transition-colors"
         >
           <Search className="w-3.5 h-3.5 text-orange-400 shrink-0" />
           <span>¿Ya te inscribiste? Consultar mi estado y dorsal →</span>
