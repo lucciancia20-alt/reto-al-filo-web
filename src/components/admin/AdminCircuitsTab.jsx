@@ -126,7 +126,7 @@ export default function AdminCircuitsTab({
               >
                 <div className="w-24 shrink-0">
                   <label className="block w-full text-center text-[10px] font-semibold tracking-wider text-stone-400 mb-1.5">
-                    KILÓMETROS
+                    KILÓMETRO
                   </label>
                   <input
                     type="number"
