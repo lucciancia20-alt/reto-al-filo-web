@@ -31,9 +31,9 @@ export default function Footer({
             <button
               type="button"
               onClick={onOpenAdmin}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-300 hover:text-amber-400 border border-orange-500/60 hover:border-orange-400 text-xs font-semibold px-4 py-3 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-300 hover:text-orange-400 border border-orange-500/60 hover:border-orange-400 text-xs font-semibold px-4 py-3 transition-colors cursor-pointer"
             >
-              <Settings className="w-3.5 h-3.5 text-amber-400" />
+              <Settings className="w-3.5 h-3.5 text-orange-400" />
               Panel Admin
             </button>
           )}

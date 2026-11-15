@@ -248,7 +248,7 @@ export default function CircuitSection({
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Encabezado */}
         <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3 py-0.5 text-[11px] font-bold uppercase tracking-widest text-amber-400">
+          <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3 py-0.5 text-[11px] font-bold uppercase tracking-widest text-orange-400">
             <Compass className="w-3.5 h-3.5" />
             <span>Circuito GPX Oficial y Altimetría Real</span>
           </div>
@@ -304,7 +304,7 @@ export default function CircuitSection({
           {/* Barra superior */}
           <div className="px-3.5 sm:px-5 py-2 bg-stone-950/75 border-b border-orange-500/40 flex flex-wrap items-center justify-between gap-2.5">
             <div className="flex items-center gap-2.5">
-              <span className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0">
+              <span className="w-8 h-8 rounded-xl bg-orange-500/10 border border-orange-500/40 text-orange-400 flex items-center justify-center shrink-0">
                 <MapIcon className="w-4 h-4" />
               </span>
               <div>
@@ -312,7 +312,7 @@ export default function CircuitSection({
                   <h3 className="font-display font-extrabold text-sm sm:text-base text-white uppercase">
                     Track GPX Real · {currentCircuit.tabLabel}
                   </h3>
-                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-950 border border-orange-500/70 text-orange-400">
                     {currentCircuit.summaryBadge}
                   </span>
                 </div>
@@ -327,9 +327,9 @@ export default function CircuitSection({
                 <a
                   href={track.gpxDownloadUrl}
                   download={`reto-al-filo-${activeDistance.toLowerCase()}.gpx`}
-                  className="inline-flex items-center gap-1.5 bg-stone-800 hover:bg-stone-700 text-stone-100 border border-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.25)] hover:border-orange-400 px-3 py-1.5 rounded-xl transition-colors"
+                  className="inline-flex items-center gap-1.5 bg-zinc-950 hover:bg-stone-900 text-orange-400 border border-orange-500/70 shadow-[0_0_10px_rgba(249,115,22,0.25)] hover:border-orange-400 px-3 py-1.5 rounded-xl transition-colors"
                 >
-                  <Download className="w-3.5 h-3.5 text-amber-400" />
+                  <Download className="w-3.5 h-3.5 text-orange-400" />
                   Descargar .GPX
                 </a>
               )}
@@ -337,7 +337,7 @@ export default function CircuitSection({
                 <Droplets className="w-3.5 h-3.5" />
                 {stations.length} Puestos PA
               </span>
-              <span className="inline-flex items-center gap-1.5 text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2.5 py-1.5 rounded-xl">
+              <span className="inline-flex items-center gap-1.5 text-orange-400 bg-orange-500/10 border border-orange-500/30 px-2.5 py-1.5 rounded-xl">
                 <Navigation className="w-3.5 h-3.5" />
                 {currentCircuit.elevationGain} D+
               </span>
@@ -351,7 +351,7 @@ export default function CircuitSection({
               <div className="lg:col-span-5 rounded-2xl bg-stone-950/90 border border-orange-500/80 shadow-[0_0_14px_rgba(249,115,22,0.18)] p-2.5 sm:p-3 flex flex-col justify-between">
                 <div className="flex items-center justify-between text-xs mb-1.5">
                   <span className="font-display font-bold uppercase tracking-wider text-stone-200 flex items-center gap-1.5">
-                    <Compass className="w-3.5 h-3.5 text-amber-400" />
+                    <Compass className="w-3.5 h-3.5 text-orange-400" />
                     Trazado GPS ({String(track.totalKm).replace('.', ',')} km)
                   </span>
                   <span className="font-mono text-[10px] text-stone-400 bg-stone-900 px-2 py-0.5 rounded border border-orange-500/50">
@@ -369,7 +369,7 @@ export default function CircuitSection({
                   <path
                     d={mapSvg.path}
                     fill="none"
-                    stroke="#f59e0b"
+                    stroke="#f97316"
                     strokeOpacity="0.2"
                     strokeWidth="8"
                     strokeLinecap="round"
@@ -379,7 +379,7 @@ export default function CircuitSection({
                   <path
                     d={mapSvg.path}
                     fill="none"
-                    stroke="#f59e0b"
+                    stroke="#f97316"
                     strokeWidth="2.8"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -419,7 +419,7 @@ export default function CircuitSection({
                           cx={peakPos.x}
                           cy={peakPos.y}
                           r="7"
-                          fill="#f59e0b"
+                          fill="#f97316"
                           stroke="#0c0a09"
                           strokeWidth="2"
                         />
@@ -427,7 +427,7 @@ export default function CircuitSection({
                           x={peakPos.x}
                           y={peakPos.y - 11}
                           textAnchor="middle"
-                          className="fill-amber-300 text-[10px] font-bold"
+                          className="fill-orange-400 text-[10px] font-bold"
                         >
                           Cumbre {track.maxAlt}m
                         </text>
@@ -466,8 +466,8 @@ export default function CircuitSection({
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
                     Largada / Meta
                   </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
+                  <span className="inline-flex items-center gap-1.5 text-orange-400">
+                    <span className="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block" />
                     Cumbre ({track.maxAlt}m)
                   </span>
                   <span className="inline-flex items-center gap-1.5">
@@ -481,10 +481,10 @@ export default function CircuitSection({
               <div className="lg:col-span-7 rounded-2xl bg-stone-950/90 border border-orange-500/80 shadow-[0_0_14px_rgba(249,115,22,0.18)] p-2.5 sm:p-3 flex flex-col justify-between">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5 text-xs">
                   <span className="font-display font-bold uppercase tracking-wider text-stone-200 flex items-center gap-1.5">
-                    <Mountain className="w-3.5 h-3.5 text-amber-400" />
+                    <Mountain className="w-3.5 h-3.5 text-orange-400" />
                     Perfil de Altimetría Real ({track.minAlt}m – {track.maxAlt}m)
                   </span>
-                  <span className="font-mono text-[11px] text-amber-300 bg-stone-900 px-2.5 py-0.5 rounded border border-orange-500/50">
+                  <span className="font-mono text-[11px] text-orange-400 bg-stone-900 px-2.5 py-0.5 rounded border border-orange-500/60">
                     {hoverPoint
                       ? `KM ${hoverPoint.km.toFixed(1)} · ${hoverPoint.alt} msnm`
                       : `Pasá el dedo o mouse para ver altitud`}
@@ -508,8 +508,8 @@ export default function CircuitSection({
                   >
                     <defs>
                       <linearGradient id="elevationFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.45" />
-                        <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.02" />
+                        <stop offset="0%" stopColor="#f97316" stopOpacity="0.45" />
+                        <stop offset="100%" stopColor="#f97316" stopOpacity="0.02" />
                       </linearGradient>
                     </defs>
 
@@ -546,7 +546,7 @@ export default function CircuitSection({
                     <path
                       d={elevationSvg.linePath}
                       fill="none"
-                      stroke="#f59e0b"
+                      stroke="#f97316"
                       strokeWidth="3"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -579,7 +579,7 @@ export default function CircuitSection({
                             y1={pos.y}
                             x2={pos.x}
                             y2={elevationSvg.baselineY}
-                            stroke="#f59e0b"
+                            stroke="#f97316"
                             strokeDasharray="2 3"
                             strokeWidth="1.2"
                             opacity="0.7"
@@ -588,7 +588,7 @@ export default function CircuitSection({
                             cx={pos.x}
                             cy={pos.y}
                             r="6"
-                            fill="#f59e0b"
+                            fill="#f97316"
                             stroke="#0c0a09"
                             strokeWidth="2"
                           />
@@ -596,7 +596,7 @@ export default function CircuitSection({
                             x={pos.x}
                             y={pos.y - 10}
                             textAnchor="middle"
-                            className="fill-amber-300 text-[10px] font-bold"
+                            className="fill-orange-400 text-[10px] font-bold"
                           >
                             Cumbre {peakPoint.alt}m
                           </text>
@@ -659,7 +659,7 @@ export default function CircuitSection({
                               cy={hp.y}
                               r="5"
                               fill="#ffffff"
-                              stroke="#f59e0b"
+                              stroke="#f97316"
                               strokeWidth="2.5"
                             />
                           </g>
@@ -693,7 +693,7 @@ export default function CircuitSection({
               <button
                 type="button"
                 onClick={() => onOpenModalWithDistance(activeDistance)}
-                className="inline-flex items-center gap-2 rounded-xl bg-amber-500/15 hover:bg-amber-500 text-amber-300 hover:text-stone-950 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.3)] font-display font-bold text-xs uppercase tracking-wider px-3.5 py-1.5 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-[0_0_12px_rgba(245,158,11,0.3)] font-display font-bold text-xs uppercase tracking-wider px-3.5 py-1.5 transition-all cursor-pointer"
               >
                 <Flame className="w-4 h-4" />
                 Inscribirme en {activeDistance}
@@ -711,7 +711,7 @@ export default function CircuitSection({
                 key={stat.label}
                 className="rounded-2xl bg-stone-900/75 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] px-3.5 py-2.5 flex items-center gap-3 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
               >
-                <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/35 text-orange-400 flex items-center justify-center shrink-0">
                   <IconComponent className="w-4 h-4" />
                 </div>
                 <div>
@@ -742,11 +742,11 @@ export default function CircuitSection({
             <div className="mt-4 rounded-2xl bg-stone-900/75 border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.18)] p-4 sm:p-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 pb-3 border-b border-orange-500/25">
                 <div className="flex items-center gap-2.5">
-                  <span className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/35 text-amber-400 flex items-center justify-center shrink-0">
+                  <span className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/35 text-orange-400 flex items-center justify-center shrink-0">
                     <PackageCheck className="w-4 h-4" />
                   </span>
                   <div>
-                    <span className="block text-[10px] font-bold uppercase tracking-widest text-amber-400">
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
                       Kit del Corredor y Cobertura Oficial
                     </span>
                     <h3 className="font-display text-base sm:text-lg font-black text-white uppercase leading-tight">

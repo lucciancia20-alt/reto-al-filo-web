@@ -56,7 +56,7 @@ export default function GallerySection() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Encabezado limpio de muestra fotográfica de la 1ra Edición */}
         <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
+          <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
             <Camera className="w-3.5 h-3.5" />
             <span>Galería · 1ra Edición</span>
           </div>
@@ -89,7 +89,7 @@ export default function GallerySection() {
                   setSelectedPhoto(photo);
                 }
               }}
-              className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-stone-900 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+              className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-stone-900 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
             >
               <div className={`w-full overflow-hidden bg-stone-900 ${photo.aspectClass}`}>
                 <img
@@ -116,7 +116,7 @@ export default function GallerySection() {
                 </div>
 
                 <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-orange-400">
                     1ra Edición · Reto al Filo
                   </span>
                   <p className="text-sm font-bold text-white">{photo.sector}</p>
@@ -156,7 +156,7 @@ export default function GallerySection() {
             />
 
             <div className="p-4 sm:p-5 bg-stone-950 border-t border-stone-800">
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-orange-400">
                 1ra Edición · Reto al Filo
               </span>
               <p className="mt-0.5 text-sm sm:text-base font-bold text-white">

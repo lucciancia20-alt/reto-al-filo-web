@@ -25,7 +25,7 @@ export default function Navbar({ onOpenModal }) {
           />
           <span className="leading-none">
             RETO AL FILO
-            <span className="block text-[10px] font-sans font-semibold tracking-widest text-amber-400 uppercase mt-0.5">
+            <span className="block text-[10px] font-sans font-semibold tracking-widest text-orange-400 uppercase mt-0.5">
               2da Edición · 2027
             </span>
           </span>

@@ -91,7 +91,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           {/* Parte 1: Línea de Tiempo (Cronograma del Día) */}
           <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
+            <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
               <Clock className="w-3.5 h-3.5" />
               <span>Cronograma Oficial · {formattedFullDate}</span>
             </div>
@@ -106,7 +106,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
           </div>
 
           {/* Línea de tiempo vertical con los horarios del día */}
-          <div className="mt-3.5 sm:mt-4 max-w-2xl mx-auto relative pl-6 sm:pl-8 before:content-[''] before:absolute before:left-2.5 sm:before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-amber-500 before:via-amber-500/50 before:to-stone-800 space-y-2.5">
+          <div className="mt-3.5 sm:mt-4 max-w-2xl mx-auto relative pl-6 sm:pl-8 before:content-[''] before:absolute before:left-2.5 sm:before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-orange-500 before:via-orange-500/50 before:to-stone-800 space-y-2.5">
             {syncedSchedule.map((item, idx) => (
               <div
                 key={`${item.time}-${idx}`}
@@ -116,8 +116,8 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 <span
                   className={`absolute -left-[25px] sm:-left-[29px] top-5 w-4 h-4 rounded-full border-2 ${
                     idx === 2
-                      ? 'bg-amber-400 border-stone-950 ring-4 ring-amber-500/30'
-                      : 'bg-stone-950 border-amber-400'
+                      ? 'bg-orange-500 border-stone-950 ring-4 ring-orange-500/30'
+                      : 'bg-stone-950 border-orange-500'
                   }`}
                 />
 
@@ -128,7 +128,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                         {item.day}
                       </span>
                     )}
-                    <span className="font-mono text-sm sm:text-base font-extrabold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-lg">
+                    <span className="font-mono text-sm sm:text-base font-extrabold text-orange-400 bg-orange-500/10 border border-orange-500/40 px-3 py-1 rounded-lg">
                       {item.time}
                     </span>
                   </div>
@@ -156,7 +156,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
+            <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
               <Award className="w-3.5 h-3.5" />
               <span>Clasificación Oficial · Damas y Caballeros</span>
             </div>
@@ -166,7 +166,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             </h2>
             <p className="mt-1.5 max-w-2xl mx-auto text-balance text-xs sm:text-sm text-stone-300">
               Aplicable tanto para <strong className="text-cyan-400">27K Competitivo</strong> como para{' '}
-              <strong className="text-red-400">13K Competitivo</strong> en ramas Damas y Caballeros.
+              <strong className="text-red-500">13K Competitivo</strong> en ramas Damas y Caballeros.
             </p>
           </div>
 
@@ -174,7 +174,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             {/* Resumen de Premiación */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div className="rounded-2xl bg-stone-900/80 border border-orange-500/70 p-3.5">
-                <span className="block text-[10px] font-bold uppercase tracking-widest text-amber-400">
+                <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
                   Clasificación General
                 </span>
                 <p className="mt-1 text-xs sm:text-sm font-bold text-white">
@@ -182,7 +182,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 </p>
               </div>
               <div className="rounded-2xl bg-stone-900/80 border border-orange-500/70 p-3.5">
-                <span className="block text-[10px] font-bold uppercase tracking-widest text-amber-400">
+                <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
                   Premiación por Categorías
                 </span>
                 <p className="mt-1 text-xs sm:text-sm font-bold text-white">
@@ -197,7 +197,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
-                      <tr className="bg-stone-950 border-b border-orange-500/35 text-[11px] uppercase tracking-wider text-amber-400">
+                      <tr className="bg-stone-950 border-b border-orange-500/35 text-[11px] uppercase tracking-wider text-orange-400">
                         <th className="px-4 py-2.5 font-extrabold">Franja Etaria</th>
                         <th className="px-4 py-2.5 font-extrabold text-right">Ramas y Distancias</th>
                       </tr>
@@ -213,7 +213,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                           </td>
                           <td className="px-4 py-2.5 text-right text-[11px] sm:text-xs text-stone-300">
                             Damas / Caballeros · <span className="text-cyan-400 font-bold">27K</span> y{' '}
-                            <span className="text-red-400 font-bold">13K</span>
+                            <span className="text-red-500 font-bold">13K</span>
                           </td>
                         </tr>
                       ))}
@@ -224,8 +224,8 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             )}
 
             {ageCategories.ruleNote && (
-              <div className="rounded-xl bg-amber-500/10 border border-amber-500/35 px-4 py-2.5 text-xs text-amber-100 leading-relaxed">
-                <strong className="text-amber-300">Criterio reglamentario: </strong>
+              <div className="rounded-xl bg-orange-500/10 border border-orange-500/40 px-4 py-2.5 text-xs text-orange-100 leading-relaxed">
+                <strong className="text-orange-400">Criterio reglamentario: </strong>
                 {ageCategories.ruleNote}
               </div>
             )}
@@ -241,7 +241,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="rounded-3xl bg-stone-950 border border-orange-500/80 shadow-[0_0_24px_rgba(249,115,22,0.18)] p-5 sm:p-6">
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-amber-400">
+              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-orange-400">
                 <Search className="w-3.5 h-3.5" />
                 <span>Consultor Oficial de Corredores</span>
               </div>
@@ -249,7 +249,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 ¿Ya te inscribiste? Consultá tu Estado y Dorsal
               </h2>
               <p className="mt-1 text-xs sm:text-sm text-stone-300">
-                Ingresá tu DNI (sin puntos) o tu código <span className="font-mono text-amber-300">RAF-XXXXX</span> para verificar confirmación, talle y número asignado.
+                Ingresá tu DNI (sin puntos) o tu código <span className="font-mono text-orange-400">RAF-XXXXX</span> para verificar confirmación, talle y número asignado.
               </p>
             </div>
 
@@ -265,7 +265,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   onChange={(e) => setLookupQuery(e.target.value)}
                   placeholder="Ej: 30123456 o RAF-12345"
                   aria-label="DNI o código de inscripción RAF"
-                  className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-amber-400 focus:outline-none pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-stone-500 font-mono"
+                  className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-stone-500 font-mono"
                 />
               </div>
               <button
@@ -302,13 +302,13 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                         }
                       : isRejected
                         ? {
-                            wrapper: 'border-rose-500/60 bg-rose-500/10',
-                            pill: 'bg-rose-500/20 border-rose-400 text-rose-300',
+                            wrapper: 'border-red-500/60 bg-red-500/10',
+                            pill: 'bg-red-500/20 border-red-500 text-red-400',
                             label: 'Observada / Rechazada',
                           }
                         : {
-                            wrapper: 'border-amber-500/60 bg-amber-500/10',
-                            pill: 'bg-amber-500/20 border-amber-400 text-amber-300',
+                            wrapper: 'border-orange-500/60 bg-orange-500/10',
+                            pill: 'bg-orange-500/20 border-orange-500 text-orange-400',
                             label: 'Pendiente de Verificación',
                           };
 
@@ -338,7 +338,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
 
                           <div className="font-display font-black text-base sm:text-lg text-white">
                             {isConfirmed ? (
-                              <span className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 border border-orange-500 px-3 py-1 text-amber-300">
+                              <span className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 border border-orange-500 px-3 py-1 text-orange-400">
                                 Dorsal:{' '}
                                 <span className="text-white">
                                   {st.assignedBib ? `#${st.assignedBib}` : 'A asignar en mesa'}
@@ -359,7 +359,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                             </span>
                             <strong
                               className={
-                                st.distance === '27K' ? 'text-cyan-400 font-bold' : 'text-red-400 font-bold'
+                                st.distance === '27K' ? 'text-cyan-400 font-bold' : 'text-red-500 font-bold'
                               }
                             >
                               {st.distance} Competitivo
@@ -370,7 +370,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                             <span className="text-stone-400 block text-[10px] uppercase font-bold">
                               Talle Reservado
                             </span>
-                            <strong className="text-amber-300">{st.shirtSize || 'A confirmar'}</strong>
+                            <strong className="text-orange-400">{st.shirtSize || 'A confirmar'}</strong>
                           </div>
 
                           <div className="rounded-xl bg-stone-950/75 border border-stone-800 px-3 py-2">
@@ -384,14 +384,14 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                         </div>
 
                         {!isConfirmed && !isRejected && (
-                          <p className="text-xs text-amber-100/90">
+                          <p className="text-xs text-orange-100/90">
                             Tu comprobante está en cola de verificación manual por la organización. Apenas confirmemos el pago verás acá tu número de dorsal asignado.
                           </p>
                         )}
 
                         {isRejected ? (
                           <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-                            <p className="text-xs text-rose-200">
+                            <p className="text-xs text-red-200">
                               Hay una observación con tu inscripción o comprobante. Contactanos para resolverlo rápido:
                             </p>
                             {orgDigits && (
@@ -423,7 +423,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                               <button
                                 type="button"
                                 onClick={() => openPrintableMedicalCert({ raceConfig })}
-                                className="inline-flex items-center gap-1 rounded-lg bg-stone-950 hover:bg-stone-800 text-amber-300 border border-orange-500/70 font-bold text-[11px] uppercase px-2.5 py-1.5 transition-colors cursor-pointer"
+                                className="inline-flex items-center gap-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-[11px] uppercase px-2.5 py-1.5 transition-colors cursor-pointer"
                               >
                                 <FileCheck2 className="w-3.5 h-3.5" />
                                 Apto Médico A4
@@ -437,7 +437,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 ) : (
                   <div className="rounded-2xl border border-stone-700 bg-stone-900/90 p-4 text-xs text-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-start gap-2.5">
-                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      <AlertCircle className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
                       <span>
                         {lookupResult.invalidQuery
                           ? 'Ingresá un número de DNI (sin puntos) o tu código RAF-XXXXX para realizar la consulta.'
@@ -472,7 +472,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
+            <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Información Clave para el Corredor</span>
             </div>
@@ -504,7 +504,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                     className="w-full px-4 sm:px-5 py-3.5 sm:py-4 text-left flex items-center justify-between gap-4 cursor-pointer"
                   >
                     <div className="flex items-center gap-3.5">
-                      <span className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
+                      <span className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/40 text-orange-400 flex items-center justify-center shrink-0">
                         <IconComponent className="w-5 h-5" />
                       </span>
                       <span className="font-display text-base sm:text-lg font-extrabold text-white">
@@ -513,7 +513,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                     </div>
 
                     <ChevronDown
-                      className={`w-5 h-5 text-amber-400 shrink-0 transition-transform duration-200 ${
+                      className={`w-5 h-5 text-orange-400 shrink-0 transition-transform duration-200 ${
                         isOpen ? 'rotate-180' : ''
                       }`}
                     />
@@ -544,13 +544,13 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                             </div>
 
                             <div className="rounded-xl bg-stone-950 border border-red-500/60 p-3.5">
-                              <span className="inline-flex items-center gap-1.5 text-xs font-display font-black uppercase tracking-wider text-red-400">
+                              <span className="inline-flex items-center gap-1.5 text-xs font-display font-black uppercase tracking-wider text-red-500">
                                 13K Competitivo
                               </span>
                               <ul className="mt-2 space-y-1.5 text-xs text-stone-200">
                                 {gear13.map((item, idx) => (
                                   <li key={`gear13-${idx}`} className="flex items-start gap-2">
-                                    <CheckCircle2 className="w-3.5 h-3.5 text-red-400 shrink-0 mt-0.5" />
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
                                     <span>{item}</span>
                                   </li>
                                 ))}
@@ -559,7 +559,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                           </div>
 
                           {mandatoryGear.note && (
-                            <p className="text-[11px] text-amber-200/90 bg-amber-500/10 border border-amber-500/30 rounded-lg px-3 py-2">
+                            <p className="text-[11px] text-orange-200 bg-orange-500/10 border border-orange-500/40 rounded-lg px-3 py-2">
                               {mandatoryGear.note}
                             </p>
                           )}
@@ -580,7 +580,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                           <button
                             type="button"
                             onClick={() => openPrintableMedicalCert({ raceConfig })}
-                            className="inline-flex items-center gap-2 rounded-xl bg-stone-950 hover:bg-stone-800 text-amber-300 border border-orange-500/70 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-colors cursor-pointer"
                           >
                             <FileCheck2 className="w-4 h-4 shrink-0" />
                             <span>Modelo de Apto Médico (A4 / PDF)</span>
@@ -590,8 +590,8 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
 
                       {faq.id === 'como-llegar' && (
                         <div className="mt-3.5 grid grid-cols-1 md:grid-cols-3 gap-2.5">
-                          <div className="rounded-xl bg-stone-950 border border-amber-500/45 p-3 space-y-1.5">
-                            <span className="inline-flex items-center gap-1.5 text-[11px] font-display font-black uppercase tracking-wider text-amber-300">
+                          <div className="rounded-xl bg-stone-950 border border-orange-500/50 p-3 space-y-1.5">
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-display font-black uppercase tracking-wider text-orange-400">
                               <PackageCheck className="w-4 h-4 shrink-0" />
                               Checklist para Retirar Kit
                             </span>
@@ -645,7 +645,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             {/* Acceso directo permanente a Documentos Imprimibles A4 */}
             <div className="rounded-2xl bg-stone-900/90 border border-orange-500/70 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <span className="block text-[10px] font-bold uppercase tracking-widest text-amber-400">
+                <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
                   Documentación para Acreditación (Imprimible A4)
                 </span>
                 <p className="mt-0.5 text-xs sm:text-sm font-bold text-white">
@@ -664,7 +664,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 <button
                   type="button"
                   onClick={() => openPrintableMedicalCert({ raceConfig })}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 text-amber-300 border border-orange-500/70 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
                 >
                   <FileCheck2 className="w-3.5 h-3.5 shrink-0" />
                   <span>Apto Médico A4</span>
