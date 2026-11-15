@@ -103,7 +103,7 @@ export default function AdminScheduleFaqTab({
           <button
             type="button"
             onClick={onAddSchedule}
-            className="inline-flex items-center gap-1 rounded-xl bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-bold px-3 py-1.5 cursor-pointer"
+            className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 transition-colors text-xs font-bold px-3 py-1.5 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             Agregar Día y Horario
@@ -131,7 +131,7 @@ export default function AdminScheduleFaqTab({
                   onChange={(e) => onScheduleChange(idx, 'time', e.target.value)}
                   placeholder="06:00 hs"
                   aria-label="Horario"
-                  className="sm:col-span-2 rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono text-amber-300"
+                  className="sm:col-span-2 rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono text-white"
                 />
                 <input
                   type="text"
@@ -219,15 +219,15 @@ export default function AdminScheduleFaqTab({
               items: gear27,
               accentText: 'text-cyan-400',
               borderClass: 'border-cyan-500/50 focus:border-cyan-400',
-              btnClass: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/40 hover:bg-cyan-500/20',
+              btnClass: 'bg-zinc-950 text-cyan-400 border-cyan-500/70 hover:border-cyan-400',
             },
             {
               dist: '13K',
               title: '13K Competitivo',
               items: gear13,
-              accentText: 'text-red-400',
+              accentText: 'text-red-500',
               borderClass: 'border-red-500/50 focus:border-red-400',
-              btnClass: 'bg-red-500/10 text-red-300 border-red-500/40 hover:bg-red-500/20',
+              btnClass: 'bg-zinc-950 text-red-500 border-red-500/70 hover:border-red-400',
             },
           ].map((col) => (
             <div
@@ -304,7 +304,7 @@ export default function AdminScheduleFaqTab({
           <button
             type="button"
             onClick={handleAddBracket}
-            className="inline-flex items-center gap-1 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/35 text-xs font-bold px-3 py-1.5 cursor-pointer transition-colors"
+            className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-bold px-3 py-1.5 cursor-pointer transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Agregar Franja</span>
