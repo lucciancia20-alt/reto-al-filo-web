@@ -97,8 +97,8 @@ export default function AdminScheduleFaqTab({
     <div className="space-y-3.5">
       <div>
         <div className="flex items-center justify-between mb-2">
-          <h4 className="font-display text-sm font-bold text-white uppercase">
-            Cronograma del Día de Carrera
+          <h4 className="font-display text-[11px] sm:text-xs text-white font-bold uppercase tracking-normal pl-3">
+            EDITAR CRONOGRAMA DEL DÍA DE CARRERA
           </h4>
           <button
             type="button"
@@ -170,14 +170,14 @@ export default function AdminScheduleFaqTab({
       </div>
 
       <div>
-        <h4 className="font-display text-[11px] sm:text-xs text-white font-bold uppercase tracking-normal sm:whitespace-nowrap mb-2.5">
+        <h4 className="font-display text-[11px] sm:text-xs text-white font-bold uppercase tracking-normal sm:whitespace-nowrap mb-2.5 pl-3">
           EDITAR PREGUNTAS FRECUENTES, ELEMENTOS OBLIGATORIOS DIFERENCIADOS 27K VS 13K Y CATEGORÍAS POR EDAD Y PREMIACIÓN
         </h4>
         <div className="space-y-3">
           {faqs.map((faq, idx) => (
             <div
               key={faq.id}
-              className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2"
+              className="rounded-2xl bg-stone-950 border border-stone-800 p-2.5 space-y-2"
             >
               <input
                 type="text"
