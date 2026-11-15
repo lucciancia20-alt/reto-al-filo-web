@@ -1485,9 +1485,9 @@ export default function AdminModal({
                           ?.scrollIntoView({ behavior: 'smooth' });
                       }, 80);
                     }}
-                    className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-amber-500/20 cursor-pointer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 transition-colors cursor-pointer"
                   >
-                    <CheckCircle2 className="w-4 h-4" />
+                    <CheckCircle2 className="w-4 h-4 text-orange-500" />
                     ✓ Listo · Ver Galería en la Web
                   </button>
                 )
@@ -1496,9 +1496,9 @@ export default function AdminModal({
                   type="button"
                   onClick={loadRegistrations}
                   disabled={regsLoading}
-                  className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  <RefreshCw className={`w-4 h-4 ${regsLoading ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-4 h-4 text-orange-500 ${regsLoading ? 'animate-spin' : ''}`} />
                   {regsLoading ? 'Actualizando...' : 'Actualizar Inscriptos'}
                 </button>
               ) : (
