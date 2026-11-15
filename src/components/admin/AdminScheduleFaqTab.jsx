@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Trash2, ShieldCheck, Award } from 'lucide-react';
 import { RACE_CONFIG } from '../../data/raceConfig';
 import ResizableTextarea from './ResizableTextarea';
@@ -14,6 +14,56 @@ export default function AdminScheduleFaqTab({
   onRemoveSchedule,
   onFaqChange,
 }) {
+  const [confirmingKey, setConfirmingKey] = useState(null);
+  const confirmTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (confirmTimerRef.current) {
+        clearTimeout(confirmTimerRef.current);
+      }
+    };
+  }, []);
+
+  const handleConfirmOrDelete = (key, onDelete) => {
+    if (confirmingKey === key) {
+      if (confirmTimerRef.current) {
+        clearTimeout(confirmTimerRef.current);
+        confirmTimerRef.current = null;
+      }
+      setConfirmingKey(null);
+      onDelete();
+      return;
+    }
+
+    if (confirmTimerRef.current) {
+      clearTimeout(confirmTimerRef.current);
+    }
+    setConfirmingKey(key);
+    confirmTimerRef.current = setTimeout(() => {
+      setConfirmingKey(null);
+      confirmTimerRef.current = null;
+    }, 3000);
+  };
+
+  const renderDeleteButton = (key, ariaLabel, onDelete, iconSizeClass = 'w-4 h-4') => {
+    const isConfirming = confirmingKey === key;
+    return (
+      <button
+        type="button"
+        onClick={() => handleConfirmOrDelete(key, onDelete)}
+        aria-label={isConfirming ? `Confirmar: ${ariaLabel}` : ariaLabel}
+        className={
+          isConfirming
+            ? 'rounded-lg bg-red-500/15 border border-red-500 px-2 py-1 text-[11px] font-bold text-red-400 hover:bg-red-500/25 hover:text-white transition-colors cursor-pointer shrink-0'
+            : 'p-1.5 rounded-lg text-red-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/40 transition-colors cursor-pointer shrink-0'
+        }
+      >
+        {isConfirming ? '¿Eliminar?' : <Trash2 className={iconSizeClass} />}
+      </button>
+    );
+  };
+
   const gear = mandatoryGear || RACE_CONFIG.mandatoryGear;
   const gear27 = Array.isArray(gear['27K']) ? gear['27K'] : RACE_CONFIG.mandatoryGear['27K'];
   const gear13 = Array.isArray(gear['13K']) ? gear['13K'] : RACE_CONFIG.mandatoryGear['13K'];
@@ -116,47 +166,42 @@ export default function AdminScheduleFaqTab({
               key={idx}
               className="rounded-2xl bg-stone-950 border border-stone-800 p-2.5 space-y-2"
             >
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-                <input
-                  type="text"
-                  value={item.day ?? ''}
-                  onChange={(e) => onScheduleChange(idx, 'day', e.target.value)}
-                  placeholder="Ej. Sábado 10"
-                  aria-label="Día del cronograma"
-                  className="sm:col-span-3 rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-semibold text-orange-300"
-                />
-                <input
-                  type="text"
-                  value={item.time}
-                  onChange={(e) => onScheduleChange(idx, 'time', e.target.value)}
-                  placeholder="06:00 hs"
-                  aria-label="Horario"
-                  className="sm:col-span-2 rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono text-white"
-                />
-                <input
-                  type="text"
-                  value={item.title}
-                  onChange={(e) => onScheduleChange(idx, 'title', e.target.value)}
-                  placeholder="Título"
-                  aria-label="Título"
-                  className="sm:col-span-4 rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-bold text-white"
-                />
-                <input
-                  type="text"
-                  value={item.tag}
-                  onChange={(e) => onScheduleChange(idx, 'tag', e.target.value)}
-                  placeholder="Lugar"
-                  aria-label="Lugar"
-                  className="sm:col-span-2 rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs text-stone-200"
-                />
-                <button
-                  type="button"
-                  onClick={() => onRemoveSchedule(idx)}
-                  aria-label="Quitar horario"
-                  className="sm:col-span-1 justify-self-end p-1.5 text-stone-400 hover:text-rose-400 cursor-pointer"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+              <div className="flex items-center gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 flex-1 min-w-0">
+                  <input
+                    type="text"
+                    value={item.day ?? ''}
+                    onChange={(e) => onScheduleChange(idx, 'day', e.target.value)}
+                    placeholder="Ej. Sábado 10"
+                    aria-label="Día del cronograma"
+                    className="sm:col-span-3 w-full rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-semibold text-orange-300"
+                  />
+                  <input
+                    type="text"
+                    value={item.time}
+                    onChange={(e) => onScheduleChange(idx, 'time', e.target.value)}
+                    placeholder="06:00 hs"
+                    aria-label="Horario"
+                    className="sm:col-span-2 w-full rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono text-white"
+                  />
+                  <input
+                    type="text"
+                    value={item.title}
+                    onChange={(e) => onScheduleChange(idx, 'title', e.target.value)}
+                    placeholder="Título"
+                    aria-label="Título"
+                    className="sm:col-span-4 w-full rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-bold text-white"
+                  />
+                  <input
+                    type="text"
+                    value={item.tag}
+                    onChange={(e) => onScheduleChange(idx, 'tag', e.target.value)}
+                    placeholder="Lugar"
+                    aria-label="Lugar"
+                    className="sm:col-span-3 w-full rounded-lg bg-zinc-900 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-semibold text-white"
+                  />
+                </div>
+                {renderDeleteButton(`schedule-${idx}`, 'Quitar horario', () => onRemoveSchedule(idx))}
               </div>
               <ResizableTextarea
                 rows={1}
@@ -258,14 +303,12 @@ export default function AdminScheduleFaqTab({
                       placeholder={`Elemento obligatorio ${col.dist}...`}
                       className={`flex-1 min-w-0 rounded-lg bg-stone-950 border ${col.borderClass} focus:outline-none px-2.5 py-1.5 text-xs text-stone-100`}
                     />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveGearItem(col.dist, idx)}
-                      aria-label={`Quitar elemento ${col.dist} #${idx + 1}`}
-                      className="p-1.5 text-stone-400 hover:text-rose-400 cursor-pointer shrink-0"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    {renderDeleteButton(
+                      `gear-${col.dist}-${idx}`,
+                      `Quitar elemento ${col.dist} #${idx + 1}`,
+                      () => handleRemoveGearItem(col.dist, idx),
+                      'w-3.5 h-3.5'
+                    )}
                   </div>
                 ))}
               </div>
@@ -363,31 +406,30 @@ export default function AdminScheduleFaqTab({
             Franjas Etarias (Damas y Caballeros · 27K y 13K)
           </span>
           {brackets.map((b, idx) => (
-            <div key={b.id || idx} className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-              <input
-                type="text"
-                value={b.label}
-                onChange={(e) => handleBracketChange(idx, 'label', e.target.value)}
-                placeholder="Ej. 18 a 29 años"
-                aria-label={`Nombre categoría ${idx + 1}`}
-                className="sm:col-span-5 rounded-lg bg-stone-900 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-bold text-white"
-              />
-              <input
-                type="text"
-                value={b.range}
-                onChange={(e) => handleBracketChange(idx, 'range', e.target.value)}
-                placeholder="Ej. 18 – 29 años"
-                aria-label={`Rango edad ${idx + 1}`}
-                className="sm:col-span-6 rounded-lg bg-stone-900 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono text-amber-300"
-              />
-              <button
-                type="button"
-                onClick={() => handleRemoveBracket(idx)}
-                aria-label={`Quitar categoría ${idx + 1}`}
-                className="sm:col-span-1 justify-self-end p-1.5 text-stone-400 hover:text-rose-400 cursor-pointer"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+            <div key={b.id || idx} className="flex items-center gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-11 gap-2 flex-1 min-w-0">
+                <input
+                  type="text"
+                  value={b.label}
+                  onChange={(e) => handleBracketChange(idx, 'label', e.target.value)}
+                  placeholder="Ej. 18 a 29 años"
+                  aria-label={`Nombre categoría ${idx + 1}`}
+                  className="sm:col-span-5 w-full rounded-lg bg-stone-900 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-bold text-white"
+                />
+                <input
+                  type="text"
+                  value={b.range}
+                  onChange={(e) => handleBracketChange(idx, 'range', e.target.value)}
+                  placeholder="Ej. 18 – 29 años"
+                  aria-label={`Rango edad ${idx + 1}`}
+                  className="sm:col-span-6 w-full rounded-lg bg-stone-900 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono text-amber-300"
+                />
+              </div>
+              {renderDeleteButton(
+                `bracket-${b.id || idx}`,
+                `Quitar categoría ${idx + 1}`,
+                () => handleRemoveBracket(idx)
+              )}
             </div>
           ))}
         </div>
