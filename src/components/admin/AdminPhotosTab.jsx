@@ -313,7 +313,7 @@ export default function AdminPhotosTab({
                   onDrop={(e) => handleDrop(e, item)}
                   onDragEnd={handleDragEnd}
                   onClick={() => setPreviewIndex(idx)}
-                  className={`relative aspect-[4/3] rounded-xl overflow-hidden bg-zinc-950 border border-orange-500/75 hover:border-orange-400 cursor-grab active:cursor-grabbing transition-all group ${
+                  className={`relative aspect-[4/3] rounded-xl overflow-hidden bg-zinc-950 border border-orange-500/80 hover:border-orange-400 cursor-grab active:cursor-grabbing transition-all group ${
                     isDragOver ? 'ring-2 ring-orange-400 scale-[1.02]' : ''
                   } ${isDragged ? 'opacity-60' : ''}`}
                 >
@@ -321,7 +321,7 @@ export default function AdminPhotosTab({
                     src={item.cloudinaryThumb}
                     alt={item.sector}
                     draggable={false}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
                   />
                   <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 rounded-full bg-orange-500 text-zinc-950 font-bold text-[10px] px-2 py-0.5 shadow-md">
                     ✓ Publicada en la web
@@ -341,11 +341,11 @@ export default function AdminPhotosTab({
                   </button>
                   <div
                     onClick={(e) => e.stopPropagation()}
-                    className="absolute bottom-0 inset-x-0 z-10 px-2.5 py-2 bg-zinc-950/20 backdrop-blur-sm border-t-2 border-orange-500/80 flex items-center justify-between gap-2"
+                    className="absolute bottom-0 inset-x-0 z-10 rounded-b-xl px-2.5 py-2 bg-zinc-950/12 backdrop-blur-sm border-t-2 border-orange-500/80 flex items-center justify-between gap-2"
                   >
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <GripVertical className="w-3.5 h-3.5 text-stone-200 shrink-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
-                      <span className="text-[11px] font-medium text-white truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                      <GripVertical className="w-3.5 h-3.5 text-stone-200 shrink-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
+                      <span className="text-[11px] font-medium text-white truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                         {item.sector}
                       </span>
                     </div>
@@ -366,7 +366,7 @@ export default function AdminPhotosTab({
                       className={`rounded-lg cursor-pointer shrink-0 transition-colors disabled:opacity-40 ${
                         confirmDeleteId === item.id
                           ? 'px-2 py-1 text-[10px] font-bold bg-zinc-950 border border-red-500 text-red-400'
-                          : 'p-1.5 text-stone-100 hover:text-red-400 hover:bg-zinc-900/40 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]'
+                          : 'p-1.5 text-stone-100 hover:text-red-400 hover:bg-zinc-900/40 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]'
                       }`}
                     >
                       {confirmDeleteId === item.id ? '¿Borrar?' : <Trash2 className="w-3.5 h-3.5" />}
