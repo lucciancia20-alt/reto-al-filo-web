@@ -312,65 +312,63 @@ export default function AdminPhotosTab({
           onClick={() => setPreviewIndex(null)}
         >
           <div
-            className="relative w-[90vw] max-w-4xl rounded-3xl overflow-hidden overscroll-contain bg-zinc-950/60 border border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
+            className="relative w-fit h-fit min-w-[280px] min-h-[200px] max-w-[92vw] max-h-[85vh] flex items-center justify-center rounded-2xl overflow-hidden overscroll-contain border border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative w-full aspect-[4/3] min-h-[320px] sm:min-h-[480px] md:min-h-[560px] max-h-[82vh] flex items-center justify-center">
-              <button
-                type="button"
-                onClick={() => setPreviewIndex(null)}
-                aria-label="Cerrar vista previa"
-                className="absolute top-3 right-3 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
+            <button
+              type="button"
+              onClick={() => setPreviewIndex(null)}
+              aria-label="Cerrar vista previa"
+              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
 
-              {galleryItems.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setPreviewIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length)
-                    }
-                    aria-label="Foto anterior"
-                    className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setPreviewIndex((prev) => (prev + 1) % galleryItems.length)
-                    }
-                    aria-label="Foto siguiente"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </>
-              )}
+            {galleryItems.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setPreviewIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length)
+                  }
+                  aria-label="Foto anterior"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setPreviewIndex((prev) => (prev + 1) % galleryItems.length)
+                  }
+                  aria-label="Foto siguiente"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
+            )}
 
-              <img
-                src={galleryItems[previewIndex].cloudinaryUrl || galleryItems[previewIndex].cloudinaryThumb}
-                alt={galleryItems[previewIndex].sector}
-                className="w-full h-full object-cover"
-              />
+            <img
+              src={galleryItems[previewIndex].cloudinaryUrl || galleryItems[previewIndex].cloudinaryThumb}
+              alt={galleryItems[previewIndex].sector}
+              className="block max-w-[92vw] max-h-[85vh] w-auto h-auto"
+            />
 
-              <div className="absolute bottom-0 inset-x-0 z-10 p-4 sm:p-5 bg-zinc-900/30 backdrop-blur-md border-t border-orange-500/20 flex items-center justify-between gap-2">
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-orange-400 drop-shadow-sm">
-                    1ra Edición · Reto al Filo
-                  </span>
-                  <p className="mt-0.5 text-sm sm:text-base font-bold text-white drop-shadow-sm">
-                    {galleryItems[previewIndex].sector}
-                  </p>
-                </div>
-                {galleryItems.length > 1 && (
-                  <span className="text-xs font-mono text-stone-200 drop-shadow-sm">
-                    {previewIndex + 1} / {galleryItems.length}
-                  </span>
-                )}
+            <div className="absolute bottom-0 inset-x-0 z-10 p-4 sm:p-5 bg-zinc-900/25 backdrop-blur-md border-t border-orange-500/20 flex items-center justify-between gap-2">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-orange-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                  1ra Edición · Reto al Filo
+                </span>
+                <p className="mt-0.5 text-sm sm:text-base font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                  {galleryItems[previewIndex].sector}
+                </p>
               </div>
+              {galleryItems.length > 1 && (
+                <span className="text-xs font-mono text-stone-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                  {previewIndex + 1} / {galleryItems.length}
+                </span>
+              )}
             </div>
           </div>
         </div>
