@@ -120,6 +120,48 @@ export default function AdminRegistrationsTab({
     );
   };
 
+  const handleToggleDuplicateFilter = (filterValue) => {
+    if (regStatusFilter === filterValue) {
+      setRegStatusFilter('all');
+    } else {
+      setRegDistanceFilter('all');
+      setSortConfig({ field: null, direction: 'asc' });
+      setRegStatusFilter(filterValue);
+    }
+  };
+
+  const renderDuplicateFilterButton = (filterValue, label, count) => {
+    const isActive = regStatusFilter === filterValue;
+    const hasDuplicates = count > 0;
+
+    let colorClass =
+      'border-zinc-700 text-zinc-500 hover:text-zinc-300 hover:border-zinc-600 font-medium';
+    if (isActive) {
+      colorClass = 'border-rose-400 ring-1 ring-rose-500/60 text-rose-300 font-bold';
+    } else if (hasDuplicates) {
+      colorClass = 'border-rose-500 text-rose-400 hover:bg-white/5 font-bold';
+    }
+
+    return (
+      <button
+        key={filterValue}
+        type="button"
+        onClick={() => handleToggleDuplicateFilter(filterValue)}
+        aria-pressed={isActive}
+        className={`inline-flex items-center gap-1 rounded-lg bg-stone-950 border px-2.5 py-1 text-[11px] transition-colors cursor-pointer ${colorClass}`}
+      >
+        {hasDuplicates && (
+          <span aria-hidden="true" className="text-[11px] leading-none text-rose-400">
+            ⚠
+          </span>
+        )}
+        <span>
+          {label} ({count})
+        </span>
+      </button>
+    );
+  };
+
   const toggleExpand = (id) => {
     setExpandedIds((prev) => ({
       ...prev,
@@ -293,24 +335,18 @@ export default function AdminRegistrationsTab({
 
             <select
               aria-label="Filtrar por estado"
-              value={regStatusFilter}
-              onChange={(e) => {
-                const nextStatus = e.target.value;
-                if (nextStatus === 'duplicados_dorsal' || nextStatus === 'duplicados_dni') {
-                  setRegDistanceFilter('all');
-                  setSortConfig({ field: null, direction: 'asc' });
-                }
-                setRegStatusFilter(nextStatus);
-              }}
+              value={
+                regStatusFilter === 'duplicados_dorsal' || regStatusFilter === 'duplicados_dni'
+                  ? 'all'
+                  : regStatusFilter
+              }
+              onChange={(e) => setRegStatusFilter(e.target.value)}
               className={`rounded-xl bg-stone-950 border focus:outline-none px-3 py-2 text-xs transition-colors ${
                 regStatusFilter === 'pendiente'
                   ? 'text-amber-400 border-amber-500/60 focus:border-amber-400 font-bold'
                   : regStatusFilter === 'confirmado'
                     ? 'text-emerald-400 border-emerald-500/60 focus:border-emerald-400 font-bold'
-                    : regStatusFilter === 'duplicados_dorsal' ||
-                        regStatusFilter === 'duplicados_dni'
-                      ? 'text-rose-400 border-rose-500/60 focus:border-rose-400 font-bold'
-                      : 'text-white border-white/15 focus:border-orange-400'
+                    : 'text-white border-white/15 focus:border-orange-400'
               }`}
             >
               <option value="all" className="bg-stone-950 text-white font-normal">
@@ -324,16 +360,6 @@ export default function AdminRegistrationsTab({
               </option>
               <option value="rechazado" className="bg-stone-950 text-white font-normal">
                 Rechazados
-              </option>
-              <option value="duplicados_dorsal" className="bg-stone-950 text-rose-400 font-bold">
-                {duplicateBibCount > 0
-                  ? `Dorsales duplicados (${duplicateBibCount})`
-                  : 'Dorsales duplicados'}
-              </option>
-              <option value="duplicados_dni" className="bg-stone-950 text-rose-400 font-bold">
-                {duplicateDniCount > 0
-                  ? `DNI duplicados (${duplicateDniCount})`
-                  : 'DNI duplicados'}
               </option>
             </select>
 
@@ -381,21 +407,9 @@ export default function AdminRegistrationsTab({
         <div className="rounded-2xl bg-stone-950 border border-stone-800 p-8 text-center text-xs text-stone-400">
           Cargando listado de corredores inscriptos...
         </div>
-      ) : filteredRegistrations.length === 0 ? (
-        <div className="rounded-2xl bg-stone-950 border border-stone-800 p-8 text-center space-y-1.5">
-          <Users className="w-8 h-8 text-stone-600 mx-auto" />
-          <p className="text-sm font-bold text-stone-200">
-            {registrationsCount === 0
-              ? 'Todavía no hay corredores inscriptos desde el formulario web.'
-              : 'Ningún inscripto coincide con tu filtro actual.'}
-          </p>
-          <p className="text-xs text-stone-400">
-            Apenas alguien complete el formulario y suba su comprobante, aparecerá aquí al instante.
-          </p>
-        </div>
       ) : (
         <div className="space-y-2">
-          {/* Barra compacta de encabezados ordenables */}
+          {/* Barra compacta de encabezados ordenables y accesos directos a duplicados */}
           <div className="px-2.5 py-1.5 rounded-xl bg-stone-950 border border-stone-800 flex flex-wrap items-center justify-between gap-2 text-[11px]">
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-[10px] uppercase tracking-wider text-stone-500 font-semibold mr-0.5 hidden sm:inline">
@@ -406,12 +420,33 @@ export default function AdminRegistrationsTab({
               {renderSortButton('status', 'Estado')}
             </div>
 
-            <div className="flex items-center shrink-0 lg:mr-[378px]">
+            <div className="flex flex-wrap items-center justify-between gap-2 lg:w-[446px] shrink-0">
               {renderSortButton('bib', 'Dorsal #')}
+              <div className="flex flex-wrap items-center gap-1.5">
+                {renderDuplicateFilterButton(
+                  'duplicados_dorsal',
+                  'Dorsales duplicados',
+                  duplicateBibCount
+                )}
+                {renderDuplicateFilterButton('duplicados_dni', 'DNI duplicados', duplicateDniCount)}
+              </div>
             </div>
           </div>
 
-          {sortedRegistrations.map((reg) => {
+          {filteredRegistrations.length === 0 ? (
+            <div className="rounded-2xl bg-stone-950 border border-stone-800 p-8 text-center space-y-1.5">
+              <Users className="w-8 h-8 text-stone-600 mx-auto" />
+              <p className="text-sm font-bold text-stone-200">
+                {registrationsCount === 0
+                  ? 'Todavía no hay corredores inscriptos desde el formulario web.'
+                  : 'Ningún inscripto coincide con tu filtro actual.'}
+              </p>
+              <p className="text-xs text-stone-400">
+                Apenas alguien complete el formulario y suba su comprobante, aparecerá aquí al instante.
+              </p>
+            </div>
+          ) : (
+            sortedRegistrations.map((reg) => {
             const isBusy = regBusyId === reg.id;
             const isExpanded = Boolean(expandedIds[reg.id]);
             const bibValue = bibDrafts[reg.id] ?? reg.assignedBib ?? '';
@@ -677,7 +712,8 @@ export default function AdminRegistrationsTab({
                 )}
               </div>
             );
-          })}
+          })
+          )}
         </div>
       )}
     </div>
