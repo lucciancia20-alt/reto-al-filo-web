@@ -988,7 +988,7 @@ export default function AdminRegistrationsTab({
                             type="button"
                             disabled={isBusy}
                             onClick={() => onChangeRegStatus(reg, 'pendiente')}
-                            className="rounded-lg bg-stone-950 hover:bg-white/5 border border-amber-500/50 text-amber-400 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer disabled:opacity-50"
+                            className="rounded-lg bg-zinc-900/80 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer disabled:opacity-50"
                           >
                             Pasar a Pendiente
                           </button>
