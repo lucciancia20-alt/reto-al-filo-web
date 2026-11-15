@@ -73,6 +73,8 @@ export default function AdminModal({
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
   const [authInfo, setAuthInfo] = useState('');
+  const [confirmingLogout, setConfirmingLogout] = useState(false);
+  const logoutTimerRef = useRef(null);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
 
@@ -382,7 +384,14 @@ export default function AdminModal({
       setGpxStatus('');
       setAuthError('');
       setAuthInfo('');
+      setConfirmingLogout(false);
     }
+    return () => {
+      if (logoutTimerRef.current) {
+        clearTimeout(logoutTimerRef.current);
+        logoutTimerRef.current = null;
+      }
+    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -565,6 +574,21 @@ export default function AdminModal({
   };
 
   const handleLogout = async () => {
+    if (!confirmingLogout) {
+      setConfirmingLogout(true);
+      if (logoutTimerRef.current) clearTimeout(logoutTimerRef.current);
+      logoutTimerRef.current = setTimeout(() => {
+        setConfirmingLogout(false);
+        logoutTimerRef.current = null;
+      }, 3000);
+      return;
+    }
+
+    if (logoutTimerRef.current) {
+      clearTimeout(logoutTimerRef.current);
+      logoutTimerRef.current = null;
+    }
+    setConfirmingLogout(false);
     await signOutAdmin();
     setAdminUser(null);
     setUnlocked(false);
@@ -1176,18 +1200,28 @@ export default function AdminModal({
               <button
                 type="button"
                 onClick={handleLogout}
-                aria-label="Cerrar sesión de administrador"
-                className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-xs font-semibold px-3 py-2 cursor-pointer"
+                aria-label={
+                  confirmingLogout
+                    ? 'Confirmar cierre de sesión de administrador'
+                    : 'Cerrar sesión de administrador'
+                }
+                className={`inline-flex items-center gap-1.5 rounded-xl text-xs font-semibold px-3 py-2 cursor-pointer transition-colors ${
+                  confirmingLogout
+                    ? 'bg-zinc-950 border border-red-500 text-red-400'
+                    : 'bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200'
+                }`}
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Salir</span>
+                <span className={confirmingLogout ? 'inline' : 'hidden sm:inline'}>
+                  {confirmingLogout ? '¿Cerrar sesión?' : 'Salir'}
+                </span>
               </button>
             )}
             <button
               type="button"
               onClick={handleSafeClose}
               aria-label="Cerrar panel de administración"
-              className="p-2 rounded-xl text-stone-400 hover:text-white hover:bg-stone-800 cursor-pointer"
+              className="ml-2 p-2 rounded-xl text-stone-400 hover:text-white hover:bg-stone-800 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
