@@ -1240,118 +1240,105 @@ export default function AdminModal({
                 </div>
               )}
               </div>
-
-              {canScrollMore && (
-                <div className="pointer-events-none absolute inset-x-0 bottom-2.5 flex justify-center z-10">
-                  <button
-                    type="button"
-                    onClick={handleScrollDown}
-                    className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-stone-900 hover:bg-stone-800 border border-orange-500/80 text-orange-400 text-[11px] font-bold px-3.5 py-1.5 shadow-none transition-colors cursor-pointer"
-                  >
-                    <span>Deslizá para ver más</span>
-                    <ChevronDown className="w-3.5 h-3.5 text-orange-400 animate-bounce" />
-                  </button>
-                </div>
-              )}
             </div>
 
             {/* Footer fijo con altura constante en todas las pestañas */}
-            <div className="px-4 sm:px-5 py-3.5 bg-stone-950 border-t border-stone-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
-              {activeTab === 'photos' ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={handleSafeClose}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold px-4 py-2.5 cursor-pointer"
-                  >
-                    Cerrar Panel
-                  </button>
-
-                  {photoFiles.length > 0 || photoUrl.trim().length > 0 ? (
-                    <button
-                      type="submit"
-                      form="admin-photo-form"
-                      disabled={photoSubmitting}
-                      className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
-                    >
-                      <Camera className="w-4 h-4" />
-                      {photoSubmitting
-                        ? 'Subiendo y publicando...'
-                        : `Subir y Publicar (${photoFiles.length || 1})`}
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onClose();
-                        setTimeout(() => {
-                          document
-                            .getElementById('galeria')
-                            ?.scrollIntoView({ behavior: 'smooth' });
-                        }, 80);
-                      }}
-                      className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-amber-500/20 cursor-pointer"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      ✓ Listo · Ver Galería en la Web
-                    </button>
-                  )}
-                </>
-              ) : activeTab === 'registrations' ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={handleSafeClose}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold px-4 py-2.5 cursor-pointer"
-                  >
-                    Cerrar Panel
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={loadRegistrations}
-                    disabled={regsLoading}
-                    className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50"
-                  >
-                    <RefreshCw className={`w-4 h-4 ${regsLoading ? 'animate-spin' : ''}`} />
-                    {regsLoading ? 'Actualizando...' : 'Actualizar Inscriptos'}
-                  </button>
-                </>
+            <div className="relative px-4 sm:px-5 py-3.5 bg-stone-950 border-t border-stone-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
+              {activeTab === 'photos' || activeTab === 'registrations' ? (
+                <button
+                  type="button"
+                  onClick={handleSafeClose}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold px-4 py-2.5 cursor-pointer"
+                >
+                  Cerrar Panel
+                </button>
               ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={handleReset}
-                    disabled={saving}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold px-4 py-2.5 cursor-pointer"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    Restaurar valores originales
-                  </button>
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  disabled={saving}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold px-4 py-2.5 cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  Restaurar valores originales
+                </button>
+              )}
 
+              {canScrollMore && (
+                <button
+                  type="button"
+                  onClick={handleScrollDown}
+                  title="Ir abajo"
+                  aria-label="Ir abajo"
+                  className="w-8 h-8 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-orange-500/80 text-orange-400 flex items-center justify-center shadow-none transition-colors cursor-pointer sm:absolute sm:left-1/2 sm:-translate-x-1/2"
+                >
+                  <ChevronDown className="w-4 h-4 text-orange-400 animate-bounce" />
+                </button>
+              )}
+
+              {activeTab === 'photos' ? (
+                photoFiles.length > 0 || photoUrl.trim().length > 0 ? (
+                  <button
+                    type="submit"
+                    form="admin-photo-form"
+                    disabled={photoSubmitting}
+                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
+                  >
+                    <Camera className="w-4 h-4" />
+                    {photoSubmitting
+                      ? 'Subiendo y publicando...'
+                      : `Subir y Publicar (${photoFiles.length || 1})`}
+                  </button>
+                ) : (
                   <button
                     type="button"
-                    onClick={handleSaveAll}
-                    disabled={saving || !hasUnsavedChanges}
-                    className={`inline-flex items-center gap-2 rounded-xl font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 transition-colors ${
-                      hasUnsavedChanges || saving
-                        ? 'bg-amber-400 hover:bg-amber-300 text-black shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50'
-                        : 'bg-zinc-800 border border-zinc-700 text-zinc-500 cursor-default'
-                    }`}
+                    onClick={() => {
+                      onClose();
+                      setTimeout(() => {
+                        document
+                          .getElementById('galeria')
+                          ?.scrollIntoView({ behavior: 'smooth' });
+                      }, 80);
+                    }}
+                    className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-amber-500/20 cursor-pointer"
                   >
-                    {hasUnsavedChanges || saving ? (
-                      <>
-                        <Save className="w-4 h-4" />
-                        {saving ? 'Guardando...' : 'Guardar Cambios en Vivo'}
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2 className="w-4 h-4" />
-                        Cambios Guardados ✓
-                      </>
-                    )}
+                    <CheckCircle2 className="w-4 h-4" />
+                    ✓ Listo · Ver Galería en la Web
                   </button>
-                </>
+                )
+              ) : activeTab === 'registrations' ? (
+                <button
+                  type="button"
+                  onClick={loadRegistrations}
+                  disabled={regsLoading}
+                  className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-4 h-4 ${regsLoading ? 'animate-spin' : ''}`} />
+                  {regsLoading ? 'Actualizando...' : 'Actualizar Inscriptos'}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleSaveAll}
+                  disabled={saving || !hasUnsavedChanges}
+                  className={`inline-flex items-center gap-2 rounded-xl font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 transition-colors ${
+                    hasUnsavedChanges || saving
+                      ? 'bg-amber-400 hover:bg-amber-300 text-black shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50'
+                      : 'bg-zinc-800 border border-zinc-700 text-zinc-500 cursor-default'
+                  }`}
+                >
+                  {hasUnsavedChanges || saving ? (
+                    <>
+                      <Save className="w-4 h-4" />
+                      {saving ? 'Guardando...' : 'Guardar Cambios en Vivo'}
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4" />
+                      Cambios Guardados ✓
+                    </>
+                  )}
+                </button>
               )}
             </div>
           </>
