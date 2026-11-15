@@ -338,23 +338,11 @@ export default function AdminRegistrationsTab({
         ))}
       </div>
 
-      {/* Controles de búsqueda, filtro y exportación */}
+      {/* Controles de filtro y exportación */}
       <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3 space-y-2.5">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-2.5">
-          <div className="relative flex-1 min-w-0">
-            <Search className="w-4 h-4 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={regSearch}
-              onChange={(e) => setRegSearch(e.target.value)}
-              placeholder="Buscar por nombre, DNI, código RAF, dorsal, localidad..."
-              className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-9 pr-3 py-2 text-xs sm:text-sm text-white"
-            />
-          </div>
-
-          <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 shrink-0">
-            <select
-              aria-label="Filtrar por distancia"
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            aria-label="Filtrar por distancia"
               value={regDistanceFilter}
               onChange={(e) => setRegDistanceFilter(e.target.value)}
               className={`rounded-xl bg-stone-950 border focus:outline-none px-3 py-2 text-xs transition-colors ${
@@ -437,7 +425,6 @@ export default function AdminRegistrationsTab({
               <span>Mercado Pago</span>
               <ExternalLink className="w-3 h-3 opacity-80 shrink-0" />
             </a>
-          </div>
         </div>
 
         {/* Resumen en vivo de Talles (Confirmados / Activos) y Acreditación */}
@@ -539,8 +526,8 @@ export default function AdminRegistrationsTab({
         </div>
       ) : (
         <div className="space-y-2">
-          {/* Barra compacta de encabezados ordenables y accesos directos a duplicados */}
-          <div className="px-2.5 py-1.5 rounded-xl bg-stone-950 border border-stone-800 flex flex-wrap items-center gap-2 text-[11px]">
+          {/* Barra compacta de encabezados ordenables, buscador y accesos directos a duplicados */}
+          <div className="px-2.5 py-2 rounded-xl bg-stone-950 border border-stone-800 flex flex-wrap items-center gap-2 text-[11px]">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[10px] uppercase tracking-wider text-stone-500 font-semibold mr-0.5 hidden sm:inline">
                 Ordenar:
@@ -551,7 +538,19 @@ export default function AdminRegistrationsTab({
               {renderSortButton('bib', 'Dorsal #')}
             </div>
 
-            <div className="ml-auto flex items-center gap-2 flex-wrap shrink-0">
+            <div className="relative w-full md:w-auto md:flex-1 md:min-w-[200px] md:max-w-md md:mx-auto">
+              <Search className="w-3.5 h-3.5 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={regSearch}
+                onChange={(e) => setRegSearch(e.target.value)}
+                placeholder="Buscar por nombre, DNI, código RAF, dorsal, localidad..."
+                aria-label="Buscar por nombre, DNI, código RAF, dorsal o localidad"
+                className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-stone-500"
+              />
+            </div>
+
+            <div className="ml-auto md:ml-0 flex items-center gap-2 flex-wrap shrink-0">
               {renderDuplicateFilterButton('dorsal', 'Dorsales duplicados', duplicateBibCount)}
               {renderDuplicateFilterButton('dni', 'DNI duplicados', duplicateDniCount)}
             </div>
