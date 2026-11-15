@@ -259,7 +259,7 @@ export default function AdminPhotosTab({
                       setPreviewIndex(idx);
                     }}
                     aria-label={`Ampliar postal ${item.sector}`}
-                    className="absolute top-2 right-2 w-7 h-7 rounded-full bg-zinc-950/85 border border-orange-500/70 hover:border-orange-400 text-orange-400 flex items-center justify-center cursor-pointer transition-colors"
+                    className="absolute top-2 right-2 w-7 h-7 rounded-full bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-md border border-orange-500/70 hover:border-orange-400 text-orange-400 flex items-center justify-center cursor-pointer transition-all"
                   >
                     <Maximize2 className="w-3.5 h-3.5" />
                   </button>

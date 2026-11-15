@@ -153,7 +153,7 @@ export default function GallerySection() {
                         setSelectedIndex(idx);
                       }}
                       aria-label={`Ampliar postal: ${photo.sector}`}
-                      className="w-8 h-8 rounded-full bg-zinc-950/85 border border-orange-500/70 hover:border-orange-400 text-orange-400 flex items-center justify-center opacity-90 group-hover:opacity-100 transition-all cursor-pointer"
+                      className="w-8 h-8 rounded-full bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-md border border-orange-500/70 hover:border-orange-400 text-orange-400 flex items-center justify-center opacity-90 group-hover:opacity-100 transition-all cursor-pointer"
                     >
                       <Maximize2 className="w-4 h-4" />
                     </button>
