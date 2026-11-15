@@ -36,4 +36,16 @@
   .date-input::-webkit-calendar-picker-indicator:hover {
     opacity: 1;
   }
+
+  .section-title-stroke {
+    paint-order: stroke fill;
+    -webkit-text-stroke: 1px #f97316;
+    text-shadow: none;
+    filter: none;
+  }
+
+  .section-title-stroke sup {
+    paint-order: stroke fill;
+    -webkit-text-stroke: 0.8px #f97316;
+  }
 }

@@ -40,7 +40,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
               <span>Cronograma Oficial · {formattedFullDate}</span>
             </div>
 
-            <h2 className="mt-1.5 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
+            <h2 className="mt-1.5 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight section-title-stroke">
               Horarios del Día de Carrera
             </h2>
             <p className="mt-1.5 max-w-2xl mx-auto text-balance text-sm sm:text-base text-stone-300">
@@ -105,7 +105,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
               <span>Información Clave para el Corredor</span>
             </div>
 
-            <h2 className="mt-2 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">
+            <h2 className="mt-2 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight section-title-stroke">
               Preguntas Frecuentes (FAQ)
             </h2>
           </div>
