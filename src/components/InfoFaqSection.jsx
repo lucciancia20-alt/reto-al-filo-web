@@ -245,7 +245,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 <Search className="w-3.5 h-3.5" />
                 <span>Consultor Oficial de Corredores</span>
               </div>
-              <h2 className="mt-2 font-display text-xl sm:text-2xl md:text-3xl font-black text-white uppercase tracking-tight md:whitespace-nowrap">
+              <h2 className="mt-2 font-display text-xl sm:text-2xl md:text-3xl font-black text-white uppercase tracking-tight md:whitespace-nowrap section-title-stroke">
                 ¿Ya te inscribiste? Consultá tu Estado y Dorsal
               </h2>
               <p className="mt-1 text-xs sm:text-sm text-stone-300">
