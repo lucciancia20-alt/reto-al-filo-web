@@ -75,6 +75,8 @@ export default function AdminModal({
   const [authInfo, setAuthInfo] = useState('');
   const [confirmingLogout, setConfirmingLogout] = useState(false);
   const logoutTimerRef = useRef(null);
+  const [confirmingReset, setConfirmingReset] = useState(false);
+  const resetTimerRef = useRef(null);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
 
@@ -385,11 +387,16 @@ export default function AdminModal({
       setAuthError('');
       setAuthInfo('');
       setConfirmingLogout(false);
+      setConfirmingReset(false);
     }
     return () => {
       if (logoutTimerRef.current) {
         clearTimeout(logoutTimerRef.current);
         logoutTimerRef.current = null;
+      }
+      if (resetTimerRef.current) {
+        clearTimeout(resetTimerRef.current);
+        resetTimerRef.current = null;
       }
     };
   }, [isOpen]);
@@ -1027,13 +1034,21 @@ export default function AdminModal({
   };
 
   const handleReset = async () => {
-    if (
-      !window.confirm(
-        '¿Restaurar toda la configuración a los valores originales? Se perderán los cambios personalizados.'
-      )
-    ) {
+    if (!confirmingReset) {
+      setConfirmingReset(true);
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = setTimeout(() => {
+        setConfirmingReset(false);
+        resetTimerRef.current = null;
+      }, 3000);
       return;
     }
+
+    if (resetTimerRef.current) {
+      clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = null;
+    }
+    setConfirmingReset(false);
     setSaving(true);
     await onResetConfig();
     setSaving(false);
@@ -1138,7 +1153,6 @@ export default function AdminModal({
   };
 
   const handleDeleteGalleryPhoto = async (photo) => {
-    if (!window.confirm('¿Quitar esta foto de la galería pública?')) return;
     setPhotoBusyId(photo.id);
     setPhotoStatus(null);
     try {
@@ -1424,10 +1438,14 @@ export default function AdminModal({
                   type="button"
                   onClick={handleReset}
                   disabled={saving}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold px-4 py-2.5 cursor-pointer"
+                  className={`inline-flex items-center gap-1.5 rounded-xl text-xs font-semibold px-4 py-2.5 cursor-pointer transition-colors ${
+                    confirmingReset
+                      ? 'bg-zinc-950 border border-red-500 text-red-400'
+                      : 'bg-stone-800 hover:bg-stone-700 text-stone-300'
+                  }`}
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
-                  Restaurar valores originales
+                  {confirmingReset ? '¿Confirmar restauración?' : 'Restaurar valores originales'}
                 </button>
               )}
 

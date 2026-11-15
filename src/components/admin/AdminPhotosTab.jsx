@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Upload,
   Camera,
@@ -31,6 +31,37 @@ export default function AdminPhotosTab({
   onLoadGalleryItems,
   onDeleteGalleryPhoto,
 }) {
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const deleteTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (deleteTimerRef.current) {
+        clearTimeout(deleteTimerRef.current);
+        deleteTimerRef.current = null;
+      }
+    };
+  }, []);
+
+  const handlePhotoDeleteClick = (item) => {
+    if (confirmDeleteId !== item.id) {
+      setConfirmDeleteId(item.id);
+      if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current);
+      deleteTimerRef.current = setTimeout(() => {
+        setConfirmDeleteId(null);
+        deleteTimerRef.current = null;
+      }, 3000);
+      return;
+    }
+
+    if (deleteTimerRef.current) {
+      clearTimeout(deleteTimerRef.current);
+      deleteTimerRef.current = null;
+    }
+    setConfirmDeleteId(null);
+    onDeleteGalleryPhoto(item);
+  };
+
   return (
     <div className="space-y-3">
       <form
@@ -243,11 +274,19 @@ export default function AdminPhotosTab({
                   <button
                     type="button"
                     disabled={photoBusyId === item.id}
-                    onClick={() => onDeleteGalleryPhoto(item)}
-                    aria-label={`Eliminar postal ${item.sector}`}
-                    className="p-1.5 rounded-lg text-stone-400 hover:text-rose-400 hover:bg-stone-800 cursor-pointer shrink-0 disabled:opacity-40"
+                    onClick={() => handlePhotoDeleteClick(item)}
+                    aria-label={
+                      confirmDeleteId === item.id
+                        ? `Confirmar eliminación de postal ${item.sector}`
+                        : `Eliminar postal ${item.sector}`
+                    }
+                    className={`rounded-lg cursor-pointer shrink-0 transition-colors disabled:opacity-40 ${
+                      confirmDeleteId === item.id
+                        ? 'px-2 py-1 text-[10px] font-bold bg-zinc-950 border border-red-500 text-red-400'
+                        : 'p-1.5 text-stone-400 hover:text-red-500 hover:bg-stone-800'
+                    }`}
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    {confirmDeleteId === item.id ? '¿Borrar?' : <Trash2 className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
