@@ -159,23 +159,25 @@ export default function AdminRegistrationsTab({
         aria-pressed={isActive}
         className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] transition-colors cursor-pointer ${
           isActive
-            ? 'bg-stone-950 border-rose-500 ring-1 ring-rose-500/70 text-white font-bold'
-            : 'bg-zinc-900/80 border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white font-medium'
+            ? 'bg-stone-950 border-red-500 ring-1 ring-red-500/70 text-white font-bold'
+            : hasDuplicates
+              ? 'bg-zinc-900/80 border-red-500/60 text-zinc-200 hover:border-red-500 hover:text-white font-medium'
+              : 'bg-zinc-900/80 border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white font-medium'
         }`}
       >
         {hasDuplicates && (
-          <span aria-hidden="true" className="text-[11px] leading-none text-rose-400">
+          <span aria-hidden="true" className="text-[11px] leading-none text-red-500">
             ⚠
           </span>
         )}
         <span>{label}</span>
-        <span className={hasDuplicates ? 'text-rose-400 font-bold' : 'text-zinc-500'}>
+        <span className={hasDuplicates ? 'text-red-500 font-bold' : 'text-zinc-500'}>
           ({count})
         </span>
         {isActive && (
           <span
             aria-hidden="true"
-            className="ml-0.5 text-[10px] leading-none text-rose-400 font-bold"
+            className="ml-0.5 text-[10px] leading-none text-red-500 font-bold"
           >
             ✕
           </span>
@@ -665,10 +667,10 @@ export default function AdminRegistrationsTab({
                         placeholder="Dorsal"
                         className={
                           isDuplicateBib
-                            ? `w-12 rounded-lg bg-stone-950 border border-rose-500 px-1 py-1 text-xs font-mono text-rose-300 text-center ${
+                            ? `w-12 rounded-lg bg-red-500/15 border border-red-500 px-1 py-1 text-xs font-mono text-red-400 text-center ${
                                 isBibLocked
                                   ? 'font-bold cursor-default'
-                                  : 'focus:border-rose-400 focus:outline-none'
+                                  : 'focus:border-red-400 focus:outline-none'
                               }`
                             : isBibLocked
                               ? 'w-12 rounded-lg bg-stone-950 border border-orange-500/40 px-1 py-1 text-xs font-mono font-bold text-orange-400 text-center cursor-default'
