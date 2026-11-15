@@ -26,6 +26,8 @@ export default function AdminRegistrationsTab({
   setRegDistanceFilter,
   regStatusFilter,
   setRegStatusFilter,
+  regDuplicateFilter = 'none',
+  setRegDuplicateFilter,
   bibDrafts,
   setBibDrafts,
   regBusyId,
@@ -43,11 +45,8 @@ export default function AdminRegistrationsTab({
   const [sortConfig, setSortConfig] = useState({ field: null, direction: 'asc' });
 
   const handleSort = (field) => {
-    if (
-      (regStatusFilter === 'duplicados_dorsal' || regStatusFilter === 'duplicados_dni') &&
-      filteredRegistrations.length === 0
-    ) {
-      setRegStatusFilter('all');
+    if (regDuplicateFilter !== 'none' && filteredRegistrations.length === 0) {
+      setRegDuplicateFilter?.('none');
     }
     setSortConfig((prev) =>
       prev.field === field
@@ -127,22 +126,19 @@ export default function AdminRegistrationsTab({
   };
 
   const handleToggleDuplicateFilter = (filterValue) => {
-    setRegDistanceFilter('all');
     setSortConfig({ field: null, direction: 'asc' });
-    setRegStatusFilter((prev) => (prev === filterValue ? 'all' : filterValue));
+    if (regDuplicateFilter === filterValue) {
+      setRegDuplicateFilter?.('none');
+    } else {
+      setRegDistanceFilter('all');
+      setRegStatusFilter('all');
+      setRegDuplicateFilter?.(filterValue);
+    }
   };
 
   const renderDuplicateFilterButton = (filterValue, label, count) => {
-    const isActive = regStatusFilter === filterValue;
+    const isActive = regDuplicateFilter === filterValue;
     const hasDuplicates = count > 0;
-
-    let colorClass =
-      'border-zinc-700 text-zinc-500 hover:text-zinc-300 hover:border-zinc-600 font-medium';
-    if (isActive) {
-      colorClass = 'border-rose-400 ring-1 ring-rose-500/70 text-white font-bold';
-    } else if (hasDuplicates) {
-      colorClass = 'border-rose-500 text-rose-400 hover:bg-white/5 font-bold';
-    }
 
     return (
       <button
@@ -150,18 +146,26 @@ export default function AdminRegistrationsTab({
         type="button"
         onClick={() => handleToggleDuplicateFilter(filterValue)}
         aria-pressed={isActive}
-        className={`inline-flex items-center gap-1 rounded-lg bg-stone-950 border px-2.5 py-1 text-[11px] transition-colors cursor-pointer ${colorClass}`}
+        className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] transition-colors cursor-pointer ${
+          isActive
+            ? 'bg-stone-950 border-rose-500 ring-1 ring-rose-500/70 text-white font-bold'
+            : 'bg-zinc-900/80 border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white font-medium'
+        }`}
       >
         {hasDuplicates && (
           <span aria-hidden="true" className="text-[11px] leading-none text-rose-400">
             ⚠
           </span>
         )}
-        <span>
-          {label} ({count})
+        <span>{label}</span>
+        <span className={hasDuplicates ? 'text-rose-400 font-bold' : 'text-zinc-500'}>
+          ({count})
         </span>
         {isActive && (
-          <span aria-hidden="true" className="ml-0.5 text-[10px] leading-none text-rose-300">
+          <span
+            aria-hidden="true"
+            className="ml-0.5 text-[10px] leading-none text-rose-400 font-bold"
+          >
             ✕
           </span>
         )}
@@ -198,7 +202,8 @@ export default function AdminRegistrationsTab({
     }));
   };
 
-  const hasSpecificFilter = regDistanceFilter !== 'all' || regStatusFilter !== 'all';
+  const hasSpecificFilter =
+    regDistanceFilter !== 'all' || regStatusFilter !== 'all' || regDuplicateFilter !== 'none';
 
   return (
     <div className="space-y-3">
@@ -213,8 +218,12 @@ export default function AdminRegistrationsTab({
             activeClass: 'bg-stone-950 border-white',
             labelClass: 'text-white',
             dotClass: 'bg-white',
-            isActive: regDistanceFilter === 'all' && regStatusFilter === 'all',
+            isActive:
+              regDistanceFilter === 'all' &&
+              regStatusFilter === 'all' &&
+              regDuplicateFilter === 'none',
             onClick: () => {
+              setRegDuplicateFilter?.('none');
               setRegDistanceFilter('all');
               setRegStatusFilter('all');
             },
@@ -227,9 +236,13 @@ export default function AdminRegistrationsTab({
             activeClass: 'bg-stone-950 border-emerald-400',
             labelClass: 'text-emerald-400',
             dotClass: 'bg-emerald-400',
-            isActive: regStatusFilter === 'confirmado',
+            isActive: regStatusFilter === 'confirmado' && regDuplicateFilter === 'none',
             onClick: () => {
-              const isAlreadyActive = regStatusFilter === 'confirmado' && regDistanceFilter === 'all';
+              const isAlreadyActive =
+                regStatusFilter === 'confirmado' &&
+                regDistanceFilter === 'all' &&
+                regDuplicateFilter === 'none';
+              setRegDuplicateFilter?.('none');
               setRegDistanceFilter('all');
               setRegStatusFilter(isAlreadyActive ? 'all' : 'confirmado');
             },
@@ -242,9 +255,13 @@ export default function AdminRegistrationsTab({
             activeClass: 'bg-stone-950 border-amber-400',
             labelClass: 'text-amber-400',
             dotClass: 'bg-amber-400',
-            isActive: regStatusFilter === 'pendiente',
+            isActive: regStatusFilter === 'pendiente' && regDuplicateFilter === 'none',
             onClick: () => {
-              const isAlreadyActive = regStatusFilter === 'pendiente' && regDistanceFilter === 'all';
+              const isAlreadyActive =
+                regStatusFilter === 'pendiente' &&
+                regDistanceFilter === 'all' &&
+                regDuplicateFilter === 'none';
+              setRegDuplicateFilter?.('none');
               setRegDistanceFilter('all');
               setRegStatusFilter(isAlreadyActive ? 'all' : 'pendiente');
             },
@@ -257,9 +274,13 @@ export default function AdminRegistrationsTab({
             activeClass: 'bg-stone-950 border-cyan-400',
             labelClass: 'text-cyan-400',
             dotClass: 'bg-cyan-300',
-            isActive: regDistanceFilter === '27K',
+            isActive: regDistanceFilter === '27K' && regDuplicateFilter === 'none',
             onClick: () => {
-              const isAlreadyActive = regDistanceFilter === '27K' && regStatusFilter === 'all';
+              const isAlreadyActive =
+                regDistanceFilter === '27K' &&
+                regStatusFilter === 'all' &&
+                regDuplicateFilter === 'none';
+              setRegDuplicateFilter?.('none');
               setRegStatusFilter('all');
               setRegDistanceFilter(isAlreadyActive ? 'all' : '27K');
             },
@@ -272,9 +293,13 @@ export default function AdminRegistrationsTab({
             activeClass: 'bg-stone-950 border-red-500',
             labelClass: 'text-red-500',
             dotClass: 'bg-red-400',
-            isActive: regDistanceFilter === '13K',
+            isActive: regDistanceFilter === '13K' && regDuplicateFilter === 'none',
             onClick: () => {
-              const isAlreadyActive = regDistanceFilter === '13K' && regStatusFilter === 'all';
+              const isAlreadyActive =
+                regDistanceFilter === '13K' &&
+                regStatusFilter === 'all' &&
+                regDuplicateFilter === 'none';
+              setRegDuplicateFilter?.('none');
               setRegStatusFilter('all');
               setRegDistanceFilter(isAlreadyActive ? 'all' : '13K');
             },
@@ -343,25 +368,18 @@ export default function AdminRegistrationsTab({
             <select
               aria-label="Filtrar por estado"
               value={regStatusFilter}
-              onChange={(e) => setRegStatusFilter(e.target.value)}
+              onChange={(e) => {
+                setRegDuplicateFilter?.('none');
+                setRegStatusFilter(e.target.value);
+              }}
               className={`rounded-xl bg-stone-950 border focus:outline-none px-3 py-2 text-xs transition-colors ${
                 regStatusFilter === 'pendiente'
                   ? 'text-amber-400 border-amber-500/60 focus:border-amber-400 font-bold'
                   : regStatusFilter === 'confirmado'
                     ? 'text-emerald-400 border-emerald-500/60 focus:border-emerald-400 font-bold'
-                    : regStatusFilter === 'duplicados_dorsal' ||
-                        regStatusFilter === 'duplicados_dni'
-                      ? 'text-rose-400 border-rose-500/60 focus:border-rose-400 font-bold'
-                      : 'text-white border-white/15 focus:border-orange-400'
+                    : 'text-white border-white/15 focus:border-orange-400'
               }`}
             >
-              {(regStatusFilter === 'duplicados_dorsal' || regStatusFilter === 'duplicados_dni') && (
-                <option value={regStatusFilter} hidden>
-                  {regStatusFilter === 'duplicados_dorsal'
-                    ? 'Dorsales duplicados'
-                    : 'DNI duplicados'}
-                </option>
-              )}
               <option value="all" className="bg-stone-950 text-white font-normal">
                 Todos los estados
               </option>
@@ -435,12 +453,8 @@ export default function AdminRegistrationsTab({
             </div>
 
             <div className="ml-auto flex items-center gap-2 flex-wrap shrink-0">
-              {renderDuplicateFilterButton(
-                'duplicados_dorsal',
-                'Dorsales duplicados',
-                duplicateBibCount
-              )}
-              {renderDuplicateFilterButton('duplicados_dni', 'DNI duplicados', duplicateDniCount)}
+              {renderDuplicateFilterButton('dorsal', 'Dorsales duplicados', duplicateBibCount)}
+              {renderDuplicateFilterButton('dni', 'DNI duplicados', duplicateDniCount)}
             </div>
           </div>
 

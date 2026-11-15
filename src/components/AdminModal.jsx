@@ -103,6 +103,7 @@ export default function AdminModal({
   const [regSearch, setRegSearch] = useState('');
   const [regDistanceFilter, setRegDistanceFilter] = useState('all');
   const [regStatusFilter, setRegStatusFilter] = useState('all');
+  const [regDuplicateFilter, setRegDuplicateFilter] = useState('none');
   const [bibDrafts, setBibDrafts] = useState({});
   const [regBusyId, setRegBusyId] = useState('');
 
@@ -226,18 +227,19 @@ export default function AdminModal({
       if (regDistanceFilter !== 'all' && reg.distance !== regDistanceFilter) {
         return false;
       }
-      if (regStatusFilter === 'duplicados_dorsal') {
+      if (regStatusFilter !== 'all' && reg.status !== regStatusFilter) {
+        return false;
+      }
+      if (regDuplicateFilter === 'dorsal') {
         const savedBib = normalizeBibNumber(reg.assignedBib);
         const liveBib = normalizeBibNumber(bibDrafts[reg.id] ?? reg.assignedBib);
         const isDupBib =
           (savedBib !== null && duplicateInfo.duplicateSavedBibs.has(savedBib)) ||
           (liveBib !== null && duplicateInfo.duplicateLiveBibs.has(liveBib));
         if (!isDupBib) return false;
-      } else if (regStatusFilter === 'duplicados_dni') {
+      } else if (regDuplicateFilter === 'dni') {
         const dni = normalizeDni(reg.dni);
         if (!dni || !duplicateInfo.duplicateDnis.has(dni)) return false;
-      } else if (regStatusFilter !== 'all' && reg.status !== regStatusFilter) {
-        return false;
       }
       if (!q) return true;
       const haystack = [
@@ -255,7 +257,7 @@ export default function AdminModal({
       return haystack.includes(q);
     });
 
-    if (regStatusFilter === 'duplicados_dorsal') {
+    if (regDuplicateFilter === 'dorsal') {
       return [...list].sort((a, b) => {
         const bibA =
           normalizeBibNumber(bibDrafts[a.id] ?? a.assignedBib) ??
@@ -272,7 +274,7 @@ export default function AdminModal({
       });
     }
 
-    if (regStatusFilter === 'duplicados_dni') {
+    if (regDuplicateFilter === 'dni') {
       return [...list].sort((a, b) => {
         const dniA = normalizeDni(a.dni);
         const dniB = normalizeDni(b.dni);
@@ -285,7 +287,15 @@ export default function AdminModal({
     }
 
     return list;
-  }, [registrations, regSearch, regDistanceFilter, regStatusFilter, duplicateInfo, bibDrafts]);
+  }, [
+    registrations,
+    regSearch,
+    regDistanceFilter,
+    regStatusFilter,
+    regDuplicateFilter,
+    duplicateInfo,
+    bibDrafts,
+  ]);
 
   const loadGalleryItems = async () => {
     setGalleryLoading(true);
@@ -1209,6 +1219,8 @@ export default function AdminModal({
                   setRegDistanceFilter={setRegDistanceFilter}
                   regStatusFilter={regStatusFilter}
                   setRegStatusFilter={setRegStatusFilter}
+                  regDuplicateFilter={regDuplicateFilter}
+                  setRegDuplicateFilter={setRegDuplicateFilter}
                   bibDrafts={bibDrafts}
                   setBibDrafts={setBibDrafts}
                   regBusyId={regBusyId}
