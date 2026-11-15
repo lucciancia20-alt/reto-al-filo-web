@@ -1174,7 +1174,7 @@ export default function AdminModal({
       onClick={handleSafeClose}
     >
       <div
-        className={`w-full max-w-5xl ${unlocked ? 'h-[90dvh] sm:h-[780px]' : 'h-auto'} max-h-[90dvh] rounded-3xl bg-stone-900 border border-stone-700 shadow-2xl flex flex-col overflow-hidden overscroll-contain text-stone-100`}
+        className={`w-full max-w-5xl ${unlocked ? 'h-[88vh] max-h-[850px]' : 'h-auto max-h-[90dvh]'} rounded-3xl bg-stone-900 border border-stone-700 shadow-2xl flex flex-col justify-start overflow-hidden overscroll-contain text-stone-100`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header del Modal */}
@@ -1279,7 +1279,7 @@ export default function AdminModal({
                 ref={scrollContainerRef}
                 onScroll={checkScrollMore}
                 style={{ scrollbarGutter: 'stable' }}
-                className="flex-1 min-h-0 overflow-y-scroll overscroll-contain p-4 sm:px-6 sm:py-4 space-y-4"
+                className="flex-1 min-h-0 overflow-y-scroll overscroll-contain flex flex-col justify-start items-stretch p-4 sm:px-6 sm:py-4 space-y-4"
               >
               {activeTab === 'general' && (
                 <AdminGeneralTab
@@ -1296,6 +1296,9 @@ export default function AdminModal({
                   onSelectDistance={(d) => {
                     setEditDistance(d);
                     setGpxStatus('');
+                    if (scrollContainerRef.current) {
+                      scrollContainerRef.current.scrollTop = 0;
+                    }
                   }}
                   activeCircuitDraft={activeCircuitDraft}
                   activeTrack={activeTrack}

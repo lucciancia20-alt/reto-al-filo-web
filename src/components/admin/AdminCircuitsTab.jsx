@@ -25,18 +25,18 @@ export default function AdminCircuitsTab({
           const colorClass =
             d === '27K'
               ? active
-                ? 'bg-zinc-950 text-cyan-400 border-2 border-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.3)]'
-                : 'bg-zinc-950 text-cyan-400 border border-cyan-500/40 opacity-80 hover:opacity-100'
+                ? 'bg-zinc-950 text-cyan-400 border border-cyan-400'
+                : 'bg-zinc-950 text-cyan-400 border border-transparent opacity-80 hover:opacity-100'
               : active
-                ? 'bg-zinc-950 text-red-500 border-2 border-red-500'
-                : 'bg-zinc-950 text-red-500 border border-red-500/50 hover:border-red-500 opacity-80 hover:opacity-100';
+                ? 'bg-zinc-950 text-red-500 border border-red-500'
+                : 'bg-zinc-950 text-red-500 border border-transparent opacity-80 hover:opacity-100';
 
           return (
             <button
               key={d}
               type="button"
               onClick={() => onSelectDistance(d)}
-              className={`px-4 py-2 rounded-xl font-display font-bold text-xs uppercase cursor-pointer transition-all ${colorClass}`}
+              className={`px-4 py-2 rounded-xl font-display font-bold text-xs uppercase leading-none cursor-pointer transition-colors ${colorClass}`}
             >
               Circuito {d}
             </button>
