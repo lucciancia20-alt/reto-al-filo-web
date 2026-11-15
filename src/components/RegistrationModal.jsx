@@ -840,9 +840,9 @@ export default function RegistrationModal({
                         type="button"
                         aria-expanded={showSizeGuide}
                         onClick={() => setShowSizeGuide((prev) => !prev)}
-                        className="inline-flex items-center gap-1 rounded-lg bg-stone-950 hover:bg-stone-800 border border-orange-500/50 text-amber-300 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 rounded-lg bg-stone-950 hover:bg-stone-800 border border-orange-500/60 text-white text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer"
                       >
-                        <Ruler className="w-3.5 h-3.5 shrink-0" />
+                        <Ruler className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         <span>{showSizeGuide ? 'Ocultar medidas' : 'Guía de talles (cm)'}</span>
                         <ChevronDown
                           className={`w-3 h-3 transition-transform duration-150 ${
@@ -861,8 +861,8 @@ export default function RegistrationModal({
                             onClick={() => handleFieldChange('shirtSize', size)}
                             className={`min-h-[42px] rounded-xl font-display font-bold text-xs sm:text-sm border transition-colors cursor-pointer ${
                               active
-                                ? 'bg-amber-500 text-stone-950 border-orange-500'
-                                : 'bg-stone-950 text-stone-300 border-orange-500/40 hover:border-orange-500'
+                                ? 'bg-zinc-950 border-orange-500 ring-1 ring-orange-500/60 text-orange-400 font-bold'
+                                : 'bg-zinc-950 text-white border-orange-500/40 hover:border-orange-500'
                             }`}
                           >
                             {size}
@@ -874,7 +874,7 @@ export default function RegistrationModal({
                     {showSizeGuide && (
                       <div className="mt-2 rounded-xl bg-stone-950 border border-orange-500/45 p-3 text-xs">
                         <div className="flex items-center justify-between gap-2 mb-2">
-                          <span className="font-bold text-amber-300 text-[11px] uppercase tracking-wider">
+                          <span className="text-white font-semibold text-[11px] uppercase tracking-wider">
                             Medidas aproximadas · Corte Unisex
                           </span>
                           <span className="text-[10px] text-stone-400">
@@ -899,7 +899,7 @@ export default function RegistrationModal({
                                     onClick={() => handleFieldChange('shirtSize', row.size)}
                                     className={`cursor-pointer transition-colors ${
                                       isSelected
-                                        ? 'bg-amber-500/15 text-amber-200 font-bold'
+                                        ? 'bg-zinc-950 text-white font-bold border border-orange-500/80 outline outline-1 outline-orange-500/80 -outline-offset-1 rounded-md'
                                         : 'text-stone-300 hover:bg-stone-900'
                                     }`}
                                   >
@@ -1204,9 +1204,9 @@ export default function RegistrationModal({
               {submitError && (
                 <div
                   role="alert"
-                  className="rounded-xl bg-rose-500/15 border border-rose-500/35 p-3 text-xs text-rose-200 flex items-start gap-2"
+                  className="rounded-xl bg-zinc-950 border border-red-500 p-3 text-xs text-white flex items-start gap-2"
                 >
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
                   <span>{submitError}</span>
                 </div>
               )}
