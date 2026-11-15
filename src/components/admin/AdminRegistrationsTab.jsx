@@ -448,7 +448,7 @@ export default function AdminRegistrationsTab({
                       : 'bg-zinc-900/80 border-amber-500/60 text-white hover:border-amber-400'
                   }`}
                 >
-                  <span className="font-bold text-amber-300">{item.size}:</span>
+                  <span className="text-white font-semibold">{item.size}:</span>
                   <span>
                     <strong className="text-emerald-400">{item.confirmed}</strong>/{item.total}
                   </span>
@@ -505,7 +505,7 @@ export default function AdminRegistrationsTab({
         <p className="text-[11px] text-stone-400">
           Mostrando <strong className="text-stone-200">{filteredRegistrations.length}</strong> de{' '}
           <strong className="text-stone-200">{registrationsCount}</strong> inscripciones · Fuente:{' '}
-          <span className="font-mono text-amber-300">
+          <span className="font-mono text-white font-semibold">
             {regsSource === 'firestore' ? 'Firestore en vivo' : 'Respaldo local'}
           </span>
         </p>
