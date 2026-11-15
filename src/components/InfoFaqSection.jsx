@@ -198,7 +198,6 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   <table className="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
                       <tr className="bg-stone-950 border-b border-orange-500/35 text-[11px] uppercase tracking-wider text-amber-400">
-                        <th className="px-4 py-2.5 font-extrabold">Categoría</th>
                         <th className="px-4 py-2.5 font-extrabold">Franja Etaria</th>
                         <th className="px-4 py-2.5 font-extrabold text-right">Ramas y Distancias</th>
                       </tr>
@@ -210,10 +209,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                           className="hover:bg-stone-950/60 transition-colors"
                         >
                           <td className="px-4 py-2.5 font-display font-bold text-white">
-                            {cat.label}
-                          </td>
-                          <td className="px-4 py-2.5 font-mono text-amber-300 font-semibold">
-                            {cat.range || cat.label}
+                            {cat.label || cat.range}
                           </td>
                           <td className="px-4 py-2.5 text-right text-[11px] sm:text-xs text-stone-300">
                             Damas / Caballeros · <span className="text-cyan-400 font-bold">27K</span> y{' '}

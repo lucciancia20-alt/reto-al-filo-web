@@ -123,9 +123,9 @@ export default function AdminScheduleFaqTab({
     }));
   };
 
-  const handleBracketChange = (idx, field, value) => {
+  const handleBracketChange = (idx, value) => {
     const nextBrackets = brackets.map((b, i) =>
-      i === idx ? { ...b, [field]: value } : b
+      i === idx ? { id: b?.id || `cat-${i}`, label: value } : b
     );
     updateCategoryField('brackets', nextBrackets);
   };
@@ -133,7 +133,7 @@ export default function AdminScheduleFaqTab({
   const handleAddBracket = () => {
     updateCategoryField('brackets', [
       ...brackets,
-      { id: `cat-${Date.now()}`, label: '', range: '' },
+      { id: `cat-${Date.now()}`, label: '' },
     ]);
   };
 
@@ -406,25 +406,15 @@ export default function AdminScheduleFaqTab({
             Franjas Etarias (Damas y Caballeros · 27K y 13K)
           </span>
           {brackets.map((b, idx) => (
-            <div key={b.id || idx} className="flex items-center gap-2">
-              <div className="grid grid-cols-1 sm:grid-cols-11 gap-2 flex-1 min-w-0">
-                <input
-                  type="text"
-                  value={b.label}
-                  onChange={(e) => handleBracketChange(idx, 'label', e.target.value)}
-                  placeholder="Ej. 18 a 29 años"
-                  aria-label={`Nombre categoría ${idx + 1}`}
-                  className="sm:col-span-5 w-full rounded-lg bg-stone-900 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-bold text-white"
-                />
-                <input
-                  type="text"
-                  value={b.range}
-                  onChange={(e) => handleBracketChange(idx, 'range', e.target.value)}
-                  placeholder="Ej. 18 – 29 años"
-                  aria-label={`Rango edad ${idx + 1}`}
-                  className="sm:col-span-6 w-full rounded-lg bg-stone-900 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono text-amber-300"
-                />
-              </div>
+            <div key={b.id || idx} className="flex items-center gap-3">
+              <input
+                type="text"
+                value={b.label ?? b.range ?? ''}
+                onChange={(e) => handleBracketChange(idx, e.target.value)}
+                placeholder="Ej. 18 a 29 años"
+                aria-label={`Franja etaria ${idx + 1}`}
+                className="flex-1 min-w-0 w-full rounded-lg bg-stone-900 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-bold text-white"
+              />
               {renderDeleteButton(
                 `bracket-${b.id || idx}`,
                 `Quitar categoría ${idx + 1}`,

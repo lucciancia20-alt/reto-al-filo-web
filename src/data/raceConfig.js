@@ -257,11 +257,11 @@ export const RACE_CONFIG = {
     generalPodium: 'Top 3 General Damas y Caballeros (27K y 13K)',
     categoryPodium: '1° al 3° Puesto por Categoría en Damas y Caballeros (27K y 13K)',
     brackets: [
-      { id: 'cat-18-29', label: '18 a 29 años', range: '18 – 29 años' },
-      { id: 'cat-30-39', label: '30 a 39 años', range: '30 – 39 años' },
-      { id: 'cat-40-49', label: '40 a 49 años', range: '40 – 49 años' },
-      { id: 'cat-50-59', label: '50 a 59 años', range: '50 – 59 años' },
-      { id: 'cat-60-plus', label: '60+ años', range: '60 años en adelante' },
+      { id: 'cat-18-29', label: '18 a 29 años' },
+      { id: 'cat-30-39', label: '30 a 39 años' },
+      { id: 'cat-40-49', label: '40 a 49 años' },
+      { id: 'cat-50-59', label: '50 a 59 años' },
+      { id: 'cat-60-plus', label: '60+ años' },
     ],
   },
 };
@@ -547,8 +547,7 @@ export function mergeRaceConfig(override) {
     brackets: Array.isArray(incomingCats.brackets)
       ? incomingCats.brackets.map((b, idx) => ({
           id: b?.id || `cat-${idx}`,
-          label: String(b?.label ?? ''),
-          range: String(b?.range ?? ''),
+          label: String(b?.label || b?.range || ''),
         }))
       : RACE_CONFIG.ageCategories.brackets,
   };
@@ -730,14 +729,15 @@ export function resolveRunnerCategory(runner, raceConfig = RACE_CONFIG) {
       : RACE_CONFIG.ageCategories.brackets;
 
   const matchedBracket = matchAgeBracket(age, brackets);
-  const bracketLabel = matchedBracket?.label || (age !== null ? `${age} años` : '');
+  const bracketLabel =
+    matchedBracket?.label || matchedBracket?.range || (age !== null ? `${age} años` : '');
 
   const fullParts = [distanceLabel, genderLabel, bracketLabel].filter(Boolean);
   const fullCategory = fullParts.length > 0 ? fullParts.join(' · ') : 'Sin clasificar';
 
-  const compactRange = matchedBracket?.range
-    ? matchedBracket.range.replace(/años?/gi, '').replace(/\s+/g, ' ').trim()
-    : bracketLabel;
+  const compactRange = bracketLabel
+    ? bracketLabel.replace(/años?/gi, '').replace(/\s+/g, ' ').trim()
+    : '';
   const shortParts = [distanceLabel, genderShort || genderLabel, compactRange].filter(Boolean);
   const shortCategory = shortParts.length > 0 ? shortParts.join(' ') : 'Sin clasificar';
 
