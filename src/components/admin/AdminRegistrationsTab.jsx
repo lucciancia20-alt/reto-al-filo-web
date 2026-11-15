@@ -450,7 +450,7 @@ export default function AdminRegistrationsTab({
                 >
                   <span className="text-white font-semibold">{item.size}:</span>
                   <span>
-                    <strong className="text-emerald-400">{item.confirmed}</strong>/{item.total}
+                    <strong className="text-white font-bold">{item.confirmed}</strong>/{item.total}
                   </span>
                 </button>
               );
@@ -599,7 +599,7 @@ export default function AdminRegistrationsTab({
                   {/* Identificación rápida del corredor (estructura fija en 2 líneas) */}
                   <div className="min-w-[270px] flex-1 space-y-1.5">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="font-mono text-[10px] sm:text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-stone-950 border border-amber-500/50 text-amber-300 shrink-0">
+                      <span className="font-mono text-[10px] sm:text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-stone-950 border border-amber-500/60 text-white shrink-0">
                         {reg.code}
                       </span>
                       <span
@@ -619,7 +619,7 @@ export default function AdminRegistrationsTab({
                       </h4>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-[11px] text-stone-400 shrink-0">
+                      <span className="font-mono text-[11px] text-white font-medium shrink-0">
                         DNI {reg.dni}
                       </span>
                       <span
