@@ -827,48 +827,48 @@ export default function AdminRegistrationsTab({
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1.5">
                         <div className="truncate">
-                          <span className="text-stone-500">Email: </span>
-                          <span className="text-stone-100">{reg.email}</span>
+                          <span className="text-stone-200">Email: </span>
+                          <span className="text-white font-semibold">{reg.email}</span>
                         </div>
                         <div>
-                          <span className="text-stone-500">Nacimiento: </span>
-                          <span className="text-stone-100">{reg.birthDate}</span>
+                          <span className="text-stone-200">Nacimiento: </span>
+                          <span className="text-white font-semibold">{reg.birthDate}</span>
                         </div>
                         <div>
-                          <span className="text-stone-500">Género: </span>
-                          <span className="text-stone-100">{reg.gender}</span>
+                          <span className="text-stone-200">Género: </span>
+                          <span className="text-white font-semibold">{reg.gender}</span>
                         </div>
                         <div>
-                          <span className="text-stone-500">Talle remera: </span>
-                          <strong className="text-amber-300">{reg.shirtSize}</strong>
+                          <span className="text-stone-200">Talle remera: </span>
+                          <span className="text-white font-semibold">{reg.shirtSize}</span>
                         </div>
                         <div>
-                          <span className="text-stone-500">Localidad: </span>
-                          <span className="text-stone-100">{reg.city}</span>
+                          <span className="text-stone-200">Localidad: </span>
+                          <span className="text-white font-semibold">{reg.city}</span>
                         </div>
                         <div>
-                          <span className="text-stone-500">Team: </span>
-                          <span className="text-stone-100">{reg.team || 'Libre'}</span>
+                          <span className="text-stone-200">Team: </span>
+                          <span className="text-white font-semibold">{reg.team || 'Libre'}</span>
                         </div>
                         <div>
-                          <span className="text-stone-500">Teléfono: </span>
-                          <span className="font-mono text-stone-100">{reg.phone}</span>
+                          <span className="text-stone-200">Teléfono: </span>
+                          <span className="font-mono text-white font-semibold">{reg.phone}</span>
                         </div>
                         <div>
-                          <span className="text-stone-500">Emergencia: </span>
-                          <span className="text-stone-100">
+                          <span className="text-stone-200">Emergencia: </span>
+                          <span className="text-white font-semibold">
                             {reg.emergencyContactName} ({reg.emergencyContactPhone})
                           </span>
                         </div>
                         <div>
-                          <span className="text-stone-500">Grupo sanguíneo: </span>
-                          <strong className="font-mono text-rose-300">
+                          <span className="text-stone-200">Grupo sanguíneo: </span>
+                          <span className="font-mono text-white font-semibold">
                             {reg.bloodType || 'No especificado'}
-                          </strong>
+                          </span>
                         </div>
-                        <div className="sm:col-span-2 md:col-span-3 text-stone-200">
-                          <span className="text-stone-500">Observaciones médicas: </span>
-                          <span className={reg.medicalNotes ? 'text-amber-200' : 'text-stone-400'}>
+                        <div className="sm:col-span-2 md:col-span-3">
+                          <span className="text-stone-200">Observaciones médicas: </span>
+                          <span className="text-white font-semibold">
                             {reg.medicalNotes || 'Sin observaciones médicas'}
                           </span>
                         </div>
