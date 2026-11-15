@@ -702,7 +702,7 @@ export default function AdminRegistrationsTab({
                       }
                       className={`inline-flex items-center gap-1 rounded-lg font-display font-black text-[10px] sm:text-[11px] uppercase px-2 py-1 transition-colors ${
                         isAlreadySaved
-                          ? 'bg-zinc-950 text-zinc-400 border border-emerald-500/70 cursor-default'
+                          ? 'bg-zinc-900/80 text-zinc-300 border border-zinc-700 cursor-default'
                           : 'bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/70 cursor-pointer disabled:opacity-50'
                       }`}
                     >
