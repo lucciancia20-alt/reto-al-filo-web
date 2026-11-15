@@ -803,23 +803,20 @@ export default function AdminRegistrationsTab({
                   return (
                     <div className="border-t border-stone-800/90 bg-stone-950 px-3.5 py-2.5 space-y-2 text-xs text-stone-300">
                       <div className="flex flex-wrap items-center gap-2 pb-2 border-b border-stone-800/70">
-                        <span className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500/10 border border-amber-500/35 px-2.5 py-1 text-[11px] font-bold text-amber-300">
-                          Categoría Oficial: <strong className="text-white">{cat.fullCategory}</strong>
+                        <span className="inline-flex items-center gap-1 rounded-lg bg-zinc-900/80 border border-amber-500/60 px-2.5 py-1 text-[11px] text-zinc-200">
+                          Categoría Oficial: <span className="text-white font-medium">{cat.fullCategory}</span>
                         </span>
-                        <span className="inline-flex items-center gap-1 rounded-lg bg-stone-900 border border-stone-700 px-2 py-1 text-[11px] text-stone-200">
+                        <span className="inline-flex items-center gap-1 rounded-lg bg-zinc-900/80 border border-amber-500/60 px-2.5 py-1 text-[11px] text-zinc-200">
                           Edad al día de carrera:{' '}
-                          <strong className="font-mono text-amber-300">
+                          <span className="text-white font-medium">
                             {cat.age !== null ? `${cat.age} años` : 'Sin fecha'}
-                          </strong>
+                          </span>
                         </span>
-                        <span
-                          className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[11px] font-semibold ${
-                            reg.checkedIn
-                              ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300'
-                              : 'bg-stone-900 border-stone-700 text-stone-400'
-                          }`}
-                        >
-                          Mesa Kit: {reg.checkedIn ? 'Kit entregado ✓' : 'Pendiente de retiro'}
+                        <span className="inline-flex items-center gap-1 rounded-lg bg-zinc-900/80 border border-amber-500/60 px-2.5 py-1 text-[11px] text-zinc-200">
+                          Mesa Kit:{' '}
+                          <span className="text-white font-medium">
+                            {reg.checkedIn ? 'Kit entregado ✓' : 'Pendiente de retiro'}
+                          </span>
                         </span>
                       </div>
 
