@@ -212,7 +212,7 @@ export default function AdminGeneralTab({
       {/* Precios y Datos Bancarios de Inscripción */}
       <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5">
         <div className="flex items-center gap-2">
-          <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
+          <Landmark className="w-4 h-4 text-orange-500 shrink-0" />
           <div>
             <h4 className="font-display text-sm font-bold text-white uppercase">
               Valores y Cuenta Bancaria para Inscripciones
@@ -258,7 +258,7 @@ export default function AdminGeneralTab({
               value={draft.payment?.bankAlias || ''}
               onChange={(e) => onUpdatePaymentField('bankAlias', e.target.value)}
               placeholder="RETO.AL.FILO"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono text-amber-300"
+              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono text-orange-400"
             />
           </div>
           <div>
@@ -351,7 +351,7 @@ export default function AdminGeneralTab({
           <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <PackageCheck className="w-4 h-4 text-amber-400 shrink-0" />
+                <PackageCheck className="w-4 h-4 text-orange-500 shrink-0" />
                 <div>
                   <h4 className="font-display text-sm font-bold text-white uppercase">
                     ¿Qué incluye la Inscripción? (Kit del Corredor)
@@ -365,7 +365,7 @@ export default function AdminGeneralTab({
               <button
                 type="button"
                 onClick={handleAddKitItem}
-                className="inline-flex items-center gap-1 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/35 text-xs font-bold px-3 py-1.5 cursor-pointer transition-colors"
+                className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-bold px-3 py-1.5 cursor-pointer transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Agregar ítem</span>
