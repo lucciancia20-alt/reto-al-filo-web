@@ -122,10 +122,12 @@ export default function AdminCircuitsTab({
             return (
               <div
                 key={st.id || idx}
-                className="flex flex-wrap sm:flex-nowrap items-center gap-2 bg-stone-900 p-2.5 rounded-xl border border-stone-800"
+                className="flex flex-wrap sm:flex-nowrap items-end gap-2 bg-stone-900 p-2.5 rounded-xl border border-stone-800"
               >
                 <div className="w-24 shrink-0">
-                  <label className="block text-[10px] text-stone-400">KM</label>
+                  <label className="block w-full text-center text-[10px] font-semibold tracking-wider text-stone-400 mb-1.5">
+                    KILÓMETROS
+                  </label>
                   <input
                     type="number"
                     step="0.1"
@@ -133,19 +135,19 @@ export default function AdminCircuitsTab({
                     max={activeTrack.totalKm}
                     value={st.km}
                     onChange={(e) => onStationChange(idx, 'km', e.target.value)}
-                    className={`w-full rounded-lg bg-stone-950 ${circuitInputBorderClass} px-2.5 py-1.5 text-xs font-mono text-white`}
+                    className={`w-full rounded-lg bg-stone-950 ${circuitInputBorderClass} px-2.5 py-1.5 text-center text-xs font-mono text-white`}
                   />
                 </div>
                 <div className="flex-1 min-w-[140px]">
-                  <label className="block text-[10px] text-stone-400">Nombre del Puesto</label>
                   <input
                     type="text"
+                    aria-label="Nombre del puesto"
                     value={st.label}
                     onChange={(e) => onStationChange(idx, 'label', e.target.value)}
                     className={`w-full rounded-lg bg-stone-950 ${circuitInputBorderClass} px-2.5 py-1.5 text-xs text-white`}
                   />
                 </div>
-                <div className="text-[11px] font-mono font-semibold text-white px-2 whitespace-nowrap">
+                <div className="text-[11px] font-mono font-semibold text-white px-2 pb-1.5 whitespace-nowrap">
                   {interp.alt} msnm
                 </div>
                 <button
