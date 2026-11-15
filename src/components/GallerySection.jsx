@@ -189,7 +189,7 @@ export default function GallerySection() {
               type="button"
               onClick={() => setSelectedIndex(null)}
               aria-label="Cerrar vista previa"
-              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-zinc-950/85 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -202,7 +202,7 @@ export default function GallerySection() {
                     setSelectedIndex((prev) => (prev - 1 + photos.length) % photos.length)
                   }
                   aria-label="Foto anterior"
-                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-950/85 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
@@ -212,7 +212,7 @@ export default function GallerySection() {
                     setSelectedIndex((prev) => (prev + 1) % photos.length)
                   }
                   aria-label="Foto siguiente"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-950/85 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
@@ -225,7 +225,7 @@ export default function GallerySection() {
               className="w-full max-h-[78vh] object-contain bg-stone-950"
             />
 
-            <div className="p-4 sm:p-5 bg-stone-950 border-t border-stone-800 flex items-center justify-between gap-2">
+            <div className="p-4 sm:p-5 bg-zinc-900/55 backdrop-blur-md border-t border-stone-800/80 flex items-center justify-between gap-2">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-orange-400">
                   1ra Edición · Reto al Filo
