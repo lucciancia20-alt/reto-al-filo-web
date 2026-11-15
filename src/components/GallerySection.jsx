@@ -1,19 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { Camera, Maximize2, X } from 'lucide-react';
 import { RACE_CONFIG } from '../data/raceConfig';
-import { fetchGalleryPhotos, filterDemoPhotos } from '../firebase/config';
+import {
+  fetchGalleryPhotos,
+  filterDemoPhotos,
+  getLocalCachedGalleryPhotos,
+} from '../firebase/config';
 
 export default function GallerySection() {
-  const [photos, setPhotos] = useState(() => filterDemoPhotos('', 1));
+  const [photos, setPhotos] = useState(() => getLocalCachedGalleryPhotos() || []);
+  const [isLoadingGallery, setIsLoadingGallery] = useState(
+    () => !getLocalCachedGalleryPhotos()
+  );
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
   useEffect(() => {
     let isCancelled = false;
 
     const loadPhotos = async () => {
-      const result = await fetchGalleryPhotos();
-      if (!isCancelled && Array.isArray(result?.photos) && result.photos.length > 0) {
-        setPhotos(result.photos);
+      try {
+        const result = await fetchGalleryPhotos();
+        if (!isCancelled) {
+          if (Array.isArray(result?.photos) && result.photos.length > 0) {
+            setPhotos(result.photos);
+          } else {
+            setPhotos(filterDemoPhotos('', 1));
+          }
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoadingGallery(false);
+        }
       }
     };
 
@@ -75,56 +92,71 @@ export default function GallerySection() {
         </div>
 
         {/* Grilla Masonry de postales */}
-        <div className="mt-5 sm:mt-6 columns-1 sm:columns-2 lg:columns-3 gap-3.5 space-y-3.5">
-          {photos.map((photo) => (
-            <article
-              key={photo.id}
-              role="button"
-              tabIndex={0}
-              aria-label={`Ampliar postal: ${photo.sector}`}
-              onClick={() => setSelectedPhoto(photo)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  setSelectedPhoto(photo);
-                }
-              }}
-              className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-stone-900 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
-            >
-              <div className={`w-full overflow-hidden bg-stone-900 ${photo.aspectClass}`}>
-                <img
-                  src={photo.cloudinaryThumb}
-                  alt={`Postal de Reto al Filo — ${photo.sector}`}
-                  loading="lazy"
-                  decoding="async"
-                  onError={(e) => {
-                    if (!e.currentTarget.dataset.fallbackApplied) {
-                      e.currentTarget.dataset.fallbackApplied = 'true';
-                      e.currentTarget.src = RACE_CONFIG.heroImage;
-                    }
-                  }}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-
-              {/* Superposición discreta con ubicación y botón ampliar */}
-              <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/15 to-transparent flex flex-col justify-between p-4">
-                <div className="flex justify-end">
-                  <span className="w-8 h-8 rounded-lg bg-stone-950/75 text-stone-200 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
-                    <Maximize2 className="w-4 h-4" />
-                  </span>
+        {isLoadingGallery && photos.length === 0 ? (
+          <div
+            aria-busy="true"
+            aria-label="Cargando galería fotográfica"
+            className="mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 min-h-[260px]"
+          >
+            {[0, 1, 2].map((item) => (
+              <div
+                key={item}
+                className="aspect-[4/3] w-full rounded-2xl bg-zinc-950 border border-orange-500/40 animate-pulse"
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-5 sm:mt-6 columns-1 sm:columns-2 lg:columns-3 gap-3.5 space-y-3.5">
+            {photos.map((photo) => (
+              <article
+                key={photo.id}
+                role="button"
+                tabIndex={0}
+                aria-label={`Ampliar postal: ${photo.sector}`}
+                onClick={() => setSelectedPhoto(photo)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedPhoto(photo);
+                  }
+                }}
+                className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-stone-900 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+              >
+                <div className={`w-full overflow-hidden bg-stone-900 ${photo.aspectClass}`}>
+                  <img
+                    src={photo.cloudinaryThumb}
+                    alt={`Postal de Reto al Filo — ${photo.sector}`}
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => {
+                      if (!e.currentTarget.dataset.fallbackApplied) {
+                        e.currentTarget.dataset.fallbackApplied = 'true';
+                        e.currentTarget.src = RACE_CONFIG.heroImage;
+                      }
+                    }}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
                 </div>
 
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-orange-400">
-                    1ra Edición · Reto al Filo
-                  </span>
-                  <p className="text-sm font-bold text-white">{photo.sector}</p>
+                {/* Superposición discreta con ubicación y botón ampliar */}
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/15 to-transparent flex flex-col justify-between p-4">
+                  <div className="flex justify-end">
+                    <span className="w-8 h-8 rounded-lg bg-stone-950/75 text-stone-200 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
+                      <Maximize2 className="w-4 h-4" />
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-orange-400">
+                      1ra Edición · Reto al Filo
+                    </span>
+                    <p className="text-sm font-bold text-white">{photo.sector}</p>
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
-        </div>
+              </article>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Modal Lightbox de foto seleccionada */}

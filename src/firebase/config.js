@@ -2,6 +2,7 @@ import { RACE_CONFIG, mergeRaceConfig, calculateRunnerAgeAtRace } from '../data/
 
 const LOCAL_CONFIG_STORAGE_KEY = 'reto_al_filo_config_v2';
 const LOCAL_REGISTRATIONS_STORAGE_KEY = 'reto_al_filo_registrations_v1';
+const LOCAL_GALLERY_STORAGE_KEY = 'reto_al_filo_gallery_v1';
 
 /**
  * Configuración de Firebase leída desde variables de entorno de Vite (.env.local).
@@ -122,6 +123,20 @@ export function filterDemoPhotos(_cleanBib = '', edicion = 1) {
   return RACE_CONFIG.demoPhotos
     .filter((item) => item.visible !== false && (item.edicion || 1) === edicion)
     .map((item) => normalizePhotoRecord(item.id, item));
+}
+
+/**
+ * Lee las fotografías cacheadas localmente de la galería (evita flash de demos al recargar).
+ */
+export function getLocalCachedGalleryPhotos() {
+  try {
+    const raw = window.localStorage.getItem(LOCAL_GALLERY_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -298,12 +313,23 @@ export async function fetchGalleryPhotos() {
       .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
     if (firestorePhotos.length > 0) {
+      try {
+        window.localStorage.setItem(LOCAL_GALLERY_STORAGE_KEY, JSON.stringify(firestorePhotos));
+      } catch {
+        // Ignorar errores de cuota de almacenamiento
+      }
       return {
         photos: firestorePhotos,
         customCount: firestorePhotos.length,
         source: 'firestore',
         networkError: false,
       };
+    }
+
+    try {
+      window.localStorage.removeItem(LOCAL_GALLERY_STORAGE_KEY);
+    } catch {
+      // Ignorar errores de almacenamiento
     }
 
     return {
@@ -317,6 +343,15 @@ export async function fetchGalleryPhotos() {
       '[Reto al Filo] Fallback a postales demo locales:',
       error?.code || error?.message
     );
+    const cached = getLocalCachedGalleryPhotos();
+    if (cached) {
+      return {
+        photos: cached,
+        customCount: cached.length,
+        source: 'local-cache',
+        networkError: true,
+      };
+    }
     return {
       photos: demoPhotos,
       customCount: 0,
