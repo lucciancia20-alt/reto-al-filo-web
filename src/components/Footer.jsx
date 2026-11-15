@@ -40,9 +40,9 @@ export default function Footer({
           <button
             type="button"
             onClick={() => onOpenModal()}
-            className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-5 py-3 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-orange-500 hover:bg-orange-400 text-zinc-950 font-display font-bold text-xs uppercase tracking-wider px-5 py-3 transition-colors cursor-pointer"
           >
-            <Flame className="w-4 h-4 fill-stone-950" />
+            <Flame className="w-4 h-4 fill-zinc-950" />
             Quiero Inscribirme
           </button>
         </div>

@@ -755,9 +755,9 @@ export default function CircuitSection({
                 <button
                   type="button"
                   onClick={() => onOpenModalWithDistance(activeDistance)}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black text-xs uppercase tracking-wider px-4 py-2 transition-colors cursor-pointer shrink-0"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-orange-500 hover:bg-orange-400 text-zinc-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2 transition-colors cursor-pointer shrink-0"
                 >
-                  <Flame className="w-3.5 h-3.5 fill-stone-950" />
+                  <Flame className="w-3.5 h-3.5 fill-zinc-950" />
                   <span>
                     Inscribirme · {activeDistance} ({currentCircuit.price})
                   </span>

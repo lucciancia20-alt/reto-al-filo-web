@@ -271,16 +271,16 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
               <button
                 type="submit"
                 disabled={lookupLoading}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-[0.99] text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-all cursor-pointer disabled:opacity-60 shrink-0"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 active:scale-[0.99] text-orange-400 font-display font-bold text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-all cursor-pointer disabled:opacity-60 shrink-0"
               >
                 {lookupLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin text-orange-500" />
                     <span>Buscando...</span>
                   </>
                 ) : (
                   <>
-                    <Search className="w-4 h-4" />
+                    <Search className="w-4 h-4 text-orange-500" />
                     <span>Consultar Estado</span>
                   </>
                 )}
@@ -415,17 +415,17 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                               <button
                                 type="button"
                                 onClick={() => openPrintableWaiver({ raceConfig })}
-                                className="inline-flex items-center gap-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-[11px] uppercase px-2.5 py-1.5 transition-colors cursor-pointer"
+                                className="inline-flex items-center gap-1 rounded-lg bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-bold text-[11px] uppercase px-2.5 py-1.5 transition-colors cursor-pointer"
                               >
-                                <Printer className="w-3.5 h-3.5" />
+                                <Printer className="w-3.5 h-3.5 text-orange-500" />
                                 Deslinde A4
                               </button>
                               <button
                                 type="button"
                                 onClick={() => openPrintableMedicalCert({ raceConfig })}
-                                className="inline-flex items-center gap-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-[11px] uppercase px-2.5 py-1.5 transition-colors cursor-pointer"
+                                className="inline-flex items-center gap-1 rounded-lg bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-bold text-[11px] uppercase px-2.5 py-1.5 transition-colors cursor-pointer"
                               >
-                                <FileCheck2 className="w-3.5 h-3.5" />
+                                <FileCheck2 className="w-3.5 h-3.5 text-orange-500" />
                                 Apto Médico A4
                               </button>
                             </div>
@@ -571,18 +571,18 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                           <button
                             type="button"
                             onClick={() => openPrintableWaiver({ raceConfig })}
-                            className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-colors cursor-pointer"
                           >
-                            <Printer className="w-4 h-4 shrink-0" />
+                            <Printer className="w-4 h-4 shrink-0 text-orange-500" />
                             <span>Deslinde de Responsabilidad (A4 / PDF)</span>
                           </button>
 
                           <button
                             type="button"
                             onClick={() => openPrintableMedicalCert({ raceConfig })}
-                            className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-colors cursor-pointer"
                           >
-                            <FileCheck2 className="w-4 h-4 shrink-0" />
+                            <FileCheck2 className="w-4 h-4 shrink-0 text-orange-500" />
                             <span>Modelo de Apto Médico (A4 / PDF)</span>
                           </button>
                         </div>
@@ -628,11 +628,11 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                             href={raceConfig.googleMapsUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-colors"
+                            className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-colors"
                           >
-                            <MapPin className="w-4 h-4" />
+                            <MapPin className="w-4 h-4 text-orange-500" />
                             Abrir ubicación en Google Maps
-                            <ExternalLink className="w-3.5 h-3.5" />
+                            <ExternalLink className="w-3.5 h-3.5 text-orange-500" />
                           </a>
                         </div>
                       )}
@@ -656,17 +656,17 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 <button
                   type="button"
                   onClick={() => openPrintableWaiver({ raceConfig })}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
                 >
-                  <Printer className="w-3.5 h-3.5 shrink-0" />
+                  <Printer className="w-3.5 h-3.5 shrink-0 text-orange-500" />
                   <span>Deslinde A4</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => openPrintableMedicalCert({ raceConfig })}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
                 >
-                  <FileCheck2 className="w-3.5 h-3.5 shrink-0" />
+                  <FileCheck2 className="w-3.5 h-3.5 shrink-0 text-orange-500" />
                   <span>Apto Médico A4</span>
                 </button>
               </div>
