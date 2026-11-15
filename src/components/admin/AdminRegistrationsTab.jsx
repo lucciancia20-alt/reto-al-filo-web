@@ -444,10 +444,8 @@ export default function AdminRegistrationsTab({
                   title={`Filtrar por talle ${item.size}: ${item.confirmed} confirmados de ${item.total} inscriptos no rechazados`}
                   className={`inline-flex items-center gap-1 rounded-lg border px-2 py-0.5 font-mono transition-colors cursor-pointer ${
                     isSelected
-                      ? 'bg-orange-500/20 border-orange-400 text-white font-bold'
-                      : item.total > 0
-                        ? 'bg-stone-950 border-stone-700 text-stone-200 hover:border-orange-500/60'
-                        : 'bg-stone-950 border-stone-800/80 text-stone-500 hover:border-stone-700'
+                      ? 'bg-amber-500/20 border-amber-400 ring-1 ring-amber-400/70 shadow-sm text-white font-bold'
+                      : 'bg-zinc-900/80 border-amber-500/60 text-white hover:border-amber-400'
                   }`}
                 >
                   <span className="font-bold text-amber-300">{item.size}:</span>
@@ -480,8 +478,8 @@ export default function AdminRegistrationsTab({
               }
               className={`rounded-lg border px-2 py-0.5 text-[11px] font-semibold transition-colors cursor-pointer ${
                 regCheckInFilter === 'checked'
-                  ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 font-bold'
-                  : 'bg-stone-950 border-stone-700 text-emerald-400 hover:border-emerald-500/60'
+                  ? 'bg-amber-500/25 border-amber-400 ring-1 ring-amber-400/70 text-white font-bold'
+                  : 'bg-zinc-900/80 border-amber-500/60 text-white hover:border-amber-400'
               }`}
             >
               Kits entregados ({regStats.checkedInCount || 0})
@@ -495,8 +493,8 @@ export default function AdminRegistrationsTab({
               }
               className={`rounded-lg border px-2 py-0.5 text-[11px] font-semibold transition-colors cursor-pointer ${
                 regCheckInFilter === 'pending_checkin'
-                  ? 'bg-amber-500/20 border-amber-400 text-amber-200 font-bold'
-                  : 'bg-stone-950 border-stone-700 text-amber-300 hover:border-amber-500/60'
+                  ? 'bg-amber-500/25 border-amber-400 ring-1 ring-amber-400/70 text-white font-bold'
+                  : 'bg-zinc-900/80 border-amber-500/60 text-white hover:border-amber-400'
               }`}
             >
               Pendientes de retirar ({regStats.pendingCheckInCount || 0})
