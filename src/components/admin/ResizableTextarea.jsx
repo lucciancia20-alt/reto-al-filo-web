@@ -109,8 +109,8 @@ export default function ResizableTextarea({
         <span
           className={`pointer-events-none text-[10px] leading-none transition-colors ${
             isDragging
-              ? 'text-orange-400'
-              : 'text-zinc-500/70 group-hover:text-orange-400'
+              ? 'text-white'
+              : 'text-zinc-500 group-hover:text-white'
           }`}
         >
           ↕ Agrandar / achicar
