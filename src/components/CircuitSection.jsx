@@ -248,7 +248,7 @@ export default function CircuitSection({
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Encabezado */}
         <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3 py-0.5 text-[11px] font-bold uppercase tracking-widest text-orange-400">
+          <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 px-3 py-0.5 text-[11px] font-bold uppercase tracking-widest text-orange-400">
             <Compass className="w-3.5 h-3.5" />
             <span>Circuito GPX Oficial y Altimetría Real</span>
           </div>
@@ -269,17 +269,17 @@ export default function CircuitSection({
           aria-label="Seleccionar distancia del circuito"
           className="mt-3 flex justify-center"
         >
-          <div className="inline-grid grid-cols-2 gap-1.5 p-1.5 rounded-2xl bg-stone-900 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.25)] w-full max-w-md">
+          <div className="inline-grid grid-cols-2 gap-1.5 p-1.5 rounded-2xl bg-zinc-900/90 border border-orange-500 w-full max-w-md">
             {Object.values(circuits).map((circuit) => {
               const isSelected = circuit.id === activeDistance;
               const is13K = circuit.id === '13K';
               const tabColorClass = isSelected
                 ? is13K
-                  ? 'bg-red-950/80 text-red-500 border border-red-500 shadow-[0_0_18px_rgba(239,68,68,0.45)]'
-                  : 'bg-cyan-950/80 text-cyan-400 border border-cyan-500 shadow-[0_0_18px_rgba(6,182,212,0.45)]'
+                  ? 'bg-zinc-950 text-red-500 border-2 border-red-500'
+                  : 'bg-zinc-950 text-cyan-400 border-2 border-cyan-400'
                 : is13K
-                  ? 'bg-stone-950/65 text-red-500 border border-red-500/70 opacity-85 hover:opacity-100 hover:bg-red-950/40 hover:border-red-500 hover:brightness-110'
-                  : 'bg-stone-950/65 text-cyan-400 border border-cyan-500/70 opacity-85 hover:opacity-100 hover:bg-cyan-950/40 hover:border-cyan-400 hover:brightness-110';
+                  ? 'bg-zinc-950 text-red-500 border border-red-500/50 opacity-80 hover:opacity-100 hover:border-red-500'
+                  : 'bg-zinc-950 text-cyan-400 border border-cyan-500/50 opacity-80 hover:opacity-100 hover:border-cyan-400';
               return (
                 <button
                   key={circuit.id}
@@ -300,11 +300,11 @@ export default function CircuitSection({
         </div>
 
         {/* Contenedor principal del Circuito GPX + Altimetría */}
-        <div className="mt-3 rounded-3xl bg-stone-900/90 border border-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.22)] overflow-hidden">
+        <div className="mt-3 rounded-3xl bg-zinc-900/90 border border-orange-500 overflow-hidden">
           {/* Barra superior */}
           <div className="px-3.5 sm:px-5 py-2 bg-stone-950/75 border-b border-orange-500/40 flex flex-wrap items-center justify-between gap-2.5">
             <div className="flex items-center gap-2.5">
-              <span className="w-8 h-8 rounded-xl bg-orange-500/10 border border-orange-500/40 text-orange-400 flex items-center justify-center shrink-0">
+              <span className="w-8 h-8 rounded-xl bg-zinc-950 border border-orange-500/60 text-orange-400 flex items-center justify-center shrink-0">
                 <MapIcon className="w-4 h-4" />
               </span>
               <div>
@@ -327,17 +327,23 @@ export default function CircuitSection({
                 <a
                   href={track.gpxDownloadUrl}
                   download={`reto-al-filo-${activeDistance.toLowerCase()}.gpx`}
-                  className="inline-flex items-center gap-1.5 bg-zinc-950 hover:bg-stone-900 text-orange-400 border border-orange-500/70 shadow-[0_0_10px_rgba(249,115,22,0.25)] hover:border-orange-400 px-3 py-1.5 rounded-xl transition-colors"
+                  className="inline-flex items-center gap-1.5 bg-zinc-950 hover:bg-stone-900 text-orange-400 border border-orange-500/70 hover:border-orange-400 px-3 py-1.5 rounded-xl transition-colors"
                 >
                   <Download className="w-3.5 h-3.5 text-orange-400" />
                   Descargar .GPX
                 </a>
               )}
-              <span className="inline-flex items-center gap-1.5 text-sky-400 bg-sky-500/10 border border-sky-500/30 px-2.5 py-1.5 rounded-xl">
+              <span
+                className={`inline-flex items-center gap-1.5 bg-zinc-950 border px-2.5 py-1.5 rounded-xl ${
+                  activeDistance === '13K'
+                    ? 'border-red-500/60 text-red-500'
+                    : 'border-cyan-500/60 text-cyan-400'
+                }`}
+              >
                 <Droplets className="w-3.5 h-3.5" />
                 {stations.length} Puestos PA
               </span>
-              <span className="inline-flex items-center gap-1.5 text-orange-400 bg-orange-500/10 border border-orange-500/30 px-2.5 py-1.5 rounded-xl">
+              <span className="inline-flex items-center gap-1.5 bg-zinc-950 border border-orange-500/60 text-orange-400 px-2.5 py-1.5 rounded-xl">
                 <Navigation className="w-3.5 h-3.5" />
                 {currentCircuit.elevationGain} D+
               </span>
@@ -348,7 +354,7 @@ export default function CircuitSection({
           <div className="p-2.5 sm:p-3.5 bg-gradient-to-b from-stone-950/50 to-stone-900">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
               {/* Columna Izquierda: Recorrido GPS Vectorial */}
-              <div className="lg:col-span-5 rounded-2xl bg-stone-950/90 border border-orange-500/80 shadow-[0_0_14px_rgba(249,115,22,0.18)] p-2.5 sm:p-3 flex flex-col justify-between">
+              <div className="lg:col-span-5 rounded-2xl bg-stone-950/90 border border-orange-500/80 p-2.5 sm:p-3 flex flex-col justify-between">
                 <div className="flex items-center justify-between text-xs mb-1.5">
                   <span className="font-display font-bold uppercase tracking-wider text-stone-200 flex items-center gap-1.5">
                     <Compass className="w-3.5 h-3.5 text-orange-400" />
@@ -478,7 +484,7 @@ export default function CircuitSection({
               </div>
 
               {/* Columna Derecha: Perfil de Altimetría Real SVG */}
-              <div className="lg:col-span-7 rounded-2xl bg-stone-950/90 border border-orange-500/80 shadow-[0_0_14px_rgba(249,115,22,0.18)] p-2.5 sm:p-3 flex flex-col justify-between">
+              <div className="lg:col-span-7 rounded-2xl bg-stone-950/90 border border-orange-500/80 p-2.5 sm:p-3 flex flex-col justify-between">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5 text-xs">
                   <span className="font-display font-bold uppercase tracking-wider text-stone-200 flex items-center gap-1.5">
                     <Mountain className="w-3.5 h-3.5 text-orange-400" />
@@ -709,9 +715,9 @@ export default function CircuitSection({
             return (
               <div
                 key={stat.label}
-                className="rounded-2xl bg-stone-900/75 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] px-3.5 py-2.5 flex items-center gap-3 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
+                className="rounded-2xl bg-stone-900/75 border border-orange-500 px-3.5 py-2.5 flex items-center gap-3 hover:border-orange-400 transition-all"
               >
-                <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/35 text-orange-400 flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-zinc-950 border border-orange-500/60 text-orange-400 flex items-center justify-center shrink-0">
                   <IconComponent className="w-4 h-4" />
                 </div>
                 <div>
@@ -739,10 +745,10 @@ export default function CircuitSection({
           if (kitItems.length === 0) return null;
 
           return (
-            <div className="mt-4 rounded-2xl bg-stone-900/75 border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.18)] p-4 sm:p-5">
+            <div className="mt-4 rounded-2xl bg-stone-900/75 border border-orange-500/80 p-4 sm:p-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 pb-3 border-b border-orange-500/25">
                 <div className="flex items-center gap-2.5">
-                  <span className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/35 text-orange-400 flex items-center justify-center shrink-0">
+                  <span className="w-9 h-9 rounded-xl bg-zinc-950 border border-orange-500/60 text-orange-400 flex items-center justify-center shrink-0">
                     <PackageCheck className="w-4 h-4" />
                   </span>
                   <div>
