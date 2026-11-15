@@ -6,6 +6,10 @@ import {
   AlertCircle,
   RefreshCw,
   Trash2,
+  Maximize2,
+  X,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 export default function AdminPhotosTab({
@@ -32,6 +36,7 @@ export default function AdminPhotosTab({
   onDeleteGalleryPhoto,
 }) {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [previewIndex, setPreviewIndex] = useState(null);
   const deleteTimerRef = useRef(null);
 
   useEffect(() => {
@@ -42,6 +47,21 @@ export default function AdminPhotosTab({
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (previewIndex === null) return undefined;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setPreviewIndex(null);
+      } else if (e.key === 'ArrowRight' && galleryItems.length > 1) {
+        setPreviewIndex((prev) => (prev + 1) % galleryItems.length);
+      } else if (e.key === 'ArrowLeft' && galleryItems.length > 1) {
+        setPreviewIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [previewIndex, galleryItems.length]);
 
   const handlePhotoDeleteClick = (item) => {
     if (confirmDeleteId !== item.id) {
@@ -146,45 +166,6 @@ export default function AdminPhotosTab({
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <div className="sm:col-span-2">
-            <label className="block text-xs font-semibold text-stone-300 mb-1">
-              Lugar o descripción breve (opcional)
-            </label>
-            <input
-              type="text"
-              value={photoSector}
-              onChange={(e) => setPhotoSector(e.target.value)}
-              placeholder="Ej. Cumbre Cerro Providencia · 1ra Edición"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs sm:text-sm text-white"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-stone-300 mb-1">
-              Upload Preset (Unsigned en Cloudinary)
-            </label>
-            <input
-              type="text"
-              value={uploadPreset}
-              onChange={(e) => setUploadPreset(e.target.value)}
-              placeholder="reto_al_filo"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs sm:text-sm font-mono text-orange-400"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-stone-300 mb-1">
-              O pegar URL existente (opcional si subís archivo)
-            </label>
-            <input
-              type="text"
-              value={photoUrl}
-              onChange={(e) => setPhotoUrl(e.target.value)}
-              placeholder="https://res.cloudinary.com/..."
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs sm:text-sm text-white"
-            />
-          </div>
-        </div>
-
         {(photoFiles.length > 0 || photoUrl.trim().length > 0) && (
           <button
             type="submit"
@@ -208,12 +189,12 @@ export default function AdminPhotosTab({
           <div
             className={`p-3 rounded-xl text-xs flex items-start gap-2 ${
               photoStatus.type === 'success'
-                ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                ? 'bg-zinc-950 text-orange-400 border border-orange-500/70'
                 : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
             }`}
           >
             {photoStatus.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
             ) : (
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             )}
@@ -254,20 +235,34 @@ export default function AdminPhotosTab({
 
         {galleryCustomCount > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {galleryItems.map((item) => (
+            {galleryItems.map((item, idx) => (
               <div
                 key={item.id}
                 className="rounded-xl overflow-hidden bg-stone-900 border border-stone-800 flex flex-col"
               >
-                <div className="relative aspect-[16/10] bg-stone-950 overflow-hidden">
+                <div
+                  onClick={() => setPreviewIndex(idx)}
+                  className="relative aspect-[16/10] bg-stone-950 overflow-hidden cursor-pointer group"
+                >
                   <img
                     src={item.cloudinaryThumb}
                     alt={item.sector}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-orange-500 text-zinc-950 font-bold text-[10px] px-2 py-0.5 shadow-md">
                     ✓ Publicada en la web
                   </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPreviewIndex(idx);
+                    }}
+                    aria-label={`Ampliar postal ${item.sector}`}
+                    className="absolute top-2 right-2 w-7 h-7 rounded-full bg-zinc-950/85 border border-orange-500/70 hover:border-orange-400 text-orange-400 flex items-center justify-center cursor-pointer transition-colors"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
                 <div className="p-2 flex items-center justify-between gap-2">
                   <span className="text-[11px] text-stone-200 truncate">{item.sector}</span>
@@ -294,6 +289,77 @@ export default function AdminPhotosTab({
           </div>
         )}
       </div>
+
+      {previewIndex !== null && galleryItems[previewIndex] && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Vista ampliada de fotografía"
+          className="fixed inset-0 z-[70] bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-4 overscroll-contain"
+          onClick={() => setPreviewIndex(null)}
+        >
+          <div
+            className="relative max-w-3xl w-full rounded-3xl overflow-hidden overscroll-contain bg-stone-900 border border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setPreviewIndex(null)}
+              aria-label="Cerrar vista previa"
+              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-zinc-950/85 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {galleryItems.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setPreviewIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length)
+                  }
+                  aria-label="Foto anterior"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-950/85 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setPreviewIndex((prev) => (prev + 1) % galleryItems.length)
+                  }
+                  aria-label="Foto siguiente"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-950/85 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
+            )}
+
+            <img
+              src={galleryItems[previewIndex].cloudinaryUrl || galleryItems[previewIndex].cloudinaryThumb}
+              alt={galleryItems[previewIndex].sector}
+              className="w-full max-h-[78vh] object-contain bg-stone-950"
+            />
+
+            <div className="p-4 sm:p-5 bg-stone-950 border-t border-stone-800 flex items-center justify-between gap-2">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-orange-400">
+                  1ra Edición · Reto al Filo
+                </span>
+                <p className="mt-0.5 text-sm sm:text-base font-bold text-white">
+                  {galleryItems[previewIndex].sector}
+                </p>
+              </div>
+              {galleryItems.length > 1 && (
+                <span className="text-xs font-mono text-stone-400">
+                  {previewIndex + 1} / {galleryItems.length}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
