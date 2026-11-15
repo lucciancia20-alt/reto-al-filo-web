@@ -820,7 +820,7 @@ export default function AdminRegistrationsTab({
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1.5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[1.2fr_1fr_0.9fr_1.4fr] gap-x-4 gap-y-1.5">
                         <div className="truncate">
                           <span className="text-stone-200">Email: </span>
                           <span className="text-white font-semibold">{reg.email}</span>
@@ -849,7 +849,7 @@ export default function AdminRegistrationsTab({
                           <span className="text-stone-200">Teléfono: </span>
                           <span className="font-mono text-white font-semibold">{reg.phone}</span>
                         </div>
-                        <div>
+                        <div className="md:whitespace-nowrap">
                           <span className="text-stone-200">Emergencia: </span>
                           <span className="text-white font-semibold">
                             {reg.emergencyContactName} ({reg.emergencyContactPhone})
