@@ -145,11 +145,7 @@ export default function AdminCircuitsTab({
                     className={`w-full rounded-lg bg-stone-950 ${circuitInputBorderClass} px-2.5 py-1.5 text-xs text-white`}
                   />
                 </div>
-                <div
-                  className={`text-[11px] font-mono px-2 whitespace-nowrap ${
-                    editDistance === '13K' ? 'text-red-500' : 'text-cyan-400'
-                  }`}
-                >
+                <div className="text-[11px] font-mono font-semibold text-white px-2 whitespace-nowrap">
                   {interp.alt} msnm
                 </div>
                 <button
