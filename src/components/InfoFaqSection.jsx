@@ -238,14 +238,14 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
         id="consultar-dorsal"
         className="scroll-mt-20 py-8 sm:py-10 bg-stone-900/70 border-t-2 border-orange-500/50"
       >
-        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="rounded-3xl bg-stone-950 border border-orange-500/80 shadow-[0_0_24px_rgba(249,115,22,0.18)] p-5 sm:p-6">
             <div className="text-center">
               <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-orange-400">
                 <Search className="w-3.5 h-3.5" />
                 <span>Consultor Oficial de Corredores</span>
               </div>
-              <h2 className="mt-2 font-display text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
+              <h2 className="mt-2 font-display text-xl sm:text-2xl md:text-3xl font-black text-white uppercase tracking-tight md:whitespace-nowrap">
                 ¿Ya te inscribiste? Consultá tu Estado y Dorsal
               </h2>
               <p className="mt-1 text-xs sm:text-sm text-stone-300">
@@ -559,7 +559,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                           </div>
 
                           {mandatoryGear.note && (
-                            <p className="text-[11px] text-orange-200 bg-orange-500/10 border border-orange-500/40 rounded-lg px-3 py-2">
+                            <p className="text-[11px] text-white bg-zinc-950 border border-orange-500/70 rounded-lg px-3 py-2">
                               {mandatoryGear.note}
                             </p>
                           )}
