@@ -261,11 +261,11 @@ export default function AdminRegistrationsTab({
           {
             label: 'Pendientes',
             value: regStats.pending,
-            tone: 'text-amber-400',
-            inactiveClass: 'bg-zinc-950 border-amber-500/35 hover:border-amber-400/70',
-            activeClass: 'bg-zinc-950 border-amber-400 ring-1 ring-amber-400/70',
-            labelClass: 'text-amber-400',
-            dotClass: 'bg-amber-400',
+            tone: 'text-orange-400',
+            inactiveClass: 'bg-zinc-950 border-orange-500/40 hover:border-orange-400/70',
+            activeClass: 'bg-zinc-950 border-orange-400 ring-1 ring-orange-400/70',
+            labelClass: 'text-orange-400',
+            dotClass: 'bg-orange-400',
             isActive: regStatusFilter === 'pendiente' && regDuplicateFilter === 'none',
             onClick: () => {
               const isAlreadyActive =
@@ -408,7 +408,7 @@ export default function AdminRegistrationsTab({
             onClick={onPrintAccreditationSheet}
             disabled={(regStats.confirmed || 0) === 0}
             title="Imprimir planilla A4 de acreditación y seguridad SOS ordenada por dorsal"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-amber-300 border border-amber-500/60 text-xs font-bold px-2.5 sm:px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900/80 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-xs font-bold px-2.5 sm:px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
           >
             <Printer className="w-3.5 h-3.5 shrink-0" />
             Imprimir Planilla Acreditación / SOS
@@ -727,7 +727,7 @@ export default function AdminRegistrationsTab({
                         className={`inline-flex items-center gap-1 rounded-lg border text-[10px] sm:text-[11px] font-bold px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
                           reg.checkedIn
                             ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 hover:bg-emerald-500/30'
-                            : 'bg-stone-950 border-amber-500/60 text-amber-300 hover:bg-white/5 hover:border-amber-400'
+                            : 'bg-zinc-900/80 border-orange-500/70 text-orange-400 hover:border-orange-400'
                         }`}
                       >
                         <PackageCheck className="w-3.5 h-3.5 shrink-0" />
