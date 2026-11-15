@@ -23,6 +23,7 @@ import {
   addPhotoToFirestore,
   fetchGalleryPhotos,
   deletePhotoFromFirestore,
+  saveGalleryOrderToFirestore,
   uploadImageToCloudinary,
   subscribeToAdminAuth,
   signInAdminWithGoogle,
@@ -1172,6 +1173,20 @@ export default function AdminModal({
     }
   };
 
+  const handleReorderGalleryPhotos = async (reorderedItems) => {
+    setGalleryItems(reorderedItems);
+    setPhotoStatus(null);
+    try {
+      await saveGalleryOrderToFirestore(reorderedItems);
+    } catch (err) {
+      await loadGalleryItems();
+      setPhotoStatus({
+        type: 'error',
+        message: err?.message || 'No se pudo guardar el nuevo orden de la galería.',
+      });
+    }
+  };
+
   const activeCircuitDraft = draft.circuits[editDistance];
   const activeTrack = activeCircuitDraft.customGpx || GPX_TRACKS[editDistance];
   const circuitInputBorderClass =
@@ -1364,6 +1379,7 @@ export default function AdminModal({
                   onAddPhoto={handleAddPhoto}
                   onLoadGalleryItems={loadGalleryItems}
                   onDeleteGalleryPhoto={handleDeleteGalleryPhoto}
+                  onReorderGalleryPhotos={handleReorderGalleryPhotos}
                 />
               )}
 

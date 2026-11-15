@@ -111,6 +111,7 @@ function normalizePhotoRecord(docId, data) {
     sector: data.sector || 'Circuito Reto al Filo',
     edicion: Number(data.edicion) || 1,
     timestamp: data.timestamp || Date.now(),
+    order: Number.isFinite(Number(data.order)) ? Number(data.order) : null,
     visible: data.visible !== false,
     aspectClass: data.aspectClass || 'aspect-[4/3]',
   };
@@ -310,7 +311,17 @@ export async function fetchGalleryPhotos() {
     const firestorePhotos = snapshot.docs
       .filter((docSnap) => docSnap.data()?.visible !== false)
       .map((docSnap) => normalizePhotoRecord(docSnap.id, docSnap.data()))
-      .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+      .sort((a, b) => {
+        const aHasOrder = a.order !== null && a.order !== undefined;
+        const bHasOrder = b.order !== null && b.order !== undefined;
+        if (aHasOrder && bHasOrder && a.order !== b.order) {
+          return a.order - b.order;
+        }
+        if (aHasOrder !== bHasOrder) {
+          return aHasOrder ? -1 : 1;
+        }
+        return (b.timestamp || 0) - (a.timestamp || 0);
+      });
 
     if (firestorePhotos.length > 0) {
       try {
@@ -386,6 +397,47 @@ export async function deletePhotoFromFirestore(photoId) {
   }
 
   return { ok: true, id: photoId };
+}
+
+/**
+ * Guarda el orden personalizado de las postales en Firestore mediante un lote (`order: index`),
+ * actualiza la caché local y notifica a la galería pública.
+ */
+export async function saveGalleryOrderToFirestore(orderedPhotos) {
+  if (!Array.isArray(orderedPhotos) || orderedPhotos.length === 0) {
+    return { ok: true };
+  }
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase no está configurado en las variables de entorno.');
+  }
+
+  const bundle = await getFirestoreDb();
+  if (!bundle) {
+    throw new Error('No se pudo inicializar Firestore.');
+  }
+
+  const { db, firestore } = bundle;
+  const { doc, writeBatch } = firestore;
+  const batch = writeBatch(db);
+
+  const normalizedOrdered = orderedPhotos.map((item, idx) => {
+    batch.update(doc(db, 'photos', item.id), { order: idx });
+    return { ...item, order: idx };
+  });
+
+  await batch.commit();
+
+  try {
+    window.localStorage.setItem(LOCAL_GALLERY_STORAGE_KEY, JSON.stringify(normalizedOrdered));
+  } catch {
+    // Ignorar errores de cuota de almacenamiento
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('reto-gallery-updated'));
+  }
+
+  return { ok: true };
 }
 
 export const MAX_UPLOAD_SIZE_BYTES = 8 * 1024 * 1024;

@@ -10,6 +10,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  GripVertical,
 } from 'lucide-react';
 
 export default function AdminPhotosTab({
@@ -34,9 +35,12 @@ export default function AdminPhotosTab({
   onAddPhoto,
   onLoadGalleryItems,
   onDeleteGalleryPhoto,
+  onReorderGalleryPhotos,
 }) {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [previewIndex, setPreviewIndex] = useState(null);
+  const [draggedPhotoId, setDraggedPhotoId] = useState(null);
+  const [dragOverPhotoId, setDragOverPhotoId] = useState(null);
   const deleteTimerRef = useRef(null);
 
   useEffect(() => {
@@ -93,6 +97,53 @@ export default function AdminPhotosTab({
     }
     setConfirmDeleteId(null);
     onDeleteGalleryPhoto(item);
+  };
+
+  const handleDragStart = (e, item) => {
+    setDraggedPhotoId(item.id);
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', item.id);
+    }
+  };
+
+  const handleDragOver = (e, item) => {
+    e.preventDefault();
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'move';
+    }
+    if (dragOverPhotoId !== item.id) {
+      setDragOverPhotoId(item.id);
+    }
+  };
+
+  const handleDragLeave = (item) => {
+    if (dragOverPhotoId === item.id) {
+      setDragOverPhotoId(null);
+    }
+  };
+
+  const handleDrop = (e, targetItem) => {
+    e.preventDefault();
+    const sourceId = draggedPhotoId || e.dataTransfer?.getData('text/plain');
+    setDraggedPhotoId(null);
+    setDragOverPhotoId(null);
+
+    if (!sourceId || sourceId === targetItem.id || !onReorderGalleryPhotos) return;
+
+    const fromIndex = galleryItems.findIndex((p) => p.id === sourceId);
+    const toIndex = galleryItems.findIndex((p) => p.id === targetItem.id);
+    if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
+
+    const reordered = [...galleryItems];
+    const [moved] = reordered.splice(fromIndex, 1);
+    reordered.splice(toIndex, 0, moved);
+    onReorderGalleryPhotos(reordered);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedPhotoId(null);
+    setDragOverPhotoId(null);
   };
 
   return (
@@ -248,57 +299,81 @@ export default function AdminPhotosTab({
 
         {galleryCustomCount > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {galleryItems.map((item, idx) => (
-              <div
-                key={item.id}
-                className="rounded-xl overflow-hidden bg-stone-900 border border-stone-800 flex flex-col"
-              >
+            {galleryItems.map((item, idx) => {
+              const isDragged = draggedPhotoId === item.id;
+              const isDragOver = dragOverPhotoId === item.id && !isDragged;
+
+              return (
                 <div
-                  onClick={() => setPreviewIndex(idx)}
-                  className="relative aspect-[16/10] bg-stone-950 overflow-hidden cursor-pointer group"
+                  key={item.id}
+                  draggable={!photoBusyId}
+                  onDragStart={(e) => handleDragStart(e, item)}
+                  onDragOver={(e) => handleDragOver(e, item)}
+                  onDragLeave={() => handleDragLeave(item)}
+                  onDrop={(e) => handleDrop(e, item)}
+                  onDragEnd={handleDragEnd}
+                  className={`rounded-xl overflow-hidden bg-stone-900 border border-stone-800 flex flex-col cursor-grab active:cursor-grabbing transition-all ${
+                    isDragOver ? 'ring-2 ring-orange-400 scale-[1.02]' : ''
+                  } ${isDragged ? 'opacity-60' : ''}`}
                 >
-                  <img
-                    src={item.cloudinaryThumb}
-                    alt={item.sector}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-orange-500 text-zinc-950 font-bold text-[10px] px-2 py-0.5 shadow-md">
-                    ✓ Publicada en la web
-                  </span>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPreviewIndex(idx);
-                    }}
-                    aria-label={`Ampliar postal ${item.sector}`}
-                    className="absolute top-2 right-2 w-7 h-7 rounded-full bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-md border border-orange-500/70 hover:border-orange-400 text-orange-400 flex items-center justify-center cursor-pointer transition-all"
+                  <div
+                    onClick={() => setPreviewIndex(idx)}
+                    className="relative aspect-[16/10] bg-stone-950 overflow-hidden cursor-pointer group"
                   >
-                    <Maximize2 className="w-3.5 h-3.5" />
-                  </button>
+                    <img
+                      src={item.cloudinaryThumb}
+                      alt={item.sector}
+                      draggable={false}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-orange-500 text-zinc-950 font-bold text-[10px] px-2 py-0.5 shadow-md">
+                      ✓ Publicada en la web
+                    </span>
+                    <button
+                      type="button"
+                      draggable={false}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPreviewIndex(idx);
+                      }}
+                      aria-label={`Ampliar postal ${item.sector}`}
+                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-md border border-orange-500/70 hover:border-orange-400 text-orange-400 flex items-center justify-center cursor-pointer transition-all"
+                    >
+                      <Maximize2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div className="p-2 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <GripVertical className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+                      <span className="text-[11px] text-stone-200 truncate">{item.sector}</span>
+                    </div>
+                    <button
+                      type="button"
+                      draggable={false}
+                      disabled={photoBusyId === item.id}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePhotoDeleteClick(item);
+                      }}
+                      aria-label={
+                        confirmDeleteId === item.id
+                          ? `Confirmar eliminación de postal ${item.sector}`
+                          : `Eliminar postal ${item.sector}`
+                      }
+                      className={`rounded-lg cursor-pointer shrink-0 transition-colors disabled:opacity-40 ${
+                        confirmDeleteId === item.id
+                          ? 'px-2 py-1 text-[10px] font-bold bg-zinc-950 border border-red-500 text-red-400'
+                          : 'p-1.5 text-stone-400 hover:text-red-500 hover:bg-stone-800'
+                      }`}
+                    >
+                      {confirmDeleteId === item.id ? '¿Borrar?' : <Trash2 className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
                 </div>
-                <div className="p-2 flex items-center justify-between gap-2">
-                  <span className="text-[11px] text-stone-200 truncate">{item.sector}</span>
-                  <button
-                    type="button"
-                    disabled={photoBusyId === item.id}
-                    onClick={() => handlePhotoDeleteClick(item)}
-                    aria-label={
-                      confirmDeleteId === item.id
-                        ? `Confirmar eliminación de postal ${item.sector}`
-                        : `Eliminar postal ${item.sector}`
-                    }
-                    className={`rounded-lg cursor-pointer shrink-0 transition-colors disabled:opacity-40 ${
-                      confirmDeleteId === item.id
-                        ? 'px-2 py-1 text-[10px] font-bold bg-zinc-950 border border-red-500 text-red-400'
-                        : 'p-1.5 text-stone-400 hover:text-red-500 hover:bg-stone-800'
-                    }`}
-                  >
-                    {confirmDeleteId === item.id ? '¿Borrar?' : <Trash2 className="w-3.5 h-3.5" />}
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
