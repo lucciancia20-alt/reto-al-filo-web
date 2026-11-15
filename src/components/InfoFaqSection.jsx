@@ -11,14 +11,50 @@ import {
   CheckCircle2,
   Printer,
   FileCheck2,
+  Search,
+  Wifi,
+  AlertCircle,
+  Loader2,
+  PackageCheck,
+  Car,
+  MessageCircle,
 } from 'lucide-react';
 import { RACE_CONFIG, parseTargetDateParts, syncScheduleWithTargetDate } from '../data/raceConfig';
 import { openPrintableWaiver, openPrintableMedicalCert } from '../utils/printableDocs';
+import { fetchPublicRunnerStatus } from '../firebase/config';
 
 export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
   const [openFaqId, setOpenFaqId] = useState(
     raceConfig?.faqs?.[0]?.id || RACE_CONFIG.faqs[0].id
   );
+  const [lookupQuery, setLookupQuery] = useState('');
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [lookupResult, setLookupResult] = useState(null);
+
+  const handleLookupSubmit = async (e) => {
+    e.preventDefault();
+    const trimmed = lookupQuery.trim();
+    if (!trimmed) {
+      setLookupResult({ found: false, invalidQuery: true });
+      return;
+    }
+    setLookupLoading(true);
+    setLookupResult(null);
+    try {
+      const res = await fetchPublicRunnerStatus(trimmed);
+      setLookupResult(res);
+    } catch {
+      setLookupResult({ found: false, errorCode: 'unknown' });
+    } finally {
+      setLookupLoading(false);
+    }
+  };
+
+  const orgDigits = String(raceConfig?.whatsappNumber || '').replace(/\D/g, '');
+  const orgWaUrl = orgDigits
+    ? `https://wa.me/${orgDigits}?text=${encodeURIComponent('Hola! Consulto por el estado de mi inscripción en Reto al Filo.')}`
+    : '#';
+
   const { formattedFullDate } = parseTargetDateParts(raceConfig.targetDateIso);
   const syncedSchedule = syncScheduleWithTargetDate(
     raceConfig.schedule || [],
@@ -201,6 +237,238 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
         </div>
       </section>
 
+      {/* Parte 2.5: Consultor Público Seguro de Inscripción y Dorsal */}
+      <section
+        id="consultar-dorsal"
+        className="scroll-mt-20 py-8 sm:py-10 bg-stone-900/70 border-t-2 border-orange-500/50"
+      >
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="rounded-3xl bg-stone-950 border border-orange-500/80 shadow-[0_0_24px_rgba(249,115,22,0.18)] p-5 sm:p-6">
+            <div className="text-center">
+              <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-amber-400">
+                <Search className="w-3.5 h-3.5" />
+                <span>Consultor Oficial de Corredores</span>
+              </div>
+              <h2 className="mt-2 font-display text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
+                ¿Ya te inscribiste? Consultá tu Estado y Dorsal
+              </h2>
+              <p className="mt-1 text-xs sm:text-sm text-stone-300">
+                Ingresá tu DNI (sin puntos) o tu código <span className="font-mono text-amber-300">RAF-XXXXX</span> para verificar confirmación, talle y número asignado.
+              </p>
+            </div>
+
+            <form
+              onSubmit={handleLookupSubmit}
+              className="mt-4 flex flex-col sm:flex-row gap-2.5"
+            >
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  value={lookupQuery}
+                  onChange={(e) => setLookupQuery(e.target.value)}
+                  placeholder="Ej: 30123456 o RAF-12345"
+                  aria-label="DNI o código de inscripción RAF"
+                  className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-amber-400 focus:outline-none pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-stone-500 font-mono"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={lookupLoading}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-[0.99] text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-all cursor-pointer disabled:opacity-60 shrink-0"
+              >
+                {lookupLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Buscando...</span>
+                  </>
+                ) : (
+                  <>
+                    <Search className="w-4 h-4" />
+                    <span>Consultar Estado</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+            {lookupResult && (
+              <div className="mt-4">
+                {lookupResult.found && lookupResult.data ? (
+                  (() => {
+                    const st = lookupResult.data;
+                    const isConfirmed = st.status === 'confirmed';
+                    const isRejected = st.status === 'rejected';
+                    const badgeConfig = isConfirmed
+                      ? {
+                          wrapper: 'border-emerald-500/60 bg-emerald-500/10',
+                          pill: 'bg-emerald-500/20 border-emerald-400 text-emerald-300',
+                          label: 'Inscripción Confirmada',
+                        }
+                      : isRejected
+                        ? {
+                            wrapper: 'border-rose-500/60 bg-rose-500/10',
+                            pill: 'bg-rose-500/20 border-rose-400 text-rose-300',
+                            label: 'Observada / Rechazada',
+                          }
+                        : {
+                            wrapper: 'border-amber-500/60 bg-amber-500/10',
+                            pill: 'bg-amber-500/20 border-amber-400 text-amber-300',
+                            label: 'Pendiente de Verificación',
+                          };
+
+                    return (
+                      <div className={`rounded-2xl border p-4 space-y-3 ${badgeConfig.wrapper}`}>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span
+                              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-extrabold uppercase tracking-wider ${badgeConfig.pill}`}
+                            >
+                              {isConfirmed ? (
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                              ) : isRejected ? (
+                                <AlertCircle className="w-3.5 h-3.5" />
+                              ) : (
+                                <Clock className="w-3.5 h-3.5" />
+                              )}
+                              {badgeConfig.label}
+                            </span>
+                            <span className="font-mono text-xs text-stone-200 bg-stone-950/80 border border-stone-700 rounded-lg px-2 py-0.5">
+                              {st.code}
+                            </span>
+                            <span className="text-xs font-bold text-stone-100">
+                              Iniciales: {st.initials}
+                            </span>
+                          </div>
+
+                          <div className="font-display font-black text-base sm:text-lg text-white">
+                            {isConfirmed ? (
+                              <span className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 border border-orange-500 px-3 py-1 text-amber-300">
+                                Dorsal:{' '}
+                                <span className="text-white">
+                                  {st.assignedBib ? `#${st.assignedBib}` : 'A asignar en mesa'}
+                                </span>
+                              </span>
+                            ) : (
+                              <span className="text-xs font-semibold text-stone-300">
+                                Dorsal pendiente de confirmación
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                          <div className="rounded-xl bg-stone-950/75 border border-stone-800 px-3 py-2">
+                            <span className="text-stone-400 block text-[10px] uppercase font-bold">
+                              Distancia
+                            </span>
+                            <strong
+                              className={
+                                st.distance === '27K' ? 'text-cyan-400 font-bold' : 'text-red-400 font-bold'
+                              }
+                            >
+                              {st.distance} Competitivo
+                            </strong>
+                          </div>
+
+                          <div className="rounded-xl bg-stone-950/75 border border-stone-800 px-3 py-2">
+                            <span className="text-stone-400 block text-[10px] uppercase font-bold">
+                              Talle Reservado
+                            </span>
+                            <strong className="text-amber-300">{st.shirtSize || 'A confirmar'}</strong>
+                          </div>
+
+                          <div className="rounded-xl bg-stone-950/75 border border-stone-800 px-3 py-2">
+                            <span className="text-stone-400 block text-[10px] uppercase font-bold">
+                              Acreditación Presencial
+                            </span>
+                            <strong className={st.checkedIn ? 'text-emerald-300' : 'text-stone-200'}>
+                              {st.checkedIn ? 'Kit entregado ✓' : 'Pendiente de retiro'}
+                            </strong>
+                          </div>
+                        </div>
+
+                        {!isConfirmed && !isRejected && (
+                          <p className="text-xs text-amber-100/90">
+                            Tu comprobante está en cola de verificación manual por la organización. Apenas confirmemos el pago verás acá tu número de dorsal asignado.
+                          </p>
+                        )}
+
+                        {isRejected ? (
+                          <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                            <p className="text-xs text-rose-200">
+                              Hay una observación con tu inscripción o comprobante. Contactanos para resolverlo rápido:
+                            </p>
+                            {orgDigits && (
+                              <a
+                                href={orgWaUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-bold text-xs px-3.5 py-2 transition-colors"
+                              >
+                                <MessageCircle className="w-3.5 h-3.5" />
+                                Contactar por WhatsApp
+                              </a>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-white/10">
+                            <span className="text-[11px] text-stone-300">
+                              Recordá llevar DNI, Deslinde firmado y Apto Médico para retirar tu kit:
+                            </span>
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                type="button"
+                                onClick={() => openPrintableWaiver({ raceConfig })}
+                                className="inline-flex items-center gap-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-[11px] uppercase px-2.5 py-1.5 transition-colors cursor-pointer"
+                              >
+                                <Printer className="w-3.5 h-3.5" />
+                                Deslinde A4
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => openPrintableMedicalCert({ raceConfig })}
+                                className="inline-flex items-center gap-1 rounded-lg bg-stone-950 hover:bg-stone-800 text-amber-300 border border-orange-500/70 font-bold text-[11px] uppercase px-2.5 py-1.5 transition-colors cursor-pointer"
+                              >
+                                <FileCheck2 className="w-3.5 h-3.5" />
+                                Apto Médico A4
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()
+                ) : (
+                  <div className="rounded-2xl border border-stone-700 bg-stone-900/90 p-4 text-xs text-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-start gap-2.5">
+                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      <span>
+                        {lookupResult.invalidQuery
+                          ? 'Ingresá un número de DNI (sin puntos) o tu código RAF-XXXXX para realizar la consulta.'
+                          : lookupResult.errorCode === 'permission-denied'
+                            ? 'El consultor online está actualizando permisos en Firebase. Mientras tanto podés verificar tu estado escribiéndonos por WhatsApp.'
+                            : 'No encontramos ninguna inscripción con ese DNI o código RAF. Verificá los datos o consultanos por WhatsApp si te inscribiste recién.'}
+                      </span>
+                    </div>
+                    {orgDigits && (
+                      <a
+                        href={orgWaUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 font-bold text-xs px-3 py-2 transition-colors shrink-0"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        Consultar WhatsApp
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* Parte 3: Acordeón Desplegable de Preguntas Frecuentes */}
       <section
         id="faq"
@@ -321,6 +589,40 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                             <FileCheck2 className="w-4 h-4 shrink-0" />
                             <span>Modelo de Apto Médico (A4 / PDF)</span>
                           </button>
+                        </div>
+                      )}
+
+                      {faq.id === 'como-llegar' && (
+                        <div className="mt-3.5 grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                          <div className="rounded-xl bg-stone-950 border border-amber-500/45 p-3 space-y-1.5">
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-display font-black uppercase tracking-wider text-amber-300">
+                              <PackageCheck className="w-4 h-4 shrink-0" />
+                              Checklist para Retirar Kit
+                            </span>
+                            <p className="text-[11px] sm:text-xs text-stone-200 leading-relaxed">
+                              Presentá en mesa: <strong className="text-white">DNI físico</strong>, <strong className="text-white">Apto Médico firmado por médico</strong> (vigencia &lt; 1 año) y <strong className="text-white">Deslinde impreso firmado</strong>. Sin documentación completa no se entrega dorsal ni chip.
+                            </p>
+                          </div>
+
+                          <div className="rounded-xl bg-stone-950 border border-cyan-500/45 p-3 space-y-1.5">
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-display font-black uppercase tracking-wider text-cyan-300">
+                              <Wifi className="w-4 h-4 shrink-0" />
+                              Wi-Fi Starlink + Track Offline
+                            </span>
+                            <p className="text-[11px] sm:text-xs text-stone-200 leading-relaxed">
+                              Contamos con <strong className="text-white">Wi-Fi satelital Starlink</strong> en la base (domo, cantina y largada). En los filos y cumbres no hay señal móvil: llevá el <strong className="text-white">archivo .GPX descargado offline</strong> en tu reloj o teléfono antes de largar.
+                            </p>
+                          </div>
+
+                          <div className="rounded-xl bg-stone-950 border border-emerald-500/45 p-3 space-y-1.5">
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-display font-black uppercase tracking-wider text-emerald-300">
+                              <Car className="w-4 h-4 shrink-0" />
+                              Servicios en Cerro Providencia
+                            </span>
+                            <p className="text-[11px] sm:text-xs text-stone-200 leading-relaxed">
+                              Predio con <strong className="text-white">estacionamiento</strong>, <strong className="text-white">guardarropas</strong> organizado por número de dorsal, <strong className="text-white">baños químicos</strong> y cantina (se recomienda llevar algo de <strong className="text-white">efectivo</strong> además de pago digital).
+                            </p>
+                          </div>
                         </div>
                       )}
 

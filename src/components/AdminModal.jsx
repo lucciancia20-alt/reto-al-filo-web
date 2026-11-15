@@ -17,7 +17,8 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { GPX_TRACKS, parseGpxXml } from '../data/gpxTracks';
-import { syncScheduleWithTargetDate } from '../data/raceConfig';
+import { syncScheduleWithTargetDate, resolveRunnerCategory } from '../data/raceConfig';
+import { openPrintableAccreditationSheet } from '../utils/printableDocs';
 import {
   addPhotoToFirestore,
   fetchGalleryPhotos,
@@ -32,6 +33,8 @@ import {
   fetchRegistrations,
   updateRegistrationStatus,
   deleteRegistrationRecord,
+  syncPublicRunnerStatus,
+  syncAllPublicRunnerStatuses,
 } from '../firebase/config';
 import AdminLoginView from './admin/AdminLoginView';
 import AdminGeneralTab from './admin/AdminGeneralTab';
@@ -104,6 +107,8 @@ export default function AdminModal({
   const [regDistanceFilter, setRegDistanceFilter] = useState('all');
   const [regStatusFilter, setRegStatusFilter] = useState('all');
   const [regDuplicateFilter, setRegDuplicateFilter] = useState('none');
+  const [regShirtFilter, setRegShirtFilter] = useState('all');
+  const [regCheckInFilter, setRegCheckInFilter] = useState('all');
   const [bibDrafts, setBibDrafts] = useState({});
   const [regBusyId, setRegBusyId] = useState('');
 
@@ -124,6 +129,9 @@ export default function AdminModal({
         }
         return next;
       });
+      if (res.source === 'firestore' && list.length > 0) {
+        syncAllPublicRunnerStatuses(list).catch(() => {});
+      }
     } catch (err) {
       setRegsError(err?.message || 'No se pudieron cargar los inscriptos.');
     } finally {
@@ -142,11 +150,37 @@ export default function AdminModal({
     let pending = 0;
     let count27k = 0;
     let count13k = 0;
+    let checkedInCount = 0;
+    let pendingCheckInCount = 0;
+    const SHIRT_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+    const shirtMap = new Map(SHIRT_ORDER.map((sz) => [sz, { size: sz, confirmed: 0, total: 0 }]));
+
     for (const r of registrations) {
-      if (r.status === 'confirmado') confirmed += 1;
-      else if (r.status === 'pendiente') pending += 1;
+      const st = String(r.status || '').toLowerCase();
+      const isConfirmed = st === 'confirmado' || st === 'confirmed';
+      const isPending = st === 'pendiente' || st === 'pending';
+      const isRejected = st === 'rechazado' || st === 'rejected';
+
+      if (isConfirmed) {
+        confirmed += 1;
+        if (r.checkedIn) checkedInCount += 1;
+        else pendingCheckInCount += 1;
+      } else if (isPending) {
+        pending += 1;
+      }
+
       if (r.distance === '27K' || r.distance === '21K') count27k += 1;
       else if (r.distance === '13K' || r.distance === '10K') count13k += 1;
+
+      const sz = String(r.shirtSize || '').trim().toUpperCase();
+      if (sz && !isRejected) {
+        if (!shirtMap.has(sz)) {
+          shirtMap.set(sz, { size: sz, confirmed: 0, total: 0 });
+        }
+        const entry = shirtMap.get(sz);
+        entry.total += 1;
+        if (isConfirmed) entry.confirmed += 1;
+      }
     }
     return {
       total: registrations.length,
@@ -154,6 +188,9 @@ export default function AdminModal({
       pending,
       count27k,
       count13k,
+      checkedInCount,
+      pendingCheckInCount,
+      shirtSizes: Array.from(shirtMap.values()),
     };
   }, [registrations]);
 
@@ -241,6 +278,17 @@ export default function AdminModal({
         const dni = normalizeDni(reg.dni);
         if (!dni || !duplicateInfo.duplicateDnis.has(dni)) return false;
       }
+      if (regShirtFilter !== 'all') {
+        if (String(reg.shirtSize || '').trim().toUpperCase() !== regShirtFilter) {
+          return false;
+        }
+      }
+      if (regCheckInFilter === 'checked') {
+        if (!reg.checkedIn) return false;
+      } else if (regCheckInFilter === 'pending_checkin') {
+        const isConf = reg.status === 'confirmado' || reg.status === 'confirmed';
+        if (!isConf || reg.checkedIn) return false;
+      }
       if (!q) return true;
       const haystack = [
         reg.fullName,
@@ -293,6 +341,8 @@ export default function AdminModal({
     regDistanceFilter,
     regStatusFilter,
     regDuplicateFilter,
+    regShirtFilter,
+    regCheckInFilter,
     duplicateInfo,
     bibDrafts,
   ]);
@@ -554,13 +604,16 @@ export default function AdminModal({
         status: 'confirmado',
         assignedBib,
       });
+      const updatedReg = {
+        ...reg,
+        status: 'confirmado',
+        assignedBib,
+        updatedAt: Date.now(),
+      };
       setRegistrations((prev) =>
-        prev.map((item) =>
-          item.id === reg.id
-            ? { ...item, status: 'confirmado', assignedBib, updatedAt: Date.now() }
-            : item
-        )
+        prev.map((item) => (item.id === reg.id ? updatedReg : item))
       );
+      syncPublicRunnerStatus(updatedReg).catch(() => {});
     } catch (err) {
       setRegsError(err?.message || 'No se pudo confirmar la inscripción.');
     } finally {
@@ -577,18 +630,56 @@ export default function AdminModal({
         status: nextStatus,
         assignedBib,
       });
+      const updatedReg = {
+        ...reg,
+        status: nextStatus,
+        assignedBib,
+        updatedAt: Date.now(),
+      };
       setRegistrations((prev) =>
-        prev.map((item) =>
-          item.id === reg.id
-            ? { ...item, status: nextStatus, assignedBib, updatedAt: Date.now() }
-            : item
-        )
+        prev.map((item) => (item.id === reg.id ? updatedReg : item))
       );
+      syncPublicRunnerStatus(updatedReg).catch(() => {});
     } catch (err) {
       setRegsError(err?.message || 'No se pudo actualizar el estado.');
     } finally {
       setRegBusyId('');
     }
+  };
+
+  const handleToggleCheckIn = async (reg) => {
+    setRegBusyId(reg.id);
+    setRegsError('');
+    try {
+      const nextCheckedIn = !reg.checkedIn;
+      const checkedInAt = nextCheckedIn ? Date.now() : null;
+      await updateRegistrationStatus(reg.id, {
+        checkedIn: nextCheckedIn,
+        checkedInAt,
+      });
+      const updatedReg = {
+        ...reg,
+        checkedIn: nextCheckedIn,
+        checkedInAt,
+        updatedAt: Date.now(),
+      };
+      setRegistrations((prev) =>
+        prev.map((item) => (item.id === reg.id ? updatedReg : item))
+      );
+      syncPublicRunnerStatus(updatedReg).catch(() => {});
+    } catch (err) {
+      setRegsError(err?.message || 'No se pudo actualizar la acreditación.');
+    } finally {
+      setRegBusyId('');
+    }
+  };
+
+  const handlePrintAccreditationSheet = () => {
+    openPrintableAccreditationSheet({
+      raceConfig: draft,
+      registrations,
+      bibDrafts,
+    });
   };
 
   const handleDeleteRegistration = async (reg) => {
@@ -602,8 +693,16 @@ export default function AdminModal({
     setRegBusyId(reg.id);
     setRegsError('');
     try {
-      await deleteRegistrationRecord(reg.id);
-      setRegistrations((prev) => prev.filter((item) => item.id !== reg.id));
+      await deleteRegistrationRecord(reg.id, reg);
+      const remaining = registrations.filter((item) => item.id !== reg.id);
+      setRegistrations(remaining);
+      const targetDni = normalizeDni(reg.dni);
+      if (targetDni) {
+        const fallbackSameDni = remaining.find((item) => normalizeDni(item.dni) === targetDni);
+        if (fallbackSameDni) {
+          syncPublicRunnerStatus(fallbackSameDni).catch(() => {});
+        }
+      }
     } catch (err) {
       setRegsError(err?.message || 'No se pudo eliminar la inscripción.');
     } finally {
@@ -635,11 +734,14 @@ export default function AdminModal({
         'DNI',
         'Fecha de Nacimiento',
         'Género',
+        'Edad Carrera',
+        'Categoría Oficial',
         'Teléfono',
         'Email',
         'Localidad',
         'Team',
         'Talle Remera',
+        'Kit / Acreditación',
         'Grupo Sanguíneo',
         'Contacto Emergencia',
         'Tel. Emergencia',
@@ -648,8 +750,9 @@ export default function AdminModal({
         'Fecha Inscripción',
       ];
 
-      const rows = registrations.map((r) =>
-        [
+      const rows = registrations.map((r) => {
+        const cat = resolveRunnerCategory(r, draft);
+        return [
           r.code || '',
           (r.status || '').toUpperCase(),
           bibDrafts[r.id] ?? r.assignedBib ?? '',
@@ -659,22 +762,25 @@ export default function AdminModal({
           r.dni || '',
           r.birthDate || '',
           r.gender || '',
+          cat.age !== null ? cat.age : '',
+          cat.fullCategory,
           r.phone || '',
           r.email || '',
           r.city || '',
           r.team || '',
           r.shirtSize || '',
+          r.checkedIn ? 'ENTREGADO' : 'PENDIENTE',
           r.bloodType || '',
           r.emergencyContactName || '',
           r.emergencyContactPhone || '',
           r.medicalNotes || '',
           r.receiptUrl || '',
           r.createdAt ? new Date(r.createdAt).toLocaleString('es-AR') : '',
-        ].map(sanitizeExcelCell)
-      );
+        ].map(sanitizeExcelCell);
+      });
 
       const titleRow = [
-        'RETO AL FILO - 2DA EDICIÓN (2027) · PLANILLA DE CORREDORES INSCRIPTOS',
+        `${(draft?.raceTitle || 'RETO AL FILO - 2DA EDICIÓN').toUpperCase()} · PLANILLA DE CORREDORES INSCRIPTOS`,
       ];
       const subtitleRow = [
         `Exportado el ${new Date().toLocaleString('es-AR')} · Total: ${registrations.length} inscriptos`,
@@ -1212,6 +1318,7 @@ export default function AdminModal({
 
               {activeTab === 'registrations' && (
                 <AdminRegistrationsTab
+                  raceConfig={draft}
                   regStats={regStats}
                   registrationsCount={registrations.length}
                   filteredRegistrations={filteredRegistrations}
@@ -1226,12 +1333,18 @@ export default function AdminModal({
                   setRegStatusFilter={setRegStatusFilter}
                   regDuplicateFilter={regDuplicateFilter}
                   setRegDuplicateFilter={setRegDuplicateFilter}
+                  regShirtFilter={regShirtFilter}
+                  setRegShirtFilter={setRegShirtFilter}
+                  regCheckInFilter={regCheckInFilter}
+                  setRegCheckInFilter={setRegCheckInFilter}
                   bibDrafts={bibDrafts}
                   setBibDrafts={setBibDrafts}
                   regBusyId={regBusyId}
                   onExportExcel={handleExportExcel}
+                  onPrintAccreditationSheet={handlePrintAccreditationSheet}
                   onConfirmRegistration={handleConfirmRegistration}
                   onChangeRegStatus={handleChangeRegStatus}
+                  onToggleCheckIn={handleToggleCheckIn}
                   onDeleteRegistration={handleDeleteRegistration}
                   buildRunnerWhatsappUrl={buildRunnerWhatsappUrl}
                   duplicateBibCount={duplicateInfo.duplicateBibCount}

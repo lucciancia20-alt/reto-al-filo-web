@@ -577,3 +577,148 @@ export function mergeRaceConfig(override) {
     ageCategories: nextAgeCategories,
   };
 }
+
+function parseIsoOrDmyDate(dateStr) {
+  const raw = String(dateStr || '').trim();
+  if (!raw) return null;
+
+  const isoMatch = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (isoMatch) {
+    const year = Number(isoMatch[1]);
+    const month = Number(isoMatch[2]);
+    const day = Number(isoMatch[3]);
+    if (year >= 1900 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+      return { year, month, day };
+    }
+  }
+
+  const dmyMatch = raw.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
+  if (dmyMatch) {
+    const day = Number(dmyMatch[1]);
+    const month = Number(dmyMatch[2]);
+    const year = Number(dmyMatch[3]);
+    if (year >= 1900 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+      return { year, month, day };
+    }
+  }
+
+  return null;
+}
+
+export function calculateRunnerAgeAtRace(birthDateStr, targetDateIso = RACE_CONFIG.targetDateIso) {
+  const birth = parseIsoOrDmyDate(birthDateStr);
+  if (!birth) return null;
+
+  const targetParts = parseTargetDateParts(targetDateIso || RACE_CONFIG.targetDateIso);
+  const race = parseIsoOrDmyDate(targetParts.datePart);
+  if (!race) return null;
+
+  let age = race.year - birth.year;
+  if (race.month < birth.month || (race.month === birth.month && race.day < birth.day)) {
+    age -= 1;
+  }
+
+  return Number.isFinite(age) && age >= 0 && age <= 120 ? age : null;
+}
+
+function matchAgeBracket(age, brackets) {
+  if (age === null || !Array.isArray(brackets) || brackets.length === 0) return null;
+
+  for (const bracket of brackets) {
+    const source = `${bracket?.range || ''} ${bracket?.label || ''}`.trim();
+    const nums = source.match(/\d+/g)?.map(Number) || [];
+    if (nums.length >= 2) {
+      const min = Math.min(nums[0], nums[1]);
+      const max = Math.max(nums[0], nums[1]);
+      if (age >= min && age <= max) return bracket;
+    } else if (nums.length === 1) {
+      const val = nums[0];
+      const lower = source.toLowerCase();
+      if (
+        lower.includes('hasta') ||
+        lower.includes('menor') ||
+        lower.includes('sub') ||
+        lower.includes('<')
+      ) {
+        if (age <= val) return bracket;
+      } else if (age >= val) {
+        return bracket;
+      }
+    }
+  }
+
+  // Si la edad es menor al primer umbral numérico configurado (ej. menor con autorización)
+  const firstNums = `${brackets[0]?.range || ''} ${brackets[0]?.label || ''}`
+    .match(/\d+/g)
+    ?.map(Number);
+  if (firstNums?.length && age < firstNums[0]) {
+    return { id: 'cat-menor', label: `Menor de ${firstNums[0]} años`, range: `< ${firstNums[0]}` };
+  }
+
+  return brackets[brackets.length - 1] || null;
+}
+
+export function resolveRunnerCategory(runner, raceConfig = RACE_CONFIG) {
+  const age = calculateRunnerAgeAtRace(
+    runner?.birthDate,
+    raceConfig?.targetDateIso || RACE_CONFIG.targetDateIso
+  );
+
+  const rawDist = String(runner?.distance || '').trim().toUpperCase();
+  const distanceLabel = rawDist.includes('27')
+    ? '27K'
+    : rawDist.includes('13')
+      ? '13K'
+      : rawDist;
+
+  const rawGender = String(runner?.gender || '').trim();
+  const lowerGender = rawGender.toLowerCase();
+  let genderLabel = '';
+  let genderShort = '';
+  if (
+    lowerGender.includes('masc') ||
+    lowerGender.includes('hombre') ||
+    lowerGender.includes('varon') ||
+    lowerGender.includes('varón') ||
+    lowerGender.includes('caballero')
+  ) {
+    genderLabel = 'Caballeros';
+    genderShort = 'Cab.';
+  } else if (
+    lowerGender.includes('fem') ||
+    lowerGender.includes('mujer') ||
+    lowerGender.includes('dama')
+  ) {
+    genderLabel = 'Damas';
+    genderShort = 'Dam.';
+  } else if (rawGender) {
+    genderLabel = rawGender;
+    genderShort = rawGender.slice(0, 4);
+  }
+
+  const brackets =
+    Array.isArray(raceConfig?.ageCategories?.brackets) && raceConfig.ageCategories.brackets.length > 0
+      ? raceConfig.ageCategories.brackets
+      : RACE_CONFIG.ageCategories.brackets;
+
+  const matchedBracket = matchAgeBracket(age, brackets);
+  const bracketLabel = matchedBracket?.label || (age !== null ? `${age} años` : '');
+
+  const fullParts = [distanceLabel, genderLabel, bracketLabel].filter(Boolean);
+  const fullCategory = fullParts.length > 0 ? fullParts.join(' · ') : 'Sin clasificar';
+
+  const compactRange = matchedBracket?.range
+    ? matchedBracket.range.replace(/años?/gi, '').replace(/\s+/g, ' ').trim()
+    : bracketLabel;
+  const shortParts = [distanceLabel, genderShort || genderLabel, compactRange].filter(Boolean);
+  const shortCategory = shortParts.length > 0 ? shortParts.join(' ') : 'Sin clasificar';
+
+  return {
+    age,
+    distanceLabel,
+    genderLabel,
+    bracketLabel,
+    fullCategory,
+    shortCategory,
+  };
+}

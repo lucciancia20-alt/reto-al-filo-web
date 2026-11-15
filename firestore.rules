@@ -61,9 +61,47 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    function isValidPublicStatusCreate(data) {
+      return data.keys().hasAll([
+        'code',
+        'initials',
+        'distance',
+        'status',
+        'assignedBib',
+        'shirtSize',
+        'checkedIn',
+        'updatedAt'
+      ])
+      && data.keys().hasOnly([
+        'code',
+        'initials',
+        'distance',
+        'status',
+        'assignedBib',
+        'shirtSize',
+        'checkedIn',
+        'updatedAt'
+      ])
+      && data.code is string && data.code.size() >= 4 && data.code.size() <= 30
+      && data.initials is string && data.initials.size() >= 1 && data.initials.size() <= 16
+      && data.distance in ['27K', '13K']
+      && data.status == 'pending'
+      && data.assignedBib == ''
+      && data.shirtSize is string && data.shirtSize.size() <= 10
+      && data.checkedIn == false
+      && data.updatedAt is string && data.updatedAt.size() <= 40;
+    }
+
     match /registrations/{registrationId} {
       allow create: if isValidRegistrationCreate(request.resource.data);
       allow read, update, delete: if isAdmin();
+    }
+
+    match /publicStatus/{lookupId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if isAdmin() || isValidPublicStatusCreate(request.resource.data);
+      allow update, delete: if isAdmin();
     }
 
     match /{document=**} {

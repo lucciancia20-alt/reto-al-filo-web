@@ -1,4 +1,4 @@
-import { RACE_CONFIG, parseTargetDateParts } from '../data/raceConfig';
+import { RACE_CONFIG, parseTargetDateParts, resolveRunnerCategory } from '../data/raceConfig';
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -14,7 +14,13 @@ function fieldValueOrLine(value, fallbackDots = '...............................
   return clean ? `<strong>${escapeHtml(clean)}</strong>` : fallbackDots;
 }
 
-function openPrintableHtmlWindow(title, bodyHtml) {
+function openPrintableHtmlWindow(title, bodyHtml, { landscape = false } = {}) {
+  const pageSize = landscape ? 'A4 landscape' : 'A4 portrait';
+  const pageMargin = landscape ? '9mm 10mm' : '12mm 14mm';
+  const sheetMaxWidth = landscape ? '297mm' : '210mm';
+  const sheetMinHeight = landscape ? '190mm' : '272mm';
+  const sheetPadding = landscape ? '8mm 10mm' : '12mm 14mm';
+
   const html = `<!doctype html>
 <html lang="es">
   <head>
@@ -23,8 +29,8 @@ function openPrintableHtmlWindow(title, bodyHtml) {
     <title>${escapeHtml(title)}</title>
     <style>
       @page {
-        size: A4 portrait;
-        margin: 12mm 14mm;
+        size: ${pageSize};
+        margin: ${pageMargin};
       }
       * {
         box-sizing: border-box;
@@ -78,12 +84,79 @@ function openPrintableHtmlWindow(title, bodyHtml) {
         cursor: pointer;
       }
       .sheet {
-        max-width: 210mm;
-        min-height: 272mm;
+        max-width: ${sheetMaxWidth};
+        min-height: ${sheetMinHeight};
         margin: 14px auto;
         background: #ffffff;
-        padding: 12mm 14mm;
+        padding: ${sheetPadding};
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+      }
+      .sos-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+        font-size: 9.8px;
+      }
+      .sos-table thead {
+        display: table-header-group;
+      }
+      .sos-table th {
+        background: #18181b;
+        color: #ffffff;
+        text-align: left;
+        padding: 5px 6px;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 8.8px;
+        letter-spacing: 0.04em;
+        border: 1px solid #27272a;
+      }
+      .sos-table td {
+        padding: 5px 6px;
+        border: 1px solid #d1d5db;
+        vertical-align: top;
+      }
+      .sos-table tr {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .sos-table tbody tr:nth-child(even) {
+        background: #f9fafb;
+      }
+      .bib-cell {
+        font-weight: 900;
+        font-size: 12.5px;
+        color: #c2410c;
+        white-space: nowrap;
+        text-align: center;
+      }
+      .blood-pill {
+        display: inline-block;
+        padding: 1px 5px;
+        border-radius: 4px;
+        background: #fee2e2;
+        border: 1px solid #fca5a5;
+        color: #991b1b;
+        font-weight: 800;
+        font-size: 9.5px;
+      }
+      .chk-row {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-bottom: 3px;
+        font-size: 8.8px;
+      }
+      .chk-box {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 11px;
+        height: 11px;
+        border: 1.2px solid #374151;
+        border-radius: 2px;
+        font-weight: 900;
+        font-size: 8.5px;
       }
       .doc-header {
         display: flex;
@@ -446,4 +519,153 @@ export function openPrintableMedicalCert({ raceConfig = RACE_CONFIG, runner = nu
   `;
 
   return openPrintableHtmlWindow(`Apto Médico Oficial - ${meta.raceTitle}`, bodyHtml);
+}
+
+/**
+ * Abre una vista A4 apaisada imprimible para la mesa de acreditación y rescate SOS,
+ * ordenada por número de dorsal ascendente con todos los corredores confirmados.
+ */
+export function openPrintableAccreditationSheet({
+  raceConfig,
+  registrations = [],
+  bibDrafts = {},
+} = {}) {
+  const meta = buildEventMeta(raceConfig);
+
+  const confirmedRunners = (Array.isArray(registrations) ? registrations : []).filter((reg) => {
+    const st = String(reg?.status || '').trim().toLowerCase();
+    return st === 'confirmed' || st === 'confirmado';
+  });
+
+  const sortedRunners = [...confirmedRunners].sort((a, b) => {
+    const rawBibA = String((bibDrafts[a.id] ?? a.assignedBib) || '').trim();
+    const rawBibB = String((bibDrafts[b.id] ?? b.assignedBib) || '').trim();
+    const numA = Number(rawBibA);
+    const numB = Number(rawBibB);
+    const validA = rawBibA !== '' && Number.isFinite(numA) && numA > 0;
+    const validB = rawBibB !== '' && Number.isFinite(numB) && numB > 0;
+
+    if (validA && validB) {
+      if (numA !== numB) return numA - numB;
+    } else if (validA) {
+      return -1;
+    } else if (validB) {
+      return 1;
+    }
+
+    return String(a.fullName || '').localeCompare(String(b.fullName || ''), 'es');
+  });
+
+  const count27k = sortedRunners.filter((r) => String(r.distance || '').includes('27')).length;
+  const count13k = sortedRunners.filter((r) => String(r.distance || '').includes('13')).length;
+  const checkedCount = sortedRunners.filter((r) => Boolean(r.checkedIn)).length;
+  const printedAt = new Date().toLocaleString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  const rowsHtml =
+    sortedRunners.length > 0
+      ? sortedRunners
+          .map((reg, idx) => {
+            const liveBib = String((bibDrafts[reg.id] ?? reg.assignedBib) || '').trim();
+            const cat = resolveRunnerCategory(reg, raceConfig);
+            const blood = String(reg.bloodType || '').trim();
+            const medNotes = String(reg.medicalNotes || '').trim();
+            const emergencyName = String(reg.emergencyContactName || '').trim();
+            const emergencyPhone = String(reg.emergencyContactPhone || '').trim();
+            const isChecked = Boolean(reg.checkedIn);
+            const ageText = cat.age !== null ? `${cat.age} años` : 'Edad s/d';
+
+            return `
+              <tr>
+                <td class="bib-cell">${liveBib ? `#${escapeHtml(liveBib)}` : `S/N<br/><span style="font-size:8px;color:#6b7280;">(#${idx + 1})</span>`}</td>
+                <td>
+                  <strong>${escapeHtml(reg.fullName || '-')}</strong>
+                  <div style="font-size:8.6px;color:#4b5563;">
+                    ${escapeHtml(reg.code || 'SIN-COD')} · ${escapeHtml(reg.city || reg.locality || 'S/D')}${reg.team ? ` · Team: ${escapeHtml(reg.team)}` : ''}
+                  </div>
+                </td>
+                <td>
+                  <strong>DNI ${escapeHtml(reg.dni || '-')}</strong>
+                  <div style="font-size:8.6px;color:#374151;">${escapeHtml(ageText)} · ${escapeHtml(cat.shortCategory)}</div>
+                </td>
+                <td style="white-space:nowrap;">
+                  <strong>${escapeHtml(cat.distanceLabel || reg.distance || '-')}</strong>
+                  <div style="font-size:8.8px;color:#374151;">Talle: <strong>${escapeHtml(reg.shirtSize || '-')}</strong></div>
+                </td>
+                <td>
+                  ${blood ? `<span class="blood-pill">${escapeHtml(blood)}</span>` : '<span style="color:#6b7280;font-size:8.6px;">Grupo s/d</span>'}
+                  ${
+                    medNotes
+                      ? `<div style="margin-top:2px;font-size:8.6px;color:#7f1d1d;"><strong>Obs:</strong> ${escapeHtml(medNotes)}</div>`
+                      : ''
+                  }
+                </td>
+                <td>
+                  <strong>${escapeHtml(emergencyName || '-')}</strong>
+                  <div style="font-size:8.8px;color:#111827;">${escapeHtml(emergencyPhone || '-')}</div>
+                </td>
+                <td style="min-width:118px;">
+                  <div class="chk-row">
+                    <span class="chk-box">${isChecked ? '✓' : ''}</span>
+                    <span>${isChecked ? '<strong>Kit entregado (web)</strong>' : 'Kit + Chip + Dorsal'}</span>
+                  </div>
+                  <div class="chk-row">
+                    <span class="chk-box"></span>
+                    <span>Apto + Deslinde OK</span>
+                  </div>
+                  <div style="border-bottom:1px dotted #9ca3af;margin-top:6px;height:10px;font-size:7.8px;color:#6b7280;">Firma:</div>
+                </td>
+              </tr>
+            `;
+          })
+          .join('')
+      : `<tr><td colspan="7" style="text-align:center;padding:18px;color:#4b5563;">No hay corredores confirmados para imprimir todavía.</td></tr>`;
+
+  const bodyHtml = `
+    <header class="doc-header" style="margin-bottom:8px;">
+      <div class="doc-brand">
+        <div class="doc-tag">Mesa de Acreditación &amp; Planilla Médica SOS</div>
+        <h1>Planilla de Control — Ordenada por Dorsal</h1>
+        <p>${escapeHtml(meta.raceTitle)} · ${escapeHtml(meta.locationName)} · Fecha oficial: ${escapeHtml(meta.eventDate)}</p>
+      </div>
+      <div class="doc-meta">
+        <div>Confirmados: <strong>${sortedRunners.length}</strong> (27K: ${count27k} · 13K: ${count13k})</div>
+        <div>Ya acreditados en web: <strong>${checkedCount}</strong> / ${sortedRunners.length}</div>
+        <div>Emitida: ${escapeHtml(printedAt)}</div>
+      </div>
+    </header>
+
+    <table class="sos-table">
+      <thead>
+        <tr>
+          <th style="width:58px;text-align:center;">Dorsal</th>
+          <th>Corredor / Código / Procedencia</th>
+          <th>DNI / Edad / Categoría</th>
+          <th>Dist. / Talle</th>
+          <th>Grupo RH / Alertas Médicas</th>
+          <th>Contacto Emergencia SOS</th>
+          <th style="width:128px;">Check-in Mesa</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+    </table>
+
+    <footer class="footer-meta">
+      <span>DOCUMENTO INTERNO DE ORGANIZACIÓN Y RESCATE EN MONTAÑA — NO EXPONER PÚBLICAMENTE</span>
+      <span>${escapeHtml(meta.raceTitle)}</span>
+    </footer>
+  `;
+
+  return openPrintableHtmlWindow(
+    `Planilla Acreditación SOS - ${meta.raceTitle}`,
+    bodyHtml,
+    { landscape: true }
+  );
 }

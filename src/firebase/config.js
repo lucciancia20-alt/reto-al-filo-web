@@ -539,6 +539,10 @@ export async function submitRunnerRegistration(payload) {
   const localList = readLocalRegistrations();
   writeLocalRegistrations([savedRecord, ...localList]);
 
+  if (persistedTo === 'firestore') {
+    await syncPublicRunnerStatus(savedRecord).catch(() => {});
+  }
+
   return {
     ...savedRecord,
     persistedTo,
@@ -628,10 +632,14 @@ export async function updateRegistrationStatus(registrationId, updates) {
 /**
  * Elimina un registro de inscripción desde el Panel Admin.
  */
-export async function deleteRegistrationRecord(registrationId) {
+export async function deleteRegistrationRecord(registrationId, registrationRecord = null) {
   if (!registrationId) {
     throw new Error('ID de inscripción inválido.');
   }
+
+  const localBefore = readLocalRegistrations();
+  const targetRecord =
+    registrationRecord || localBefore.find((item) => item.id === registrationId) || null;
 
   if (
     isFirebaseConfigured() &&
@@ -642,13 +650,236 @@ export async function deleteRegistrationRecord(registrationId) {
       const { db, firestore } = bundle;
       const { doc, deleteDoc } = firestore;
       await deleteDoc(doc(db, 'registrations', registrationId));
+
+      if (targetRecord) {
+        const keysToDelete = [];
+        const codeKey = normalizeCodeKey(targetRecord.code);
+        const dniKey = normalizeDniKey(targetRecord.dni);
+        if (codeKey) keysToDelete.push(codeKey);
+        if (dniKey) keysToDelete.push(dniKey);
+        await Promise.allSettled(
+          keysToDelete.map((key) => deleteDoc(doc(db, 'publicStatus', key)))
+        );
+      }
     }
   }
 
-  const localList = readLocalRegistrations().filter((item) => item.id !== registrationId);
+  const localList = localBefore.filter((item) => item.id !== registrationId);
   writeLocalRegistrations(localList);
 
   return { ok: true, id: registrationId };
+}
+
+function normalizeDniKey(rawDni) {
+  const digits = String(rawDni || '').replace(/\D/g, '');
+  return digits ? `dni-${digits}` : '';
+}
+
+function normalizeCodeKey(rawCode) {
+  const cleaned = String(rawCode || '')
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9-]/g, '');
+  return cleaned ? `code-${cleaned}` : '';
+}
+
+function getRunnerInitials(fullName) {
+  const parts = String(fullName || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (parts.length === 0) return 'Corredor';
+  return parts
+    .slice(0, 3)
+    .map((p) => `${p.charAt(0).toUpperCase()}.`)
+    .join(' ')
+    .slice(0, 16);
+}
+
+function mapStatusToPublic(rawStatus) {
+  const normalized = String(rawStatus || '').trim().toLowerCase();
+  if (normalized === 'confirmed' || normalized === 'confirmado') return 'confirmed';
+  if (normalized === 'rejected' || normalized === 'rechazado') return 'rejected';
+  return 'pending';
+}
+
+export function buildPublicStatusPayload(record) {
+  const rawDist = String(record?.distance || '').toUpperCase();
+  return {
+    code: String(record?.code || '').trim().toUpperCase().slice(0, 30) || 'SIN-COD',
+    initials: getRunnerInitials(record?.fullName),
+    distance: rawDist.includes('13') ? '13K' : '27K',
+    status: mapStatusToPublic(record?.status),
+    assignedBib: String(record?.assignedBib || '').trim().slice(0, 20),
+    shirtSize: String(record?.shirtSize || '').trim().slice(0, 10),
+    checkedIn: Boolean(record?.checkedIn),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+/**
+ * Sincroniza la proyección pública no sensible (`publicStatus/{lookupId}`) de un corredor.
+ */
+export async function syncPublicRunnerStatus(record) {
+  if (!record || !isFirebaseConfigured()) return { ok: false };
+
+  try {
+    const bundle = await getFirestoreDb();
+    if (!bundle) return { ok: false };
+
+    const { db, firestore } = bundle;
+    const { doc, setDoc } = firestore;
+    const payload = buildPublicStatusPayload(record);
+
+    const keys = [normalizeCodeKey(record.code), normalizeDniKey(record.dni)].filter(Boolean);
+    if (keys.length === 0) return { ok: false };
+
+    await Promise.allSettled(
+      keys.map((key) => setDoc(doc(db, 'publicStatus', key), payload, { merge: true }))
+    );
+    return { ok: true };
+  } catch (error) {
+    console.warn('[Reto al Filo] Error sincronizando publicStatus:', error?.code || error?.message);
+    return { ok: false };
+  }
+}
+
+/**
+ * Sincroniza en lote toda la lista de inscriptos hacia `publicStatus` (solo Admin).
+ */
+export async function syncAllPublicRunnerStatuses(registrationsList = []) {
+  if (!isFirebaseConfigured() || !Array.isArray(registrationsList) || registrationsList.length === 0) {
+    return { ok: false, count: 0 };
+  }
+
+  try {
+    const bundle = await getFirestoreDb();
+    if (!bundle) return { ok: false, count: 0 };
+
+    const { db, firestore } = bundle;
+    const { doc, writeBatch } = firestore;
+
+    const statusPriority = { confirmed: 3, pending: 2, rejected: 1 };
+    const docMap = new Map();
+
+    // Ordenar de menor a mayor prioridad para que la más importante (confirmed > pending > rejected) gane en `dni-...`
+    const ordered = [...registrationsList].sort((a, b) => {
+      const pa = statusPriority[mapStatusToPublic(a.status)] || 0;
+      const pb = statusPriority[mapStatusToPublic(b.status)] || 0;
+      if (pa !== pb) return pa - pb;
+      return Number(a.createdAt || 0) - Number(b.createdAt || 0);
+    });
+
+    for (const reg of ordered) {
+      const payload = buildPublicStatusPayload(reg);
+      const codeKey = normalizeCodeKey(reg.code);
+      const dniKey = normalizeDniKey(reg.dni);
+      if (codeKey) docMap.set(codeKey, payload);
+      if (dniKey) docMap.set(dniKey, payload);
+    }
+
+    const entries = Array.from(docMap.entries());
+    const CHUNK_SIZE = 400;
+    for (let i = 0; i < entries.length; i += CHUNK_SIZE) {
+      const batch = writeBatch(db);
+      const slice = entries.slice(i, i + CHUNK_SIZE);
+      slice.forEach(([key, payload]) => {
+        batch.set(doc(db, 'publicStatus', key), payload, { merge: true });
+      });
+      await batch.commit();
+    }
+
+    return { ok: true, count: entries.length };
+  } catch (error) {
+    console.warn('[Reto al Filo] No se pudo sincronizar lote publicStatus:', error?.code || error?.message);
+    return { ok: false, count: 0 };
+  }
+}
+
+function buildLookupCandidates(rawQuery) {
+  const trimmed = String(rawQuery || '').trim();
+  if (!trimmed) return [];
+
+  const upper = trimmed.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+  const digits = trimmed.replace(/\D/g, '');
+  const candidates = [];
+
+  if (upper.startsWith('RAF') || /[A-Z]/.test(upper)) {
+    candidates.push(`code-${upper}`);
+    if (upper.startsWith('RAF') && !upper.includes('-') && upper.length > 3) {
+      candidates.push(`code-RAF-${upper.slice(3)}`);
+    }
+  } else if (digits.length >= 6) {
+    candidates.push(`dni-${digits}`);
+  } else if (digits.length >= 4) {
+    candidates.push(`code-RAF-${digits}`);
+    candidates.push(`dni-${digits}`);
+  }
+
+  return Array.from(new Set(candidates));
+}
+
+/**
+ * Consulta pública segura de estado/dorsal por DNI o código RAF-XXXXX.
+ */
+export async function fetchPublicRunnerStatus(rawQuery) {
+  const candidates = buildLookupCandidates(rawQuery);
+  if (candidates.length === 0) {
+    return { found: false, invalidQuery: true };
+  }
+
+  let firestoreErrorCode = '';
+
+  if (isFirebaseConfigured()) {
+    try {
+      const bundle = await getFirestoreDb();
+      if (bundle) {
+        const { db, firestore } = bundle;
+        const { doc, getDoc } = firestore;
+
+        for (const key of candidates) {
+          const snap = await getDoc(doc(db, 'publicStatus', key));
+          if (snap.exists()) {
+            return {
+              found: true,
+              source: 'firestore',
+              data: snap.data(),
+            };
+          }
+        }
+      }
+    } catch (error) {
+      firestoreErrorCode = error?.code || 'unknown';
+      console.warn('[Reto al Filo] Error consultando publicStatus:', firestoreErrorCode);
+    }
+  }
+
+  // Fallback local (registraciones guardadas en el mismo navegador / modo sin rules o local)
+  const localList = readLocalRegistrations();
+  const digits = String(rawQuery || '').replace(/\D/g, '');
+  const upperCode = String(rawQuery || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
+  const localMatch = localList.find((reg) => {
+    const regDni = String(reg.dni || '').replace(/\D/g, '');
+    const regCode = String(reg.code || '').trim().toUpperCase();
+    return (
+      (digits && regDni === digits) ||
+      (upperCode && (regCode === upperCode || regCode === `RAF-${upperCode}`))
+    );
+  });
+
+  if (localMatch) {
+    return {
+      found: true,
+      source: 'local',
+      data: buildPublicStatusPayload(localMatch),
+    };
+  }
+
+  return {
+    found: false,
+    source: isFirebaseConfigured() ? 'firestore' : 'local',
+    errorCode: firestoreErrorCode,
+  };
 }
 
 /**

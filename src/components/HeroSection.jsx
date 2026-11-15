@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, Flame, ChevronDown, Timer } from 'lucide-react';
+import { Calendar, MapPin, Flame, ChevronDown, Timer, Search } from 'lucide-react';
 import { RACE_CONFIG, parseTargetDateParts } from '../data/raceConfig';
 
 function calculateTimeLeft(targetIso) {
@@ -139,6 +139,14 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
             Ver Circuito y Altimetría
           </a>
         </div>
+
+        <a
+          href="#consultar-dorsal"
+          className="mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-stone-950/75 hover:bg-stone-900 border border-stone-700/80 hover:border-amber-400/70 px-3.5 py-1.5 text-xs font-semibold text-amber-200 hover:text-amber-300 transition-colors"
+        >
+          <Search className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+          <span>¿Ya te inscribiste? Consultar mi estado y dorsal →</span>
+        </a>
 
         {/* Ubicación rápida */}
         <div className="mt-4 inline-flex items-center gap-2 text-xs sm:text-sm text-stone-300">

@@ -11,9 +11,14 @@ import {
   ChevronDown,
   Pencil,
   Wallet,
+  Printer,
+  PackageCheck,
+  Shirt,
 } from 'lucide-react';
+import { resolveRunnerCategory } from '../../data/raceConfig';
 
 export default function AdminRegistrationsTab({
+  raceConfig,
   regStats,
   registrationsCount,
   filteredRegistrations,
@@ -28,12 +33,18 @@ export default function AdminRegistrationsTab({
   setRegStatusFilter,
   regDuplicateFilter = 'none',
   setRegDuplicateFilter,
+  regShirtFilter = 'all',
+  setRegShirtFilter,
+  regCheckInFilter = 'all',
+  setRegCheckInFilter,
   bibDrafts,
   setBibDrafts,
   regBusyId,
   onExportExcel,
+  onPrintAccreditationSheet,
   onConfirmRegistration,
   onChangeRegStatus,
+  onToggleCheckIn,
   onDeleteRegistration,
   buildRunnerWhatsappUrl,
   duplicateBibCount = 0,
@@ -203,7 +214,11 @@ export default function AdminRegistrationsTab({
   };
 
   const hasSpecificFilter =
-    regDistanceFilter !== 'all' || regStatusFilter !== 'all' || regDuplicateFilter !== 'none';
+    regDistanceFilter !== 'all' ||
+    regStatusFilter !== 'all' ||
+    regDuplicateFilter !== 'none' ||
+    regShirtFilter !== 'all' ||
+    regCheckInFilter !== 'all';
 
   return (
     <div className="space-y-3">
@@ -218,14 +233,13 @@ export default function AdminRegistrationsTab({
             activeClass: 'bg-stone-950 border-white',
             labelClass: 'text-white',
             dotClass: 'bg-white',
-            isActive:
-              regDistanceFilter === 'all' &&
-              regStatusFilter === 'all' &&
-              regDuplicateFilter === 'none',
+            isActive: !hasSpecificFilter,
             onClick: () => {
               setRegDuplicateFilter?.('none');
               setRegDistanceFilter('all');
               setRegStatusFilter('all');
+              setRegShirtFilter?.('all');
+              setRegCheckInFilter?.('all');
             },
           },
           {
@@ -404,6 +418,17 @@ export default function AdminRegistrationsTab({
               Exportar Excel (.XLSX)
             </button>
 
+            <button
+              type="button"
+              onClick={onPrintAccreditationSheet}
+              disabled={(regStats.confirmed || 0) === 0}
+              title="Imprimir planilla A4 de acreditación y seguridad SOS ordenada por dorsal"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-amber-300 border border-amber-500/60 text-xs font-bold px-3.5 py-2 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap"
+            >
+              <Printer className="w-3.5 h-3.5 shrink-0" />
+              Imprimir Planilla Acreditación / SOS
+            </button>
+
             <a
               href="https://www.mercadopago.com.ar/activities"
               target="_blank"
@@ -415,6 +440,83 @@ export default function AdminRegistrationsTab({
               <span>Mercado Pago</span>
               <ExternalLink className="w-3 h-3 opacity-80 shrink-0" />
             </a>
+          </div>
+        </div>
+
+        {/* Resumen en vivo de Talles (Confirmados / Activos) y Acreditación */}
+        <div className="pt-2 border-t border-stone-800/80 flex flex-col xl:flex-row xl:items-center justify-between gap-2 text-[11px]">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-stone-400 mr-1">
+              <Shirt className="w-3.5 h-3.5 text-amber-400" />
+              Talles (Conf/Tot):
+            </span>
+            {(regStats.shirtSizes || []).map((item) => {
+              const isSelected = regShirtFilter === item.size;
+              return (
+                <button
+                  key={item.size}
+                  type="button"
+                  onClick={() => setRegShirtFilter?.(isSelected ? 'all' : item.size)}
+                  title={`Filtrar por talle ${item.size}: ${item.confirmed} confirmados de ${item.total} inscriptos no rechazados`}
+                  className={`inline-flex items-center gap-1 rounded-lg border px-2 py-0.5 font-mono transition-colors cursor-pointer ${
+                    isSelected
+                      ? 'bg-orange-500/20 border-orange-400 text-white font-bold'
+                      : item.total > 0
+                        ? 'bg-stone-950 border-stone-700 text-stone-200 hover:border-orange-500/60'
+                        : 'bg-stone-950 border-stone-800/80 text-stone-500 hover:border-stone-700'
+                  }`}
+                >
+                  <span className="font-bold text-amber-300">{item.size}:</span>
+                  <span>
+                    <strong className="text-emerald-400">{item.confirmed}</strong>/{item.total}
+                  </span>
+                </button>
+              );
+            })}
+            {regShirtFilter !== 'all' && (
+              <button
+                type="button"
+                onClick={() => setRegShirtFilter?.('all')}
+                className="text-[10px] text-orange-400 hover:text-orange-300 underline ml-1 cursor-pointer"
+              >
+                Limpiar talle
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-stone-400 mr-0.5">
+              <PackageCheck className="w-3.5 h-3.5 text-emerald-400" />
+              Mesa Kit:
+            </span>
+            <button
+              type="button"
+              onClick={() =>
+                setRegCheckInFilter?.(regCheckInFilter === 'checked' ? 'all' : 'checked')
+              }
+              className={`rounded-lg border px-2 py-0.5 text-[11px] font-semibold transition-colors cursor-pointer ${
+                regCheckInFilter === 'checked'
+                  ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 font-bold'
+                  : 'bg-stone-950 border-stone-700 text-emerald-400 hover:border-emerald-500/60'
+              }`}
+            >
+              Kits entregados ({regStats.checkedInCount || 0})
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setRegCheckInFilter?.(
+                  regCheckInFilter === 'pending_checkin' ? 'all' : 'pending_checkin'
+                )
+              }
+              className={`rounded-lg border px-2 py-0.5 text-[11px] font-semibold transition-colors cursor-pointer ${
+                regCheckInFilter === 'pending_checkin'
+                  ? 'bg-amber-500/20 border-amber-400 text-amber-200 font-bold'
+                  : 'bg-stone-950 border-stone-700 text-amber-300 hover:border-amber-500/60'
+              }`}
+            >
+              Pendientes de retirar ({regStats.pendingCheckInCount || 0})
+            </button>
           </div>
         </div>
 
@@ -531,6 +633,11 @@ export default function AdminRegistrationsTab({
                       >
                         {reg.status}
                       </span>
+                      {reg.checkedIn && (
+                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border border-emerald-500/60 bg-emerald-500/15 text-emerald-300 shrink-0">
+                          Kit ✓
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -613,6 +720,29 @@ export default function AdminRegistrationsTab({
                           : 'Confirmar'}
                     </button>
 
+                    {(isConfirmed || reg.checkedIn) && (
+                      <button
+                        type="button"
+                        disabled={isBusy}
+                        onClick={() => onToggleCheckIn?.(reg)}
+                        title={
+                          reg.checkedIn
+                            ? 'Kit acreditado y entregado (clic para desmarcar)'
+                            : 'Marcar kit entregado / corredor acreditado en mesa'
+                        }
+                        className={`inline-flex items-center gap-1 rounded-lg border text-[10px] sm:text-[11px] font-bold px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
+                          reg.checkedIn
+                            ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 hover:bg-emerald-500/30'
+                            : 'bg-stone-950 border-amber-500/60 text-amber-300 hover:bg-white/5 hover:border-amber-400'
+                        }`}
+                      >
+                        <PackageCheck className="w-3.5 h-3.5 shrink-0" />
+                        <span className="hidden md:inline">
+                          {reg.checkedIn ? 'Kit OK' : 'Acreditar'}
+                        </span>
+                      </button>
+                    )}
+
                     {reg.receiptUrl && (
                       <a
                         href={reg.receiptUrl}
@@ -674,71 +804,95 @@ export default function AdminRegistrationsTab({
                 </div>
 
                 {/* Panel expandible (Acordeón con datos complementarios) */}
-                {isExpanded && (
-                  <div className="border-t border-stone-800/90 bg-stone-950 px-3.5 py-2.5 space-y-2 text-xs text-stone-300">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1.5">
-                      <div className="truncate">
-                        <span className="text-stone-500">Email: </span>
-                        <span className="text-stone-100">{reg.email}</span>
-                      </div>
-                      <div>
-                        <span className="text-stone-500">Nacimiento: </span>
-                        <span className="text-stone-100">{reg.birthDate}</span>
-                      </div>
-                      <div>
-                        <span className="text-stone-500">Género: </span>
-                        <span className="text-stone-100">{reg.gender}</span>
-                      </div>
-                      <div>
-                        <span className="text-stone-500">Talle remera: </span>
-                        <strong className="text-amber-300">{reg.shirtSize}</strong>
-                      </div>
-                      <div>
-                        <span className="text-stone-500">Localidad: </span>
-                        <span className="text-stone-100">{reg.city}</span>
-                      </div>
-                      <div>
-                        <span className="text-stone-500">Team: </span>
-                        <span className="text-stone-100">{reg.team || 'Libre'}</span>
-                      </div>
-                      <div>
-                        <span className="text-stone-500">Teléfono: </span>
-                        <span className="font-mono text-stone-100">{reg.phone}</span>
-                      </div>
-                      <div>
-                        <span className="text-stone-500">Emergencia: </span>
-                        <span className="text-stone-100">
-                          {reg.emergencyContactName} ({reg.emergencyContactPhone})
+                {isExpanded && (() => {
+                  const cat = resolveRunnerCategory(reg, raceConfig);
+                  return (
+                    <div className="border-t border-stone-800/90 bg-stone-950 px-3.5 py-2.5 space-y-2 text-xs text-stone-300">
+                      <div className="flex flex-wrap items-center gap-2 pb-2 border-b border-stone-800/70">
+                        <span className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500/10 border border-amber-500/35 px-2.5 py-1 text-[11px] font-bold text-amber-300">
+                          Categoría Oficial: <strong className="text-white">{cat.fullCategory}</strong>
                         </span>
-                      </div>
-                      <div>
-                        <span className="text-stone-500">Grupo sanguíneo: </span>
-                        <strong className="font-mono text-rose-300">
-                          {reg.bloodType || 'No especificado'}
-                        </strong>
-                      </div>
-                      <div className="sm:col-span-2 md:col-span-3 text-stone-200">
-                        <span className="text-stone-500">Observaciones médicas: </span>
-                        <span className={reg.medicalNotes ? 'text-amber-200' : 'text-stone-400'}>
-                          {reg.medicalNotes || 'Sin observaciones médicas'}
+                        <span className="inline-flex items-center gap-1 rounded-lg bg-stone-900 border border-stone-700 px-2 py-1 text-[11px] text-stone-200">
+                          Edad al día de carrera:{' '}
+                          <strong className="font-mono text-amber-300">
+                            {cat.age !== null ? `${cat.age} años` : 'Sin fecha'}
+                          </strong>
                         </span>
-                      </div>
-                    </div>
-
-                    {reg.status !== 'pendiente' && (
-                      <div className="pt-1 flex justify-end border-t border-stone-800/60">
-                        <button
-                          type="button"
-                          disabled={isBusy}
-                          onClick={() => onChangeRegStatus(reg, 'pendiente')}
-                          className="rounded-lg bg-stone-950 hover:bg-white/5 border border-amber-500/50 text-amber-400 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer disabled:opacity-50"
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[11px] font-semibold ${
+                            reg.checkedIn
+                              ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300'
+                              : 'bg-stone-900 border-stone-700 text-stone-400'
+                          }`}
                         >
-                          Pasar a Pendiente
-                        </button>
+                          Mesa Kit: {reg.checkedIn ? 'Kit entregado ✓' : 'Pendiente de retiro'}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                )}
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1.5">
+                        <div className="truncate">
+                          <span className="text-stone-500">Email: </span>
+                          <span className="text-stone-100">{reg.email}</span>
+                        </div>
+                        <div>
+                          <span className="text-stone-500">Nacimiento: </span>
+                          <span className="text-stone-100">{reg.birthDate}</span>
+                        </div>
+                        <div>
+                          <span className="text-stone-500">Género: </span>
+                          <span className="text-stone-100">{reg.gender}</span>
+                        </div>
+                        <div>
+                          <span className="text-stone-500">Talle remera: </span>
+                          <strong className="text-amber-300">{reg.shirtSize}</strong>
+                        </div>
+                        <div>
+                          <span className="text-stone-500">Localidad: </span>
+                          <span className="text-stone-100">{reg.city}</span>
+                        </div>
+                        <div>
+                          <span className="text-stone-500">Team: </span>
+                          <span className="text-stone-100">{reg.team || 'Libre'}</span>
+                        </div>
+                        <div>
+                          <span className="text-stone-500">Teléfono: </span>
+                          <span className="font-mono text-stone-100">{reg.phone}</span>
+                        </div>
+                        <div>
+                          <span className="text-stone-500">Emergencia: </span>
+                          <span className="text-stone-100">
+                            {reg.emergencyContactName} ({reg.emergencyContactPhone})
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-stone-500">Grupo sanguíneo: </span>
+                          <strong className="font-mono text-rose-300">
+                            {reg.bloodType || 'No especificado'}
+                          </strong>
+                        </div>
+                        <div className="sm:col-span-2 md:col-span-3 text-stone-200">
+                          <span className="text-stone-500">Observaciones médicas: </span>
+                          <span className={reg.medicalNotes ? 'text-amber-200' : 'text-stone-400'}>
+                            {reg.medicalNotes || 'Sin observaciones médicas'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {reg.status !== 'pendiente' && (
+                        <div className="pt-1 flex justify-end border-t border-stone-800/60">
+                          <button
+                            type="button"
+                            disabled={isBusy}
+                            onClick={() => onChangeRegStatus(reg, 'pendiente')}
+                            className="rounded-lg bg-stone-950 hover:bg-white/5 border border-amber-500/50 text-amber-400 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer disabled:opacity-50"
+                          >
+                            Pasar a Pendiente
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             );
           })
