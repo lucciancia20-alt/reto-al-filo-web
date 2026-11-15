@@ -170,9 +170,14 @@ export default function AdminScheduleFaqTab({
       </div>
 
       <div>
-        <h4 className="font-display text-sm font-bold text-white uppercase mb-3">
-          Preguntas Frecuentes (FAQ)
-        </h4>
+        <div className="mb-3">
+          <h4 className="font-display text-sm text-white font-bold uppercase tracking-wider leading-snug">
+            EDITAR PREGUNTAS FRECUENTES, ELEMENTOS OBLIGATORIOS DIFERENCIADOS 27K VS 13K Y CATEGORÍAS POR EDAD Y PREMIACIÓN
+          </h4>
+          <p className="text-xs text-zinc-400 mt-1">
+            Deslizá hacia abajo o usá la flecha inferior para editar cada bloque.
+          </p>
+        </div>
         <div className="space-y-3">
           {faqs.map((faq, idx) => (
             <div
