@@ -1,4 +1,4 @@
-import { RACE_CONFIG, mergeRaceConfig } from '../data/raceConfig';
+import { RACE_CONFIG, mergeRaceConfig, calculateRunnerAgeAtRace } from '../data/raceConfig';
 
 const LOCAL_CONFIG_STORAGE_KEY = 'reto_al_filo_config_v2';
 const LOCAL_REGISTRATIONS_STORAGE_KEY = 'reto_al_filo_registrations_v1';
@@ -485,6 +485,16 @@ export async function submitRunnerRegistration(payload) {
     if (!String(payload?.[key] || '').trim()) {
       throw new Error(`Completá el campo obligatorio: ${label}.`);
     }
+  }
+
+  const runnerAge = calculateRunnerAgeAtRace(
+    payload.birthDate,
+    payload.targetDateIso || RACE_CONFIG.targetDateIso
+  );
+  if (runnerAge === null || runnerAge < 18) {
+    throw new Error(
+      'La edad mínima para inscribirse es de 18 años cumplidos al día de la carrera.'
+    );
   }
 
   const now = Date.now();

@@ -21,7 +21,14 @@ import {
   BookOpen,
   ChevronDown,
 } from 'lucide-react';
-import { RACE_CONFIG, buildWhatsAppUrl } from '../data/raceConfig';
+import {
+  RACE_CONFIG,
+  buildWhatsAppUrl,
+  calculateRunnerAgeAtRace,
+  resolveRunnerCategory,
+  getMaxBirthDateIso,
+  formatBirthDateDmy,
+} from '../data/raceConfig';
 import {
   validateUploadFile,
   uploadImageToCloudinary,
@@ -58,29 +65,24 @@ const INITIAL_FORM = {
   medicalNotes: '',
 };
 
-function formatBirthDateInput(rawValue) {
-  const digits = String(rawValue || '').replace(/\D/g, '').slice(0, 8);
-  if (digits.length <= 2) return digits;
-  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
-}
+const MIN_BIRTH_DATE_ISO = '1926-01-01';
+const UNDERAGE_ERROR_MSG =
+  'La edad mínima para inscribirse es de 18 años cumplidos al día de la carrera.';
+const INVALID_BIRTHDATE_MSG =
+  'Ingresá una Fecha de Nacimiento válida (desde 01/01/1926 y con al menos 18 años al día de la carrera).';
 
-function isValidBirthDate(value) {
-  const match = String(value || '').trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (!match) return false;
-  const day = Number(match[1]);
-  const month = Number(match[2]);
-  const year = Number(match[3]);
-  const maxYear = new Date().getFullYear() - 5;
-  if (year < 1920 || year > maxYear || month < 1 || month > 12 || day < 1) {
-    return false;
+function getBirthDateValidationError(birthDateStr, raceDateIso, maxBirthDateIso) {
+  const raw = String(birthDateStr || '').trim();
+  if (!raw) return INVALID_BIRTHDATE_MSG;
+
+  const age = calculateRunnerAgeAtRace(raw, raceDateIso);
+  if (raw > maxBirthDateIso || (age !== null && age < 18)) {
+    return UNDERAGE_ERROR_MSG;
   }
-  const date = new Date(year, month - 1, day);
-  return (
-    date.getFullYear() === year &&
-    date.getMonth() === month - 1 &&
-    date.getDate() === day
-  );
+  if (raw < MIN_BIRTH_DATE_ISO || age === null) {
+    return INVALID_BIRTHDATE_MSG;
+  }
+  return '';
 }
 
 export default function RegistrationModal({
@@ -101,12 +103,14 @@ export default function RegistrationModal({
   const [submitting, setSubmitting] = useState(false);
   const [submitStep, setSubmitStep] = useState('');
   const [submitError, setSubmitError] = useState('');
+  const [birthDateError, setBirthDateError] = useState('');
   const [confirmedReg, setConfirmedReg] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
       setSelectedDistance(initialDistance);
       setSubmitError('');
+      setBirthDateError('');
       setSubmitStep('');
       setShowTermsModal(false);
       setShowSizeGuide(false);
@@ -175,8 +179,57 @@ export default function RegistrationModal({
   const activeDistanceInfo =
     distances.find((d) => d.id === selectedDistance) || distances[0];
 
+  const raceDateIso = raceConfig?.targetDateIso || RACE_CONFIG.targetDateIso;
+  const maxBirthDateIso = getMaxBirthDateIso(raceDateIso, 18);
+  const runnerAgeAtRace = calculateRunnerAgeAtRace(form.birthDate, raceDateIso);
+  const isRunnerAdult =
+    Boolean(form.birthDate) &&
+    form.birthDate >= MIN_BIRTH_DATE_ISO &&
+    form.birthDate <= maxBirthDateIso &&
+    runnerAgeAtRace !== null &&
+    runnerAgeAtRace >= 18;
+  const runnerCategoryPreview = isRunnerAdult
+    ? resolveRunnerCategory(
+        { birthDate: form.birthDate, gender: form.gender, distance: selectedDistance },
+        raceConfig
+      )
+    : null;
+
   const handleFieldChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleBirthDateChange = (rawValue) => {
+    handleFieldChange('birthDate', rawValue);
+
+    if (!rawValue) {
+      setBirthDateError('');
+      if (submitError === UNDERAGE_ERROR_MSG || submitError === INVALID_BIRTHDATE_MSG) {
+        setSubmitError('');
+      }
+      return;
+    }
+
+    const yearPrefix = Number(String(rawValue).slice(0, 4));
+    if (!Number.isFinite(yearPrefix) || yearPrefix < 1000) {
+      return;
+    }
+
+    const validationMsg = getBirthDateValidationError(rawValue, raceDateIso, maxBirthDateIso);
+    setBirthDateError(validationMsg);
+    if (!validationMsg && (submitError === UNDERAGE_ERROR_MSG || submitError === INVALID_BIRTHDATE_MSG)) {
+      setSubmitError('');
+    }
+  };
+
+  const handleBirthDateBlur = () => {
+    if (!form.birthDate) {
+      setBirthDateError('');
+      return;
+    }
+    setBirthDateError(
+      getBirthDateValidationError(form.birthDate, raceDateIso, maxBirthDateIso)
+    );
   };
 
   const handleCopyText = async (field, value) => {
@@ -240,6 +293,7 @@ export default function RegistrationModal({
     setForm(INITIAL_FORM);
     setConfirmedReg(null);
     setSubmitError('');
+    setBirthDateError('');
     setSubmitStep('');
     setAcceptedTerms(false);
     setShowTermsModal(false);
@@ -250,12 +304,17 @@ export default function RegistrationModal({
     e.preventDefault();
     setSubmitError('');
 
-    if (!isValidBirthDate(form.birthDate)) {
-      setSubmitError(
-        'Ingresá una Fecha de Nacimiento válida en formato DD/MM/AAAA (por ejemplo 15/06/1987).'
-      );
+    const birthValidationError = getBirthDateValidationError(
+      form.birthDate,
+      raceDateIso,
+      maxBirthDateIso
+    );
+    if (birthValidationError) {
+      setBirthDateError(birthValidationError);
+      setSubmitError(birthValidationError);
       return;
     }
+    setBirthDateError('');
 
     if (!receiptFile) {
       setSubmitError(
@@ -282,6 +341,8 @@ export default function RegistrationModal({
       setSubmitStep('Registrando tu ficha de corredor...');
       const created = await submitRunnerRegistration({
         ...form,
+        birthDate: formatBirthDateDmy(form.birthDate),
+        targetDateIso: raceDateIso,
         acceptedTerms: true,
         distance: selectedDistance,
         priceSnapshot: activeDistanceInfo.price,
@@ -714,18 +775,54 @@ export default function RegistrationModal({
                     <input
                       id="reg-birthdate"
                       name="birthDate"
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={10}
+                      type="date"
+                      min={MIN_BIRTH_DATE_ISO}
+                      max={maxBirthDateIso}
                       required
                       autoComplete="bday"
                       value={form.birthDate}
-                      onChange={(e) =>
-                        handleFieldChange('birthDate', formatBirthDateInput(e.target.value))
-                      }
-                      placeholder="DD/MM/AAAA"
-                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+                      onChange={(e) => handleBirthDateChange(e.target.value)}
+                      onBlur={handleBirthDateBlur}
+                      onInvalid={(e) => {
+                        if (form.birthDate) {
+                          e.preventDefault();
+                          const msg = getBirthDateValidationError(
+                            form.birthDate,
+                            raceDateIso,
+                            maxBirthDateIso
+                          );
+                          setBirthDateError(msg || UNDERAGE_ERROR_MSG);
+                          setSubmitError(msg || UNDERAGE_ERROR_MSG);
+                        }
+                      }}
+                      className={`w-full rounded-xl bg-stone-950 border transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white [color-scheme:dark] ${
+                        birthDateError
+                          ? 'border-red-500 focus:border-red-400'
+                          : 'border-orange-500/40 focus:border-orange-500'
+                      }`}
                     />
+                    {birthDateError && (
+                      <div
+                        role="alert"
+                        className="mt-2 rounded-xl bg-zinc-950 border border-red-500 p-2.5 text-[11px] text-white flex items-start gap-2"
+                      >
+                        <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
+                        <span>{birthDateError}</span>
+                      </div>
+                    )}
+                    {!birthDateError && runnerCategoryPreview && (
+                      <p className="mt-1.5 rounded-lg bg-zinc-950 border border-orange-500/35 px-2.5 py-1 text-[11px] text-stone-300">
+                        Edad al día de carrera:{' '}
+                        <strong className="text-white font-semibold">
+                          {runnerAgeAtRace} años
+                        </strong>{' '}
+                        · Categoría:{' '}
+                        <strong className="text-white font-semibold">
+                          {runnerCategoryPreview.genderLabel}{' '}
+                          {runnerCategoryPreview.bracketLabel}
+                        </strong>
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -1113,7 +1210,11 @@ export default function RegistrationModal({
                     onClick={() =>
                       openPrintableWaiver({
                         raceConfig,
-                        runner: { ...form, distance: selectedDistance },
+                        runner: {
+                          ...form,
+                          birthDate: formatBirthDateDmy(form.birthDate),
+                          distance: selectedDistance,
+                        },
                       })
                     }
                     className="inline-flex items-center gap-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-[11px] font-semibold px-2.5 py-1.5 transition-colors cursor-pointer"
@@ -1127,7 +1228,11 @@ export default function RegistrationModal({
                     onClick={() =>
                       openPrintableMedicalCert({
                         raceConfig,
-                        runner: { ...form, distance: selectedDistance },
+                        runner: {
+                          ...form,
+                          birthDate: formatBirthDateDmy(form.birthDate),
+                          distance: selectedDistance,
+                        },
                       })
                     }
                     className="inline-flex items-center gap-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-[11px] font-semibold px-2.5 py-1.5 transition-colors cursor-pointer"

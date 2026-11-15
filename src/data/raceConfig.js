@@ -578,31 +578,59 @@ export function mergeRaceConfig(override) {
   };
 }
 
+function toValidatedDateParts(year, month, day) {
+  if (year < 1926 || month < 1 || month > 12 || day < 1 || day > 31) {
+    return null;
+  }
+  const date = new Date(year, month - 1, day);
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+  return { year, month, day };
+}
+
 function parseIsoOrDmyDate(dateStr) {
   const raw = String(dateStr || '').trim();
   if (!raw) return null;
 
-  const isoMatch = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  const isoMatch = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
   if (isoMatch) {
-    const year = Number(isoMatch[1]);
-    const month = Number(isoMatch[2]);
-    const day = Number(isoMatch[3]);
-    if (year >= 1900 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-      return { year, month, day };
-    }
+    return toValidatedDateParts(
+      Number(isoMatch[1]),
+      Number(isoMatch[2]),
+      Number(isoMatch[3])
+    );
   }
 
-  const dmyMatch = raw.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
+  const dmyMatch = raw.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
   if (dmyMatch) {
-    const day = Number(dmyMatch[1]);
-    const month = Number(dmyMatch[2]);
-    const year = Number(dmyMatch[3]);
-    if (year >= 1900 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-      return { year, month, day };
-    }
+    return toValidatedDateParts(
+      Number(dmyMatch[3]),
+      Number(dmyMatch[2]),
+      Number(dmyMatch[1])
+    );
   }
 
   return null;
+}
+
+export function getMaxBirthDateIso(targetDateIso = RACE_CONFIG.targetDateIso, minAge = 18) {
+  const targetParts = parseTargetDateParts(targetDateIso || RACE_CONFIG.targetDateIso);
+  const race = parseIsoOrDmyDate(targetParts.datePart) || { year: 2027, month: 4, day: 10 };
+  const targetYear = race.year - Number(minAge || 18);
+  const lastDayOfMonth = new Date(targetYear, race.month, 0).getDate();
+  const safeDay = Math.min(race.day, lastDayOfMonth);
+  return `${String(targetYear).padStart(4, '0')}-${String(race.month).padStart(2, '0')}-${String(safeDay).padStart(2, '0')}`;
+}
+
+export function formatBirthDateDmy(dateStr) {
+  const parsed = parseIsoOrDmyDate(dateStr);
+  if (!parsed) return String(dateStr || '').trim();
+  return `${String(parsed.day).padStart(2, '0')}/${String(parsed.month).padStart(2, '0')}/${String(parsed.year).padStart(4, '0')}`;
 }
 
 export function calculateRunnerAgeAtRace(birthDateStr, targetDateIso = RACE_CONFIG.targetDateIso) {
@@ -647,12 +675,12 @@ function matchAgeBracket(age, brackets) {
     }
   }
 
-  // Si la edad es menor al primer umbral numérico configurado (ej. menor con autorización)
+  // Si la edad es menor al primer umbral numérico configurado, se asigna al primer tramo oficial
   const firstNums = `${brackets[0]?.range || ''} ${brackets[0]?.label || ''}`
     .match(/\d+/g)
     ?.map(Number);
   if (firstNums?.length && age < firstNums[0]) {
-    return { id: 'cat-menor', label: `Menor de ${firstNums[0]} años`, range: `< ${firstNums[0]}` };
+    return brackets[0] || null;
   }
 
   return brackets[brackets.length - 1] || null;
