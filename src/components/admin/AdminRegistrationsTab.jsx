@@ -51,7 +51,7 @@ export default function AdminRegistrationsTab({
   duplicateDniCount = 0,
   duplicateLiveBibs,
 }) {
-  const [expandedIds, setExpandedIds] = useState({});
+  const [expandedId, setExpandedId] = useState(null);
   const [editingBibIds, setEditingBibIds] = useState({});
   const [sortConfig, setSortConfig] = useState({ field: null, direction: 'asc' });
 
@@ -185,10 +185,7 @@ export default function AdminRegistrationsTab({
   };
 
   const toggleExpand = (id) => {
-    setExpandedIds((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+    setExpandedId((prev) => (prev === id ? null : id));
   };
 
   const startEditingBib = (id) => {
@@ -575,7 +572,7 @@ export default function AdminRegistrationsTab({
           ) : (
             sortedRegistrations.map((reg) => {
             const isBusy = regBusyId === reg.id;
-            const isExpanded = Boolean(expandedIds[reg.id]);
+            const isExpanded = expandedId === reg.id;
             const bibValue = bibDrafts[reg.id] ?? reg.assignedBib ?? '';
             const isConfirmed = reg.status === 'confirmado';
             const isEditingBib = Boolean(editingBibIds[reg.id]);
