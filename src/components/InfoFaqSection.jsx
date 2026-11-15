@@ -124,11 +124,11 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
                     {item.day && (
-                      <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-orange-300 bg-orange-500/15 border border-orange-500/50 px-3 py-1 rounded-lg">
+                      <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-orange-300 bg-zinc-950 border border-orange-500/60 px-3 py-1 rounded-lg">
                         {item.day}
                       </span>
                     )}
-                    <span className="font-mono text-sm sm:text-base font-extrabold text-orange-400 bg-orange-500/10 border border-orange-500/40 px-3 py-1 rounded-lg">
+                    <span className="font-mono text-sm sm:text-base font-extrabold text-orange-400 bg-zinc-950 border border-orange-500/50 px-3 py-1 rounded-lg">
                       {item.time}
                     </span>
                   </div>
