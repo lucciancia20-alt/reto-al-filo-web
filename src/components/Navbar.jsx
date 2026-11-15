@@ -47,7 +47,7 @@ export default function Navbar({ onOpenModal }) {
           <button
             type="button"
             onClick={() => onOpenModal()}
-            className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 hover:bg-orange-400 active:scale-[0.99] text-zinc-950 font-display font-black text-xs uppercase tracking-wider px-4 py-2.5 shadow-xl shadow-orange-500/25 transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 hover:bg-orange-400 active:scale-[0.99] text-zinc-950 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2.5 shadow-xl shadow-orange-500/25 transition-all cursor-pointer"
           >
             Quiero Inscribirme
             <ArrowUpRight className="w-4 h-4" />
@@ -83,7 +83,7 @@ export default function Navbar({ onOpenModal }) {
               setMobileMenuOpen(false);
               onOpenModal();
             }}
-            className="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 hover:bg-orange-400 active:scale-[0.99] text-zinc-950 font-display font-black text-sm uppercase tracking-wider py-3.5 shadow-xl shadow-orange-500/25 transition-all cursor-pointer"
+            className="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 hover:bg-orange-400 active:scale-[0.99] text-zinc-950 font-display font-semibold text-sm uppercase tracking-wider py-3.5 shadow-xl shadow-orange-500/25 transition-all cursor-pointer"
           >
             Quiero Inscribirme
             <ArrowUpRight className="w-4 h-4" />
