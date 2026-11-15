@@ -94,9 +94,9 @@ export default function AdminScheduleFaqTab({
     );
   };
   return (
-    <div className="space-y-6">
+    <div className="space-y-3.5">
       <div>
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-2">
           <h4 className="font-display text-sm font-bold text-white uppercase">
             Cronograma del Día de Carrera
           </h4>
@@ -110,11 +110,11 @@ export default function AdminScheduleFaqTab({
           </button>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {schedule.map((item, idx) => (
             <div
               key={idx}
-              className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5"
+              className="rounded-2xl bg-stone-950 border border-stone-800 p-2.5 space-y-2"
             >
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
                 <input
@@ -170,14 +170,9 @@ export default function AdminScheduleFaqTab({
       </div>
 
       <div>
-        <div className="mb-3">
-          <h4 className="font-display text-sm text-white font-bold uppercase tracking-wider leading-snug">
-            EDITAR PREGUNTAS FRECUENTES, ELEMENTOS OBLIGATORIOS DIFERENCIADOS 27K VS 13K Y CATEGORÍAS POR EDAD Y PREMIACIÓN
-          </h4>
-          <p className="text-xs text-zinc-400 mt-1">
-            Deslizá hacia abajo o usá la flecha inferior para editar cada bloque.
-          </p>
-        </div>
+        <h4 className="font-display text-[11px] sm:text-xs text-white font-bold uppercase tracking-normal sm:whitespace-nowrap mb-2.5">
+          EDITAR PREGUNTAS FRECUENTES, ELEMENTOS OBLIGATORIOS DIFERENCIADOS 27K VS 13K Y CATEGORÍAS POR EDAD Y PREMIACIÓN
+        </h4>
         <div className="space-y-3">
           {faqs.map((faq, idx) => (
             <div
