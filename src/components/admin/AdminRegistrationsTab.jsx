@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Search,
   Download,
@@ -54,6 +54,51 @@ export default function AdminRegistrationsTab({
   const [expandedId, setExpandedId] = useState(null);
   const [editingBibIds, setEditingBibIds] = useState({});
   const [sortConfig, setSortConfig] = useState({ field: null, direction: 'asc' });
+  const [pendingStatusAction, setPendingStatusAction] = useState({});
+  const [pendingKitAction, setPendingKitAction] = useState({});
+  const statusTimersRef = useRef({});
+  const kitTimersRef = useRef({});
+
+  useEffect(() => {
+    const statusTimers = statusTimersRef.current;
+    const kitTimers = kitTimersRef.current;
+    return () => {
+      Object.values(statusTimers).forEach((timerId) => clearTimeout(timerId));
+      Object.values(kitTimers).forEach((timerId) => clearTimeout(timerId));
+    };
+  }, []);
+
+  const clearPendingAction = (timersRef, setState, id) => {
+    if (timersRef.current[id]) {
+      clearTimeout(timersRef.current[id]);
+      delete timersRef.current[id];
+    }
+    setState((prev) => {
+      if (!prev[id]) return prev;
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  };
+
+  const armPendingAction = (timersRef, setState, id, targetAction) => {
+    if (timersRef.current[id]) {
+      clearTimeout(timersRef.current[id]);
+    }
+    setState((prev) => ({
+      ...prev,
+      [id]: targetAction,
+    }));
+    timersRef.current[id] = setTimeout(() => {
+      delete timersRef.current[id];
+      setState((prev) => {
+        if (!prev[id]) return prev;
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    }, 3000);
+  };
 
   const handleSort = (field) => {
     if (regDuplicateFilter !== 'none' && filteredRegistrations.length === 0) {
@@ -208,6 +253,38 @@ export default function AdminRegistrationsTab({
       ...prev,
       [reg.id]: false,
     }));
+  };
+
+  const handleStatusButtonClick = async (reg, { isConfirmed, isAlreadySaved }) => {
+    if (isConfirmed && !isAlreadySaved) {
+      clearPendingAction(statusTimersRef, setPendingStatusAction, reg.id);
+      await handleSaveOrConfirm(reg);
+      return;
+    }
+
+    const targetAction = isConfirmed ? 'unconfirm' : 'confirm';
+    if (pendingStatusAction[reg.id] === targetAction) {
+      clearPendingAction(statusTimersRef, setPendingStatusAction, reg.id);
+      if (targetAction === 'unconfirm') {
+        await onChangeRegStatus(reg, 'pendiente');
+      } else {
+        await handleSaveOrConfirm(reg);
+      }
+      return;
+    }
+
+    armPendingAction(statusTimersRef, setPendingStatusAction, reg.id, targetAction);
+  };
+
+  const handleKitButtonClick = async (reg) => {
+    const targetAction = reg.checkedIn ? 'revoke' : 'deliver';
+    if (pendingKitAction[reg.id] === targetAction) {
+      clearPendingAction(kitTimersRef, setPendingKitAction, reg.id);
+      await onToggleCheckIn?.(reg);
+      return;
+    }
+
+    armPendingAction(kitTimersRef, setPendingKitAction, reg.id, targetAction);
   };
 
   const hasSpecificFilter =
@@ -582,6 +659,8 @@ export default function AdminRegistrationsTab({
               numericBib > 0 &&
               Boolean(duplicateLiveBibs?.has(numericBib));
             const isAlreadySaved = isConfirmed && !isEditingBib && currentBib === savedBib;
+            const armedStatusAction = pendingStatusAction[reg.id];
+            const armedKitAction = pendingKitAction[reg.id];
             const statusBadgeClass =
               reg.status === 'confirmado'
                 ? 'bg-stone-950 text-emerald-400 border-emerald-500/60'
@@ -691,48 +770,82 @@ export default function AdminRegistrationsTab({
 
                     <button
                       type="button"
-                      disabled={isBusy || isAlreadySaved}
-                      onClick={() => handleSaveOrConfirm(reg)}
+                      disabled={isBusy}
+                      onClick={() => handleStatusButtonClick(reg, { isConfirmed, isAlreadySaved })}
                       title={
-                        isAlreadySaved
-                          ? 'Inscripción confirmada y dorsal guardado'
-                          : isConfirmed
-                            ? 'Guardar nuevo número de dorsal'
-                            : 'Guardar número de dorsal y confirmar inscripción'
+                        armedStatusAction === 'unconfirm'
+                          ? 'Hacé clic de nuevo para pasar a Pendiente'
+                          : armedStatusAction === 'confirm'
+                            ? 'Hacé clic de nuevo para confirmar inscripción y dorsal'
+                            : isAlreadySaved
+                              ? 'Inscripción confirmada (clic para pasar a Pendiente)'
+                              : isConfirmed
+                                ? 'Guardar nuevo número de dorsal'
+                                : 'Guardar número de dorsal y confirmar inscripción'
                       }
-                      className={`inline-flex items-center gap-1 rounded-lg font-display font-black text-[10px] sm:text-[11px] uppercase px-2 py-1 transition-colors ${
-                        isAlreadySaved
-                          ? 'bg-zinc-900/80 text-zinc-300 border border-zinc-700 cursor-default'
-                          : 'bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/70 cursor-pointer disabled:opacity-50'
+                      className={`inline-flex items-center gap-1 rounded-lg font-display font-black text-[10px] sm:text-[11px] uppercase px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
+                        armedStatusAction === 'unconfirm'
+                          ? 'bg-zinc-950 text-red-400 border border-red-500 ring-1 ring-red-500/60'
+                          : armedStatusAction === 'confirm'
+                            ? 'bg-zinc-950 text-orange-400 border border-orange-500 ring-1 ring-orange-500/60'
+                            : isAlreadySaved
+                              ? 'bg-zinc-900/80 text-zinc-300 border border-zinc-700 hover:border-zinc-500'
+                              : 'bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/70'
                       }`}
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      {isAlreadySaved
-                        ? 'Confirmado'
-                        : isConfirmed
-                          ? 'Guardar Dorsal'
-                          : 'Confirmar'}
+                      <CheckCircle2
+                        className={`w-3.5 h-3.5 shrink-0 ${
+                          armedStatusAction === 'unconfirm'
+                            ? 'text-red-400'
+                            : armedStatusAction === 'confirm'
+                              ? 'text-orange-400'
+                              : 'text-emerald-400'
+                        }`}
+                      />
+                      {armedStatusAction === 'unconfirm'
+                        ? '¿Desconfirmar?'
+                        : armedStatusAction === 'confirm'
+                          ? '¿Confirmar?'
+                          : isAlreadySaved
+                            ? 'Confirmado'
+                            : isConfirmed
+                              ? 'Guardar Dorsal'
+                              : 'Confirmar'}
                     </button>
 
                     {(isConfirmed || reg.checkedIn) && (
                       <button
                         type="button"
                         disabled={isBusy}
-                        onClick={() => onToggleCheckIn?.(reg)}
+                        onClick={() => handleKitButtonClick(reg)}
                         title={
-                          reg.checkedIn
-                            ? 'Kit acreditado y entregado (clic para desmarcar)'
-                            : 'Marcar kit entregado / corredor acreditado en mesa'
+                          armedKitAction === 'revoke'
+                            ? 'Hacé clic de nuevo para anular la entrega del kit'
+                            : armedKitAction === 'deliver'
+                              ? 'Hacé clic de nuevo para acreditar y entregar el kit'
+                              : reg.checkedIn
+                                ? 'Kit acreditado y entregado (clic para desmarcar)'
+                                : 'Marcar kit entregado / corredor acreditado en mesa'
                         }
                         className={`inline-flex items-center gap-1 rounded-lg border text-[10px] sm:text-[11px] font-bold px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
-                          reg.checkedIn
-                            ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 hover:bg-emerald-500/30'
-                            : 'bg-zinc-900/80 border-orange-500/70 text-orange-400 hover:border-orange-400'
+                          armedKitAction === 'revoke'
+                            ? 'bg-zinc-950 border-red-500 ring-1 ring-red-500/60 text-red-400'
+                            : armedKitAction === 'deliver'
+                              ? 'bg-zinc-950 border-orange-500 ring-1 ring-orange-500/60 text-orange-300'
+                              : reg.checkedIn
+                                ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 hover:bg-emerald-500/30'
+                                : 'bg-zinc-900/80 border-orange-500/70 text-orange-400 hover:border-orange-400'
                         }`}
                       >
                         <PackageCheck className="w-3.5 h-3.5 shrink-0" />
-                        <span className="hidden md:inline">
-                          {reg.checkedIn ? 'Kit OK' : 'Acreditar'}
+                        <span className={armedKitAction ? 'inline' : 'hidden md:inline'}>
+                          {armedKitAction === 'revoke'
+                            ? '¿Anular Kit?'
+                            : armedKitAction === 'deliver'
+                              ? '¿Entregar Kit?'
+                              : reg.checkedIn
+                                ? 'Kit OK'
+                                : 'Acreditar'}
                         </span>
                       </button>
                     )}
