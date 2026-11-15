@@ -160,7 +160,7 @@ export default function AdminRegistrationsTab({
         className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] transition-colors cursor-pointer ${
           isActive
             ? 'bg-stone-950 border-red-500 ring-1 ring-red-500/50 text-white font-bold'
-            : 'bg-zinc-900/80 border-amber-500/60 text-zinc-200 hover:border-amber-400 hover:text-white font-medium'
+            : 'bg-stone-950 border-orange-500/60 text-zinc-200 hover:border-orange-400 hover:text-white font-medium'
         }`}
       >
         {hasDuplicates && (
