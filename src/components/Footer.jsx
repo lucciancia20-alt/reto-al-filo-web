@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, Settings, Handshake } from 'lucide-react';
+import { Flame, Settings } from 'lucide-react';
 import { RACE_CONFIG } from '../data/raceConfig';
 
 export default function Footer({
@@ -7,13 +7,6 @@ export default function Footer({
   onOpenModal,
   onOpenAdmin,
 }) {
-  const orgDigits = String(raceConfig?.whatsappNumber || '').replace(/\D/g, '');
-  const sponsorWaUrl = orgDigits
-    ? `https://wa.me/${orgDigits}?text=${encodeURIComponent(
-        'Hola! Me interesa recibir información para ser sponsor de Reto al Filo · 2da Edición (Abril 2027).'
-      )}`
-    : '#';
-
   return (
     <footer className="bg-stone-950 border-t-2 border-orange-500/50 py-6 sm:py-8 text-stone-400">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -33,25 +26,14 @@ export default function Footer({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          {orgDigits && (
-            <a
-              href={sponsorWaUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 text-xs font-semibold px-4 py-3 transition-colors"
-            >
-              <Handshake className="w-3.5 h-3.5 text-orange-500" />
-              ¿Querés ser sponsor?
-            </a>
-          )}
+        <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
           {onOpenAdmin && (
             <button
               type="button"
               onClick={onOpenAdmin}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-300 hover:text-orange-400 border border-orange-500/60 hover:border-orange-400 text-xs font-semibold px-4 py-3 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 text-xs font-semibold px-4 py-3 transition-colors cursor-pointer"
             >
-              <Settings className="w-3.5 h-3.5 text-orange-400" />
+              <Settings className="w-3.5 h-3.5 text-orange-500" />
               Panel Admin
             </button>
           )}

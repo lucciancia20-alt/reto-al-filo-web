@@ -101,7 +101,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col overflow-x-hidden">
-      <Navbar onOpenModal={() => handleOpenModal(activeDistance)} />
+      <Navbar
+        raceConfig={raceConfig}
+        onOpenModal={() => handleOpenModal(activeDistance)}
+      />
 
       <main className="flex-1">
         <HeroSection

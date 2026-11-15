@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
-import { Menu, X, ArrowUpRight } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Handshake } from 'lucide-react';
+import { RACE_CONFIG } from '../data/raceConfig';
 
-export default function Navbar({ onOpenModal }) {
+export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const orgDigits = String(raceConfig?.whatsappNumber || '').replace(/\D/g, '');
+  const sponsorWaUrl = orgDigits
+    ? `https://wa.me/${orgDigits}?text=${encodeURIComponent(
+        'Hola! Me interesa recibir información para ser sponsor de Reto al Filo · 2da Edición (Abril 2027).'
+      )}`
+    : '#';
 
   const navLinks = [
     { label: 'Circuito', href: '#circuito' },
@@ -31,7 +39,7 @@ export default function Navbar({ onOpenModal }) {
           </span>
         </a>
 
-        <nav className="hidden md:flex items-center gap-7 text-sm font-semibold text-orange-400">
+        <nav className="hidden md:flex items-center gap-5 lg:gap-7 text-sm font-semibold text-orange-400">
           {navLinks.map((link) => (
             <a
               key={link.href}
@@ -43,11 +51,22 @@ export default function Navbar({ onOpenModal }) {
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center">
+        <div className="hidden md:flex items-center gap-3 shrink-0">
+          {orgDigits && (
+            <a
+              href={sponsorWaUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 text-xs font-semibold px-3.5 py-2.5 transition-colors whitespace-nowrap"
+            >
+              <Handshake className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+              ¿Querés ser sponsor?
+            </a>
+          )}
           <button
             type="button"
             onClick={() => onOpenModal()}
-            className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 hover:bg-orange-400 active:scale-[0.99] text-zinc-950 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2.5 shadow-xl shadow-orange-500/25 transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 hover:bg-orange-400 active:scale-[0.99] text-zinc-950 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2.5 shadow-xl shadow-orange-500/25 transition-all cursor-pointer whitespace-nowrap"
           >
             Quiero Inscribirme
             <ArrowUpRight className="w-4 h-4" />
@@ -77,6 +96,18 @@ export default function Navbar({ onOpenModal }) {
               {link.label}
             </a>
           ))}
+          {orgDigits && (
+            <a
+              href={sponsorWaUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 text-sm font-semibold py-3 transition-colors"
+            >
+              <Handshake className="w-4 h-4 text-orange-500 shrink-0" />
+              ¿Querés ser sponsor?
+            </a>
+          )}
           <button
             type="button"
             onClick={() => {
