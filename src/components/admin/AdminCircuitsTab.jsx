@@ -25,11 +25,11 @@ export default function AdminCircuitsTab({
           const colorClass =
             d === '27K'
               ? active
-                ? 'bg-stone-950 text-cyan-400 border-2 border-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.3)]'
-                : 'bg-stone-950 text-cyan-400 border border-cyan-500/40 opacity-80 hover:opacity-100'
+                ? 'bg-zinc-950 text-cyan-400 border-2 border-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.3)]'
+                : 'bg-zinc-950 text-cyan-400 border border-cyan-500/40 opacity-80 hover:opacity-100'
               : active
-                ? 'bg-stone-950 text-red-500 border-2 border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.3)]'
-                : 'bg-stone-950 text-red-500 border border-red-500/40 opacity-80 hover:opacity-100';
+                ? 'bg-zinc-950 text-red-500 border-2 border-red-500'
+                : 'bg-zinc-950 text-red-500 border border-red-500/50 hover:border-red-500 opacity-80 hover:opacity-100';
 
           return (
             <button
@@ -107,8 +107,8 @@ export default function AdminCircuitsTab({
             onClick={onAddStation}
             className={`inline-flex items-center gap-1 rounded-xl border text-xs font-bold px-3 py-1.5 cursor-pointer transition-colors ${
               editDistance === '13K'
-                ? 'bg-black/40 hover:bg-red-500/10 text-red-500 border-red-500'
-                : 'bg-black/40 hover:bg-cyan-500/10 text-cyan-400 border-cyan-400'
+                ? 'bg-zinc-950 text-red-500 border-red-500/70 hover:border-red-400'
+                : 'bg-zinc-950 text-cyan-400 border-cyan-500/70 hover:border-cyan-400'
             }`}
           >
             <Plus className="w-3.5 h-3.5" />
@@ -156,7 +156,7 @@ export default function AdminCircuitsTab({
                   type="button"
                   onClick={() => onRemoveStation(idx)}
                   aria-label="Eliminar puesto"
-                  className="p-2 text-stone-400 hover:text-rose-400 cursor-pointer"
+                  className="p-2 text-stone-400 hover:text-red-500 cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -180,7 +180,7 @@ export default function AdminCircuitsTab({
             Subí un archivo .gpx exportado de Garmin, COROS, Strava o Wikiloc para actualizar el
             mapa y la altimetría.
           </p>
-          {gpxStatus && <p className="mt-1 text-xs text-amber-300 font-medium">{gpxStatus}</p>}
+          {gpxStatus && <p className="mt-1 text-xs text-orange-400 font-medium">{gpxStatus}</p>}
         </div>
 
         <div className="flex items-center gap-2">
@@ -193,8 +193,8 @@ export default function AdminCircuitsTab({
               Usar GPX original
             </button>
           )}
-          <label className="inline-flex items-center gap-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 text-xs font-bold px-3.5 py-2 cursor-pointer">
-            <Upload className="w-4 h-4" />
+          <label className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 transition-colors text-xs font-bold px-3.5 py-2 cursor-pointer">
+            <Upload className="w-4 h-4 text-orange-500" />
             Subir archivo .GPX
             <input type="file" accept=".gpx" onChange={onGpxFileUpload} className="hidden" />
           </label>
