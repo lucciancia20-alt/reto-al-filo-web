@@ -34,6 +34,9 @@ export default function AdminRegistrationsTab({
   onChangeRegStatus,
   onDeleteRegistration,
   buildRunnerWhatsappUrl,
+  duplicateBibCount = 0,
+  duplicateDniCount = 0,
+  duplicateLiveBibs,
 }) {
   const [expandedIds, setExpandedIds] = useState({});
   const [editingBibIds, setEditingBibIds] = useState({});
@@ -291,13 +294,23 @@ export default function AdminRegistrationsTab({
             <select
               aria-label="Filtrar por estado"
               value={regStatusFilter}
-              onChange={(e) => setRegStatusFilter(e.target.value)}
+              onChange={(e) => {
+                const nextStatus = e.target.value;
+                if (nextStatus === 'duplicados_dorsal' || nextStatus === 'duplicados_dni') {
+                  setRegDistanceFilter('all');
+                  setSortConfig({ field: null, direction: 'asc' });
+                }
+                setRegStatusFilter(nextStatus);
+              }}
               className={`rounded-xl bg-stone-950 border focus:outline-none px-3 py-2 text-xs transition-colors ${
                 regStatusFilter === 'pendiente'
                   ? 'text-amber-400 border-amber-500/60 focus:border-amber-400 font-bold'
                   : regStatusFilter === 'confirmado'
                     ? 'text-emerald-400 border-emerald-500/60 focus:border-emerald-400 font-bold'
-                    : 'text-white border-white/15 focus:border-orange-400'
+                    : regStatusFilter === 'duplicados_dorsal' ||
+                        regStatusFilter === 'duplicados_dni'
+                      ? 'text-rose-400 border-rose-500/60 focus:border-rose-400 font-bold'
+                      : 'text-white border-white/15 focus:border-orange-400'
               }`}
             >
               <option value="all" className="bg-stone-950 text-white font-normal">
@@ -311,6 +324,16 @@ export default function AdminRegistrationsTab({
               </option>
               <option value="rechazado" className="bg-stone-950 text-white font-normal">
                 Rechazados
+              </option>
+              <option value="duplicados_dorsal" className="bg-stone-950 text-rose-400 font-bold">
+                {duplicateBibCount > 0
+                  ? `Dorsales duplicados (${duplicateBibCount})`
+                  : 'Dorsales duplicados'}
+              </option>
+              <option value="duplicados_dni" className="bg-stone-950 text-rose-400 font-bold">
+                {duplicateDniCount > 0
+                  ? `DNI duplicados (${duplicateDniCount})`
+                  : 'DNI duplicados'}
               </option>
             </select>
 
@@ -397,6 +420,11 @@ export default function AdminRegistrationsTab({
             const isBibLocked = isConfirmed && !isEditingBib;
             const savedBib = String(reg.assignedBib ?? '').trim();
             const currentBib = String(bibValue ?? '').trim();
+            const numericBib = currentBib !== '' ? Number(currentBib) : NaN;
+            const isDuplicateBib =
+              Number.isFinite(numericBib) &&
+              numericBib > 0 &&
+              Boolean(duplicateLiveBibs?.has(numericBib));
             const isAlreadySaved = isConfirmed && !isEditingBib && currentBib === savedBib;
             const statusBadgeClass =
               reg.status === 'confirmado'
@@ -448,7 +476,10 @@ export default function AdminRegistrationsTab({
 
                   {/* Acciones operativas en línea */}
                   <div className="flex flex-wrap items-center gap-1 shrink-0">
-                    <div className="flex items-center gap-1">
+                    <div
+                      className="flex items-center gap-1"
+                      title={isDuplicateBib ? 'Dorsal repetido' : undefined}
+                    >
                       <label
                         htmlFor={`bib-${reg.id}`}
                         className="text-[11px] font-semibold text-stone-400"
@@ -462,6 +493,7 @@ export default function AdminRegistrationsTab({
                         readOnly={isBibLocked}
                         disabled={isBibLocked}
                         aria-label={`Número de dorsal de ${reg.fullName}`}
+                        title={isDuplicateBib ? 'Dorsal repetido' : undefined}
                         value={bibValue}
                         onChange={(e) =>
                           setBibDrafts((prev) => ({
@@ -471,9 +503,15 @@ export default function AdminRegistrationsTab({
                         }
                         placeholder="Dorsal"
                         className={
-                          isBibLocked
-                            ? 'w-12 rounded-lg bg-stone-950 border border-orange-500/40 px-1 py-1 text-xs font-mono font-bold text-orange-400 text-center cursor-default'
-                            : 'w-12 rounded-lg bg-stone-950 border border-orange-500 focus:border-orange-400 focus:outline-none px-1 py-1 text-xs font-mono text-white text-center'
+                          isDuplicateBib
+                            ? `w-12 rounded-lg bg-stone-950 border border-rose-500 px-1 py-1 text-xs font-mono text-rose-300 text-center ${
+                                isBibLocked
+                                  ? 'font-bold cursor-default'
+                                  : 'focus:border-rose-400 focus:outline-none'
+                              }`
+                            : isBibLocked
+                              ? 'w-12 rounded-lg bg-stone-950 border border-orange-500/40 px-1 py-1 text-xs font-mono font-bold text-orange-400 text-center cursor-default'
+                              : 'w-12 rounded-lg bg-stone-950 border border-orange-500 focus:border-orange-400 focus:outline-none px-1 py-1 text-xs font-mono text-white text-center'
                         }
                       />
                       {isBibLocked && (

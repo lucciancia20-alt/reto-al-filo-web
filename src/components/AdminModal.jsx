@@ -48,6 +48,16 @@ const sanitizeExcelCell = (value) => {
   return /^\s*[=+\-@]/.test(str) ? `'${str}` : str;
 };
 
+const normalizeBibNumber = (value) => {
+  const trimmed = String(value ?? '').trim();
+  if (!trimmed) return null;
+  const num = Number(trimmed);
+  return Number.isFinite(num) && num > 0 ? num : null;
+};
+
+const normalizeDni = (value) =>
+  String(value ?? '').replace(/[.\s-]+/g, '').trim().toUpperCase();
+
 export default function AdminModal({
   isOpen,
   onClose,
@@ -146,13 +156,87 @@ export default function AdminModal({
     };
   }, [registrations]);
 
+  const duplicateInfo = useMemo(() => {
+    const savedBibCounts = new Map();
+    const liveBibCounts = new Map();
+    const dniCounts = new Map();
+
+    for (const r of registrations) {
+      const savedBib = normalizeBibNumber(r.assignedBib);
+      if (savedBib !== null) {
+        savedBibCounts.set(savedBib, (savedBibCounts.get(savedBib) || 0) + 1);
+      }
+
+      const liveBib = normalizeBibNumber(bibDrafts[r.id] ?? r.assignedBib);
+      if (liveBib !== null) {
+        liveBibCounts.set(liveBib, (liveBibCounts.get(liveBib) || 0) + 1);
+      }
+
+      const dni = normalizeDni(r.dni);
+      if (dni) {
+        dniCounts.set(dni, (dniCounts.get(dni) || 0) + 1);
+      }
+    }
+
+    const duplicateSavedBibs = new Set();
+    for (const [bib, count] of savedBibCounts.entries()) {
+      if (count > 1) duplicateSavedBibs.add(bib);
+    }
+
+    const duplicateLiveBibs = new Set();
+    for (const [bib, count] of liveBibCounts.entries()) {
+      if (count > 1) duplicateLiveBibs.add(bib);
+    }
+
+    const duplicateDnis = new Set();
+    for (const [dni, count] of dniCounts.entries()) {
+      if (count > 1) duplicateDnis.add(dni);
+    }
+
+    let duplicateBibCount = 0;
+    let duplicateDniCount = 0;
+    for (const r of registrations) {
+      const savedBib = normalizeBibNumber(r.assignedBib);
+      const liveBib = normalizeBibNumber(bibDrafts[r.id] ?? r.assignedBib);
+      if (
+        (savedBib !== null && duplicateSavedBibs.has(savedBib)) ||
+        (liveBib !== null && duplicateLiveBibs.has(liveBib))
+      ) {
+        duplicateBibCount += 1;
+      }
+
+      const dni = normalizeDni(r.dni);
+      if (dni && duplicateDnis.has(dni)) {
+        duplicateDniCount += 1;
+      }
+    }
+
+    return {
+      duplicateSavedBibs,
+      duplicateLiveBibs,
+      duplicateDnis,
+      duplicateBibCount,
+      duplicateDniCount,
+    };
+  }, [registrations, bibDrafts]);
+
   const filteredRegistrations = useMemo(() => {
     const q = regSearch.trim().toLowerCase();
-    return registrations.filter((reg) => {
+    const list = registrations.filter((reg) => {
       if (regDistanceFilter !== 'all' && reg.distance !== regDistanceFilter) {
         return false;
       }
-      if (regStatusFilter !== 'all' && reg.status !== regStatusFilter) {
+      if (regStatusFilter === 'duplicados_dorsal') {
+        const savedBib = normalizeBibNumber(reg.assignedBib);
+        const liveBib = normalizeBibNumber(bibDrafts[reg.id] ?? reg.assignedBib);
+        const isDupBib =
+          (savedBib !== null && duplicateInfo.duplicateSavedBibs.has(savedBib)) ||
+          (liveBib !== null && duplicateInfo.duplicateLiveBibs.has(liveBib));
+        if (!isDupBib) return false;
+      } else if (regStatusFilter === 'duplicados_dni') {
+        const dni = normalizeDni(reg.dni);
+        if (!dni || !duplicateInfo.duplicateDnis.has(dni)) return false;
+      } else if (regStatusFilter !== 'all' && reg.status !== regStatusFilter) {
         return false;
       }
       if (!q) return true;
@@ -170,7 +254,38 @@ export default function AdminModal({
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [registrations, regSearch, regDistanceFilter, regStatusFilter]);
+
+    if (regStatusFilter === 'duplicados_dorsal') {
+      return [...list].sort((a, b) => {
+        const bibA =
+          normalizeBibNumber(bibDrafts[a.id] ?? a.assignedBib) ??
+          normalizeBibNumber(a.assignedBib) ??
+          Number.MAX_SAFE_INTEGER;
+        const bibB =
+          normalizeBibNumber(bibDrafts[b.id] ?? b.assignedBib) ??
+          normalizeBibNumber(b.assignedBib) ??
+          Number.MAX_SAFE_INTEGER;
+        if (bibA !== bibB) return bibA - bibB;
+        return String(a.fullName || '').localeCompare(String(b.fullName || ''), 'es', {
+          sensitivity: 'base',
+        });
+      });
+    }
+
+    if (regStatusFilter === 'duplicados_dni') {
+      return [...list].sort((a, b) => {
+        const dniA = normalizeDni(a.dni);
+        const dniB = normalizeDni(b.dni);
+        const cmp = dniA.localeCompare(dniB, 'es', { numeric: true });
+        if (cmp !== 0) return cmp;
+        return String(a.fullName || '').localeCompare(String(b.fullName || ''), 'es', {
+          sensitivity: 'base',
+        });
+      });
+    }
+
+    return list;
+  }, [registrations, regSearch, regDistanceFilter, regStatusFilter, duplicateInfo, bibDrafts]);
 
   const loadGalleryItems = async () => {
     setGalleryLoading(true);
@@ -1102,6 +1217,9 @@ export default function AdminModal({
                   onChangeRegStatus={handleChangeRegStatus}
                   onDeleteRegistration={handleDeleteRegistration}
                   buildRunnerWhatsappUrl={buildRunnerWhatsappUrl}
+                  duplicateBibCount={duplicateInfo.duplicateBibCount}
+                  duplicateDniCount={duplicateInfo.duplicateDniCount}
+                  duplicateLiveBibs={duplicateInfo.duplicateLiveBibs}
                 />
               )}
 
