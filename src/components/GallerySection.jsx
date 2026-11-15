@@ -196,10 +196,10 @@ export default function GallerySection() {
           onClick={() => setSelectedIndex(null)}
         >
           <div
-            className="relative w-[90vw] max-w-4xl rounded-3xl overflow-hidden overscroll-contain bg-stone-900 border border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
+            className="relative w-[90vw] max-w-4xl rounded-3xl overflow-hidden overscroll-contain bg-zinc-950/60 border border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative w-full aspect-[4/3] min-h-[320px] sm:min-h-[480px] md:min-h-[560px] max-h-[75vh] bg-zinc-950/60 flex items-center justify-center">
+            <div className="relative w-full aspect-[4/3] min-h-[320px] sm:min-h-[480px] md:min-h-[560px] max-h-[82vh] flex items-center justify-center">
               <button
                 type="button"
                 onClick={() => setSelectedIndex(null)}
@@ -237,24 +237,24 @@ export default function GallerySection() {
               <img
                 src={selectedPhoto.cloudinaryUrl}
                 alt={selectedPhoto.sector}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover"
               />
-            </div>
 
-            <div className="p-4 sm:p-5 bg-zinc-900/55 backdrop-blur-md border-t border-stone-800/80 flex items-center justify-between gap-2">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-orange-400">
-                  1ra Edición · Reto al Filo
-                </span>
-                <p className="mt-0.5 text-sm sm:text-base font-bold text-white">
-                  {selectedPhoto.sector}
-                </p>
+              <div className="absolute bottom-0 inset-x-0 z-10 p-4 sm:p-5 bg-zinc-900/30 backdrop-blur-md border-t border-orange-500/20 flex items-center justify-between gap-2">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-orange-400 drop-shadow-sm">
+                    1ra Edición · Reto al Filo
+                  </span>
+                  <p className="mt-0.5 text-sm sm:text-base font-bold text-white drop-shadow-sm">
+                    {selectedPhoto.sector}
+                  </p>
+                </div>
+                {photos.length > 1 && (
+                  <span className="text-xs font-mono text-stone-200 drop-shadow-sm">
+                    {selectedIndex + 1} / {photos.length}
+                  </span>
+                )}
               </div>
-              {photos.length > 1 && (
-                <span className="text-xs font-mono text-stone-400">
-                  {selectedIndex + 1} / {photos.length}
-                </span>
-              )}
             </div>
           </div>
         </div>
