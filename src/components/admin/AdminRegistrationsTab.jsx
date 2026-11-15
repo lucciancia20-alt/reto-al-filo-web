@@ -340,91 +340,91 @@ export default function AdminRegistrationsTab({
 
       {/* Controles de filtro y exportación */}
       <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3 space-y-2.5">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap lg:flex-nowrap items-center gap-1.5 sm:gap-2">
           <select
             aria-label="Filtrar por distancia"
-              value={regDistanceFilter}
-              onChange={(e) => setRegDistanceFilter(e.target.value)}
-              className={`rounded-xl bg-stone-950 border focus:outline-none px-3 py-2 text-xs transition-colors ${
-                regDistanceFilter === '27K'
-                  ? 'text-cyan-400 font-bold border-cyan-500/60 focus:border-cyan-400'
-                  : regDistanceFilter === '13K'
-                    ? 'text-red-500 font-bold border-red-500/60 focus:border-red-500'
-                    : 'text-white border-white/15 focus:border-orange-400'
-              }`}
-            >
-              <option value="all" className="bg-stone-950 text-white font-normal">
-                Todas las distancias
-              </option>
-              <option value="27K" className="bg-stone-950 text-cyan-400 font-bold">
-                Solo 27K
-              </option>
-              <option value="13K" className="bg-stone-950 text-red-500 font-bold">
-                Solo 13K
-              </option>
-            </select>
+            value={regDistanceFilter}
+            onChange={(e) => setRegDistanceFilter(e.target.value)}
+            className={`rounded-xl bg-stone-950 border focus:outline-none pl-2.5 pr-5 py-1.5 text-xs transition-colors shrink-0 ${
+              regDistanceFilter === '27K'
+                ? 'text-cyan-400 font-bold border-cyan-500/60 focus:border-cyan-400'
+                : regDistanceFilter === '13K'
+                  ? 'text-red-500 font-bold border-red-500/60 focus:border-red-500'
+                  : 'text-white border-white/15 focus:border-orange-400'
+            }`}
+          >
+            <option value="all" className="bg-stone-950 text-white font-normal">
+              Todas las distancias
+            </option>
+            <option value="27K" className="bg-stone-950 text-cyan-400 font-bold">
+              Solo 27K
+            </option>
+            <option value="13K" className="bg-stone-950 text-red-500 font-bold">
+              Solo 13K
+            </option>
+          </select>
 
-            <select
-              aria-label="Filtrar por estado"
-              value={regStatusFilter}
-              onChange={(e) => {
-                setRegDuplicateFilter?.('none');
-                setRegStatusFilter(e.target.value);
-              }}
-              className={`rounded-xl bg-stone-950 border focus:outline-none px-3 py-2 text-xs transition-colors ${
-                regStatusFilter === 'pendiente'
-                  ? 'text-amber-400 border-amber-500/60 focus:border-amber-400 font-bold'
-                  : regStatusFilter === 'confirmado'
-                    ? 'text-emerald-400 border-emerald-500/60 focus:border-emerald-400 font-bold'
-                    : 'text-white border-white/15 focus:border-orange-400'
-              }`}
-            >
-              <option value="all" className="bg-stone-950 text-white font-normal">
-                Todos los estados
-              </option>
-              <option value="pendiente" className="bg-stone-950 text-amber-400 font-bold">
-                Pendientes
-              </option>
-              <option value="confirmado" className="bg-stone-950 text-emerald-400 font-bold">
-                Confirmados
-              </option>
-              <option value="rechazado" className="bg-stone-950 text-white font-normal">
-                Rechazados
-              </option>
-            </select>
+          <select
+            aria-label="Filtrar por estado"
+            value={regStatusFilter}
+            onChange={(e) => {
+              setRegDuplicateFilter?.('none');
+              setRegStatusFilter(e.target.value);
+            }}
+            className={`rounded-xl bg-stone-950 border focus:outline-none pl-2.5 pr-5 py-1.5 text-xs transition-colors shrink-0 ${
+              regStatusFilter === 'pendiente'
+                ? 'text-amber-400 border-amber-500/60 focus:border-amber-400 font-bold'
+                : regStatusFilter === 'confirmado'
+                  ? 'text-emerald-400 border-emerald-500/60 focus:border-emerald-400 font-bold'
+                  : 'text-white border-white/15 focus:border-orange-400'
+            }`}
+          >
+            <option value="all" className="bg-stone-950 text-white font-normal">
+              Todos los estados
+            </option>
+            <option value="pendiente" className="bg-stone-950 text-amber-400 font-bold">
+              Pendientes
+            </option>
+            <option value="confirmado" className="bg-stone-950 text-emerald-400 font-bold">
+              Confirmados
+            </option>
+            <option value="rechazado" className="bg-stone-950 text-white font-normal">
+              Rechazados
+            </option>
+          </select>
 
-            <button
-              type="button"
-              onClick={onExportExcel}
-              disabled={registrationsCount === 0}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 text-xs font-bold px-3.5 py-2 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap"
-            >
-              <Download className="w-3.5 h-3.5 shrink-0" />
-              Exportar Excel (.XLSX)
-            </button>
+          <button
+            type="button"
+            onClick={onExportExcel}
+            disabled={registrationsCount === 0}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 text-xs font-bold px-2.5 sm:px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
+          >
+            <Download className="w-3.5 h-3.5 shrink-0" />
+            Exportar Excel (.XLSX)
+          </button>
 
-            <button
-              type="button"
-              onClick={onPrintAccreditationSheet}
-              disabled={(regStats.confirmed || 0) === 0}
-              title="Imprimir planilla A4 de acreditación y seguridad SOS ordenada por dorsal"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-amber-300 border border-amber-500/60 text-xs font-bold px-3.5 py-2 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap"
-            >
-              <Printer className="w-3.5 h-3.5 shrink-0" />
-              Imprimir Planilla Acreditación / SOS
-            </button>
+          <button
+            type="button"
+            onClick={onPrintAccreditationSheet}
+            disabled={(regStats.confirmed || 0) === 0}
+            title="Imprimir planilla A4 de acreditación y seguridad SOS ordenada por dorsal"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-amber-300 border border-amber-500/60 text-xs font-bold px-2.5 sm:px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
+          >
+            <Printer className="w-3.5 h-3.5 shrink-0" />
+            Imprimir Planilla Acreditación / SOS
+          </button>
 
-            <a
-              href="https://www.mercadopago.com.ar/activities"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Abrir actividad y transferencias recibidas en Mercado Pago"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-sky-400 border border-sky-500/60 text-xs font-bold px-3.5 py-2 transition-colors whitespace-nowrap"
-            >
-              <Wallet className="w-3.5 h-3.5 shrink-0" />
-              <span>Mercado Pago</span>
-              <ExternalLink className="w-3 h-3 opacity-80 shrink-0" />
-            </a>
+          <a
+            href="https://www.mercadopago.com.ar/activities"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Abrir actividad y transferencias recibidas en Mercado Pago"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-sky-400 border border-sky-500/60 text-xs font-bold px-2.5 sm:px-3 py-1.5 transition-colors whitespace-nowrap shrink-0"
+          >
+            <Wallet className="w-3.5 h-3.5 shrink-0" />
+            <span>Mercado Pago</span>
+            <ExternalLink className="w-3 h-3 opacity-80 shrink-0" />
+          </a>
         </div>
 
         {/* Resumen en vivo de Talles (Confirmados / Activos) y Acreditación */}
