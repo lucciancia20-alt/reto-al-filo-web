@@ -239,7 +239,7 @@ export default function GallerySection() {
               className="block max-w-[92vw] max-h-[85vh] w-auto h-auto"
             />
 
-            <div className="absolute bottom-0 inset-x-0 z-10 p-4 sm:p-5 bg-zinc-900/25 backdrop-blur-md border-t border-orange-500/20 flex items-center justify-between gap-2">
+            <div className="absolute bottom-0 inset-x-0 z-10 p-4 sm:p-5 bg-zinc-950/15 backdrop-blur-sm border-t-2 border-orange-500/85 flex items-center justify-between gap-2">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-orange-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
                   1ra Edición · Reto al Filo
