@@ -7,8 +7,13 @@ import {
   ExternalLink,
   ShieldCheck,
   FileText,
+  Award,
+  CheckCircle2,
+  Printer,
+  FileCheck2,
 } from 'lucide-react';
 import { RACE_CONFIG, parseTargetDateParts, syncScheduleWithTargetDate } from '../data/raceConfig';
+import { openPrintableWaiver, openPrintableMedicalCert } from '../utils/printableDocs';
 
 export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
   const [openFaqId, setOpenFaqId] = useState(
@@ -25,6 +30,21 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
     'como-llegar': MapPin,
     reglamento: FileText,
   };
+
+  const mandatoryGear = raceConfig?.mandatoryGear || RACE_CONFIG.mandatoryGear;
+  const gear27 = (Array.isArray(mandatoryGear?.['27K']) ? mandatoryGear['27K'] : RACE_CONFIG.mandatoryGear['27K']).filter(
+    (item) => String(item || '').trim()
+  );
+  const gear13 = (Array.isArray(mandatoryGear?.['13K']) ? mandatoryGear['13K'] : RACE_CONFIG.mandatoryGear['13K']).filter(
+    (item) => String(item || '').trim()
+  );
+
+  const ageCategories = raceConfig?.ageCategories || RACE_CONFIG.ageCategories;
+  const categoryBrackets = (
+    Array.isArray(ageCategories?.brackets)
+      ? ageCategories.brackets
+      : RACE_CONFIG.ageCategories.brackets
+  ).filter((b) => String(b?.label || b?.range || '').trim());
 
   return (
     <>
@@ -93,7 +113,95 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
         </div>
       </section>
 
-      {/* Parte 2: Acordeón Desplegable de Preguntas Frecuentes */}
+      {/* Parte 2: Tabla Pública de Categorías por Edad y Premiación */}
+      <section
+        id="categorias"
+        className="scroll-mt-16 py-8 sm:py-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
+      >
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400">
+              <Award className="w-3.5 h-3.5" />
+              <span>Clasificación Oficial · Damas y Caballeros</span>
+            </div>
+
+            <h2 className="mt-2 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight section-title-stroke">
+              {ageCategories.title || 'Categorías por Edad y Premiación'}
+            </h2>
+            <p className="mt-1.5 max-w-2xl mx-auto text-balance text-xs sm:text-sm text-stone-300">
+              Aplicable tanto para <strong className="text-cyan-400">27K Competitivo</strong> como para{' '}
+              <strong className="text-red-400">13K Competitivo</strong> en ramas Damas y Caballeros.
+            </p>
+          </div>
+
+          <div className="mt-5 max-w-3xl mx-auto space-y-3">
+            {/* Resumen de Premiación */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="rounded-2xl bg-stone-900/80 border border-orange-500/70 p-3.5">
+                <span className="block text-[10px] font-bold uppercase tracking-widest text-amber-400">
+                  Clasificación General
+                </span>
+                <p className="mt-1 text-xs sm:text-sm font-bold text-white">
+                  {ageCategories.generalPodium || RACE_CONFIG.ageCategories.generalPodium}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-stone-900/80 border border-orange-500/70 p-3.5">
+                <span className="block text-[10px] font-bold uppercase tracking-widest text-amber-400">
+                  Premiación por Categorías
+                </span>
+                <p className="mt-1 text-xs sm:text-sm font-bold text-white">
+                  {ageCategories.categoryPodium || RACE_CONFIG.ageCategories.categoryPodium}
+                </p>
+              </div>
+            </div>
+
+            {/* Tabla de Franjas Etarias */}
+            {categoryBrackets.length > 0 && (
+              <div className="rounded-2xl bg-stone-900/80 border border-orange-500/80 overflow-hidden shadow-[0_0_16px_rgba(249,115,22,0.18)]">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                    <thead>
+                      <tr className="bg-stone-950 border-b border-orange-500/35 text-[11px] uppercase tracking-wider text-amber-400">
+                        <th className="px-4 py-2.5 font-extrabold">Categoría</th>
+                        <th className="px-4 py-2.5 font-extrabold">Franja Etaria</th>
+                        <th className="px-4 py-2.5 font-extrabold text-right">Ramas y Distancias</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-800/80">
+                      {categoryBrackets.map((cat, idx) => (
+                        <tr
+                          key={cat.id || idx}
+                          className="hover:bg-stone-950/60 transition-colors"
+                        >
+                          <td className="px-4 py-2.5 font-display font-bold text-white">
+                            {cat.label}
+                          </td>
+                          <td className="px-4 py-2.5 font-mono text-amber-300 font-semibold">
+                            {cat.range || cat.label}
+                          </td>
+                          <td className="px-4 py-2.5 text-right text-[11px] sm:text-xs text-stone-300">
+                            Damas / Caballeros · <span className="text-cyan-400 font-bold">27K</span> y{' '}
+                            <span className="text-red-400 font-bold">13K</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {ageCategories.ruleNote && (
+              <div className="rounded-xl bg-amber-500/10 border border-amber-500/35 px-4 py-2.5 text-xs text-amber-100 leading-relaxed">
+                <strong className="text-amber-300">Criterio reglamentario: </strong>
+                {ageCategories.ruleNote}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Parte 3: Acordeón Desplegable de Preguntas Frecuentes */}
       <section
         id="faq"
         className="scroll-mt-16 py-8 sm:py-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
@@ -154,6 +262,68 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                     >
                       <p className="mt-2.5">{faq.answer}</p>
 
+                      {faq.id === 'elementos-obligatorios' && (
+                        <div className="mt-3.5 space-y-2.5">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="rounded-xl bg-stone-950 border border-cyan-500/60 p-3.5">
+                              <span className="inline-flex items-center gap-1.5 text-xs font-display font-black uppercase tracking-wider text-cyan-400">
+                                27K Cumbre Técnica
+                              </span>
+                              <ul className="mt-2 space-y-1.5 text-xs text-stone-200">
+                                {gear27.map((item, idx) => (
+                                  <li key={`gear27-${idx}`} className="flex items-start gap-2">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5" />
+                                    <span>{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            <div className="rounded-xl bg-stone-950 border border-red-500/60 p-3.5">
+                              <span className="inline-flex items-center gap-1.5 text-xs font-display font-black uppercase tracking-wider text-red-400">
+                                13K Competitivo
+                              </span>
+                              <ul className="mt-2 space-y-1.5 text-xs text-stone-200">
+                                {gear13.map((item, idx) => (
+                                  <li key={`gear13-${idx}`} className="flex items-start gap-2">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-red-400 shrink-0 mt-0.5" />
+                                    <span>{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+
+                          {mandatoryGear.note && (
+                            <p className="text-[11px] text-amber-200/90 bg-amber-500/10 border border-amber-500/30 rounded-lg px-3 py-2">
+                              {mandatoryGear.note}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {faq.id === 'reglamento' && (
+                        <div className="mt-3.5 flex flex-wrap gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => openPrintableWaiver({ raceConfig })}
+                            className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-colors cursor-pointer"
+                          >
+                            <Printer className="w-4 h-4 shrink-0" />
+                            <span>Deslinde de Responsabilidad (A4 / PDF)</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => openPrintableMedicalCert({ raceConfig })}
+                            className="inline-flex items-center gap-2 rounded-xl bg-stone-950 hover:bg-stone-800 text-amber-300 border border-orange-500/70 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-colors cursor-pointer"
+                          >
+                            <FileCheck2 className="w-4 h-4 shrink-0" />
+                            <span>Modelo de Apto Médico (A4 / PDF)</span>
+                          </button>
+                        </div>
+                      )}
+
                       {faq.hasMapButton && (
                         <div className="mt-3">
                           <a
@@ -173,6 +343,36 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 </div>
               );
             })}
+
+            {/* Acceso directo permanente a Documentos Imprimibles A4 */}
+            <div className="rounded-2xl bg-stone-900/90 border border-orange-500/70 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span className="block text-[10px] font-bold uppercase tracking-widest text-amber-400">
+                  Documentación para Acreditación (Imprimible A4)
+                </span>
+                <p className="mt-0.5 text-xs sm:text-sm font-bold text-white">
+                  Descargá e imprimí tu Deslinde y el Modelo de Certificado / Apto Médico
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => openPrintableWaiver({ raceConfig })}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5 shrink-0" />
+                  <span>Deslinde A4</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openPrintableMedicalCert({ raceConfig })}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-stone-800 text-amber-300 border border-orange-500/70 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
+                >
+                  <FileCheck2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>Apto Médico A4</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

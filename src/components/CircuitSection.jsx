@@ -9,6 +9,8 @@ import {
   Navigation,
   Download,
   Mountain,
+  CheckCircle2,
+  PackageCheck,
 } from 'lucide-react';
 import { RACE_CONFIG, computeClosingTime, getStartTime } from '../data/raceConfig';
 import { GPX_TRACKS, interpolatePointAtKm } from '../data/gpxTracks';
@@ -725,6 +727,60 @@ export default function CircuitSection({
             );
           })}
         </div>
+
+        {/* ¿Qué incluye tu inscripción? (Kit del Corredor + Cobertura) */}
+        {(() => {
+          const kitItems = (
+            Array.isArray(raceConfig?.kitIncludes)
+              ? raceConfig.kitIncludes
+              : RACE_CONFIG.kitIncludes
+          ).filter((item) => String(item || '').trim());
+
+          if (kitItems.length === 0) return null;
+
+          return (
+            <div className="mt-4 rounded-2xl bg-stone-900/75 border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.18)] p-4 sm:p-5">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 pb-3 border-b border-orange-500/25">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/35 text-amber-400 flex items-center justify-center shrink-0">
+                    <PackageCheck className="w-4 h-4" />
+                  </span>
+                  <div>
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-amber-400">
+                      Kit del Corredor y Cobertura Oficial
+                    </span>
+                    <h3 className="font-display text-base sm:text-lg font-black text-white uppercase leading-tight">
+                      ¿Qué incluye tu inscripción?
+                    </h3>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onOpenModalWithDistance(activeDistance)}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black text-xs uppercase tracking-wider px-4 py-2 transition-colors cursor-pointer shrink-0"
+                >
+                  <Flame className="w-3.5 h-3.5 fill-stone-950" />
+                  <span>
+                    Inscribirme · {activeDistance} ({currentCircuit.price})
+                  </span>
+                </button>
+              </div>
+
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {kitItems.map((item, idx) => (
+                  <div
+                    key={`kit-item-${idx}`}
+                    className="flex items-start gap-2 rounded-xl bg-stone-950/90 border border-stone-800 px-3 py-2 text-xs text-stone-200 leading-snug"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </section>
   );

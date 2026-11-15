@@ -640,6 +640,7 @@ export default function AdminModal({
         'Localidad',
         'Team',
         'Talle Remera',
+        'Grupo Sanguíneo',
         'Contacto Emergencia',
         'Tel. Emergencia',
         'Observaciones Médicas',
@@ -663,6 +664,7 @@ export default function AdminModal({
           r.city || '',
           r.team || '',
           r.shirtSize || '',
+          r.bloodType || '',
           r.emergencyContactName || '',
           r.emergencyContactPhone || '',
           r.medicalNotes || '',
@@ -1172,6 +1174,9 @@ export default function AdminModal({
                 <AdminScheduleFaqTab
                   schedule={draft.schedule}
                   faqs={draft.faqs}
+                  mandatoryGear={draft.mandatoryGear}
+                  ageCategories={draft.ageCategories}
+                  setDraft={setDraft}
                   onScheduleChange={handleScheduleChange}
                   onAddSchedule={handleAddSchedule}
                   onRemoveSchedule={handleRemoveSchedule}

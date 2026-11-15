@@ -203,7 +203,7 @@ export const RACE_CONFIG = {
       id: 'elementos-obligatorios',
       question: 'Elementos obligatorios',
       answer:
-        'Todo corredor deberá portar durante la totalidad del recorrido: mochila o chaleco de hidratación con capacidad mínima de 1 litro, campera rompevientos impermeable con costuras termoselladas, silbato de emergencia náutico o incorporado en la mochila, manta térmica de supervivencia, vaso o eco-taza reutilizable (no se entregan vasos descartables en los puestos de abastecimiento) y número de dorsal visible al frente en todo momento.',
+        'El equipamiento obligatorio se adapta a la exigencia técnica y de cumbre de cada distancia. Revisá la lista diferenciada para 27K y 13K antes de largar:',
     },
     {
       id: 'como-llegar',
@@ -219,6 +219,51 @@ export const RACE_CONFIG = {
         'El tiempo máximo de corte es de 5 horas para los 27K (con corte intermedio a las 3 hs de carrera) y 3 horas para los 13K. Está terminantemente prohibido arrojar envoltorios de geles, botellas o cualquier tipo de residuo fuera de los cestos de los puestos de hidratación (penalización con descalificación directa). Es requisito excluyente presentar apto médico vigente (emitido dentro de los últimos 12 meses) y deslinde de responsabilidad firmado al retirar el kit.',
     },
   ],
+
+  kitIncludes: [
+    'Remera técnica oficial del evento',
+    'Dorsal oficial + Chip de cronometraje electrónico',
+    'Medalla Finisher metálica para quienes crucen la meta',
+    'Hidratación y abastecimiento sólido/líquido en circuito y llegada',
+    'Seguro de accidentes personales para cada corredor acreditado',
+    'Asistencia médica y equipo de rescate en sierra',
+    'Tercer Tiempo y sorteos en la base del cerro',
+  ],
+
+  mandatoryGear: {
+    '27K': [
+      'Mochila o chaleco de hidratación con capacidad mínima de 1,0 L',
+      'Campera rompevientos / impermeable',
+      'Manta térmica de emergencia',
+      'Silbato de emergencia (náutico o incorporado en mochila)',
+      'Teléfono celular con carga suficiente y número SOS de la organización agendado',
+      'Eco-vaso o recipiente reutilizable (no se entregan vasos descartables en PA)',
+      'Dorsal oficial visible al frente durante todo el recorrido',
+    ],
+    '13K': [
+      'Reserva de hidratación mínima de 500 ml (cinturón, soft flask, caramañola o chaleco)',
+      'Eco-vaso o recipiente reutilizable (no se entregan vasos descartables en PA)',
+      'Silbato de emergencia',
+      'Dorsal oficial visible al frente durante todo el recorrido',
+      'Campera rompevientos (sujeta al parte meteorológico oficial previo a la largada)',
+    ],
+    note: 'El control de equipamiento podrá realizarse en la acreditación, en el ingreso al corral de largada o en cualquier puesto del recorrido.',
+  },
+
+  ageCategories: {
+    title: 'Categorías por Edad y Premiación',
+    ruleNote:
+      'Para todas las categorías (Damas y Caballeros en 27K y 13K) la edad se computa al día de la carrera. La premiación de la Clasificación General (Top 3) no es acumulativa con las categorías por edad.',
+    generalPodium: 'Top 3 General Damas y Caballeros (27K y 13K)',
+    categoryPodium: '1° al 3° Puesto por Categoría en Damas y Caballeros (27K y 13K)',
+    brackets: [
+      { id: 'cat-18-29', label: '18 a 29 años', range: '18 – 29 años' },
+      { id: 'cat-30-39', label: '30 a 39 años', range: '30 – 39 años' },
+      { id: 'cat-40-49', label: '40 a 49 años', range: '40 – 49 años' },
+      { id: 'cat-50-59', label: '50 a 59 años', range: '50 – 59 años' },
+      { id: 'cat-60-plus', label: '60+ años', range: '60 años en adelante' },
+    ],
+  },
 };
 
 const ARGENTINA_TIMEZONE = 'America/Argentina/Buenos_Aires';
@@ -451,13 +496,62 @@ export function mergeRaceConfig(override) {
 
   const nextSchedule = syncScheduleWithTargetDate(rawSchedule, resolvedTargetDateIso);
 
+  const isLegacyGearFaqAnswer = (text) =>
+    typeof text === 'string' &&
+    text.includes('costuras termoselladas') &&
+    text.includes('capacidad mínima de 1 litro');
+
   const nextFaqs = Array.isArray(override.faqs)
-    ? override.faqs.map((faq) => ({
-        ...faq,
-        question: normalizeDistanceCopy(faq?.question),
-        answer: normalizeDistanceCopy(faq?.answer),
-      }))
+    ? override.faqs.map((faq) => {
+        const normalizedAnswer = normalizeDistanceCopy(faq?.answer);
+        const answer =
+          faq?.id === 'elementos-obligatorios' && isLegacyGearFaqAnswer(normalizedAnswer)
+            ? RACE_CONFIG.faqs[0].answer
+            : normalizedAnswer;
+        return {
+          ...faq,
+          question: normalizeDistanceCopy(faq?.question),
+          answer,
+        };
+      })
     : RACE_CONFIG.faqs;
+
+  const nextKitIncludes = Array.isArray(override.kitIncludes)
+    ? override.kitIncludes.map((item) => String(item ?? ''))
+    : RACE_CONFIG.kitIncludes;
+
+  const incomingGear =
+    override.mandatoryGear && typeof override.mandatoryGear === 'object'
+      ? override.mandatoryGear
+      : {};
+  const nextMandatoryGear = {
+    '27K': Array.isArray(incomingGear['27K'])
+      ? incomingGear['27K'].map((item) => String(item ?? ''))
+      : RACE_CONFIG.mandatoryGear['27K'],
+    '13K': Array.isArray(incomingGear['13K'])
+      ? incomingGear['13K'].map((item) => String(item ?? ''))
+      : RACE_CONFIG.mandatoryGear['13K'],
+    note:
+      typeof incomingGear.note === 'string'
+        ? incomingGear.note
+        : RACE_CONFIG.mandatoryGear.note,
+  };
+
+  const incomingCats =
+    override.ageCategories && typeof override.ageCategories === 'object'
+      ? override.ageCategories
+      : {};
+  const nextAgeCategories = {
+    ...RACE_CONFIG.ageCategories,
+    ...incomingCats,
+    brackets: Array.isArray(incomingCats.brackets)
+      ? incomingCats.brackets.map((b, idx) => ({
+          id: b?.id || `cat-${idx}`,
+          label: String(b?.label ?? ''),
+          range: String(b?.range ?? ''),
+        }))
+      : RACE_CONFIG.ageCategories.brackets,
+  };
 
   return {
     ...RACE_CONFIG,
@@ -478,5 +572,8 @@ export function mergeRaceConfig(override) {
     },
     schedule: nextSchedule,
     faqs: nextFaqs,
+    kitIncludes: nextKitIncludes,
+    mandatoryGear: nextMandatoryGear,
+    ageCategories: nextAgeCategories,
   };
 }

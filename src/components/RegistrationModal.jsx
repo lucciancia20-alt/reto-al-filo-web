@@ -14,6 +14,12 @@ import {
   Loader2,
   User,
   ShieldAlert,
+  Ruler,
+  Printer,
+  FileCheck2,
+  PackageCheck,
+  BookOpen,
+  ChevronDown,
 } from 'lucide-react';
 import { RACE_CONFIG, buildWhatsAppUrl } from '../data/raceConfig';
 import {
@@ -22,9 +28,19 @@ import {
   submitRunnerRegistration,
 } from '../firebase/config';
 import { sendRegistrationNotificationEmail } from '../utils/emailNotification';
+import { openPrintableWaiver, openPrintableMedicalCert } from '../utils/printableDocs';
 
 const SHIRT_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+const SHIRT_SIZE_GUIDE = [
+  { size: 'XS', width: '46 cm', length: '64 cm' },
+  { size: 'S', width: '49 cm', length: '67 cm' },
+  { size: 'M', width: '52 cm', length: '70 cm' },
+  { size: 'L', width: '55 cm', length: '72 cm' },
+  { size: 'XL', width: '58 cm', length: '75 cm' },
+  { size: 'XXL', width: '61 cm', length: '78 cm' },
+];
 const GENDERS = ['Femenino', 'Masculino', 'Otro'];
+const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-', 'No sabe'];
 
 const INITIAL_FORM = {
   fullName: '',
@@ -36,6 +52,7 @@ const INITIAL_FORM = {
   city: '',
   team: '',
   shirtSize: 'M',
+  bloodType: 'No sabe',
   emergencyContactName: '',
   emergencyContactPhone: '',
   medicalNotes: '',
@@ -77,6 +94,9 @@ export default function RegistrationModal({
   const [receiptFile, setReceiptFile] = useState(null);
   const [receiptPreview, setReceiptPreview] = useState('');
   const [copiedField, setCopiedField] = useState('');
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
   const [submitStep, setSubmitStep] = useState('');
@@ -88,6 +108,8 @@ export default function RegistrationModal({
       setSelectedDistance(initialDistance);
       setSubmitError('');
       setSubmitStep('');
+      setShowTermsModal(false);
+      setShowSizeGuide(false);
     }
   }, [initialDistance, isOpen]);
 
@@ -120,6 +142,21 @@ export default function RegistrationModal({
 
   const circuits = raceConfig?.circuits || RACE_CONFIG.circuits;
   const payment = raceConfig?.payment || RACE_CONFIG.payment;
+
+  const kitItems = (
+    Array.isArray(raceConfig?.kitIncludes) ? raceConfig.kitIncludes : RACE_CONFIG.kitIncludes
+  ).filter((item) => String(item || '').trim());
+
+  const mandatoryGear = raceConfig?.mandatoryGear || RACE_CONFIG.mandatoryGear;
+  const gear27 = (
+    Array.isArray(mandatoryGear?.['27K']) ? mandatoryGear['27K'] : RACE_CONFIG.mandatoryGear['27K']
+  ).filter((item) => String(item || '').trim());
+  const gear13 = (
+    Array.isArray(mandatoryGear?.['13K']) ? mandatoryGear['13K'] : RACE_CONFIG.mandatoryGear['13K']
+  ).filter((item) => String(item || '').trim());
+
+  const reglamentFaq = (raceConfig?.faqs || RACE_CONFIG.faqs).find((f) => f.id === 'reglamento');
+  const ageCategories = raceConfig?.ageCategories || RACE_CONFIG.ageCategories;
 
   const distances = ['27K', '13K'].map((id) => {
     const c = circuits[id] || RACE_CONFIG.circuits[id];
@@ -204,6 +241,9 @@ export default function RegistrationModal({
     setConfirmedReg(null);
     setSubmitError('');
     setSubmitStep('');
+    setAcceptedTerms(false);
+    setShowTermsModal(false);
+    setShowSizeGuide(false);
   };
 
   const handleSubmit = async (e) => {
@@ -224,6 +264,13 @@ export default function RegistrationModal({
       return;
     }
 
+    if (!acceptedTerms) {
+      setSubmitError(
+        'Debés aceptar el Reglamento Oficial y el Deslinde de Responsabilidad antes de confirmar tu inscripción.'
+      );
+      return;
+    }
+
     setSubmitting(true);
     try {
       setSubmitStep('Subiendo comprobante de pago de forma segura...');
@@ -235,6 +282,7 @@ export default function RegistrationModal({
       setSubmitStep('Registrando tu ficha de corredor...');
       const created = await submitRunnerRegistration({
         ...form,
+        acceptedTerms: true,
         distance: selectedDistance,
         priceSnapshot: activeDistanceInfo.price,
         receiptUrl: uploaded.secureUrl,
@@ -376,6 +424,12 @@ export default function RegistrationModal({
                   <span className="text-stone-400">Talle de Remera</span>
                   <span className="font-bold text-stone-100">{confirmedReg.shirtSize}</span>
                 </div>
+                <div className="flex justify-between gap-3 py-1 border-b border-stone-800/80">
+                  <span className="text-stone-400">Grupo Sanguíneo / RH</span>
+                  <span className="font-mono font-bold text-amber-300">
+                    {confirmedReg.bloodType || 'No sabe'}
+                  </span>
+                </div>
                 <div className="flex justify-between items-center gap-3 pt-1">
                   <span className="text-stone-400">Comprobante adjunto</span>
                   <a
@@ -387,6 +441,37 @@ export default function RegistrationModal({
                     Ver comprobante subido
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </a>
+                </div>
+              </div>
+
+              {/* Descargas A4 pre-llenadas para Acreditación */}
+              <div className="rounded-2xl bg-amber-500/10 border border-orange-500/50 p-4 space-y-2.5">
+                <div>
+                  <span className="block text-[10px] font-bold uppercase tracking-widest text-amber-400">
+                    Documentación para presentar al retirar tu kit
+                  </span>
+                  <p className="mt-0.5 text-xs text-stone-200 leading-relaxed">
+                    Descargá e imprimí tu <strong className="text-white">Deslinde</strong> (ya
+                    pre-llenado con tus datos) y el <strong className="text-white">Modelo de Apto Médico</strong> para llevar firmados a la acreditación.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openPrintableWaiver({ raceConfig, runner: confirmedReg })}
+                    className="min-h-[42px] inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
+                  >
+                    <Printer className="w-4 h-4 shrink-0" />
+                    <span>Deslinde Oficial (A4 / PDF)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openPrintableMedicalCert({ raceConfig, runner: confirmedReg })}
+                    className="min-h-[42px] inline-flex items-center justify-center gap-2 rounded-xl bg-stone-950 hover:bg-stone-800 text-amber-300 border border-orange-500/70 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
+                  >
+                    <FileCheck2 className="w-4 h-4 shrink-0" />
+                    <span>Modelo Apto Médico (A4)</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -473,6 +558,23 @@ export default function RegistrationModal({
                     );
                   })}
                 </div>
+
+                {kitItems.length > 0 && (
+                  <div className="mt-3 rounded-2xl bg-stone-950/90 border border-orange-500/35 p-3 space-y-2">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-400">
+                      <PackageCheck className="w-3.5 h-3.5 shrink-0" />
+                      <span>Tu inscripción incluye</span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] text-stone-200">
+                      {kitItems.map((item, idx) => (
+                        <div key={`modal-kit-${idx}`} className="flex items-start gap-1.5 leading-snug">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </section>
 
               {/* 2. Datos Bancarios para Transferir */}
@@ -728,11 +830,27 @@ export default function RegistrationModal({
                     />
                   </div>
 
-                  {/* Talle de Remera */}
+                  {/* Talle de Remera + Guía de Talles (cm) */}
                   <div className="sm:col-span-2">
-                    <span className="block text-xs font-semibold text-stone-300 mb-1.5">
-                      Talle de Remera Oficial <span className="text-red-500">*</span>
-                    </span>
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                      <span className="block text-xs font-semibold text-stone-300">
+                        Talle de Remera Oficial <span className="text-red-500">*</span>
+                      </span>
+                      <button
+                        type="button"
+                        aria-expanded={showSizeGuide}
+                        onClick={() => setShowSizeGuide((prev) => !prev)}
+                        className="inline-flex items-center gap-1 rounded-lg bg-stone-950 hover:bg-stone-800 border border-orange-500/50 text-amber-300 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer"
+                      >
+                        <Ruler className="w-3.5 h-3.5 shrink-0" />
+                        <span>{showSizeGuide ? 'Ocultar medidas' : 'Guía de talles (cm)'}</span>
+                        <ChevronDown
+                          className={`w-3 h-3 transition-transform duration-150 ${
+                            showSizeGuide ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </button>
+                    </div>
                     <div className="grid grid-cols-6 gap-1.5">
                       {SHIRT_SIZES.map((size) => {
                         const active = form.shirtSize === size;
@@ -752,6 +870,50 @@ export default function RegistrationModal({
                         );
                       })}
                     </div>
+
+                    {showSizeGuide && (
+                      <div className="mt-2 rounded-xl bg-stone-950 border border-orange-500/45 p-3 text-xs">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <span className="font-bold text-amber-300 text-[11px] uppercase tracking-wider">
+                            Medidas aproximadas · Corte Unisex
+                          </span>
+                          <span className="text-[10px] text-stone-400">
+                            Medida en prenda plana (Axila × Largo)
+                          </span>
+                        </div>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left border-collapse text-[11px]">
+                            <thead>
+                              <tr className="border-b border-stone-800 text-stone-400 uppercase text-[10px]">
+                                <th className="py-1 pr-2">Talle</th>
+                                <th className="py-1 px-2">Ancho (Axila a Axila)</th>
+                                <th className="py-1 pl-2">Largo Total</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-stone-800/70">
+                              {SHIRT_SIZE_GUIDE.map((row) => {
+                                const isSelected = form.shirtSize === row.size;
+                                return (
+                                  <tr
+                                    key={row.size}
+                                    onClick={() => handleFieldChange('shirtSize', row.size)}
+                                    className={`cursor-pointer transition-colors ${
+                                      isSelected
+                                        ? 'bg-amber-500/15 text-amber-200 font-bold'
+                                        : 'text-stone-300 hover:bg-stone-900'
+                                    }`}
+                                  >
+                                    <td className="py-1 pr-2 font-display font-bold">{row.size}</td>
+                                    <td className="py-1 px-2 font-mono">{row.width}</td>
+                                    <td className="py-1 pl-2 font-mono">{row.length}</td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -804,12 +966,33 @@ export default function RegistrationModal({
                         className="w-full rounded-xl bg-stone-900 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                       />
                     </div>
-                    <div className="sm:col-span-2">
+                    <div>
+                      <label
+                        htmlFor="reg-blood-type"
+                        className="block text-xs font-semibold text-stone-300 mb-1"
+                      >
+                        Grupo Sanguíneo y Factor RH <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        id="reg-blood-type"
+                        name="bloodType"
+                        value={form.bloodType}
+                        onChange={(e) => handleFieldChange('bloodType', e.target.value)}
+                        className="w-full rounded-xl bg-stone-900 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+                      >
+                        {BLOOD_TYPES.map((bt) => (
+                          <option key={bt} value={bt}>
+                            {bt}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
                       <label
                         htmlFor="reg-medical"
                         className="block text-xs font-semibold text-stone-300 mb-1"
                       >
-                        Obra Social / Alergias / Observaciones Médicas (opcional)
+                        Obra Social / Alergias / Obs. Médicas (opcional)
                       </label>
                       <input
                         id="reg-medical"
@@ -878,6 +1061,137 @@ export default function RegistrationModal({
                     </div>
                   </div>
                 </div>
+              </section>
+
+              {/* 5. Aceptación Legal de Reglamento y Deslinde */}
+              <section className="rounded-2xl bg-stone-950 border border-orange-500/50 p-4 space-y-3">
+                <label
+                  htmlFor="reg-accept-terms"
+                  className="flex items-start gap-2.5 cursor-pointer select-none"
+                >
+                  <input
+                    id="reg-accept-terms"
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={(e) => {
+                      setAcceptedTerms(e.target.checked);
+                      if (e.target.checked && submitError.includes('Reglamento')) {
+                        setSubmitError('');
+                      }
+                    }}
+                    className="mt-0.5 w-4 h-4 rounded border-orange-500 bg-stone-900 text-amber-500 accent-amber-500 shrink-0 cursor-pointer"
+                  />
+                  <span className="text-xs text-stone-200 leading-relaxed">
+                    <strong className="text-white">
+                      Leí y acepto el Reglamento Oficial y el Deslinde de Responsabilidad
+                    </strong>{' '}
+                    <span className="text-red-500 font-bold">*</span>
+                    <span className="block text-[11px] text-stone-400 mt-0.5">
+                      Me comprometo a presentar el Apto Médico vigente y el Deslinde firmado al
+                      retirar mi kit.
+                    </span>
+                  </span>
+                </label>
+
+                <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                  <button
+                    type="button"
+                    aria-expanded={showTermsModal}
+                    onClick={() => setShowTermsModal((prev) => !prev)}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 border border-orange-500/60 text-amber-300 text-[11px] font-bold px-3 py-1.5 transition-colors cursor-pointer"
+                  >
+                    <BookOpen className="w-3.5 h-3.5 shrink-0" />
+                    <span>
+                      {showTermsModal
+                        ? 'Cerrar vista de Reglamento'
+                        : 'Leer Reglamento y Deslinde'}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      openPrintableWaiver({
+                        raceConfig,
+                        runner: { ...form, distance: selectedDistance },
+                      })
+                    }
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-[11px] font-semibold px-2.5 py-1.5 transition-colors cursor-pointer"
+                  >
+                    <Printer className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span>Deslinde A4</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      openPrintableMedicalCert({
+                        raceConfig,
+                        runner: { ...form, distance: selectedDistance },
+                      })
+                    }
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-[11px] font-semibold px-2.5 py-1.5 transition-colors cursor-pointer"
+                  >
+                    <FileCheck2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span>Modelo Apto Médico A4</span>
+                  </button>
+                </div>
+
+                {showTermsModal && (
+                  <div className="rounded-xl bg-stone-900 border border-stone-700 p-3.5 max-h-60 overflow-y-auto overscroll-contain space-y-2.5 text-[11px] text-stone-300 leading-relaxed">
+                    <div>
+                      <h4 className="font-display font-bold text-amber-400 uppercase text-xs">
+                        Reglamento General · {raceConfig.title || RACE_CONFIG.title}
+                      </h4>
+                      <p className="mt-1">
+                        {reglamentFaq?.answer || RACE_CONFIG.faqs[2].answer}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                      <div className="rounded-lg bg-stone-950 border border-cyan-500/40 p-2.5">
+                        <span className="block font-bold text-cyan-400 text-[10px] uppercase">
+                          Obligatorios 27K
+                        </span>
+                        <ul className="mt-1 space-y-0.5 list-disc pl-3.5">
+                          {gear27.map((g, i) => (
+                            <li key={`m27-${i}`}>{g}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="rounded-lg bg-stone-950 border border-red-500/40 p-2.5">
+                        <span className="block font-bold text-red-400 text-[10px] uppercase">
+                          Obligatorios 13K
+                        </span>
+                        <ul className="mt-1 space-y-0.5 list-disc pl-3.5">
+                          {gear13.map((g, i) => (
+                            <li key={`m13-${i}`}>{g}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {ageCategories?.ruleNote && (
+                      <p className="text-stone-300">
+                        <strong className="text-white">Categorías: </strong>
+                        {ageCategories.ruleNote}
+                      </p>
+                    )}
+
+                    <div className="pt-1 border-t border-stone-800">
+                      <h5 className="font-bold text-white uppercase text-[10px]">
+                        Síntesis del Deslinde de Responsabilidad
+                      </h5>
+                      <p className="mt-1">
+                        El/la participante declara estar apto/a física y médicamente para esfuerzos
+                        de trail running en montaña, asume los riesgos propios del terreno serrano y
+                        exime a la Organización, dueños de campos y equipo técnico de
+                        responsabilidad por incidentes derivados de la actividad, aceptando controles
+                        de material, cortes horarios y normas ambientales sin arrojar residuos.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </section>
 
               {submitStep && (

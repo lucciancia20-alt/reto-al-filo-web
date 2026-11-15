@@ -711,7 +711,13 @@ export default function AdminRegistrationsTab({
                           {reg.emergencyContactName} ({reg.emergencyContactPhone})
                         </span>
                       </div>
-                      <div className="sm:col-span-2 md:col-span-4 text-stone-200">
+                      <div>
+                        <span className="text-stone-500">Grupo sanguíneo: </span>
+                        <strong className="font-mono text-rose-300">
+                          {reg.bloodType || 'No especificado'}
+                        </strong>
+                      </div>
+                      <div className="sm:col-span-2 md:col-span-3 text-stone-200">
                         <span className="text-stone-500">Observaciones médicas: </span>
                         <span className={reg.medicalNotes ? 'text-amber-200' : 'text-stone-400'}>
                           {reg.medicalNotes || 'Sin observaciones médicas'}
