@@ -70,3 +70,37 @@ textarea:-webkit-autofill:active {
   color-scheme: dark;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+/* Scrollbars personalizados (página principal y modales/paneles internos) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090b;
+  border: 1px solid rgba(249, 115, 22, 0.45);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #f97316;
+  border-radius: 9999px;
+  border: 2px solid #09090b;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #fb923c;
+}
+
+::-webkit-scrollbar-corner {
+  background: #09090b;
+}
+
+/* Respaldo estándar para Firefox sin desactivar ::-webkit-scrollbar en Chromium 121+ */
+@supports (-moz-appearance: none) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #f97316 #09090b;
+  }
+}
