@@ -68,8 +68,8 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-2 pb-8 sm:pt-3 sm:pb-10 -mt-2 md:-mt-4 text-center flex flex-col items-center">
         {/* Etiqueta superior de aventura */}
-        <div className="inline-flex items-center gap-2 rounded-full bg-stone-900/90 border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-amber-400 mb-3.5 shadow-[0_0_14px_rgba(249,115,22,0.3)]">
-          <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
+        <div className="inline-flex items-center gap-2 rounded-full bg-stone-900/90 border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-orange-400 mb-3.5 shadow-[0_0_14px_rgba(249,115,22,0.3)]">
+          <Calendar className="w-4 h-4 text-orange-500 shrink-0" />
           <span>
             {raceConfig.subtitle} · {targetDateParts.formattedDayMonth} · {targetDateParts.formattedTime}
           </span>
@@ -79,11 +79,11 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         <h1 className="max-w-3xl mx-auto text-balance font-display text-3xl md:text-4xl font-black tracking-tight text-white uppercase leading-[1.08] section-title-stroke">
           RETO AL FILO{' '}
           <span className="whitespace-nowrap">
-            2<sup className="lowercase text-sm md:text-base font-extrabold align-super -top-2 relative">da</sup> EDICIÓN
+            2<span className="lowercase text-2xl md:text-4xl font-black align-baseline">da</span> EDICIÓN
           </span>
         </h1>
 
-        <p className="mt-2 text-lg sm:text-2xl font-bold uppercase tracking-[0.22em] text-amber-400">
+        <p className="mt-2 text-lg sm:text-2xl font-bold uppercase tracking-[0.22em] text-orange-500">
           {raceConfig.subtitle}
         </p>
 
@@ -96,7 +96,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         {/* Contador regresivo dinámico hacia la fecha y hora de largada */}
         <div className="mt-5 w-full max-w-md">
           <div className="flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-stone-300 mb-2">
-            <Timer className="w-3.5 h-3.5 text-amber-400" />
+            <Timer className="w-3.5 h-3.5 text-orange-400" />
             <span>
               {countdown.expired
                 ? '¡Largada en curso!'
@@ -113,7 +113,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                 <div className="font-display text-2xl sm:text-4xl font-black text-white tabular-nums tracking-tight">
                   {unit.value}
                 </div>
-                <div className="mt-1 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-amber-400">
+                <div className="mt-1 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-orange-400">
                   {unit.label}
                 </div>
               </div>
@@ -134,7 +134,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
           <a
             href="#circuito"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-stone-900/85 hover:bg-stone-800 text-stone-100 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.45)] font-semibold text-sm sm:text-base px-6 py-3 sm:py-3.5 transition-all"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-stone-900/85 hover:bg-stone-800 text-orange-400 hover:text-orange-300 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.45)] font-semibold text-sm sm:text-base px-6 py-3 sm:py-3.5 transition-all"
           >
             Ver Circuito y Altimetría
           </a>
@@ -142,15 +142,15 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
         <a
           href="#consultar-dorsal"
-          className="mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-stone-950/75 hover:bg-stone-900 border border-stone-700/80 hover:border-amber-400/70 px-3.5 py-1.5 text-xs font-semibold text-amber-200 hover:text-amber-300 transition-colors"
+          className="mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-stone-950/75 hover:bg-stone-900 border border-orange-500/70 hover:border-orange-400 px-3.5 py-1.5 text-xs font-semibold text-orange-400 hover:text-orange-300 transition-colors"
         >
-          <Search className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+          <Search className="w-3.5 h-3.5 text-orange-400 shrink-0" />
           <span>¿Ya te inscribiste? Consultar mi estado y dorsal →</span>
         </a>
 
         {/* Ubicación rápida */}
         <div className="mt-4 inline-flex items-center gap-2 text-xs sm:text-sm text-stone-300">
-          <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
+          <MapPin className="w-5 h-5 text-orange-500 shrink-0" />
           <span>{raceConfig.locationName}</span>
         </div>
       </div>
@@ -158,7 +158,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
       <a
         href="#circuito"
         aria-label="Desplazarse al circuito"
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 text-stone-400 hover:text-amber-400 transition-colors animate-bounce"
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 text-stone-400 hover:text-orange-400 transition-colors animate-bounce"
       >
         <ChevronDown className="w-6 h-6" />
       </a>
