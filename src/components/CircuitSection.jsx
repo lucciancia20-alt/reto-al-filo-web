@@ -682,7 +682,7 @@ export default function CircuitSection({
               </div>
             </div>
 
-            {/* Lista de Puestos de Hidratación + CTA */}
+            {/* Lista de Puestos de Hidratación */}
             <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-orange-500/30">
               <div className="flex flex-wrap gap-1.5">
                 {stations.map((st) => (
@@ -695,15 +695,6 @@ export default function CircuitSection({
                   </span>
                 ))}
               </div>
-
-              <button
-                type="button"
-                onClick={() => onOpenModalWithDistance(activeDistance)}
-                className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-[0_0_12px_rgba(245,158,11,0.3)] font-display font-bold text-xs uppercase tracking-wider px-3.5 py-1.5 transition-all cursor-pointer"
-              >
-                <Flame className="w-4 h-4" />
-                Inscribirme en {activeDistance}
-              </button>
             </div>
           </div>
         </div>
@@ -777,9 +768,9 @@ export default function CircuitSection({
                 {kitItems.map((item, idx) => (
                   <div
                     key={`kit-item-${idx}`}
-                    className="flex items-start gap-2 rounded-xl bg-stone-950/90 border border-stone-800 px-3 py-2 text-xs text-stone-200 leading-snug"
+                    className="flex items-start gap-2 rounded-xl bg-zinc-950 border border-orange-500/70 px-3 py-2 text-xs text-white leading-snug"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
                     <span>{item}</span>
                   </div>
                 ))}
