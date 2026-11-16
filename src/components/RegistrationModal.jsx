@@ -1020,7 +1020,7 @@ export default function RegistrationModal({
                     <ShieldAlert className="w-4 h-4 shrink-0" />
                     <span>Seguridad en Montaña (Contacto de Emergencia)</span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-3">
                     <div>
                       <label
                         htmlFor="reg-emergency-name"
@@ -1087,9 +1087,9 @@ export default function RegistrationModal({
                     <div>
                       <label
                         htmlFor="reg-medical"
-                        className="block text-xs font-semibold text-stone-300 mb-1"
+                        className="block text-xs font-semibold text-stone-300 mb-1 sm:whitespace-nowrap"
                       >
-                        Obra Social / Alergias / Obs. Médicas (opcional)
+                        Obra Social / Alergias / Obs. Médicas
                       </label>
                       <input
                         id="reg-medical"
@@ -1335,7 +1335,7 @@ export default function RegistrationModal({
                 type="button"
                 onClick={onClose}
                 disabled={submitting}
-                className="min-h-[44px] rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
+                className="min-h-[44px] rounded-xl bg-zinc-950 border border-orange-500/80 text-red-400 hover:text-red-300 text-xs font-semibold px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
               >
                 Cancelar
               </button>
