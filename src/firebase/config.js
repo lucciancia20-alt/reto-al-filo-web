@@ -727,12 +727,8 @@ export async function submitRunnerRegistration(payload) {
   const localList = readLocalRegistrations();
   writeLocalRegistrations([savedRecord, ...localList]);
 
-  if (persistedTo === 'firestore') {
-    await Promise.allSettled([
-      syncPublicRunnerStatus(savedRecord),
-      applyStatsDelta(null, savedRecord),
-    ]);
-  }
+  // publicStatus y stats/summary los genera la Cloud Function onRegistrationCreate;
+  // el cliente público ya no escribe en esas colecciones.
 
   return {
     ...savedRecord,

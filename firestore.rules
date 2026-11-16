@@ -34,7 +34,15 @@ service cloud.firestore {
           'createdAt',
           'updatedAt'
         ])
+        && data.keys().hasOnly([
+          'code', 'distance', 'priceSnapshot', 'fullName', 'dni', 'birthDate', 'gender',
+          'phone', 'email', 'city', 'team', 'shirtSize', 'bloodType',
+          'emergencyContactName', 'emergencyContactPhone', 'medicalNotes', 'acceptedTerms',
+          'receiptUrl', 'receiptPublicId', 'receiptFormat', 'status', 'assignedBib',
+          'createdAt', 'updatedAt'
+        ])
         && hasNonEmptyString(data, 'code')
+        && data.code.matches('^RAF-([0-9]{5}|[A-Z0-9]{8})$')
         && data.distance in ['27K', '13K']
         && hasNonEmptyString(data, 'fullName')
         && hasNonEmptyString(data, 'dni')
@@ -61,68 +69,22 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    function isValidPublicStatusCreate(data) {
-      return data.keys().hasAll([
-        'code',
-        'initials',
-        'distance',
-        'status',
-        'assignedBib',
-        'shirtSize',
-        'checkedIn',
-        'updatedAt'
-      ])
-      && data.keys().hasOnly([
-        'code',
-        'initials',
-        'distance',
-        'status',
-        'assignedBib',
-        'shirtSize',
-        'checkedIn',
-        'updatedAt'
-      ])
-      && data.code is string && data.code.size() >= 4 && data.code.size() <= 30
-      && data.initials is string && data.initials.size() >= 1 && data.initials.size() <= 16
-      && data.distance in ['27K', '13K']
-      && data.status == 'pending'
-      && data.assignedBib == ''
-      && data.shirtSize is string && data.shirtSize.size() <= 10
-      && data.checkedIn == false
-      && data.updatedAt is string && data.updatedAt.size() <= 40;
-    }
-
     match /registrations/{registrationId} {
       allow create: if isValidRegistrationCreate(request.resource.data);
       allow read, update, delete: if isAdmin();
     }
 
+    // Proyección pública: la crea/actualiza la Cloud Function (Admin SDK, ignora reglas)
+    // y el panel admin. El público solo puede leer un documento por ID (sin list).
     match /publicStatus/{lookupId} {
       allow get: if true;
       allow list: if false;
-      allow create: if isAdmin()
-        || (isValidPublicStatusCreate(request.resource.data)
-            && lookupId == 'code-' + request.resource.data.code);
-      allow update, delete: if isAdmin();
+      allow create, update, delete: if isAdmin();
     }
-
-    // Contadores agregados. El admin escribe libremente; el público solo puede
-    // sumar +1 (nueva inscripción pendiente) sobre un documento ya existente.
-    function isPublicStatsIncrement() {
-      return request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['total', 'pending', 'd27k', 'd13k', 'updatedAt'])
-        && request.resource.data.total == resource.data.total + 1
-        && request.resource.data.pending == resource.data.pending + 1
-        && (request.resource.data.d27k + request.resource.data.d13k)
-            == (resource.data.d27k + resource.data.d13k + 1);
-    }
-
+    // Contadores agregados: los mantiene la Cloud Function y el panel admin.
     match /stats/summary {
-      allow read: if isAdmin();
-      allow create, delete: if isAdmin();
-      allow update: if isAdmin() || isPublicStatsIncrement();
+      allow read, write: if isAdmin();
     }
-
     match /{document=**} {
       allow read, write: if false;
     }

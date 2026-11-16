@@ -1,4 +1,4 @@
-﻿# Cloud Functions - Reto al Filo
+# Cloud Functions - Reto al Filo
 
 `onRegistrationCreate` (Gen 2, `southamerica-east1`): al crearse `registrations/{id}` crea
 `publicStatus/code-{code}` y suma a `stats/summary` en una transaccion idempotente
@@ -18,5 +18,10 @@ firebase deploy --only functions
 ```
 Requiere plan Blaze y APIs de Cloud Functions/Cloud Build/Artifact Registry habilitadas.
 
-## Convivencia con el frontend actual
-Mientras el cliente siga escribiendo publicStatus y sumando stats, los contadores se duplican (+2). Tras desplegar la funcion, quitar esas escrituras del cliente y cerrar reglas (ver `docs/plan-cloud-function-publicstatus.md`); luego usar **Sincronizar** en el panel para recalcular `stats/summary`.
+## Orden de despliegue (importante)
+El cliente ya NO escribe `publicStatus` ni `stats` al inscribirse; lo hace solo esta funcion. Por eso:
+1. `firebase deploy --only functions` (primero, antes de publicar el frontend o las reglas).
+2. Publicar el frontend (Render, automatico con el push).
+3. `firebase deploy --only firestore:rules` (reglas cerradas: `publicStatus`/`stats` solo admin; `registrations` create con campos y codigo validados).
+4. Una vez, **Sincronizar** en el panel para recalcular `stats/summary` y reconstruir `publicStatus`.
+Si el frontend sale antes que la funcion, las inscripciones nuevas quedan sin `publicStatus` hasta desplegarla o usar **Sincronizar**.
