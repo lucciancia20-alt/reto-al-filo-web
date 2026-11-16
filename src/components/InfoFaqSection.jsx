@@ -86,7 +86,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
     <>
       {/* Grilla de 3 columnas en escritorio (xl:grid-cols-3) y 1 columna en móviles/tablets */}
       <div className="bg-stone-950 border-t-2 border-orange-500/50 py-8 sm:py-10 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 xl:grid-cols-3 gap-10 xl:gap-6 items-start">
+        <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-6 xl:px-10 grid grid-cols-1 xl:grid-cols-3 gap-10 xl:gap-6 items-start">
           {/* Columna 1: Línea de Tiempo (Cronograma del Día) */}
           <section id="cronograma" className="scroll-mt-20 min-w-0">
             <div className="text-center">
@@ -451,7 +451,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
         id="consultar-dorsal"
         className="scroll-mt-20 py-8 sm:py-10 bg-stone-900/70 border-t-2 border-orange-500/50"
       >
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="rounded-3xl bg-zinc-950 border border-orange-500/80 shadow-[0_0_24px_rgba(249,115,22,0.18)] p-5 sm:p-6">
             <div className="text-center">
               <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-orange-400">
