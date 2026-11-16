@@ -588,31 +588,31 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                       {faq.id === 'como-llegar' && (
                         <div className="mt-3.5 grid grid-cols-1 md:grid-cols-3 gap-2.5">
                           <div className="rounded-xl bg-stone-950 border border-orange-500/50 p-3 space-y-1.5">
-                            <span className="inline-flex items-center gap-1.5 text-[11px] font-display font-black uppercase tracking-wider text-orange-400">
+                            <span className="flex items-center min-h-[2.75rem] gap-1.5 text-[11px] font-display font-black uppercase tracking-wider text-orange-400">
                               <PackageCheck className="w-4 h-4 shrink-0" />
                               Checklist para Retirar Kit
                             </span>
-                            <p className="text-[11px] sm:text-xs text-stone-200 leading-relaxed">
+                            <p className="text-[11px] sm:text-xs text-stone-200 leading-relaxed tracking-[0.025em] [word-spacing:0.08em]">
                               Presentá en mesa: <strong className="text-white">DNI físico</strong>, <strong className="text-white">Apto Médico firmado por médico</strong> (vigencia &lt; 1 año) y <strong className="text-white">Deslinde impreso firmado</strong>. Sin documentación completa no se entrega dorsal ni chip.
                             </p>
                           </div>
 
                           <div className="rounded-xl bg-stone-950 border border-cyan-500/45 p-3 space-y-1.5">
-                            <span className="inline-flex items-center gap-1.5 text-[11px] font-display font-black uppercase tracking-wider text-cyan-300">
+                            <span className="flex items-center min-h-[2.75rem] gap-1.5 text-[11px] font-display font-black uppercase tracking-wider text-cyan-300">
                               <Wifi className="w-4 h-4 shrink-0" />
                               Wi-Fi Starlink + Track Offline
                             </span>
-                            <p className="text-[11px] sm:text-xs text-stone-200 leading-relaxed">
+                            <p className="text-[11px] sm:text-xs text-stone-200 leading-relaxed tracking-[0.025em] [word-spacing:0.08em]">
                               Contamos con <strong className="text-white">Wi-Fi satelital Starlink</strong> en la base (domo, cantina y largada). En los filos y cumbres no hay señal móvil: llevá el <strong className="text-white">archivo .GPX descargado offline</strong> en tu reloj o teléfono antes de largar.
                             </p>
                           </div>
 
                           <div className="rounded-xl bg-stone-950 border border-emerald-500/45 p-3 space-y-1.5">
-                            <span className="inline-flex items-center gap-1.5 text-[11px] font-display font-black uppercase tracking-wider text-emerald-300">
+                            <span className="flex items-center min-h-[2.75rem] gap-1.5 text-[11px] font-display font-black uppercase tracking-wider text-emerald-300">
                               <Car className="w-4 h-4 shrink-0 text-emerald-400" />
                               Servicios en Cerro Providencia
                             </span>
-                            <p className="text-[11px] sm:text-xs text-stone-200 leading-relaxed">
+                            <p className="text-[11px] sm:text-xs text-stone-200 leading-relaxed tracking-[0.025em] [word-spacing:0.08em]">
                               Predio con <strong className="text-white">estacionamiento</strong>, <strong className="text-white">baños químicos</strong> y cantina (se recomienda llevar algo de <strong className="text-white">efectivo</strong> además de pago digital).
                             </p>
                           </div>
