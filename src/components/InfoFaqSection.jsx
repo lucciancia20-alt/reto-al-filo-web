@@ -645,7 +645,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
                   Documentación para Acreditación (Imprimible A4)
                 </span>
-                <p className="mt-0.5 font-mono text-xs leading-relaxed font-medium text-white">
+                <p className="mt-0.5 font-mono text-[11px] font-normal tracking-tight leading-relaxed text-white">
                   Descargá e imprimí tu Deslinde y el Modelo de Certificado / Apto Médico
                 </p>
               </div>
