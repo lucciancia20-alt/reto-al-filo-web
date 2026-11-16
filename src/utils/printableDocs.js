@@ -471,6 +471,10 @@ export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } 
   const is27 = runner?.distance === '27K';
   const is13 = runner?.distance === '13K';
 
+  const storageKeyPrefix = 'raf_doc_profile_';
+  const initialDniDigits = String(runner?.dni || '').replace(/\D/g, '');
+  const hasPrefilledRunner = Boolean(runner && (runner.dni || runner.code || runner.distance));
+
   const bodyHtml = `
     <header class="doc-header">
       <div>
@@ -491,14 +495,14 @@ export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } 
 
     <div class="section-title">1 · Datos del Participante</div>
     <div class="grid-2">
-      <div class="field-row-edit"><span class="field-label">Apellido y Nombre:</span> <input type="text" class="doc-input doc-input-full" value="${escapeHtml(runner?.fullName || '')}" /></div>
-      <div class="field-row-edit"><span class="field-label">DNI / Pasaporte:</span> <input type="text" class="doc-input doc-input-full" value="${escapeHtml(runner?.dni || '')}" /></div>
-      <div class="field-row-edit"><span class="field-label">Fecha de Nacimiento:</span> <input type="text" class="doc-input doc-input-full" placeholder="DD / MM / AAAA" value="${escapeHtml(runner?.birthDate || '')}" /></div>
-      <div class="field-row-edit"><span class="field-label">Grupo Sanguíneo / RH:</span> <input type="text" class="doc-input doc-input-full" placeholder="Ej. O+" value="${escapeHtml(runner?.bloodType || '')}" /></div>
-      <div class="field-row-edit"><span class="field-label">Teléfono / WhatsApp:</span> <input type="text" class="doc-input doc-input-full" value="${escapeHtml(runner?.phone || '')}" /></div>
-      <div class="field-row-edit"><span class="field-label">Localidad / Provincia:</span> <input type="text" class="doc-input doc-input-full" value="${escapeHtml(runner?.city || '')}" /></div>
-      <div class="field-row-edit" style="grid-column: span 2;"><span class="field-label">Contacto de Emergencia (Nombre y Teléfono):</span> <input type="text" class="doc-input doc-input-full" value="${escapeHtml(emergencyText)}" /></div>
-      <div class="field-row-edit" style="grid-column: span 2;"><span class="field-label">En caso de menor de 18 años — Padre/Madre/Tutor y DNI:</span> <input type="text" class="doc-input doc-input-full" placeholder="Completar solo si corresponde" /></div>
+      <div class="field-row-edit"><span class="field-label">Apellido y Nombre:</span> <input type="text" data-field="fullName" id="waiver-name-1" class="doc-input doc-input-full" value="${escapeHtml(runner?.fullName || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">DNI / Pasaporte:</span> <input type="text" data-field="dni" id="waiver-dni-1" class="doc-input doc-input-full" value="${escapeHtml(runner?.dni || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">Fecha de Nacimiento:</span> <input type="text" data-field="birthDate" class="doc-input doc-input-full" placeholder="DD / MM / AAAA" value="${escapeHtml(runner?.birthDate || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">Grupo Sanguíneo / RH:</span> <input type="text" data-field="bloodType" class="doc-input doc-input-full" placeholder="Ej. O+" value="${escapeHtml(runner?.bloodType || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">Teléfono / WhatsApp:</span> <input type="text" data-field="phone" class="doc-input doc-input-full" value="${escapeHtml(runner?.phone || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">Localidad / Provincia:</span> <input type="text" data-field="city" class="doc-input doc-input-full" value="${escapeHtml(runner?.city || '')}" /></div>
+      <div class="field-row-edit" style="grid-column: span 2;"><span class="field-label">Contacto de Emergencia (Nombre y Teléfono):</span> <input type="text" data-field="emergencyContact" class="doc-input doc-input-full" value="${escapeHtml(emergencyText)}" /></div>
+      <div class="field-row-edit" style="grid-column: span 2;"><span class="field-label">En caso de menor de 18 años — Padre/Madre/Tutor y DNI:</span> <input type="text" data-field="guardianInfo" class="doc-input doc-input-full" placeholder="Completar solo si corresponde" /></div>
     </div>
 
     <div class="section-title">2 · Declaración Jurada y Deslinde de Responsabilidad</div>
@@ -518,8 +522,8 @@ export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } 
     <div class="signatures">
       <div class="sig-block">
         <div class="sig-line">Firma del Participante</div>
-        <div class="sig-sub">Aclaración: <input type="text" class="doc-input doc-input-inline" style="width: 195px;" value="${escapeHtml(runner?.fullName || '')}" /></div>
-        <div class="sig-sub" style="margin-top: 3px;">DNI N°: <input type="text" class="doc-input doc-input-inline" style="width: 95px;" value="${escapeHtml(runner?.dni || '')}" /> Fecha: <input type="text" class="doc-input doc-input-inline" style="width: 80px;" placeholder="DD/MM/AAAA" /></div>
+        <div class="sig-sub">Aclaración: <input type="text" id="waiver-name-2" class="doc-input doc-input-inline" style="width: 195px;" value="${escapeHtml(runner?.fullName || '')}" /></div>
+        <div class="sig-sub" style="margin-top: 3px;">DNI N°: <input type="text" id="waiver-dni-2" class="doc-input doc-input-inline" style="width: 95px;" value="${escapeHtml(runner?.dni || '')}" /> Fecha: <input type="text" data-field="signDate" class="doc-input doc-input-inline" style="width: 80px;" placeholder="DD/MM/AAAA" /></div>
       </div>
       <div class="sig-block">
         <div class="sig-line">Control Organización / Acreditación</div>
@@ -527,7 +531,7 @@ export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } 
           <label class="chk-label" style="font-weight:500;"><input type="checkbox" class="chk-input" /> DNI verificado</label>
           <label class="chk-label" style="font-weight:500;"><input type="checkbox" class="chk-input" /> Apto Médico recibido</label>
         </div>
-        <div class="sig-sub" style="margin-top: 3px;">Dorsal N° asignado: <input type="text" class="doc-input doc-input-inline" style="width: 75px; text-align:center;" value="${escapeHtml(runner?.assignedBib || '')}" /></div>
+        <div class="sig-sub" style="margin-top: 3px;">Dorsal N° asignado: <input type="text" class="doc-input doc-input-inline" style="width: 75px; text-align:center;" value="${escapeHtml(runner?.assignedBib ? `#${runner.assignedBib}` : '')}" /></div>
       </div>
     </div>
 
@@ -535,6 +539,58 @@ export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } 
       <span>${escapeHtml(meta.raceTitle)} · ${escapeHtml(meta.locationName)}</span>
       <span>Consultas WhatsApp Org.: ${escapeHtml(meta.whatsappNumber)}</span>
     </footer>
+
+    <script>
+      (function () {
+        var prefix = ${JSON.stringify(storageKeyPrefix)};
+        var prefilled = ${JSON.stringify(hasPrefilledRunner)};
+        var initialDni = ${JSON.stringify(initialDniDigits)};
+        var n1 = document.getElementById('waiver-name-1');
+        var n2 = document.getElementById('waiver-name-2');
+        var d1 = document.getElementById('waiver-dni-1');
+        var d2 = document.getElementById('waiver-dni-2');
+        if (n1 && n2) n1.addEventListener('input', function () { n2.value = n1.value; });
+        if (d1 && d2) d1.addEventListener('input', function () { d2.value = d1.value; });
+
+        function getDniKey() {
+          var raw = (d1 && d1.value ? d1.value : initialDni).replace(/\\D/g, '');
+          return raw.length >= 6 ? prefix + raw : '';
+        }
+
+        function saveProfile() {
+          try {
+            var key = getDniKey();
+            if (!key) return;
+            var prev = {};
+            try { prev = JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch (e) {}
+            document.querySelectorAll('[data-field]').forEach(function (el) {
+              var k = el.getAttribute('data-field');
+              if (k && k !== 'dni') prev[k] = el.value || '';
+            });
+            localStorage.setItem(key, JSON.stringify(prev));
+          } catch (e) {}
+        }
+
+        if (prefilled && initialDni) {
+          try {
+            var saved = JSON.parse(localStorage.getItem(prefix + initialDni) || 'null');
+            if (saved && typeof saved === 'object') {
+              document.querySelectorAll('[data-field]').forEach(function (el) {
+                var k = el.getAttribute('data-field');
+                if (k && k !== 'dni' && !el.value && saved[k]) {
+                  el.value = saved[k];
+                }
+              });
+              if (n1 && n2 && !n2.value) n2.value = n1.value;
+            }
+          } catch (e) {}
+        }
+
+        document.querySelectorAll('[data-field]').forEach(function (el) {
+          el.addEventListener('input', saveProfile);
+        });
+      })();
+    </script>
   `;
 
   return openPrintableHtmlWindow(`Deslinde Oficial - ${meta.raceTitle}`, bodyHtml, { autoPrint: false });
@@ -547,6 +603,9 @@ export function openPrintableMedicalCert({ raceConfig = RACE_CONFIG, runner = nu
   const meta = buildEventMeta(raceConfig);
   const is27 = runner?.distance === '27K';
   const is13 = runner?.distance === '13K';
+  const storageKeyPrefix = 'raf_doc_profile_';
+  const initialDniDigits = String(runner?.dni || '').replace(/\D/g, '');
+  const hasPrefilledRunner = Boolean(runner && (runner.dni || runner.code || runner.distance));
 
   const bodyHtml = `
     <header class="doc-header">
@@ -568,11 +627,11 @@ export function openPrintableMedicalCert({ raceConfig = RACE_CONFIG, runner = nu
 
     <div class="section-title">1 · Identificación del Corredor/a</div>
     <div class="grid-2">
-      <div class="field-row-edit"><span class="field-label">Apellido y Nombre:</span> <input type="text" id="med-name-1" class="doc-input doc-input-full" value="${escapeHtml(runner?.fullName || '')}" /></div>
-      <div class="field-row-edit"><span class="field-label">DNI / Pasaporte:</span> <input type="text" id="med-dni-1" class="doc-input doc-input-full" value="${escapeHtml(runner?.dni || '')}" /></div>
-      <div class="field-row-edit"><span class="field-label">Fecha de Nacimiento / Edad:</span> <input type="text" class="doc-input doc-input-full" placeholder="DD / MM / AAAA" value="${escapeHtml(runner?.birthDate || '')}" /></div>
-      <div class="field-row-edit"><span class="field-label">Grupo Sanguíneo y Factor RH:</span> <input type="text" class="doc-input doc-input-full" placeholder="Ej. A+" value="${escapeHtml(runner?.bloodType || '')}" /></div>
-      <div class="field-row-edit" style="grid-column: span 2;"><span class="field-label">Obra Social / Alergias / Medicación actual:</span> <input type="text" class="doc-input doc-input-full" value="${escapeHtml(runner?.medicalNotes || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">Apellido y Nombre:</span> <input type="text" data-field="fullName" id="med-name-1" class="doc-input doc-input-full" value="${escapeHtml(runner?.fullName || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">DNI / Pasaporte:</span> <input type="text" data-field="dni" id="med-dni-1" class="doc-input doc-input-full" value="${escapeHtml(runner?.dni || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">Fecha de Nacimiento / Edad:</span> <input type="text" data-field="birthDate" class="doc-input doc-input-full" placeholder="DD / MM / AAAA" value="${escapeHtml(runner?.birthDate || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">Grupo Sanguíneo y Factor RH:</span> <input type="text" data-field="bloodType" class="doc-input doc-input-full" placeholder="Ej. A+" value="${escapeHtml(runner?.bloodType || '')}" /></div>
+      <div class="field-row-edit" style="grid-column: span 2;"><span class="field-label">Obra Social / Alergias / Medicación actual:</span> <input type="text" data-field="medicalNotes" class="doc-input doc-input-full" value="${escapeHtml(runner?.medicalNotes || '')}" /></div>
     </div>
 
     <div class="section-title">2 · Certificado Médico de Aptitud Física (Completar por el Profesional)</div>
@@ -583,7 +642,7 @@ export function openPrintableMedicalCert({ raceConfig = RACE_CONFIG, runner = nu
         complementarios que consideré pertinentes en función de su edad y antecedentes, encontrándose actualmente
         <strong>APTO/A FÍSICAMENTE</strong> y sin contraindicaciones médicas aparentes para participar en competencias
         de <strong>Trail Running / Carrera de Montaña de esfuerzo físico intenso y competitivo</strong>
-        (modalidad <input type="text" class="doc-input doc-input-inline" style="width: 72px; text-align:center;" value="${escapeHtml(runner?.distance || '13K / 27K')}" /> en ambiente serrano),
+        (modalidad <input type="text" class="doc-input doc-input-inline" style="width: 72px; text-align:center;" value="${escapeHtml(runner?.distance || '')}" placeholder="27K / 13K" /> en ambiente serrano),
         correspondiente al evento <strong>${escapeHtml(meta.raceTitle)}</strong>.
       </p>
 
@@ -614,17 +673,58 @@ export function openPrintableMedicalCert({ raceConfig = RACE_CONFIG, runner = nu
 
     <footer class="footer-meta">
       <span>${escapeHtml(meta.raceTitle)} · ${escapeHtml(meta.locationName)}</span>
-      <span>Archivo oficial para imprimir en hoja A4</span>
+      <span>Consultas WhatsApp Org.: ${escapeHtml(meta.whatsappNumber)}</span>
     </footer>
 
     <script>
       (function () {
+        var prefix = ${JSON.stringify(storageKeyPrefix)};
+        var prefilled = ${JSON.stringify(hasPrefilledRunner)};
+        var initialDni = ${JSON.stringify(initialDniDigits)};
         var n1 = document.getElementById('med-name-1');
         var n2 = document.getElementById('med-name-2');
         var d1 = document.getElementById('med-dni-1');
         var d2 = document.getElementById('med-dni-2');
         if (n1 && n2) n1.addEventListener('input', function () { n2.value = n1.value; });
         if (d1 && d2) d1.addEventListener('input', function () { d2.value = d1.value; });
+
+        function getDniKey() {
+          var raw = (d1 && d1.value ? d1.value : initialDni).replace(/\\D/g, '');
+          return raw.length >= 6 ? prefix + raw : '';
+        }
+
+        function saveProfile() {
+          try {
+            var key = getDniKey();
+            if (!key) return;
+            var prev = {};
+            try { prev = JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch (e) {}
+            document.querySelectorAll('[data-field]').forEach(function (el) {
+              var k = el.getAttribute('data-field');
+              if (k && k !== 'dni') prev[k] = el.value || '';
+            });
+            localStorage.setItem(key, JSON.stringify(prev));
+          } catch (e) {}
+        }
+
+        if (prefilled && initialDni) {
+          try {
+            var saved = JSON.parse(localStorage.getItem(prefix + initialDni) || 'null');
+            if (saved && typeof saved === 'object') {
+              document.querySelectorAll('[data-field]').forEach(function (el) {
+                var k = el.getAttribute('data-field');
+                if (k && k !== 'dni' && !el.value && saved[k]) {
+                  el.value = saved[k];
+                }
+              });
+              if (n1 && n2 && !n2.value) n2.value = n1.value;
+            }
+          } catch (e) {}
+        }
+
+        document.querySelectorAll('[data-field]').forEach(function (el) {
+          el.addEventListener('input', saveProfile);
+        });
       })();
     </script>
   `;
