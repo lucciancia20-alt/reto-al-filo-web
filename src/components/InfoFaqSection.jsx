@@ -296,7 +296,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                     const isRejected = st.status === 'rejected';
                     const badgeConfig = isConfirmed
                       ? {
-                          wrapper: 'border-emerald-500/80 bg-zinc-950',
+                          wrapper: 'border-orange-500/80 bg-zinc-950',
                           pill: 'bg-zinc-950 border-emerald-500/80 text-emerald-400',
                           label: 'Inscripción Confirmada',
                         }
@@ -336,13 +336,10 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                             </span>
                           </div>
 
-                          <div className="font-display font-black text-base sm:text-lg text-white">
+                          <div className="font-display text-base sm:text-lg text-orange-400">
                             {isConfirmed ? (
-                              <span className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 border border-orange-500 px-3 py-1 text-orange-400">
-                                Dorsal:{' '}
-                                <span className="text-white">
-                                  {st.assignedBib ? `#${st.assignedBib}` : 'A asignar en mesa'}
-                                </span>
+                              <span className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500/80 px-3 py-1 font-medium text-orange-400">
+                                Dorsal: {st.assignedBib ? `#${st.assignedBib}` : 'A asignar en mesa'}
                               </span>
                             ) : (
                               <span className="text-xs font-semibold text-stone-300">
