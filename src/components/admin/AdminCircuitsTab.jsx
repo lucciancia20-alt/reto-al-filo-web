@@ -53,7 +53,7 @@ export default function AdminCircuitsTab({
             type="text"
             value={activeCircuitDraft.elevationGain}
             onChange={(e) => onUpdateCircuitField(editDistance, 'elevationGain', e.target.value)}
-            className={`w-full rounded-xl bg-zinc-950 ${circuitInputBorderClass} px-3 py-2 text-sm font-mono font-semibold text-white`}
+            className={`w-full rounded-xl bg-zinc-950 ${circuitInputBorderClass} px-3 py-2 text-xs font-mono font-semibold text-white`}
           />
         </div>
         <div>
@@ -62,7 +62,7 @@ export default function AdminCircuitsTab({
             type="text"
             value={activeCircuitDraft.cutoffTime}
             onChange={(e) => onUpdateCircuitField(editDistance, 'cutoffTime', e.target.value)}
-            className={`w-full rounded-xl bg-zinc-950 ${circuitInputBorderClass} px-3 py-2 text-sm font-mono font-semibold text-white`}
+            className={`w-full rounded-xl bg-zinc-950 ${circuitInputBorderClass} px-3 py-2 text-xs font-mono font-semibold text-white`}
           />
         </div>
         <div>
@@ -71,7 +71,7 @@ export default function AdminCircuitsTab({
             type="text"
             value={activeCircuitDraft.summaryBadge}
             onChange={(e) => onUpdateCircuitField(editDistance, 'summaryBadge', e.target.value)}
-            className={`w-full rounded-xl bg-zinc-950 ${circuitInputBorderClass} px-3 py-2 text-sm font-mono font-semibold text-white`}
+            className={`w-full rounded-xl bg-zinc-950 ${circuitInputBorderClass} px-3 py-2 text-xs font-mono font-semibold text-white`}
           />
         </div>
         <div className="sm:col-span-3">
@@ -82,7 +82,7 @@ export default function AdminCircuitsTab({
             rows={1}
             value={activeCircuitDraft.description}
             onChange={(e) => onUpdateCircuitField(editDistance, 'description', e.target.value)}
-            className={`rounded-xl bg-zinc-950 ${circuitInputBorderClass} px-3 py-2 text-sm text-white`}
+            className={`rounded-xl bg-zinc-950 ${circuitInputBorderClass} px-3 py-2 text-xs text-white`}
           />
         </div>
       </div>
