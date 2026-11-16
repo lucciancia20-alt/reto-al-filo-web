@@ -171,7 +171,7 @@ export default function AdminRegistrationsTab({
         aria-label={`Ordenar por ${label}`}
         className={`inline-flex items-center gap-1 rounded-lg bg-stone-950 border px-2 py-1 text-[11px] transition-colors cursor-pointer ${
           isActive
-            ? 'border-orange-500 text-orange-400 font-bold'
+            ? 'border-orange-500 text-orange-400 font-medium'
             : 'border-orange-500/40 text-white/85 hover:text-white font-medium'
         }`}
       >
@@ -204,7 +204,7 @@ export default function AdminRegistrationsTab({
         aria-pressed={isActive}
         className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] transition-colors cursor-pointer ${
           isActive
-            ? 'bg-stone-950 border-red-500 ring-1 ring-red-500/50 text-white font-bold'
+            ? 'bg-stone-950 border-red-500 ring-1 ring-red-500/50 text-white font-medium'
             : 'bg-stone-950 border-orange-500/60 text-zinc-200 hover:border-orange-400 hover:text-white font-medium'
         }`}
       >
@@ -214,13 +214,13 @@ export default function AdminRegistrationsTab({
           </span>
         )}
         <span>{label}</span>
-        <span className={hasDuplicates ? 'text-red-500 font-bold' : 'text-zinc-500'}>
+        <span className={hasDuplicates ? 'text-red-500 font-medium' : 'text-zinc-500'}>
           ({count})
         </span>
         {isActive && (
           <span
             aria-hidden="true"
-            className="ml-0.5 text-[10px] leading-none text-red-500 font-bold"
+            className="ml-0.5 text-[10px] leading-none text-red-500 font-medium"
           >
             ✕
           </span>
@@ -403,14 +403,14 @@ export default function AdminRegistrationsTab({
             }`}
           >
             <span
-              className={`flex items-center justify-center gap-1.5 text-[10px] leading-4 uppercase tracking-wider font-bold ${
+              className={`flex items-center justify-center gap-1.5 text-[10px] leading-4 uppercase tracking-wider font-medium ${
                 stat.isActive ? 'text-white' : stat.labelClass
               }`}
             >
               {stat.isActive && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${stat.dotClass}`} />}
               <span>{stat.label}</span>
             </span>
-            <span className="font-display text-xl font-black">{stat.value}</span>
+            <span className="font-display text-xl font-medium">{stat.value}</span>
           </button>
         ))}
       </div>
@@ -424,19 +424,19 @@ export default function AdminRegistrationsTab({
             onChange={(e) => setRegDistanceFilter(e.target.value)}
             className={`rounded-xl bg-zinc-950 border focus:outline-none pl-2.5 pr-5 py-1.5 text-xs font-mono transition-colors shrink-0 ${
               regDistanceFilter === '27K'
-                ? 'text-cyan-400 font-bold border-cyan-500/60 focus:border-cyan-400'
+                ? 'text-cyan-400 font-medium border-cyan-500/60 focus:border-cyan-400'
                 : regDistanceFilter === '13K'
-                  ? 'text-red-500 font-bold border-red-500/60 focus:border-red-500'
+                  ? 'text-red-500 font-medium border-red-500/60 focus:border-red-500'
                   : 'text-white font-semibold border-white/15 focus:border-orange-400'
             }`}
           >
             <option value="all" className="bg-stone-950 text-white font-normal">
               Todas las distancias
             </option>
-            <option value="27K" className="bg-stone-950 text-cyan-400 font-bold">
+            <option value="27K" className="bg-stone-950 text-cyan-400 font-medium">
               Solo 27K
             </option>
-            <option value="13K" className="bg-stone-950 text-red-500 font-bold">
+            <option value="13K" className="bg-stone-950 text-red-500 font-medium">
               Solo 13K
             </option>
           </select>
@@ -450,19 +450,19 @@ export default function AdminRegistrationsTab({
             }}
             className={`rounded-xl bg-zinc-950 border focus:outline-none pl-2.5 pr-5 py-1.5 text-xs font-mono transition-colors shrink-0 ${
               regStatusFilter === 'pendiente'
-                ? 'text-amber-400 border-amber-500/60 focus:border-amber-400 font-bold'
+                ? 'text-amber-400 border-amber-500/60 focus:border-amber-400 font-medium'
                 : regStatusFilter === 'confirmado'
-                  ? 'text-emerald-400 border-emerald-500/60 focus:border-emerald-400 font-bold'
+                  ? 'text-emerald-400 border-emerald-500/60 focus:border-emerald-400 font-medium'
                   : 'text-white font-semibold border-white/15 focus:border-orange-400'
             }`}
           >
             <option value="all" className="bg-stone-950 text-white font-normal">
               Todos los estados
             </option>
-            <option value="pendiente" className="bg-stone-950 text-amber-400 font-bold">
+            <option value="pendiente" className="bg-stone-950 text-amber-400 font-medium">
               Pendientes
             </option>
-            <option value="confirmado" className="bg-stone-950 text-emerald-400 font-bold">
+            <option value="confirmado" className="bg-stone-950 text-emerald-400 font-medium">
               Confirmados
             </option>
             <option value="rechazado" className="bg-stone-950 text-white font-normal">
@@ -474,7 +474,7 @@ export default function AdminRegistrationsTab({
             type="button"
             onClick={onExportExcel}
             disabled={registrationsCount === 0}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 text-xs font-bold px-2.5 sm:px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 text-xs font-medium px-2.5 sm:px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
           >
             <Download className="w-3.5 h-3.5 shrink-0" />
             Exportar Excel (.XLSX)
@@ -485,7 +485,7 @@ export default function AdminRegistrationsTab({
             onClick={onPrintAccreditationSheet}
             disabled={(regStats.confirmed || 0) === 0}
             title="Imprimir planilla A4 de acreditación y seguridad SOS ordenada por dorsal"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900/80 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-xs font-bold px-2.5 sm:px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900/80 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-xs font-medium px-2.5 sm:px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
           >
             <Printer className="w-3.5 h-3.5 shrink-0" />
             Imprimir Planilla Acreditación / SOS
@@ -496,7 +496,7 @@ export default function AdminRegistrationsTab({
             target="_blank"
             rel="noopener noreferrer"
             title="Abrir actividad y transferencias recibidas en Mercado Pago"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-sky-400 border border-sky-500/60 text-xs font-bold px-2.5 sm:px-3 py-1.5 transition-colors whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-sky-400 border border-sky-500/60 text-xs font-medium px-2.5 sm:px-3 py-1.5 transition-colors whitespace-nowrap shrink-0"
           >
             <Wallet className="w-3.5 h-3.5 shrink-0" />
             <span>Mercado Pago</span>
@@ -507,7 +507,7 @@ export default function AdminRegistrationsTab({
         {/* Resumen en vivo de Talles (Confirmados / Activos) y Acreditación */}
         <div className="pt-2 border-t border-stone-800/80 flex flex-col xl:flex-row xl:items-center justify-between gap-2 text-[11px]">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-stone-400 mr-1">
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-stone-400 mr-1">
               <Shirt className="w-3.5 h-3.5 text-amber-400" />
               Talles (Conf/Tot):
             </span>
@@ -521,13 +521,13 @@ export default function AdminRegistrationsTab({
                   title={`Filtrar por talle ${item.size}: ${item.confirmed} confirmados de ${item.total} inscriptos no rechazados`}
                   className={`inline-flex items-center gap-1 rounded-lg border px-2 py-0.5 font-mono transition-colors cursor-pointer ${
                     isSelected
-                      ? 'bg-amber-500/20 border-amber-400 ring-1 ring-amber-400/70 shadow-sm text-white font-bold'
+                      ? 'bg-amber-500/20 border-amber-400 ring-1 ring-amber-400/70 shadow-sm text-white font-medium'
                       : 'bg-zinc-900/80 border-amber-500/60 text-white hover:border-amber-400'
                   }`}
                 >
                   <span className="text-white font-semibold">{item.size}:</span>
                   <span>
-                    <strong className="text-white font-bold">{item.confirmed}</strong>/{item.total}
+                    <strong className="text-white font-medium">{item.confirmed}</strong>/{item.total}
                   </span>
                 </button>
               );
@@ -544,7 +544,7 @@ export default function AdminRegistrationsTab({
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5 shrink-0">
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-stone-400 mr-0.5">
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-stone-400 mr-0.5">
               <PackageCheck className="w-3.5 h-3.5 text-emerald-400" />
               Mesa Kit:
             </span>
@@ -555,7 +555,7 @@ export default function AdminRegistrationsTab({
               }
               className={`rounded-lg border px-2 py-0.5 text-[11px] font-semibold transition-colors cursor-pointer ${
                 regCheckInFilter === 'checked'
-                  ? 'bg-zinc-950 border-orange-500 ring-1 ring-orange-500/70 text-white font-bold'
+                  ? 'bg-zinc-950 border-orange-500 ring-1 ring-orange-500/70 text-white font-medium'
                   : 'bg-zinc-950 border-orange-500/60 text-white hover:border-orange-400'
               }`}
             >
@@ -570,7 +570,7 @@ export default function AdminRegistrationsTab({
               }
               className={`rounded-lg border px-2 py-0.5 text-[11px] font-semibold transition-colors cursor-pointer ${
                 regCheckInFilter === 'pending_checkin'
-                  ? 'bg-zinc-950 border-orange-500 ring-1 ring-orange-500/70 text-white font-bold'
+                  ? 'bg-zinc-950 border-orange-500 ring-1 ring-orange-500/70 text-white font-medium'
                   : 'bg-zinc-950 border-orange-500/60 text-white hover:border-orange-400'
               }`}
             >
@@ -634,7 +634,7 @@ export default function AdminRegistrationsTab({
           {filteredRegistrations.length === 0 ? (
             <div className="rounded-2xl bg-stone-950 border border-stone-800 p-8 text-center space-y-1.5">
               <Users className="w-8 h-8 text-stone-600 mx-auto" />
-              <p className="text-sm font-bold text-stone-200">
+              <p className="text-sm font-medium text-stone-200">
                 {registrationsCount === 0
                   ? 'Todavía no hay corredores inscriptos desde el formulario web.'
                   : 'Ningún inscripto coincide con tu filtro actual.'}
@@ -678,11 +678,11 @@ export default function AdminRegistrationsTab({
                   {/* Identificación rápida del corredor (estructura fija en 2 líneas) */}
                   <div className="min-w-[270px] flex-1 space-y-1.5">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="font-mono text-[10px] sm:text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-stone-950 border border-amber-500/60 text-white shrink-0">
+                      <span className="font-mono text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded-md bg-stone-950 border border-amber-500/60 text-white shrink-0">
                         {reg.code}
                       </span>
                       <span
-                        className={`text-[10px] sm:text-[11px] font-black px-1.5 py-0.5 rounded-md border shrink-0 ${
+                        className={`text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded-md border shrink-0 ${
                           reg.distance === '13K'
                             ? 'bg-stone-950 border-red-500 text-red-500'
                             : 'bg-stone-950 border-cyan-500 text-cyan-400'
@@ -702,12 +702,12 @@ export default function AdminRegistrationsTab({
                         DNI {reg.dni}
                       </span>
                       <span
-                        className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shrink-0 ${statusBadgeClass}`}
+                        className={`text-[10px] font-medium uppercase px-2 py-0.5 rounded-full border shrink-0 ${statusBadgeClass}`}
                       >
                         {reg.status}
                       </span>
                       {reg.checkedIn && (
-                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border border-emerald-500/60 bg-emerald-500/15 text-emerald-300 shrink-0">
+                        <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-full border border-emerald-500/60 bg-emerald-500/15 text-emerald-300 shrink-0">
                           Kit ✓
                         </span>
                       )}
@@ -744,13 +744,13 @@ export default function AdminRegistrationsTab({
                         placeholder="Dorsal"
                         className={
                           isDuplicateBib
-                            ? `w-12 rounded-lg bg-zinc-950 border border-red-500 px-1 py-1 text-xs font-mono font-bold text-red-500 text-center ${
+                            ? `w-12 rounded-lg bg-zinc-950 border border-red-500 px-1 py-1 text-xs font-mono font-medium text-red-500 text-center ${
                                 isBibLocked
                                   ? 'cursor-default'
                                   : 'focus:border-red-400 focus:outline-none'
                               }`
                             : isBibLocked
-                              ? 'w-12 rounded-lg bg-zinc-950 border border-orange-500/40 px-1 py-1 text-xs font-mono font-bold text-orange-400 text-center cursor-default'
+                              ? 'w-12 rounded-lg bg-zinc-950 border border-orange-500/40 px-1 py-1 text-xs font-mono font-medium text-orange-400 text-center cursor-default'
                               : 'w-12 rounded-lg bg-zinc-950 border border-orange-500 focus:border-orange-400 focus:outline-none px-1 py-1 text-xs font-mono font-semibold text-white text-center'
                         }
                       />
@@ -783,7 +783,7 @@ export default function AdminRegistrationsTab({
                                 ? 'Guardar nuevo número de dorsal'
                                 : 'Guardar número de dorsal y confirmar inscripción'
                       }
-                      className={`inline-flex items-center gap-1 rounded-lg font-display font-black text-[10px] sm:text-[11px] uppercase px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
+                      className={`inline-flex items-center gap-1 rounded-lg font-display font-medium text-[10px] sm:text-[11px] uppercase px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
                         armedStatusAction === 'unconfirm'
                           ? 'bg-zinc-950 text-red-400 border border-red-500 ring-1 ring-red-500/60'
                           : armedStatusAction === 'confirm'
@@ -827,7 +827,7 @@ export default function AdminRegistrationsTab({
                                 ? 'Kit acreditado y entregado (clic para desmarcar)'
                                 : 'Marcar kit entregado / corredor acreditado en mesa'
                         }
-                        className={`inline-flex items-center gap-1 rounded-lg border text-[10px] sm:text-[11px] font-bold px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
+                        className={`inline-flex items-center gap-1 rounded-lg border text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
                           armedKitAction === 'revoke'
                             ? 'bg-zinc-950 border-red-500 ring-1 ring-red-500/60 text-red-400'
                             : armedKitAction === 'deliver'
@@ -856,7 +856,7 @@ export default function AdminRegistrationsTab({
                         target="_blank"
                         rel="noopener noreferrer"
                         title="Ver comprobante adjunto"
-                        className="inline-flex items-center gap-1 rounded-lg bg-stone-950 hover:bg-white/5 text-sky-400 border border-sky-500/60 text-[10px] sm:text-[11px] font-bold px-2 py-1 transition-colors"
+                        className="inline-flex items-center gap-1 rounded-lg bg-stone-950 hover:bg-white/5 text-sky-400 border border-sky-500/60 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">Comprobante</span>
@@ -870,7 +870,7 @@ export default function AdminRegistrationsTab({
                         rel="noopener noreferrer"
                         title="Enviar confirmación por WhatsApp"
                         aria-label={`Enviar WhatsApp a ${reg.fullName}`}
-                        className="inline-flex items-center gap-1 rounded-lg bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 text-[10px] sm:text-[11px] font-bold px-2 py-1 transition-colors"
+                        className="inline-flex items-center gap-1 rounded-lg bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
                       >
                         <MessageCircle className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">WhatsApp</span>

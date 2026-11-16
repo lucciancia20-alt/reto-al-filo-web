@@ -34,7 +34,7 @@ export default function AdminLoginView({
           <span className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-400 inline-flex items-center justify-center">
             <ShieldCheck className="w-6 h-6" />
           </span>
-          <h3 className="mt-3 font-display text-xl font-extrabold text-white">
+          <h3 className="mt-3 font-display text-xl font-medium text-white">
             Acceso de Organización
           </h3>
           <p className="mt-1 text-xs text-stone-400">

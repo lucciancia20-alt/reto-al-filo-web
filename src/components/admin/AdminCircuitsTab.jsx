@@ -36,7 +36,7 @@ export default function AdminCircuitsTab({
               key={d}
               type="button"
               onClick={() => onSelectDistance(d)}
-              className={`px-4 py-2 rounded-xl font-display font-bold text-xs uppercase leading-none cursor-pointer transition-colors ${colorClass}`}
+              className={`px-4 py-2 rounded-xl font-display font-medium text-xs uppercase leading-none cursor-pointer transition-colors ${colorClass}`}
             >
               Circuito {d}
             </button>
@@ -91,7 +91,7 @@ export default function AdminCircuitsTab({
       <div className="rounded-2xl bg-stone-950 border border-stone-800 p-4 space-y-3">
         <div className="flex items-center justify-between gap-2">
           <div>
-            <h4 className="font-display text-sm font-bold text-white uppercase">
+            <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
               Puestos de Hidratación (
               <span className={editDistance === '13K' ? 'text-red-500' : 'text-cyan-400'}>
                 {editDistance}
@@ -105,7 +105,7 @@ export default function AdminCircuitsTab({
           <button
             type="button"
             onClick={onAddStation}
-            className={`inline-flex items-center gap-1 rounded-xl border text-xs font-bold px-3 py-1.5 cursor-pointer transition-colors ${
+            className={`inline-flex items-center gap-1 rounded-xl border text-xs font-medium px-3 py-1.5 cursor-pointer transition-colors ${
               editDistance === '13K'
                 ? 'bg-zinc-950 text-red-500 border-red-500/70 hover:border-red-400'
                 : 'bg-zinc-950 text-cyan-400 border-cyan-500/70 hover:border-cyan-400'
@@ -167,7 +167,7 @@ export default function AdminCircuitsTab({
       {/* Cargar nuevo archivo .GPX */}
       <div className="rounded-2xl bg-stone-950 border border-stone-800 p-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h4 className="font-display text-sm font-bold text-white uppercase">
+          <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
             Reemplazar Track .GPX (
             <span className={editDistance === '13K' ? 'text-red-500' : 'text-cyan-400'}>
               {editDistance}
@@ -191,7 +191,7 @@ export default function AdminCircuitsTab({
               Usar GPX original
             </button>
           )}
-          <label className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 transition-colors text-xs font-bold px-3.5 py-2 cursor-pointer">
+          <label className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 transition-colors text-xs font-medium px-3.5 py-2 cursor-pointer">
             <Upload className="w-4 h-4 text-orange-500" />
             Subir archivo .GPX
             <input type="file" accept=".gpx" onChange={onGpxFileUpload} className="hidden" />

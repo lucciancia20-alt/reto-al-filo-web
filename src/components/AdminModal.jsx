@@ -1215,7 +1215,7 @@ export default function AdminModal({
               {unlocked ? <ShieldCheck className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
             </span>
             <div className="min-w-0">
-              <h2 className="font-display text-base sm:text-lg font-black text-white uppercase truncate">
+              <h2 className="font-display text-base sm:text-lg font-medium text-white uppercase tracking-wide truncate">
                 Panel de Organización · Reto al Filo
               </h2>
               <p className="text-xs text-stone-400 truncate">
@@ -1483,7 +1483,7 @@ export default function AdminModal({
                     type="submit"
                     form="admin-photo-form"
                     disabled={photoSubmitting}
-                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
                   >
                     <Camera className="w-4 h-4" />
                     {photoSubmitting
@@ -1501,7 +1501,7 @@ export default function AdminModal({
                           ?.scrollIntoView({ behavior: 'smooth' });
                       }, 80);
                     }}
-                    className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-6 py-3 transition-colors cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4 text-orange-500" />
                     ✓ Listo · Ver Galería en la Web
@@ -1512,7 +1512,7 @@ export default function AdminModal({
                   type="button"
                   onClick={loadRegistrations}
                   disabled={regsLoading}
-                  className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
                 >
                   <RefreshCw className={`w-4 h-4 text-orange-500 ${regsLoading ? 'animate-spin' : ''}`} />
                   {regsLoading ? 'Actualizando...' : 'Actualizar Inscriptos'}
@@ -1522,7 +1522,7 @@ export default function AdminModal({
                   type="button"
                   onClick={handleSaveAll}
                   disabled={saving || !hasUnsavedChanges}
-                  className={`inline-flex items-center gap-2 rounded-xl font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 transition-colors ${
+                  className={`inline-flex items-center gap-2 rounded-xl font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-6 py-3 transition-colors ${
                     hasUnsavedChanges || saving
                       ? 'bg-amber-400 hover:bg-amber-300 text-black shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50'
                       : 'bg-zinc-950 border border-orange-500/80 text-zinc-400 cursor-default'

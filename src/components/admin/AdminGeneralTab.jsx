@@ -159,7 +159,7 @@ export default function AdminGeneralTab({
               disabled={testingEmail}
               onClick={handleTestEmailSend}
               title="Enviar correo de prueba real a esta dirección con EmailJS"
-              className="inline-flex items-center gap-1 rounded-xl bg-stone-950 hover:bg-stone-800 border border-orange-500/60 hover:border-orange-400 text-orange-400 font-bold text-xs px-2.5 py-1.5 shrink-0 cursor-pointer transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1 rounded-xl bg-stone-950 hover:bg-stone-800 border border-orange-500/60 hover:border-orange-400 text-orange-400 font-medium text-xs px-2.5 py-1.5 shrink-0 cursor-pointer transition-colors disabled:opacity-50"
             >
               {testingEmail ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -214,7 +214,7 @@ export default function AdminGeneralTab({
         <div className="flex items-center gap-2">
           <Landmark className="w-4 h-4 text-orange-500 shrink-0" />
           <div>
-            <h4 className="font-display text-sm font-bold text-white uppercase">
+            <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
               Valores y Cuenta Bancaria para Inscripciones
             </h4>
             <p className="text-[11px] text-stone-400">
@@ -227,26 +227,26 @@ export default function AdminGeneralTab({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <div>
             <label className="block text-xs font-semibold text-stone-300 mb-1">
-              Valor Inscripción <span className="text-cyan-400 font-bold">27K</span>
+              Valor Inscripción <span className="text-cyan-400 font-medium">27K</span>
             </label>
             <input
               type="text"
               value={draft.circuits?.['27K']?.price || ''}
               onChange={(e) => onUpdateCircuitField('27K', 'price', e.target.value)}
               placeholder="$45.000"
-              className="w-full rounded-xl bg-zinc-950 border border-cyan-500 focus:border-cyan-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-bold text-cyan-400"
+              className="w-full rounded-xl bg-zinc-950 border border-cyan-500 focus:border-cyan-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-medium text-cyan-400"
             />
           </div>
           <div>
             <label className="block text-xs font-semibold text-stone-300 mb-1">
-              Valor Inscripción <span className="text-red-500 font-bold">13K</span>
+              Valor Inscripción <span className="text-red-500 font-medium">13K</span>
             </label>
             <input
               type="text"
               value={draft.circuits?.['13K']?.price || ''}
               onChange={(e) => onUpdateCircuitField('13K', 'price', e.target.value)}
               placeholder="$32.000"
-              className="w-full rounded-xl bg-zinc-950 border border-red-500 focus:border-red-500 focus:outline-none px-3 py-1.5 text-sm font-mono font-bold text-red-500"
+              className="w-full rounded-xl bg-zinc-950 border border-red-500 focus:border-red-500 focus:outline-none px-3 py-1.5 text-sm font-mono font-medium text-red-500"
             />
           </div>
           <div>
@@ -353,7 +353,7 @@ export default function AdminGeneralTab({
               <div className="flex items-center gap-2">
                 <PackageCheck className="w-4 h-4 text-orange-500 shrink-0" />
                 <div>
-                  <h4 className="font-display text-sm font-bold text-white uppercase">
+                  <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
                     ¿Qué incluye la Inscripción? (Kit del Corredor)
                   </h4>
                   <p className="text-[11px] text-stone-400">
@@ -365,7 +365,7 @@ export default function AdminGeneralTab({
               <button
                 type="button"
                 onClick={handleAddKitItem}
-                className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-bold px-3 py-1.5 cursor-pointer transition-colors"
+                className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-medium px-3 py-1.5 cursor-pointer transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Agregar ítem</span>

@@ -155,7 +155,7 @@ export default function AdminPhotosTab({
       >
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <h4 className="font-display text-base font-bold text-white uppercase">
+            <h4 className="font-display text-base font-medium text-white uppercase tracking-wide">
               Subir Fotos de Muestra · 1ra Edición
             </h4>
             <p className="text-xs text-stone-400 mt-0.5">
@@ -189,7 +189,7 @@ export default function AdminPhotosTab({
             </div>
 
             <div className="flex flex-wrap items-center gap-2 shrink-0">
-              <label className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 cursor-pointer transition-colors">
+              <label className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 font-display font-medium text-xs uppercase tracking-wider px-3.5 py-2 cursor-pointer transition-colors">
                 <Upload className="w-4 h-4 text-orange-500" />
                 {photoFiles.length > 0 ? 'Cambiar Fotos' : 'Elegir Fotos'}
                 <input
@@ -234,7 +234,7 @@ export default function AdminPhotosTab({
           <button
             type="submit"
             disabled={photoSubmitting}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-5 py-3 shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-5 py-3 shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
           >
             <Upload className="w-4 h-4" />
             {photoSubmitting
@@ -271,7 +271,7 @@ export default function AdminPhotosTab({
       <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h4 className="font-display text-sm font-bold text-white uppercase">
+            <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
               Postales publicadas actualmente ({galleryCustomCount > 0 ? galleryCustomCount : '6 de muestra'})
             </h4>
             <p
@@ -365,7 +365,7 @@ export default function AdminPhotosTab({
                       }
                       className={`rounded-lg cursor-pointer shrink-0 transition-colors disabled:opacity-40 ${
                         confirmDeleteId === item.id
-                          ? 'px-2 py-1 text-[10px] font-bold bg-zinc-950 border border-red-500 text-red-400'
+                          ? 'px-2 py-1 text-[10px] font-medium bg-zinc-950 border border-red-500 text-red-400'
                           : 'p-1.5 text-stone-100 hover:text-red-400 hover:bg-zinc-900/40 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]'
                       }`}
                     >
@@ -433,10 +433,10 @@ export default function AdminPhotosTab({
 
             <div className="absolute bottom-0 inset-x-0 z-10 p-4 sm:p-5 bg-zinc-950/15 backdrop-blur-sm border-t-2 border-orange-500/85 flex items-center justify-between gap-2">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-orange-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                <span className="text-xs font-medium uppercase tracking-wider text-orange-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
                   1ra Edición · Reto al Filo
                 </span>
-                <p className="mt-0.5 text-sm sm:text-base font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                <p className="mt-0.5 text-sm sm:text-base font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
                   {galleryItems[previewIndex].sector}
                 </p>
               </div>

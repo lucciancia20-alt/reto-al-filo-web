@@ -55,7 +55,7 @@ export default function AdminScheduleFaqTab({
         aria-label={isConfirming ? `Confirmar: ${ariaLabel}` : ariaLabel}
         className={
           isConfirming
-            ? 'rounded-lg bg-red-500/15 border border-red-500 px-2 py-1 text-[11px] font-bold text-red-400 hover:bg-red-500/25 hover:text-white transition-colors cursor-pointer shrink-0'
+            ? 'rounded-lg bg-red-500/15 border border-red-500 px-2 py-1 text-[11px] font-medium text-red-400 hover:bg-red-500/25 hover:text-white transition-colors cursor-pointer shrink-0'
             : 'p-1.5 rounded-lg text-red-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/40 transition-colors cursor-pointer shrink-0'
         }
       >
@@ -147,13 +147,13 @@ export default function AdminScheduleFaqTab({
     <div className="space-y-3.5">
       <div>
         <div className="flex items-center justify-between mb-2">
-          <h4 className="font-display text-[11px] sm:text-xs text-white font-bold uppercase tracking-normal pl-3">
+          <h4 className="font-display text-[11px] sm:text-xs text-white font-medium uppercase tracking-wide pl-3">
             EDITAR CRONOGRAMA DEL DÍA DE CARRERA
           </h4>
           <button
             type="button"
             onClick={onAddSchedule}
-            className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 transition-colors text-xs font-bold px-3 py-1.5 cursor-pointer"
+            className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 transition-colors text-xs font-medium px-3 py-1.5 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             Agregar Día y Horario
@@ -190,7 +190,7 @@ export default function AdminScheduleFaqTab({
                     onChange={(e) => onScheduleChange(idx, 'title', e.target.value)}
                     placeholder="Título"
                     aria-label="Título"
-                    className="sm:col-span-4 w-full rounded-lg bg-zinc-950 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono font-bold text-white"
+                    className="sm:col-span-4 w-full rounded-lg bg-zinc-950 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono font-medium text-white"
                   />
                   <input
                     type="text"
@@ -215,7 +215,7 @@ export default function AdminScheduleFaqTab({
       </div>
 
       <div>
-        <h4 className="font-display text-[11px] sm:text-xs text-white font-bold uppercase tracking-normal sm:whitespace-nowrap mb-2.5 pl-3">
+        <h4 className="font-display text-[11px] sm:text-xs text-white font-medium uppercase tracking-wide sm:whitespace-nowrap mb-2.5 pl-3">
           EDITAR PREGUNTAS FRECUENTES, ELEMENTOS OBLIGATORIOS DIFERENCIADOS 27K VS 13K Y CATEGORÍAS POR EDAD Y PREMIACIÓN
         </h4>
         <div className="space-y-3">
@@ -228,7 +228,7 @@ export default function AdminScheduleFaqTab({
                 type="text"
                 value={faq.question}
                 onChange={(e) => onFaqChange(idx, 'question', e.target.value)}
-                className="w-full rounded-lg bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono font-bold text-white"
+                className="w-full rounded-lg bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono font-medium text-white"
               />
               <ResizableTextarea
                 rows={1}
@@ -246,7 +246,7 @@ export default function AdminScheduleFaqTab({
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
           <div>
-            <h4 className="font-display text-sm font-bold text-white uppercase">
+            <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
               Elementos Obligatorios Diferenciados (27K vs. 13K)
             </h4>
             <p className="text-[11px] text-stone-400">
@@ -280,13 +280,13 @@ export default function AdminScheduleFaqTab({
               className="rounded-xl bg-stone-900/70 border border-stone-800 p-3 space-y-2.5"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className={`font-display text-xs font-black uppercase ${col.accentText}`}>
+                <span className={`font-display text-xs font-medium uppercase ${col.accentText}`}>
                   {col.title}
                 </span>
                 <button
                   type="button"
                   onClick={() => handleAddGearItem(col.dist)}
-                  className={`inline-flex items-center gap-1 rounded-lg border text-[11px] font-bold px-2.5 py-1 cursor-pointer transition-colors ${col.btnClass}`}
+                  className={`inline-flex items-center gap-1 rounded-lg border text-[11px] font-medium px-2.5 py-1 cursor-pointer transition-colors ${col.btnClass}`}
                 >
                   <Plus className="w-3 h-3" />
                   <span>Agregar</span>
@@ -335,7 +335,7 @@ export default function AdminScheduleFaqTab({
           <div className="flex items-center gap-2">
             <Award className="w-4 h-4 text-amber-400 shrink-0" />
             <div>
-              <h4 className="font-display text-sm font-bold text-white uppercase">
+              <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
                 Categorías por Edad y Premiación
               </h4>
               <p className="text-[11px] text-stone-400">
@@ -347,7 +347,7 @@ export default function AdminScheduleFaqTab({
           <button
             type="button"
             onClick={handleAddBracket}
-            className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-bold px-3 py-1.5 cursor-pointer transition-colors"
+            className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-medium px-3 py-1.5 cursor-pointer transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Agregar Franja</span>
@@ -413,7 +413,7 @@ export default function AdminScheduleFaqTab({
                 onChange={(e) => handleBracketChange(idx, e.target.value)}
                 placeholder="Ej. 18 a 29 años"
                 aria-label={`Franja etaria ${idx + 1}`}
-                className="flex-1 min-w-0 w-full rounded-lg bg-zinc-950 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono font-bold text-white"
+                className="flex-1 min-w-0 w-full rounded-lg bg-zinc-950 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono font-medium text-white"
               />
               {renderDeleteButton(
                 `bracket-${b.id || idx}`,
