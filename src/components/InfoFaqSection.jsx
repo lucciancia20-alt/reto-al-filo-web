@@ -481,186 +481,208 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-stone-500 font-mono"
                 />
               </div>
-
               <button
                 type="submit"
                 disabled={lookupLoading}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 disabled:opacity-60 text-orange-400 font-display font-bold text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-colors cursor-pointer shrink-0"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 active:scale-[0.99] text-orange-400 font-display font-bold text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-all cursor-pointer disabled:opacity-60 shrink-0"
               >
                 {lookupLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-orange-500" />
+                    <span>Buscando...</span>
+                  </>
                 ) : (
-                  <Search className="w-4 h-4" />
+                  <>
+                    <Search className="w-4 h-4 text-orange-500" />
+                    <span>Consultar Estado</span>
+                  </>
                 )}
-                <span>{lookupLoading ? 'Buscando...' : 'Consultar Estado'}</span>
               </button>
             </form>
 
-            {lookupError && (
-              <p className="mt-3 text-xs font-semibold text-red-400 bg-stone-950 border border-red-500/50 rounded-xl px-3.5 py-2">
-                {lookupError}
-              </p>
-            )}
-
             {lookupResult && (
-              <div className="mt-4 rounded-2xl bg-stone-950 border border-orange-500/40 p-4">
-                {lookupResult.found ? (
-                  <div className="space-y-3">
-                    {(() => {
-                      const statusStyle = getStatusBadgeConfig(lookupResult.status);
-                      return (
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-stone-800">
-                          <div>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-mono text-xs font-extrabold text-orange-400">
-                                {lookupResult.code}
-                              </span>
-                              <span
-                                className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${statusStyle.cls}`}
-                              >
-                                {lookupResult.status === 'confirmado' ? (
-                                  <CheckCircle2 className="w-3 h-3" />
-                                ) : lookupResult.status === 'rechazado' ? (
-                                  <XCircle className="w-3 h-3" />
-                                ) : (
-                                  <Clock className="w-3 h-3" />
-                                )}
-                                {statusStyle.label}
-                              </span>
-                            </div>
-                            <p className="mt-1 font-display text-base sm:text-lg font-extrabold text-white">
-                              {lookupResult.fullName}
-                            </p>
+              <div className="mt-4">
+                {lookupResult.found && lookupResult.data ? (
+                  (() => {
+                    const st = lookupResult.data;
+                    const isConfirmed = st.status === 'confirmed';
+                    const isRejected = st.status === 'rejected';
+                    const badgeConfig = isConfirmed
+                      ? {
+                          wrapper: 'border-orange-500/80 bg-zinc-950',
+                          pill: 'bg-zinc-950 border-emerald-500/80 text-emerald-400',
+                          label: 'Inscripción Confirmada',
+                        }
+                      : isRejected
+                        ? {
+                            wrapper: 'border-red-500/80 bg-zinc-950',
+                            pill: 'bg-zinc-950 border-red-500/80 text-red-400',
+                            label: 'Observada / Rechazada',
+                          }
+                        : {
+                            wrapper: 'border-orange-500/80 bg-zinc-950',
+                            pill: 'bg-zinc-950 border-orange-500/80 text-orange-400',
+                            label: 'Pendiente de Verificación',
+                          };
+
+                    return (
+                      <div className={`rounded-2xl border p-4 space-y-3 ${badgeConfig.wrapper}`}>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span
+                              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-extrabold uppercase tracking-wider ${badgeConfig.pill}`}
+                            >
+                              {isConfirmed ? (
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                              ) : isRejected ? (
+                                <AlertCircle className="w-3.5 h-3.5" />
+                              ) : (
+                                <Clock className="w-3.5 h-3.5" />
+                              )}
+                              {badgeConfig.label}
+                            </span>
+                            <span className="font-mono text-xs text-stone-200 bg-zinc-950 border border-stone-700 rounded-lg px-2 py-0.5">
+                              {st.code}
+                            </span>
+                            <span className="text-xs font-bold text-stone-100">
+                              Iniciales: {st.initials}
+                            </span>
                           </div>
 
-                          <div className="text-left sm:text-right">
-                            <span className="block text-[10px] font-bold uppercase tracking-wider text-stone-400">
-                              Número de Dorsal
-                            </span>
-                            {lookupResult.bibNumber ? (
-                              <span className="inline-flex items-center gap-1 font-mono text-2xl font-black text-emerald-400">
-                                <Hash className="w-5 h-5" />
-                                {lookupResult.bibNumber}
+                          <div className="font-display text-base sm:text-lg text-orange-400">
+                            {isConfirmed ? (
+                              <span className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500/80 px-3 py-1 font-medium text-orange-400">
+                                Dorsal: {st.assignedBib ? `#${st.assignedBib}` : 'A asignar en mesa'}
                               </span>
                             ) : (
-                              <span className="text-xs font-semibold text-stone-400">
-                                {lookupResult.status === 'confirmado'
-                                  ? 'Asignación en curso'
-                                  : 'Se asigna al confirmar el pago'}
+                              <span className="text-xs font-semibold text-stone-300">
+                                Dorsal pendiente de confirmación
                               </span>
                             )}
                           </div>
                         </div>
-                      );
-                    })()}
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
-                      <div className="rounded-xl bg-zinc-950 border border-stone-800 px-3 py-2">
-                        <span className="block text-[10px] uppercase text-stone-400 font-bold">
-                          Distancia
-                        </span>
-                        <span className="font-extrabold text-white">{lookupResult.distance}</span>
-                      </div>
-                      <div className="rounded-xl bg-zinc-950 border border-stone-800 px-3 py-2">
-                        <span className="block text-[10px] uppercase text-stone-400 font-bold">
-                          Talle Remera
-                        </span>
-                        <span className="font-extrabold text-white">
-                          {lookupResult.shirtSize || '-'}
-                        </span>
-                      </div>
-                      <div className="rounded-xl bg-zinc-950 border border-stone-800 px-3 py-2 col-span-2 sm:col-span-1">
-                        <span className="block text-[10px] uppercase text-stone-400 font-bold">
-                          Acreditación / Kit
-                        </span>
-                        <span
-                          className={`font-extrabold ${
-                            lookupResult.checkedIn ? 'text-emerald-400' : 'text-stone-300'
-                          }`}
-                        >
-                          {lookupResult.checkedIn ? 'Kit Retirado' : 'Pendiente de Retiro'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {lookupResult.status === 'confirmado' && (
-                      <div className="pt-2 border-t border-stone-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                        <p className="text-[11px] text-stone-300">
-                          Podés descargar e imprimir tu comprobante oficial con código de dorsal y QR para agilizar la acreditación.
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() => openPrintableRunnerPass({ runner: lookupResult, raceConfig })}
-                          className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-bold text-xs uppercase tracking-wider px-4 py-2 transition-colors cursor-pointer shrink-0"
-                        >
-                          <Printer className="w-3.5 h-3.5 text-orange-500" />
-                          <span>Imprimir Pase Oficial (PDF)</span>
-                        </button>
-                      </div>
-                    )}
-
-                    {lookupResult.status === 'pendiente' && (
-                      <div className="pt-2 border-t border-stone-800 space-y-2.5">
-                        <p className="text-[11px] text-orange-200 leading-relaxed">
-                          ¿Se te cerró la pantalla después de anotarte o necesitás enviar/reenviar tu comprobante de transferencia? Adjuntalo acá directamente:
-                        </p>
-
-                        {receiptSuccess ? (
-                          <div className="flex items-center gap-2 rounded-xl bg-emerald-950/60 border border-emerald-500/70 px-3.5 py-2.5 text-xs font-semibold text-emerald-300">
-                            <CheckCircle2 className="w-4 h-4 shrink-0" />
-                            <span>{receiptSuccess}</span>
-                          </div>
-                        ) : (
-                          <div className="flex flex-wrap items-center gap-2">
-                            <input
-                              ref={receiptInputRef}
-                              type="file"
-                              accept="image/jpeg,image/png,image/webp,application/pdf"
-                              onChange={handleLookupReceiptUpload}
-                              className="hidden"
-                              id="lookup-receipt-upload"
-                            />
-                            <label
-                              htmlFor="lookup-receipt-upload"
-                              className={`inline-flex items-center justify-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-bold text-xs uppercase tracking-wider px-4 py-2 transition-colors cursor-pointer ${
-                                uploadingReceipt ? 'opacity-60 pointer-events-none' : ''
-                              }`}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                          <div className="rounded-xl bg-zinc-950 border border-orange-500/75 px-3 py-2">
+                            <span className="text-stone-400 block text-[10px] uppercase font-bold">
+                              Distancia
+                            </span>
+                            <strong
+                              className={
+                                st.distance === '27K' ? 'text-cyan-400 font-bold' : 'text-red-500 font-bold'
+                              }
                             >
-                              {uploadingReceipt ? (
-                                <Loader2 className="w-3.5 h-3.5 animate-spin text-orange-500" />
-                              ) : (
-                                <Upload className="w-3.5 h-3.5 text-orange-500" />
-                              )}
-                              <span>
-                                {uploadingReceipt
-                                  ? 'Subiendo comprobante...'
-                                  : lookupResult.hasReceipt
-                                  ? 'Reemplazar Comprobante'
-                                  : 'Adjuntar Comprobante Ahora'}
-                              </span>
-                            </label>
+                              {st.distance} Competitivo
+                            </strong>
+                          </div>
 
-                            {lookupResult.hasReceipt && (
-                              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400">
-                                <CheckCircle2 className="w-3.5 h-3.5" />
-                                Comprobante recibido · en verificación
-                              </span>
+                          <div className="rounded-xl bg-zinc-950 border border-orange-500/75 px-3 py-2">
+                            <span className="text-stone-400 block text-[10px] uppercase font-bold">
+                              Talle Reservado
+                            </span>
+                            <strong className="text-orange-400">{st.shirtSize || 'A confirmar'}</strong>
+                          </div>
+
+                          <div className="rounded-xl bg-zinc-950 border border-orange-500/75 px-3 py-2">
+                            <span className="text-stone-400 block text-[10px] uppercase font-bold">
+                              Acreditación Presencial
+                            </span>
+                            <strong className={st.checkedIn ? 'text-emerald-300' : 'text-stone-200'}>
+                              {st.checkedIn ? 'Kit entregado ✓' : 'Pendiente de retiro'}
+                            </strong>
+                          </div>
+                        </div>
+
+                        {!isConfirmed && !isRejected && (
+                          <p className="text-xs text-orange-100/90">
+                            Tu comprobante está en cola de verificación manual por la organización. Apenas confirmemos el pago verás acá tu número de dorsal asignado.
+                          </p>
+                        )}
+
+                        {isRejected ? (
+                          <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                            <p className="text-xs text-red-200">
+                              Hay una observación con tu inscripción o comprobante. Contactanos para resolverlo rápido:
+                            </p>
+                            {orgDigits && (
+                              <a
+                                href={orgWaUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-bold text-xs px-3.5 py-2 transition-colors"
+                              >
+                                <MessageCircle className="w-3.5 h-3.5" />
+                                Contactar por WhatsApp
+                              </a>
                             )}
                           </div>
-                        )}
-
-                        {receiptError && (
-                          <p className="text-[11px] font-semibold text-red-400">{receiptError}</p>
+                        ) : (
+                          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-white/10">
+                            <span className="text-[11px] text-stone-300">
+                              Recordá llevar DNI, Deslinde firmado y Apto Médico para retirar tu kit:
+                            </span>
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  openPrintableWaiver({
+                                    raceConfig,
+                                    runner: {
+                                      code: st.code,
+                                      distance: st.distance,
+                                      assignedBib: st.assignedBib,
+                                      dni:
+                                        st.dni ||
+                                        (/^raf-/i.test(lookupQuery.trim())
+                                          ? ''
+                                          : lookupQuery.replace(/\D/g, '')),
+                                    },
+                                  })
+                                }
+                                className="inline-flex items-center gap-1 rounded-lg bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-bold text-[11px] uppercase px-2.5 py-1.5 transition-colors cursor-pointer"
+                              >
+                                <Printer className="w-3.5 h-3.5 text-orange-500" />
+                                Deslinde A4
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  openPrintableMedicalCert({
+                                    raceConfig,
+                                    runner: {
+                                      code: st.code,
+                                      distance: st.distance,
+                                      assignedBib: st.assignedBib,
+                                      dni:
+                                        st.dni ||
+                                        (/^raf-/i.test(lookupQuery.trim())
+                                          ? ''
+                                          : lookupQuery.replace(/\D/g, '')),
+                                    },
+                                  })
+                                }
+                                className="inline-flex items-center gap-1 rounded-lg bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-bold text-[11px] uppercase px-2.5 py-1.5 transition-colors cursor-pointer"
+                              >
+                                <FileCheck2 className="w-3.5 h-3.5 text-orange-500" />
+                                Apto Médico A4
+                              </button>
+                            </div>
+                          </div>
                         )}
                       </div>
-                    )}
-                  </div>
+                    );
+                  })()
                 ) : (
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="text-xs text-stone-300">
-                      {lookupResult.errorMessage
-                        ? lookupResult.errorMessage
-                        : 'No encontramos ninguna inscripción con ese DNI o código RAF. Verificá los datos o consultanos por WhatsApp si te inscribiste recién.'}
+                  <div className="rounded-2xl border border-stone-700 bg-zinc-950 p-4 text-xs text-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-start gap-2.5">
+                      <AlertCircle className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
+                      <span>
+                        {lookupResult.invalidQuery
+                          ? 'Ingresá un número de DNI (sin puntos) o tu código RAF-XXXXX para realizar la consulta.'
+                          : lookupResult.errorCode === 'permission-denied'
+                            ? 'El consultor online está actualizando permisos en Firebase. Mientras tanto podés verificar tu estado escribiéndonos por WhatsApp.'
+                            : 'No encontramos ninguna inscripción con ese DNI o código RAF. Verificá los datos o consultanos por WhatsApp si te inscribiste recién.'}
+                      </span>
                     </div>
                     {orgDigits && (
                       <a
