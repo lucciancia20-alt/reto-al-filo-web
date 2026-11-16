@@ -97,7 +97,7 @@ export default function ResizableTextarea({
         ref={textareaRef}
         rows={1}
         style={{ minHeight: `${minHeight}px`, ...style }}
-        className={`block w-full resize-none ${className}`}
+        className={`block w-full resize-none font-mono font-semibold ${className}`}
         {...props}
       />
       <div

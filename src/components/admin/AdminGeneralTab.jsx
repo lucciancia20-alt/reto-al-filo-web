@@ -92,7 +92,7 @@ export default function AdminGeneralTab({
             type="text"
             value={draft.title}
             onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm text-white"
+            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
           />
         </div>
         <div>
@@ -103,7 +103,7 @@ export default function AdminGeneralTab({
             type="text"
             value={draft.subtitle}
             onChange={(e) => setDraft({ ...draft, subtitle: e.target.value })}
-            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm text-white"
+            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
           />
         </div>
         <div>
@@ -116,14 +116,14 @@ export default function AdminGeneralTab({
               aria-label="Fecha de largada"
               value={datePart}
               onChange={(e) => handleTargetDateChange(e.target.value, timePart)}
-              className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-sm font-mono text-white [color-scheme:dark]"
+              className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-sm font-mono font-semibold text-white [color-scheme:dark]"
             />
             <input
               type="time"
               aria-label="Hora de largada"
               value={timePart}
               onChange={(e) => handleTargetDateChange(datePart, e.target.value)}
-              className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-sm font-mono text-white [color-scheme:dark]"
+              className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-sm font-mono font-semibold text-white [color-scheme:dark]"
             />
           </div>
         </div>
@@ -136,7 +136,7 @@ export default function AdminGeneralTab({
             placeholder="5492915228310"
             value={draft.whatsappNumber ?? ''}
             onChange={(e) => setDraft({ ...draft, whatsappNumber: e.target.value })}
-            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono text-white"
+            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
           />
         </div>
         <div>
@@ -152,7 +152,7 @@ export default function AdminGeneralTab({
                 setDraft({ ...draft, notificationEmail: e.target.value });
                 if (emailTestStatus) setEmailTestStatus(null);
               }}
-              className="flex-1 min-w-0 rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono text-white"
+              className="flex-1 min-w-0 rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
             />
             <button
               type="button"
@@ -193,7 +193,7 @@ export default function AdminGeneralTab({
             type="url"
             value={draft.googleMapsUrl}
             onChange={(e) => setDraft({ ...draft, googleMapsUrl: e.target.value })}
-            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono text-white"
+            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
           />
         </div>
         <div className="sm:col-span-2">
@@ -204,7 +204,7 @@ export default function AdminGeneralTab({
             type="text"
             value={draft.locationName}
             onChange={(e) => setDraft({ ...draft, locationName: e.target.value })}
-            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm text-white"
+            className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
           />
         </div>
       </div>
@@ -234,7 +234,7 @@ export default function AdminGeneralTab({
               value={draft.circuits?.['27K']?.price || ''}
               onChange={(e) => onUpdateCircuitField('27K', 'price', e.target.value)}
               placeholder="$45.000"
-              className="w-full rounded-xl bg-stone-900 border border-cyan-500 focus:border-cyan-400 focus:outline-none px-3 py-1.5 text-sm font-bold text-cyan-400"
+              className="w-full rounded-xl bg-stone-900 border border-cyan-500 focus:border-cyan-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-bold text-cyan-400"
             />
           </div>
           <div>
@@ -246,7 +246,7 @@ export default function AdminGeneralTab({
               value={draft.circuits?.['13K']?.price || ''}
               onChange={(e) => onUpdateCircuitField('13K', 'price', e.target.value)}
               placeholder="$32.000"
-              className="w-full rounded-xl bg-stone-900 border border-red-500 focus:border-red-500 focus:outline-none px-3 py-1.5 text-sm font-bold text-red-500"
+              className="w-full rounded-xl bg-stone-900 border border-red-500 focus:border-red-500 focus:outline-none px-3 py-1.5 text-sm font-mono font-bold text-red-500"
             />
           </div>
           <div>
@@ -258,7 +258,7 @@ export default function AdminGeneralTab({
               value={draft.payment?.bankAlias || ''}
               onChange={(e) => onUpdatePaymentField('bankAlias', e.target.value)}
               placeholder="RETO.AL.FILO"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono text-orange-400"
+              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-orange-400"
             />
           </div>
           <div>
@@ -268,7 +268,7 @@ export default function AdminGeneralTab({
               value={draft.payment?.bankCbu || ''}
               onChange={(e) => onUpdatePaymentField('bankCbu', e.target.value)}
               placeholder="0000003100000000000000"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono text-white"
+              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
             />
           </div>
           <div>
@@ -280,7 +280,7 @@ export default function AdminGeneralTab({
               value={draft.payment?.bankHolder || ''}
               onChange={(e) => onUpdatePaymentField('bankHolder', e.target.value)}
               placeholder="Organización Reto al Filo"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm text-white"
+              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
             />
           </div>
           <div>
@@ -292,7 +292,7 @@ export default function AdminGeneralTab({
               value={draft.payment?.bankEntity || ''}
               onChange={(e) => onUpdatePaymentField('bankEntity', e.target.value)}
               placeholder="Mercado Pago / Banco Provincia"
-              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm text-white"
+              className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
             />
           </div>
           <div className="sm:col-span-3">
@@ -381,7 +381,7 @@ export default function AdminGeneralTab({
                     onChange={(e) => handleKitItemChange(idx, e.target.value)}
                     placeholder="Ej. Remera técnica oficial del evento"
                     aria-label={`Ítem incluido en el kit ${idx + 1}`}
-                    className="flex-1 min-w-0 rounded-xl bg-stone-900 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs text-white"
+                    className="flex-1 min-w-0 rounded-xl bg-stone-900 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono font-semibold text-white"
                   />
                   <button
                     type="button"

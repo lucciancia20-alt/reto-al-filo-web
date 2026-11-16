@@ -422,12 +422,12 @@ export default function AdminRegistrationsTab({
             aria-label="Filtrar por distancia"
             value={regDistanceFilter}
             onChange={(e) => setRegDistanceFilter(e.target.value)}
-            className={`rounded-xl bg-stone-950 border focus:outline-none pl-2.5 pr-5 py-1.5 text-xs transition-colors shrink-0 ${
+            className={`rounded-xl bg-stone-950 border focus:outline-none pl-2.5 pr-5 py-1.5 text-xs font-mono transition-colors shrink-0 ${
               regDistanceFilter === '27K'
                 ? 'text-cyan-400 font-bold border-cyan-500/60 focus:border-cyan-400'
                 : regDistanceFilter === '13K'
                   ? 'text-red-500 font-bold border-red-500/60 focus:border-red-500'
-                  : 'text-white border-white/15 focus:border-orange-400'
+                  : 'text-white font-semibold border-white/15 focus:border-orange-400'
             }`}
           >
             <option value="all" className="bg-stone-950 text-white font-normal">
@@ -448,12 +448,12 @@ export default function AdminRegistrationsTab({
               setRegDuplicateFilter?.('none');
               setRegStatusFilter(e.target.value);
             }}
-            className={`rounded-xl bg-stone-950 border focus:outline-none pl-2.5 pr-5 py-1.5 text-xs transition-colors shrink-0 ${
+            className={`rounded-xl bg-stone-950 border focus:outline-none pl-2.5 pr-5 py-1.5 text-xs font-mono transition-colors shrink-0 ${
               regStatusFilter === 'pendiente'
                 ? 'text-amber-400 border-amber-500/60 focus:border-amber-400 font-bold'
                 : regStatusFilter === 'confirmado'
                   ? 'text-emerald-400 border-emerald-500/60 focus:border-emerald-400 font-bold'
-                  : 'text-white border-white/15 focus:border-orange-400'
+                  : 'text-white font-semibold border-white/15 focus:border-orange-400'
             }`}
           >
             <option value="all" className="bg-stone-950 text-white font-normal">
@@ -621,7 +621,7 @@ export default function AdminRegistrationsTab({
                 onChange={(e) => setRegSearch(e.target.value)}
                 placeholder="Buscar por nombre, DNI, código RAF, dorsal, localidad..."
                 aria-label="Buscar por nombre, DNI, código RAF, dorsal o localidad"
-                className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-stone-500"
+                className="w-full rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-8 pr-3 py-1.5 text-xs font-mono font-semibold text-white placeholder:text-stone-500"
               />
             </div>
 
@@ -751,7 +751,7 @@ export default function AdminRegistrationsTab({
                               }`
                             : isBibLocked
                               ? 'w-12 rounded-lg bg-stone-950 border border-orange-500/40 px-1 py-1 text-xs font-mono font-bold text-orange-400 text-center cursor-default'
-                              : 'w-12 rounded-lg bg-stone-950 border border-orange-500 focus:border-orange-400 focus:outline-none px-1 py-1 text-xs font-mono text-white text-center'
+                              : 'w-12 rounded-lg bg-stone-950 border border-orange-500 focus:border-orange-400 focus:outline-none px-1 py-1 text-xs font-mono font-semibold text-white text-center'
                         }
                       />
                       {isBibLocked && (
