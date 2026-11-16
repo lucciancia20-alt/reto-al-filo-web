@@ -487,10 +487,10 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
               return (
                 <div
                   key={faq.id}
-                  className={`rounded-2xl border transition-all overflow-hidden ${
+                  className={`rounded-2xl border transition-all overflow-hidden bg-zinc-950 ${
                     isOpen
-                      ? 'bg-stone-900 border-orange-500 shadow-[0_0_18px_rgba(249,115,22,0.3)]'
-                      : 'bg-stone-900/60 border-orange-500/80 shadow-[0_0_12px_rgba(249,115,22,0.18)] hover:border-orange-400'
+                      ? 'border-orange-500 shadow-[0_0_18px_rgba(249,115,22,0.3)]'
+                      : 'border-orange-500/80 shadow-[0_0_12px_rgba(249,115,22,0.18)] hover:border-orange-400'
                   }`}
                 >
                   <button
@@ -526,7 +526,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                       {faq.id === 'elementos-obligatorios' && (
                         <div className="mt-3.5 space-y-2.5">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="rounded-xl bg-stone-950 border border-cyan-500/60 p-3.5">
+                            <div className="rounded-xl bg-zinc-950 border border-cyan-500/60 p-3.5">
                               <span className="inline-flex items-center gap-1.5 text-xs font-display font-black uppercase tracking-wider text-cyan-400">
                                 27K Cumbre Técnica
                               </span>
@@ -540,7 +540,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                               </ul>
                             </div>
 
-                            <div className="rounded-xl bg-stone-950 border border-red-500/60 p-3.5">
+                            <div className="rounded-xl bg-zinc-950 border border-red-500/60 p-3.5">
                               <span className="inline-flex items-center gap-1.5 text-xs font-display font-black uppercase tracking-wider text-red-500">
                                 13K Competitivo
                               </span>
@@ -587,7 +587,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
 
                       {faq.id === 'como-llegar' && (
                         <div className="mt-3.5 grid grid-cols-1 md:grid-cols-3 gap-2.5">
-                          <div className="rounded-xl bg-stone-950 border border-orange-500/50 p-3 space-y-1.5">
+                          <div className="rounded-xl bg-zinc-950 border border-orange-500/50 p-3 space-y-1.5">
                             <span className="flex items-center min-h-[1.75rem] gap-1.5 text-[10px] lg:text-[11px] font-display font-bold uppercase tracking-tight whitespace-nowrap text-orange-400">
                               <PackageCheck className="w-4 h-4 shrink-0" />
                               Checklist para Retirar Kit
@@ -597,7 +597,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                             </p>
                           </div>
 
-                          <div className="rounded-xl bg-stone-950 border border-cyan-500/45 p-3 space-y-1.5">
+                          <div className="rounded-xl bg-zinc-950 border border-cyan-500/45 p-3 space-y-1.5">
                             <span className="flex items-center min-h-[1.75rem] gap-1.5 text-[10px] lg:text-[11px] font-display font-bold uppercase tracking-tight whitespace-nowrap text-cyan-300">
                               <Wifi className="w-4 h-4 shrink-0" />
                               Wi-Fi Starlink + Track Offline
@@ -607,7 +607,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                             </p>
                           </div>
 
-                          <div className="rounded-xl bg-stone-950 border border-emerald-500/45 p-3 space-y-1.5">
+                          <div className="rounded-xl bg-zinc-950 border border-emerald-500/45 p-3 space-y-1.5">
                             <span className="flex items-center min-h-[1.75rem] gap-1.5 text-[10px] lg:text-[11px] font-display font-bold uppercase tracking-tight whitespace-nowrap text-emerald-300">
                               <Car className="w-4 h-4 shrink-0 text-emerald-400" />
                               Servicios en Cerro Providencia
@@ -640,7 +640,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             })}
 
             {/* Acceso directo permanente a Documentos Imprimibles A4 */}
-            <div className="rounded-2xl bg-stone-900/90 border border-orange-500/70 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="rounded-2xl bg-zinc-950 border border-orange-500/70 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
                   Documentación para Acreditación (Imprimible A4)
