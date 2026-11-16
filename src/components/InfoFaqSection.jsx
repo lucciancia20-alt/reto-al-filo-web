@@ -609,11 +609,11 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
 
                           <div className="rounded-xl bg-stone-950 border border-emerald-500/45 p-3 space-y-1.5">
                             <span className="inline-flex items-center gap-1.5 text-[11px] font-display font-black uppercase tracking-wider text-emerald-300">
-                              <Car className="w-4 h-4 shrink-0" />
+                              <Car className="w-4 h-4 shrink-0 text-emerald-400" />
                               Servicios en Cerro Providencia
                             </span>
                             <p className="text-[11px] sm:text-xs text-stone-200 leading-relaxed">
-                              Predio con <strong className="text-white">estacionamiento</strong>, <strong className="text-white">guardarropas</strong> organizado por número de dorsal, <strong className="text-white">baños químicos</strong> y cantina (se recomienda llevar algo de <strong className="text-white">efectivo</strong> además de pago digital).
+                              Predio con <strong className="text-white">estacionamiento</strong>, <strong className="text-white">baños químicos</strong> y cantina (se recomienda llevar algo de <strong className="text-white">efectivo</strong> además de pago digital).
                             </p>
                           </div>
                         </div>
