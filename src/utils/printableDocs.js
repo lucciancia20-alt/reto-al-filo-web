@@ -14,7 +14,7 @@ function fieldValueOrLine(value, fallbackDots = '...............................
   return clean ? `<strong>${escapeHtml(clean)}</strong>` : fallbackDots;
 }
 
-function openPrintableHtmlWindow(title, bodyHtml, { landscape = false } = {}) {
+function openPrintableHtmlWindow(title, bodyHtml, { landscape = false, autoPrint = true } = {}) {
   const pageSize = landscape ? 'A4 landscape' : 'A4 portrait';
   const pageMargin = landscape ? '9mm 10mm' : '12mm 14mm';
   const sheetMaxWidth = landscape ? '297mm' : '210mm';
@@ -217,9 +217,78 @@ function openPrintableHtmlWindow(title, bodyHtml, { landscape = false } = {}) {
         padding: 2px 0;
         border-bottom: 1px dotted #d1d5db;
       }
+      .field-row-edit {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        font-size: 11px;
+        padding: 2px 0;
+      }
       .field-label {
         color: #4b5563;
         font-weight: 600;
+        white-space: nowrap;
+      }
+      .doc-input {
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: 700;
+        color: #111827;
+        background: rgba(249, 115, 22, 0.06);
+        border: none;
+        border-bottom: 1px dotted #9ca3af;
+        border-radius: 3px 3px 0 0;
+        padding: 1px 4px;
+        margin: 0;
+        outline: none;
+        transition: background 0.15s, border-color 0.15s;
+      }
+      .doc-input:hover,
+      .doc-input:focus {
+        background: rgba(249, 115, 22, 0.14);
+        border-bottom-color: #ea580c;
+      }
+      .doc-input-full {
+        flex: 1;
+        min-width: 70px;
+        width: 100%;
+      }
+      .doc-input-inline {
+        display: inline-block;
+      }
+      .doc-textarea {
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: 600;
+        color: #111827;
+        background: rgba(249, 115, 22, 0.06);
+        border: 1px dotted #9ca3af;
+        border-radius: 4px;
+        padding: 2px 6px;
+        width: 100%;
+        min-height: 22px;
+        resize: vertical;
+        outline: none;
+        line-height: 1.35;
+      }
+      .doc-textarea:hover,
+      .doc-textarea:focus {
+        background: rgba(249, 115, 22, 0.14);
+        border-color: #ea580c;
+      }
+      .chk-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .chk-input {
+        accent-color: #ea580c;
+        width: 12px;
+        height: 12px;
+        margin: 0;
+        cursor: pointer;
       }
       .clauses {
         margin: 6px 0 10px;
@@ -297,13 +366,27 @@ function openPrintableHtmlWindow(title, bodyHtml, { landscape = false } = {}) {
           padding: 0;
           box-shadow: none;
         }
+        .doc-input,
+        .doc-textarea {
+          background: transparent !important;
+          border-color: #9ca3af !important;
+          padding-left: 1px;
+          padding-right: 1px;
+        }
+        .doc-textarea {
+          border-top: none !important;
+          border-left: none !important;
+          border-right: none !important;
+          border-radius: 0 !important;
+          resize: none !important;
+        }
       }
     </style>
   </head>
   <body>
     <div class="no-print">
       <div style="font-size: 12px;">
-        <strong>${escapeHtml(title)}</strong> · Formato A4 listo para imprimir o guardar como PDF
+        <strong>${escapeHtml(title)}</strong> · <span style="color: #fdba74;">Hacé clic sobre las líneas para completar tus datos antes de imprimir o guardar PDF</span>
       </div>
       <div class="no-print-actions">
         <button type="button" class="btn-print" onclick="window.print()">Imprimir / Guardar PDF (A4)</button>
@@ -313,13 +396,13 @@ function openPrintableHtmlWindow(title, bodyHtml, { landscape = false } = {}) {
     <main class="sheet">
       ${bodyHtml}
     </main>
-    <script>
+    ${autoPrint ? `<script>
       window.addEventListener('load', function () {
         setTimeout(function () {
           try { window.print(); } catch (e) {}
         }, 220);
       });
-    </script>
+    </script>` : ''}
   </body>
 </html>`;
 
@@ -385,6 +468,8 @@ export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } 
     runner?.emergencyContactName || runner?.emergencyContactPhone
       ? `${runner.emergencyContactName || ''} (${runner.emergencyContactPhone || ''})`
       : '';
+  const is27 = runner?.distance === '27K';
+  const is13 = runner?.distance === '13K';
 
   const bodyHtml = `
     <header class="doc-header">
@@ -396,19 +481,24 @@ export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } 
       <div class="badge-box">
         <div><strong>DOCUMENTO OBLIGATORIO</strong></div>
         <div>${runner?.code ? `Código: <strong>${escapeHtml(runner.code)}</strong>` : 'Presentar en Acreditación'}</div>
-        <div>Distancia: ${runner?.distance ? `<strong>${escapeHtml(runner.distance)}</strong>` : '☐ 27K  ☐ 13K'}</div>
+        <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:2px;">
+          <span>Distancia:</span>
+          <label class="chk-label"><input type="checkbox" class="chk-input" ${is27 ? 'checked' : ''} /> 27K</label>
+          <label class="chk-label"><input type="checkbox" class="chk-input" ${is13 ? 'checked' : ''} /> 13K</label>
+        </div>
       </div>
     </header>
 
     <div class="section-title">1 · Datos del Participante</div>
     <div class="grid-2">
-      <div class="field-row"><span class="field-label">Apellido y Nombre:</span> ${fieldValueOrLine(runner?.fullName, '..................................................')}</div>
-      <div class="field-row"><span class="field-label">DNI / Pasaporte:</span> ${fieldValueOrLine(runner?.dni, '....................................................')}</div>
-      <div class="field-row"><span class="field-label">Fecha de Nacimiento:</span> ${fieldValueOrLine(runner?.birthDate, '......... / ......... / .............')}</div>
-      <div class="field-row"><span class="field-label">Grupo Sanguíneo / RH:</span> ${fieldValueOrLine(runner?.bloodType, '.................................')}</div>
-      <div class="field-row"><span class="field-label">Teléfono / WhatsApp:</span> ${fieldValueOrLine(runner?.phone, '...............................................')}</div>
-      <div class="field-row"><span class="field-label">Localidad / Provincia:</span> ${fieldValueOrLine(runner?.city, '................................................')}</div>
-      <div class="field-row" style="grid-column: span 2;"><span class="field-label">Contacto de Emergencia (Nombre y Teléfono):</span> ${fieldValueOrLine(emergencyText, '....................................................................................................')}</div>
+      <div class="field-row-edit"><span class="field-label">Apellido y Nombre:</span> <input type="text" class="doc-input doc-input-full" value="${escapeHtml(runner?.fullName || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">DNI / Pasaporte:</span> <input type="text" class="doc-input doc-input-full" value="${escapeHtml(runner?.dni || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">Fecha de Nacimiento:</span> <input type="text" class="doc-input doc-input-full" placeholder="DD / MM / AAAA" value="${escapeHtml(runner?.birthDate || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">Grupo Sanguíneo / RH:</span> <input type="text" class="doc-input doc-input-full" placeholder="Ej. O+" value="${escapeHtml(runner?.bloodType || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">Teléfono / WhatsApp:</span> <input type="text" class="doc-input doc-input-full" value="${escapeHtml(runner?.phone || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">Localidad / Provincia:</span> <input type="text" class="doc-input doc-input-full" value="${escapeHtml(runner?.city || '')}" /></div>
+      <div class="field-row-edit" style="grid-column: span 2;"><span class="field-label">Contacto de Emergencia (Nombre y Teléfono):</span> <input type="text" class="doc-input doc-input-full" value="${escapeHtml(emergencyText)}" /></div>
+      <div class="field-row-edit" style="grid-column: span 2;"><span class="field-label">En caso de menor de 18 años — Padre/Madre/Tutor y DNI:</span> <input type="text" class="doc-input doc-input-full" placeholder="Completar solo si corresponde" /></div>
     </div>
 
     <div class="section-title">2 · Declaración Jurada y Deslinde de Responsabilidad</div>
@@ -428,13 +518,16 @@ export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } 
     <div class="signatures">
       <div class="sig-block">
         <div class="sig-line">Firma del Participante</div>
-        <div class="sig-sub">Aclaración: ...........................................................</div>
-        <div class="sig-sub">DNI N°: .................................. Fecha: ...... / ...... / ..........</div>
+        <div class="sig-sub">Aclaración: <input type="text" class="doc-input doc-input-inline" style="width: 195px;" value="${escapeHtml(runner?.fullName || '')}" /></div>
+        <div class="sig-sub" style="margin-top: 3px;">DNI N°: <input type="text" class="doc-input doc-input-inline" style="width: 95px;" value="${escapeHtml(runner?.dni || '')}" /> Fecha: <input type="text" class="doc-input doc-input-inline" style="width: 80px;" placeholder="DD/MM/AAAA" /></div>
       </div>
       <div class="sig-block">
         <div class="sig-line">Control Organización / Acreditación</div>
-        <div class="sig-sub">☐ DNI verificado &nbsp;&nbsp; ☐ Apto Médico recibido</div>
-        <div class="sig-sub">Dorsal N° asignado: .....................</div>
+        <div class="sig-sub" style="display:flex; justify-content:center; gap:10px;">
+          <label class="chk-label" style="font-weight:500;"><input type="checkbox" class="chk-input" /> DNI verificado</label>
+          <label class="chk-label" style="font-weight:500;"><input type="checkbox" class="chk-input" /> Apto Médico recibido</label>
+        </div>
+        <div class="sig-sub" style="margin-top: 3px;">Dorsal N° asignado: <input type="text" class="doc-input doc-input-inline" style="width: 75px; text-align:center;" value="${escapeHtml(runner?.assignedBib || '')}" /></div>
       </div>
     </div>
 
@@ -444,7 +537,7 @@ export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } 
     </footer>
   `;
 
-  return openPrintableHtmlWindow(`Deslinde Oficial - ${meta.raceTitle}`, bodyHtml);
+  return openPrintableHtmlWindow(`Deslinde Oficial - ${meta.raceTitle}`, bodyHtml, { autoPrint: false });
 }
 
 /**
@@ -452,6 +545,8 @@ export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } 
  */
 export function openPrintableMedicalCert({ raceConfig = RACE_CONFIG, runner = null } = {}) {
   const meta = buildEventMeta(raceConfig);
+  const is27 = runner?.distance === '27K';
+  const is13 = runner?.distance === '13K';
 
   const bodyHtml = `
     <header class="doc-header">
@@ -463,46 +558,51 @@ export function openPrintableMedicalCert({ raceConfig = RACE_CONFIG, runner = nu
       <div class="badge-box">
         <div><strong>VIGENCIA MÁXIMA: 12 MESES</strong></div>
         <div>${runner?.code ? `Código: <strong>${escapeHtml(runner.code)}</strong>` : 'Presentar Original / Copia'}</div>
-        <div>Distancia: ${runner?.distance ? `<strong>${escapeHtml(runner.distance)}</strong>` : '☐ 27K  ☐ 13K'}</div>
+        <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:2px;">
+          <span>Distancia:</span>
+          <label class="chk-label"><input type="checkbox" class="chk-input" ${is27 ? 'checked' : ''} /> 27K</label>
+          <label class="chk-label"><input type="checkbox" class="chk-input" ${is13 ? 'checked' : ''} /> 13K</label>
+        </div>
       </div>
     </header>
 
     <div class="section-title">1 · Identificación del Corredor/a</div>
     <div class="grid-2">
-      <div class="field-row"><span class="field-label">Apellido y Nombre:</span> ${fieldValueOrLine(runner?.fullName, '..................................................')}</div>
-      <div class="field-row"><span class="field-label">DNI / Pasaporte:</span> ${fieldValueOrLine(runner?.dni, '....................................................')}</div>
-      <div class="field-row"><span class="field-label">Fecha de Nacimiento:</span> ${fieldValueOrLine(runner?.birthDate, '......... / ......... / .............')}</div>
-      <div class="field-row"><span class="field-label">Grupo Sanguíneo y Factor RH:</span> ${fieldValueOrLine(runner?.bloodType, '........................')}</div>
-      <div class="field-row" style="grid-column: span 2;"><span class="field-label">Obra Social / Alergias / Medicación actual:</span> ${fieldValueOrLine(runner?.medicalNotes, '...................................................................................................')}</div>
+      <div class="field-row-edit"><span class="field-label">Apellido y Nombre:</span> <input type="text" id="med-name-1" class="doc-input doc-input-full" value="${escapeHtml(runner?.fullName || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">DNI / Pasaporte:</span> <input type="text" id="med-dni-1" class="doc-input doc-input-full" value="${escapeHtml(runner?.dni || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">Fecha de Nacimiento / Edad:</span> <input type="text" class="doc-input doc-input-full" placeholder="DD / MM / AAAA" value="${escapeHtml(runner?.birthDate || '')}" /></div>
+      <div class="field-row-edit"><span class="field-label">Grupo Sanguíneo y Factor RH:</span> <input type="text" class="doc-input doc-input-full" placeholder="Ej. A+" value="${escapeHtml(runner?.bloodType || '')}" /></div>
+      <div class="field-row-edit" style="grid-column: span 2;"><span class="field-label">Obra Social / Alergias / Medicación actual:</span> <input type="text" class="doc-input doc-input-full" value="${escapeHtml(runner?.medicalNotes || '')}" /></div>
     </div>
 
     <div class="section-title">2 · Certificado Médico de Aptitud Física (Completar por el Profesional)</div>
     <div class="med-box">
       <p class="med-text">
-        Certifico que el/la Sr./Sra. ${fieldValueOrLine(runner?.fullName, '..........................................................................................')},
-        DNI N° ${fieldValueOrLine(runner?.dni, '............................................')}, ha sido evaluado/a clínicamente y mediante los estudios
+        Certifico que el/la Sr./Sra. <input type="text" id="med-name-2" class="doc-input doc-input-inline" style="width: 245px;" value="${escapeHtml(runner?.fullName || '')}" />,
+        DNI N° <input type="text" id="med-dni-2" class="doc-input doc-input-inline" style="width: 115px;" value="${escapeHtml(runner?.dni || '')}" />, ha sido evaluado/a clínicamente y mediante los estudios
         complementarios que consideré pertinentes en función de su edad y antecedentes, encontrándose actualmente
         <strong>APTO/A FÍSICAMENTE</strong> y sin contraindicaciones médicas aparentes para participar en competencias
         de <strong>Trail Running / Carrera de Montaña de esfuerzo físico intenso y competitivo</strong>
-        (modalidad <strong>${runner?.distance ? escapeHtml(runner.distance) : '13K / 27K'}</strong> en ambiente serrano),
+        (modalidad <input type="text" class="doc-input doc-input-inline" style="width: 72px; text-align:center;" value="${escapeHtml(runner?.distance || '13K / 27K')}" /> en ambiente serrano),
         correspondiente al evento <strong>${escapeHtml(meta.raceTitle)}</strong>.
       </p>
 
       <div class="grid-2" style="margin-top: 8px;">
-        <div class="field-row"><span class="field-label">Tensión Arterial (TA):</span> ............................. mmHg</div>
-        <div class="field-row"><span class="field-label">Frecuencia Cardíaca (FC):</span> ....................... lpm</div>
-        <div class="field-row" style="grid-column: span 2;"><span class="field-label">Observaciones / Recomendaciones médicas:</span> ..................................................................................................</div>
-        <div class="field-row" style="grid-column: span 2;"><span class="field-label">Lugar y Fecha de emisión:</span> ................................................................................ , ...... / ...... / 202....</div>
+        <div class="field-row-edit"><span class="field-label">Tensión Arterial (TA):</span> <input type="text" class="doc-input doc-input-full" /> <span class="field-label">mmHg</span></div>
+        <div class="field-row-edit"><span class="field-label">Frecuencia Cardíaca (FC):</span> <input type="text" class="doc-input doc-input-full" /> <span class="field-label">lpm</span></div>
+        <div class="field-row-edit" style="grid-column: span 2; align-items: flex-start;"><span class="field-label" style="padding-top:2px;">Observaciones médicas:</span> <textarea rows="1" class="doc-textarea"></textarea></div>
+        <div class="field-row-edit" style="grid-column: span 2;"><span class="field-label">Lugar y Fecha de emisión:</span> <input type="text" class="doc-input doc-input-full" placeholder="Ciudad, Provincia — DD / MM / 202_" /></div>
       </div>
 
-      <div class="signatures" style="margin-top: 26px;">
+      <div class="signatures" style="margin-top: 20px;">
         <div class="sig-block">
           <div class="sig-line">Firma del Participante</div>
           <div class="sig-sub">Declaro veracidad en antecedentes informados</div>
         </div>
         <div class="sig-block">
           <div class="sig-line">Firma y Sello del Médico</div>
-          <div class="sig-sub">Matrícula Nacional / Provincial (M.N. / M.P.): ........................</div>
+          <div class="sig-sub">Profesional: <input type="text" class="doc-input doc-input-inline" style="width: 170px;" placeholder="Nombre y Apellido" /></div>
+          <div class="sig-sub" style="margin-top: 3px;">Matrícula (M.N. / M.P.): <input type="text" class="doc-input doc-input-inline" style="width: 115px;" /></div>
         </div>
       </div>
     </div>
@@ -516,9 +616,20 @@ export function openPrintableMedicalCert({ raceConfig = RACE_CONFIG, runner = nu
       <span>${escapeHtml(meta.raceTitle)} · ${escapeHtml(meta.locationName)}</span>
       <span>Archivo oficial para imprimir en hoja A4</span>
     </footer>
+
+    <script>
+      (function () {
+        var n1 = document.getElementById('med-name-1');
+        var n2 = document.getElementById('med-name-2');
+        var d1 = document.getElementById('med-dni-1');
+        var d2 = document.getElementById('med-dni-2');
+        if (n1 && n2) n1.addEventListener('input', function () { n2.value = n1.value; });
+        if (d1 && d2) d1.addEventListener('input', function () { d2.value = d1.value; });
+      })();
+    </script>
   `;
 
-  return openPrintableHtmlWindow(`Apto Médico Oficial - ${meta.raceTitle}`, bodyHtml);
+  return openPrintableHtmlWindow(`Apto Médico Oficial - ${meta.raceTitle}`, bodyHtml, { autoPrint: false });
 }
 
 /**

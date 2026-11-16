@@ -418,7 +418,21 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                             <div className="flex flex-wrap gap-2">
                               <button
                                 type="button"
-                                onClick={() => openPrintableWaiver({ raceConfig })}
+                                onClick={() =>
+                                  openPrintableWaiver({
+                                    raceConfig,
+                                    runner: {
+                                      code: st.code,
+                                      distance: st.distance,
+                                      assignedBib: st.assignedBib,
+                                      dni:
+                                        st.dni ||
+                                        (/^raf-/i.test(lookupQuery.trim())
+                                          ? ''
+                                          : lookupQuery.replace(/\D/g, '')),
+                                    },
+                                  })
+                                }
                                 className="inline-flex items-center gap-1 rounded-lg bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-bold text-[11px] uppercase px-2.5 py-1.5 transition-colors cursor-pointer"
                               >
                                 <Printer className="w-3.5 h-3.5 text-orange-500" />
@@ -426,7 +440,21 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                               </button>
                               <button
                                 type="button"
-                                onClick={() => openPrintableMedicalCert({ raceConfig })}
+                                onClick={() =>
+                                  openPrintableMedicalCert({
+                                    raceConfig,
+                                    runner: {
+                                      code: st.code,
+                                      distance: st.distance,
+                                      assignedBib: st.assignedBib,
+                                      dni:
+                                        st.dni ||
+                                        (/^raf-/i.test(lookupQuery.trim())
+                                          ? ''
+                                          : lookupQuery.replace(/\D/g, '')),
+                                    },
+                                  })
+                                }
                                 className="inline-flex items-center gap-1 rounded-lg bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-bold text-[11px] uppercase px-2.5 py-1.5 transition-colors cursor-pointer"
                               >
                                 <FileCheck2 className="w-3.5 h-3.5 text-orange-500" />
