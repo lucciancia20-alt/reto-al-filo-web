@@ -110,7 +110,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             {syncedSchedule.map((item, idx) => (
               <div
                 key={`${item.time}-${idx}`}
-                className="relative rounded-2xl bg-stone-900/80 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] p-3.5 sm:p-4 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
+                className="relative rounded-2xl bg-zinc-950 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] p-3.5 sm:p-4 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
               >
                 {/* Punto indicador en la línea vertical */}
                 <span
@@ -132,7 +132,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                       {item.time}
                     </span>
                   </div>
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 bg-stone-950 px-2.5 py-1 rounded-md border border-orange-500/60">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 bg-zinc-950 px-2.5 py-1 rounded-md border border-orange-500/60">
                     {item.tag}
                   </span>
                 </div>
@@ -173,7 +173,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
           <div className="mt-5 max-w-3xl mx-auto space-y-3">
             {/* Resumen de Premiación */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <div className="rounded-2xl bg-stone-900/80 border border-orange-500/70 p-3.5">
+              <div className="rounded-2xl bg-zinc-950 border border-orange-500/70 p-3.5">
                 <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
                   Clasificación General
                 </span>
@@ -181,7 +181,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   {ageCategories.generalPodium || RACE_CONFIG.ageCategories.generalPodium}
                 </p>
               </div>
-              <div className="rounded-2xl bg-stone-900/80 border border-orange-500/70 p-3.5">
+              <div className="rounded-2xl bg-zinc-950 border border-orange-500/70 p-3.5">
                 <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
                   Premiación por Categorías
                 </span>
@@ -193,11 +193,11 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
 
             {/* Tabla de Franjas Etarias */}
             {categoryBrackets.length > 0 && (
-              <div className="rounded-2xl bg-stone-900/80 border border-orange-500/80 overflow-hidden shadow-[0_0_16px_rgba(249,115,22,0.18)]">
+              <div className="rounded-2xl bg-zinc-950 border border-orange-500/80 overflow-hidden shadow-[0_0_16px_rgba(249,115,22,0.18)]">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
-                      <tr className="bg-stone-950 border-b border-orange-500/35 text-[11px] uppercase tracking-wider text-orange-400">
+                      <tr className="bg-zinc-950 border-b border-orange-500/35 text-[11px] uppercase tracking-wider text-orange-400">
                         <th className="px-4 py-2.5 font-extrabold">Franja Etaria</th>
                         <th className="px-4 py-2.5 font-extrabold text-right">Ramas y Distancias</th>
                       </tr>
@@ -224,7 +224,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             )}
 
             {ageCategories.ruleNote && (
-              <div className="rounded-xl bg-orange-500/10 border border-orange-500/40 px-4 py-2.5 text-xs text-orange-100 leading-relaxed">
+              <div className="rounded-xl bg-zinc-950 border border-orange-500/60 px-4 py-2.5 text-xs text-orange-100 leading-relaxed">
                 <strong className="text-orange-400">Criterio reglamentario: </strong>
                 {ageCategories.ruleNote}
               </div>
@@ -239,7 +239,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
         className="scroll-mt-20 py-8 sm:py-10 bg-stone-900/70 border-t-2 border-orange-500/50"
       >
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="rounded-3xl bg-stone-950 border border-orange-500/80 shadow-[0_0_24px_rgba(249,115,22,0.18)] p-5 sm:p-6">
+          <div className="rounded-3xl bg-zinc-950 border border-orange-500/80 shadow-[0_0_24px_rgba(249,115,22,0.18)] p-5 sm:p-6">
             <div className="text-center">
               <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-orange-400">
                 <Search className="w-3.5 h-3.5" />
@@ -265,7 +265,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   onChange={(e) => setLookupQuery(e.target.value)}
                   placeholder="Ej: 30123456 o RAF-12345"
                   aria-label="DNI o código de inscripción RAF"
-                  className="w-full rounded-xl bg-stone-900 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-stone-500 font-mono"
+                  className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-stone-500 font-mono"
                 />
               </div>
               <button
@@ -432,7 +432,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                     );
                   })()
                 ) : (
-                  <div className="rounded-2xl border border-stone-700 bg-stone-900/90 p-4 text-xs text-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="rounded-2xl border border-stone-700 bg-zinc-950 p-4 text-xs text-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-start gap-2.5">
                       <AlertCircle className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
                       <span>

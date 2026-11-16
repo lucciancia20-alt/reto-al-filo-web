@@ -139,9 +139,9 @@ export default function GallerySection() {
                     setSelectedIndex(idx);
                   }
                 }}
-                className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-stone-900 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+                className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-zinc-950 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
               >
-                <div className={`w-full overflow-hidden bg-stone-900 ${photo.aspectClass}`}>
+                <div className={`w-full overflow-hidden bg-zinc-950 ${photo.aspectClass}`}>
                   <img
                     src={photo.cloudinaryThumb}
                     alt={`Postal de Reto al Filo — ${photo.sector}`}

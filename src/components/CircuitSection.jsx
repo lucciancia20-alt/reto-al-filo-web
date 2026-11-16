@@ -269,7 +269,7 @@ export default function CircuitSection({
           aria-label="Seleccionar distancia del circuito"
           className="mt-3 flex justify-center"
         >
-          <div className="inline-grid grid-cols-2 gap-1.5 p-1.5 rounded-2xl bg-zinc-900/90 border border-orange-500 w-full max-w-md">
+          <div className="inline-grid grid-cols-2 gap-1.5 p-1.5 rounded-2xl bg-zinc-950 border border-orange-500 w-full max-w-md">
             {Object.values(circuits).map((circuit) => {
               const isSelected = circuit.id === activeDistance;
               const is13K = circuit.id === '13K';
@@ -300,7 +300,7 @@ export default function CircuitSection({
         </div>
 
         {/* Contenedor principal del Circuito GPX + Altimetría */}
-        <div className="mt-3 rounded-3xl bg-zinc-900/90 border border-orange-500 overflow-hidden">
+        <div className="mt-3 rounded-3xl bg-zinc-950 border border-orange-500 overflow-hidden">
           {/* Barra superior */}
           <div className="px-3.5 sm:px-5 py-2 bg-stone-950/75 border-b border-orange-500/40 flex flex-wrap items-center justify-between gap-2.5">
             <div className="flex items-center gap-2.5">
@@ -360,7 +360,7 @@ export default function CircuitSection({
                     <Compass className="w-3.5 h-3.5 text-orange-400" />
                     Trazado GPS ({String(track.totalKm).replace('.', ',')} km)
                   </span>
-                  <span className="font-mono text-[10px] text-stone-400 bg-stone-900 px-2 py-0.5 rounded border border-orange-500/50">
+                  <span className="font-mono text-[10px] text-stone-400 bg-zinc-950 px-2 py-0.5 rounded border border-orange-500/50">
                     N ↑
                   </span>
                 </div>
@@ -490,7 +490,7 @@ export default function CircuitSection({
                     <Mountain className="w-3.5 h-3.5 text-orange-400" />
                     Perfil de Altimetría Real ({track.minAlt}m – {track.maxAlt}m)
                   </span>
-                  <span className="font-mono text-[11px] text-orange-400 bg-stone-900 px-2.5 py-0.5 rounded border border-orange-500/60">
+                  <span className="font-mono text-[11px] text-orange-400 bg-zinc-950 px-2.5 py-0.5 rounded border border-orange-500/60">
                     {hoverPoint
                       ? `KM ${hoverPoint.km.toFixed(1)} · ${hoverPoint.alt} msnm`
                       : `Pasá el dedo o mouse para ver altitud`}
@@ -706,7 +706,7 @@ export default function CircuitSection({
             return (
               <div
                 key={stat.label}
-                className="rounded-2xl bg-stone-900/75 border border-orange-500 px-3.5 py-2.5 flex items-center gap-3 hover:border-orange-400 transition-all"
+                className="rounded-2xl bg-zinc-950 border border-orange-500 px-3.5 py-2.5 flex items-center gap-3 hover:border-orange-400 transition-all"
               >
                 <div className="w-9 h-9 rounded-xl bg-zinc-950 border border-orange-500/60 text-orange-400 flex items-center justify-center shrink-0">
                   <IconComponent className="w-4 h-4" />
@@ -736,7 +736,7 @@ export default function CircuitSection({
           if (kitItems.length === 0) return null;
 
           return (
-            <div className="mt-4 rounded-2xl bg-stone-900/75 border border-orange-500/80 p-4 sm:p-5">
+            <div className="mt-4 rounded-2xl bg-zinc-950 border border-orange-500/80 p-4 sm:p-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 pb-3 border-b border-orange-500/25">
                 <div className="flex items-center gap-2.5">
                   <span className="w-9 h-9 rounded-xl bg-zinc-950 border border-orange-500/60 text-orange-400 flex items-center justify-center shrink-0">

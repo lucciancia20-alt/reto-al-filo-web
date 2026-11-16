@@ -394,7 +394,7 @@ export default function RegistrationModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-4 bg-stone-950/85 backdrop-blur-sm animate-fadeIn overscroll-contain"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-4 bg-zinc-950/85 backdrop-blur-sm animate-fadeIn overscroll-contain"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-inscripcion-title"
@@ -403,11 +403,11 @@ export default function RegistrationModal({
       }}
     >
       <div
-        className="w-full max-w-2xl max-h-[92dvh] rounded-3xl bg-stone-900 border border-stone-700/90 shadow-2xl text-stone-100 flex flex-col overflow-hidden overscroll-contain"
+        className="w-full max-w-2xl max-h-[92dvh] rounded-3xl bg-zinc-950 border border-stone-700/90 shadow-2xl text-stone-100 flex flex-col overflow-hidden overscroll-contain"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Cabecera fija */}
-        <div className="px-4 sm:px-6 py-4 bg-stone-950 border-b border-stone-800 flex items-center justify-between gap-3 shrink-0">
+        <div className="px-4 sm:px-6 py-4 bg-zinc-950 border-b border-stone-800 flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             <span className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0">
               <Mountain className="w-5 h-5" />
@@ -445,7 +445,7 @@ export default function RegistrationModal({
                 <p className="mt-2 text-xs font-bold uppercase tracking-widest text-emerald-300">
                   Ficha y Comprobante Recibidos
                 </p>
-                <div className="mt-2 inline-block rounded-xl bg-stone-950 border border-emerald-500/40 px-4 py-2">
+                <div className="mt-2 inline-block rounded-xl bg-zinc-950 border border-emerald-500/40 px-4 py-2">
                   <span className="block text-[10px] uppercase tracking-wider text-stone-400">
                     Tu Código de Inscripción
                   </span>
@@ -460,7 +460,7 @@ export default function RegistrationModal({
                 </p>
               </div>
 
-              <div className="rounded-2xl bg-stone-950 border border-stone-800 p-4 space-y-2 text-xs sm:text-sm">
+              <div className="rounded-2xl bg-zinc-950 border border-stone-800 p-4 space-y-2 text-xs sm:text-sm">
                 <div className="flex justify-between gap-3 py-1 border-b border-stone-800/80">
                   <span className="text-stone-400">Corredor/a</span>
                   <span className="font-bold text-white text-right">
@@ -528,7 +528,7 @@ export default function RegistrationModal({
                   <button
                     type="button"
                     onClick={() => openPrintableMedicalCert({ raceConfig, runner: confirmedReg })}
-                    className="min-h-[42px] inline-flex items-center justify-center gap-2 rounded-xl bg-stone-950 hover:bg-stone-800 text-amber-300 border border-orange-500/70 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
+                    className="min-h-[42px] inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-950 hover:bg-stone-800 text-amber-300 border border-orange-500/70 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
                   >
                     <FileCheck2 className="w-4 h-4 shrink-0" />
                     <span>Modelo Apto Médico (A4)</span>
@@ -537,7 +537,7 @@ export default function RegistrationModal({
               </div>
             </div>
 
-            <div className="px-4 sm:px-6 py-4 bg-stone-950 border-t border-stone-800 flex flex-col sm:flex-row gap-2.5 shrink-0">
+            <div className="px-4 sm:px-6 py-4 bg-zinc-950 border-t border-stone-800 flex flex-col sm:flex-row gap-2.5 shrink-0">
               <a
                 href={confirmationWhatsappHref}
                 target="_blank"
@@ -579,11 +579,11 @@ export default function RegistrationModal({
                     const is13K = item.id === '13K';
                     const cardClass = active
                       ? is13K
-                        ? 'bg-stone-950 border-red-500 shadow-lg shadow-red-500/20'
-                        : 'bg-stone-950 border-cyan-500 shadow-lg shadow-cyan-500/20'
+                        ? 'bg-zinc-950 border-red-500 shadow-lg shadow-red-500/20'
+                        : 'bg-zinc-950 border-cyan-500 shadow-lg shadow-cyan-500/20'
                       : is13K
-                        ? 'bg-stone-950/80 border-red-500/70 hover:border-red-500'
-                        : 'bg-stone-950/80 border-cyan-500/70 hover:border-cyan-500';
+                        ? 'bg-zinc-950/80 border-red-500/70 hover:border-red-500'
+                        : 'bg-zinc-950/80 border-cyan-500/70 hover:border-cyan-500';
                     const titleClass = is13K ? 'text-red-500' : 'text-cyan-400';
                     const iconClass = active
                       ? is13K
@@ -621,7 +621,7 @@ export default function RegistrationModal({
                 </div>
 
                 {kitItems.length > 0 && (
-                  <div className="mt-3 rounded-2xl bg-stone-950/90 border border-orange-500/35 p-3 space-y-2">
+                  <div className="mt-3 rounded-2xl bg-zinc-950/90 border border-orange-500/35 p-3 space-y-2">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-400">
                       <PackageCheck className="w-3.5 h-3.5 shrink-0" />
                       <span>Tu inscripción incluye</span>
@@ -639,7 +639,7 @@ export default function RegistrationModal({
               </section>
 
               {/* 2. Datos Bancarios para Transferir */}
-              <section className="rounded-2xl bg-stone-950 border border-orange-500/40 p-4 space-y-3">
+              <section className="rounded-2xl bg-zinc-950 border border-orange-500/40 p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
                   <span className="text-xs font-bold uppercase tracking-wider text-white">
@@ -652,7 +652,7 @@ export default function RegistrationModal({
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                  <div className="rounded-xl bg-stone-900 border border-orange-500/40 p-2.5 flex items-center justify-between gap-2">
+                  <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-2.5 flex items-center justify-between gap-2">
                     <div className="min-w-0">
                       <span className="block text-[10px] uppercase text-stone-400">
                         Alias
@@ -680,7 +680,7 @@ export default function RegistrationModal({
                     </button>
                   </div>
 
-                  <div className="rounded-xl bg-stone-900 border border-orange-500/40 p-2.5 flex items-center justify-between gap-2">
+                  <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-2.5 flex items-center justify-between gap-2">
                     <div className="min-w-0">
                       <span className="block text-[10px] uppercase text-stone-400">
                         CBU / CVU
@@ -740,7 +740,7 @@ export default function RegistrationModal({
                       value={form.fullName}
                       onChange={(e) => handleFieldChange('fullName', e.target.value)}
                       placeholder="Ej. María Gómez"
-                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                     />
                   </div>
 
@@ -761,7 +761,7 @@ export default function RegistrationModal({
                       value={form.dni}
                       onChange={(e) => handleFieldChange('dni', e.target.value)}
                       placeholder="Ej. 34567890"
-                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
                     />
                   </div>
 
@@ -795,7 +795,7 @@ export default function RegistrationModal({
                           setSubmitError(msg || UNDERAGE_ERROR_MSG);
                         }
                       }}
-                      className={`w-full rounded-xl bg-stone-950 border transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white [color-scheme:dark] ${
+                      className={`w-full rounded-xl bg-zinc-950 border transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white [color-scheme:dark] ${
                         birthDateError
                           ? 'border-red-500 focus:border-red-400'
                           : 'border-orange-500/40 focus:border-orange-500'
@@ -838,7 +838,7 @@ export default function RegistrationModal({
                       autoComplete="sex"
                       value={form.gender}
                       onChange={(e) => handleFieldChange('gender', e.target.value)}
-                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                     >
                       {GENDERS.map((g) => (
                         <option key={g} value={g}>
@@ -864,7 +864,7 @@ export default function RegistrationModal({
                       value={form.phone}
                       onChange={(e) => handleFieldChange('phone', e.target.value)}
                       placeholder="Ej. 291 4000000"
-                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                     />
                   </div>
 
@@ -884,7 +884,7 @@ export default function RegistrationModal({
                       value={form.email}
                       onChange={(e) => handleFieldChange('email', e.target.value)}
                       placeholder="corredor@mail.com"
-                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                     />
                   </div>
 
@@ -904,7 +904,7 @@ export default function RegistrationModal({
                       value={form.city}
                       onChange={(e) => handleFieldChange('city', e.target.value)}
                       placeholder="Ej. Bahía Blanca, Bs. As."
-                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                     />
                   </div>
 
@@ -923,7 +923,7 @@ export default function RegistrationModal({
                       value={form.team}
                       onChange={(e) => handleFieldChange('team', e.target.value)}
                       placeholder="Ej. Sierra Trail Runners o Libre"
-                      className="w-full rounded-xl bg-stone-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                     />
                   </div>
 
@@ -937,7 +937,7 @@ export default function RegistrationModal({
                         type="button"
                         aria-expanded={showSizeGuide}
                         onClick={() => setShowSizeGuide((prev) => !prev)}
-                        className="inline-flex items-center gap-1 rounded-lg bg-stone-950 hover:bg-stone-800 border border-orange-500/60 text-white text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 rounded-lg bg-zinc-950 hover:bg-stone-800 border border-orange-500/60 text-white text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer"
                       >
                         <Ruler className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         <span>{showSizeGuide ? 'Ocultar medidas' : 'Guía de talles (cm)'}</span>
@@ -969,7 +969,7 @@ export default function RegistrationModal({
                     </div>
 
                     {showSizeGuide && (
-                      <div className="mt-2 rounded-xl bg-stone-950 border border-orange-500/45 p-3 text-xs">
+                      <div className="mt-2 rounded-xl bg-zinc-950 border border-orange-500/45 p-3 text-xs">
                         <div className="flex items-center justify-between gap-2 mb-2">
                           <span className="text-white font-semibold text-[11px] uppercase tracking-wider">
                             Medidas aproximadas · Corte Unisex
@@ -997,7 +997,7 @@ export default function RegistrationModal({
                                     className={`cursor-pointer transition-colors ${
                                       isSelected
                                         ? 'bg-zinc-950 text-white font-bold border border-orange-500/80 outline outline-1 outline-orange-500/80 -outline-offset-1 rounded-md'
-                                        : 'text-stone-300 hover:bg-stone-900'
+                                        : 'text-stone-300 hover:bg-zinc-950'
                                     }`}
                                   >
                                     <td className="py-1 pr-2 font-display font-bold">{row.size}</td>
@@ -1039,7 +1039,7 @@ export default function RegistrationModal({
                           handleFieldChange('emergencyContactName', e.target.value)
                         }
                         placeholder="Ej. Carlos Gómez (Familiar)"
-                        className="w-full rounded-xl bg-stone-900 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                        className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                       />
                     </div>
                     <div>
@@ -1060,7 +1060,7 @@ export default function RegistrationModal({
                           handleFieldChange('emergencyContactPhone', e.target.value)
                         }
                         placeholder="Ej. 291 4001122"
-                        className="w-full rounded-xl bg-stone-900 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                        className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                       />
                     </div>
                     <div>
@@ -1075,7 +1075,7 @@ export default function RegistrationModal({
                         name="bloodType"
                         value={form.bloodType}
                         onChange={(e) => handleFieldChange('bloodType', e.target.value)}
-                        className="w-full rounded-xl bg-stone-900 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+                        className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
                       >
                         {BLOOD_TYPES.map((bt) => (
                           <option key={bt} value={bt}>
@@ -1101,7 +1101,7 @@ export default function RegistrationModal({
                           handleFieldChange('medicalNotes', e.target.value)
                         }
                         placeholder="Ej. OSDE · Sin alergias"
-                        className="w-full rounded-xl bg-stone-900 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                        className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                       />
                     </div>
                   </div>
@@ -1113,7 +1113,7 @@ export default function RegistrationModal({
                 <span className="block text-xs font-bold uppercase tracking-wider text-white">
                   4 · Adjuntar Comprobante de Pago <span className="text-red-500">*</span>
                 </span>
-                <div className="rounded-2xl border border-dashed border-orange-500/40 hover:border-orange-500 transition-colors bg-stone-950/70 p-4 flex flex-col sm:flex-row items-center gap-4">
+                <div className="rounded-2xl border border-dashed border-orange-500/40 hover:border-orange-500 transition-colors bg-zinc-950/70 p-4 flex flex-col sm:flex-row items-center gap-4">
                   {receiptPreview ? (
                     <img
                       src={receiptPreview}
@@ -1121,7 +1121,7 @@ export default function RegistrationModal({
                       className="w-20 h-20 rounded-xl object-cover border border-orange-500/40 shrink-0"
                     />
                   ) : (
-                    <div className="w-20 h-20 rounded-xl bg-stone-900 border border-orange-500/40 flex items-center justify-center text-stone-500 shrink-0">
+                    <div className="w-20 h-20 rounded-xl bg-zinc-950 border border-orange-500/40 flex items-center justify-center text-stone-500 shrink-0">
                       <FileText className="w-8 h-8" />
                     </div>
                   )}
@@ -1161,7 +1161,7 @@ export default function RegistrationModal({
               </section>
 
               {/* 5. Aceptación Legal de Reglamento y Deslinde */}
-              <section className="rounded-2xl bg-stone-950 border border-orange-500/50 p-4 space-y-3">
+              <section className="rounded-2xl bg-zinc-950 border border-orange-500/50 p-4 space-y-3">
                 <label
                   htmlFor="reg-accept-terms"
                   className="flex items-start gap-2.5 cursor-pointer select-none"
@@ -1176,7 +1176,7 @@ export default function RegistrationModal({
                         setSubmitError('');
                       }
                     }}
-                    className="mt-0.5 w-4 h-4 rounded border-orange-500 bg-stone-900 text-amber-500 accent-amber-500 shrink-0 cursor-pointer"
+                    className="mt-0.5 w-4 h-4 rounded border-orange-500 bg-zinc-950 text-amber-500 accent-amber-500 shrink-0 cursor-pointer"
                   />
                   <span className="text-xs text-stone-200 leading-relaxed">
                     <strong className="text-white">
@@ -1195,7 +1195,7 @@ export default function RegistrationModal({
                     type="button"
                     aria-expanded={showTermsModal}
                     onClick={() => setShowTermsModal((prev) => !prev)}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 border border-orange-500/60 text-amber-300 text-[11px] font-bold px-3 py-1.5 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 hover:bg-stone-800 border border-orange-500/60 text-amber-300 text-[11px] font-bold px-3 py-1.5 transition-colors cursor-pointer"
                   >
                     <BookOpen className="w-3.5 h-3.5 shrink-0" />
                     <span>
@@ -1217,7 +1217,7 @@ export default function RegistrationModal({
                         },
                       })
                     }
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-[11px] font-semibold px-2.5 py-1.5 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 hover:bg-stone-800 border border-stone-700 text-stone-200 text-[11px] font-semibold px-2.5 py-1.5 transition-colors cursor-pointer"
                   >
                     <Printer className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span>Deslinde A4</span>
@@ -1235,7 +1235,7 @@ export default function RegistrationModal({
                         },
                       })
                     }
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200 text-[11px] font-semibold px-2.5 py-1.5 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 hover:bg-stone-800 border border-stone-700 text-stone-200 text-[11px] font-semibold px-2.5 py-1.5 transition-colors cursor-pointer"
                   >
                     <FileCheck2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span>Modelo Apto Médico A4</span>
@@ -1243,7 +1243,7 @@ export default function RegistrationModal({
                 </div>
 
                 {showTermsModal && (
-                  <div className="rounded-xl bg-stone-900 border border-stone-700 p-3.5 max-h-60 overflow-y-auto overscroll-contain space-y-2.5 text-[11px] text-stone-300 leading-relaxed">
+                  <div className="rounded-xl bg-zinc-950 border border-stone-700 p-3.5 max-h-60 overflow-y-auto overscroll-contain space-y-2.5 text-[11px] text-stone-300 leading-relaxed">
                     <div>
                       <h4 className="font-display font-bold text-amber-400 uppercase text-xs">
                         Reglamento General · {raceConfig.title || RACE_CONFIG.title}
@@ -1254,7 +1254,7 @@ export default function RegistrationModal({
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                      <div className="rounded-lg bg-stone-950 border border-cyan-500/40 p-2.5">
+                      <div className="rounded-lg bg-zinc-950 border border-cyan-500/40 p-2.5">
                         <span className="block font-bold text-cyan-400 text-[10px] uppercase">
                           Obligatorios 27K
                         </span>
@@ -1264,7 +1264,7 @@ export default function RegistrationModal({
                           ))}
                         </ul>
                       </div>
-                      <div className="rounded-lg bg-stone-950 border border-red-500/40 p-2.5">
+                      <div className="rounded-lg bg-zinc-950 border border-red-500/40 p-2.5">
                         <span className="block font-bold text-red-400 text-[10px] uppercase">
                           Obligatorios 13K
                         </span>
@@ -1330,7 +1330,7 @@ export default function RegistrationModal({
             </div>
 
             {/* Footer fijo */}
-            <div className="px-4 sm:px-6 py-3.5 bg-stone-950 border-t border-stone-800 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shrink-0">
+            <div className="px-4 sm:px-6 py-3.5 bg-zinc-950 border-t border-stone-800 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shrink-0">
               <button
                 type="button"
                 onClick={onClose}
