@@ -1,0 +1,16 @@
+﻿{
+  "name": "reto-al-filo-functions",
+  "private": true,
+  "description": "Cloud Functions de Reto al Filo (publicStatus + stats)",
+  "main": "index.js",
+  "engines": { "node": "20" },
+  "scripts": {
+    "test": "node --test test/",
+    "serve": "firebase emulators:start --only functions,firestore",
+    "deploy": "firebase deploy --only functions"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0",
+    "firebase-functions": "^6.1.0"
+  }
+}
