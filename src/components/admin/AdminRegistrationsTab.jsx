@@ -536,7 +536,7 @@ export default function AdminRegistrationsTab({
               <button
                 type="button"
                 onClick={() => setRegShirtFilter?.('all')}
-                className="text-[10px] text-orange-400 hover:text-orange-300 underline ml-1 cursor-pointer"
+                className="text-[10px] text-orange-400 hover:opacity-85 underline ml-1 cursor-pointer"
               >
                 Limpiar talle
               </button>

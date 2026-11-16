@@ -44,7 +44,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
             <a
               key={link.href}
               href={link.href}
-              className="text-orange-400 hover:text-orange-300 transition-colors"
+              className="text-orange-400 hover:opacity-85 transition-opacity"
             >
               {link.label}
             </a>
@@ -66,7 +66,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
           <button
             type="button"
             onClick={() => onOpenModal()}
-            className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 hover:bg-orange-400 active:scale-[0.99] text-zinc-950 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2.5 shadow-xl shadow-orange-500/25 transition-all cursor-pointer whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 rounded-full bg-orange-600/85 hover:bg-orange-600 active:scale-[0.99] text-zinc-950 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2.5 transition-all cursor-pointer whitespace-nowrap"
           >
             Quiero Inscribirme
             <ArrowUpRight className="w-4 h-4" />
@@ -91,7 +91,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
               key={link.href}
               href={link.href}
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-base font-semibold text-orange-400 hover:text-orange-300 border-b border-orange-500/20"
+              className="block py-2 text-base font-semibold text-orange-400 hover:opacity-85 border-b border-orange-500/20"
             >
               {link.label}
             </a>
@@ -114,7 +114,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
               setMobileMenuOpen(false);
               onOpenModal();
             }}
-            className="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 hover:bg-orange-400 active:scale-[0.99] text-zinc-950 font-display font-semibold text-sm uppercase tracking-wider py-3.5 shadow-xl shadow-orange-500/25 transition-all cursor-pointer"
+            className="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-orange-600/85 hover:bg-orange-600 active:scale-[0.99] text-zinc-950 font-display font-semibold text-sm uppercase tracking-wider py-3.5 transition-all cursor-pointer"
           >
             Quiero Inscribirme
             <ArrowUpRight className="w-4 h-4" />

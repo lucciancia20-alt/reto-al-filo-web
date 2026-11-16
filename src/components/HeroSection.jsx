@@ -99,14 +99,14 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
         {/* Contador regresivo dinámico hacia la fecha y hora de largada */}
         <div className="w-full max-w-md">
-          <div className="my-4 flex items-center justify-center gap-2 text-center text-xs sm:text-sm font-medium uppercase tracking-wider text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-            <Timer className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-orange-400 shrink-0" />
+          <p className="my-4 text-center text-xs sm:text-sm font-medium uppercase tracking-wider text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            <Timer className="inline-block w-4 h-4 sm:w-[18px] sm:h-[18px] text-orange-400 mr-1.5 -mt-0.5 align-middle" />
             <span>
               {countdown.expired
                 ? '¡Largada en curso!'
                 : `Cuenta regresiva hacia la largada (${targetDateParts.formattedShortDate})`}
             </span>
-          </div>
+          </p>
 
           <div className="grid grid-cols-4 gap-2.5 sm:gap-3">
             {timeUnits.map((unit) => (
@@ -130,7 +130,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
           <button
             type="button"
             onClick={() => onOpenModal()}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-2xl bg-orange-500 hover:bg-orange-400 active:scale-[0.99] text-zinc-950 font-display font-semibold text-base sm:text-lg uppercase tracking-wider px-8 py-3 sm:py-3.5 shadow-xl shadow-orange-500/25 transition-all cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-2xl bg-orange-600/85 hover:bg-orange-600 active:scale-[0.99] text-zinc-950 font-display font-semibold text-base sm:text-lg uppercase tracking-wider px-8 py-3 sm:py-3.5 transition-all cursor-pointer"
           >
             <Flame className="w-5 h-5 fill-zinc-950" />
             Quiero Inscribirme
@@ -138,7 +138,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
           <a
             href="#circuito"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm text-orange-400 hover:text-orange-300 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.45)] font-semibold text-sm sm:text-base px-6 py-3 sm:py-3.5 transition-all"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm text-orange-400 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:scale-[1.01] font-semibold text-sm sm:text-base px-6 py-3 sm:py-3.5 transition-all"
           >
             Ver Circuito y Altimetría
           </a>
@@ -146,7 +146,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
         <a
           href="#consultar-dorsal"
-          className="mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm border border-orange-500/70 hover:border-orange-400 px-3.5 py-1.5 text-xs font-semibold text-orange-400 hover:text-orange-300 transition-colors"
+          className="mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm border border-orange-500/70 px-3.5 py-1.5 text-xs font-semibold text-orange-400 hover:scale-[1.01] transition-all"
         >
           <Search className="w-3.5 h-3.5 text-orange-400 shrink-0" />
           <span>¿Ya te inscribiste? Consultar mi estado y dorsal →</span>

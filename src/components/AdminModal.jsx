@@ -1292,7 +1292,7 @@ export default function AdminModal({
                     type="button"
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center justify-center gap-1.5 px-2.5 py-2.5 rounded-xl bg-zinc-950 border border-orange-500/80 text-[11px] sm:text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer ${
-                      active ? 'text-orange-400' : 'text-zinc-300 hover:text-orange-300'
+                      active ? 'text-orange-400' : 'text-zinc-300 hover:text-orange-400'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5 shrink-0" />

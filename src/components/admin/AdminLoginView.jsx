@@ -164,7 +164,7 @@ export default function AdminLoginView({
               type="button"
               onClick={onPasswordReset}
               disabled={!firebaseReady || authLoading}
-              className="text-xs text-orange-400 hover:text-orange-300 underline underline-offset-2 cursor-pointer disabled:opacity-50"
+              className="text-xs text-orange-400 hover:opacity-85 underline underline-offset-2 cursor-pointer disabled:opacity-50"
             >
               ¿Olvidaste tu contraseña? Enviar enlace por mail
             </button>

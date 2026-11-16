@@ -520,7 +520,7 @@ export default function RegistrationModal({
                   <button
                     type="button"
                     onClick={() => openPrintableWaiver({ raceConfig, runner: confirmedReg })}
-                    className="min-h-[42px] inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
+                    className="min-h-[42px] inline-flex items-center justify-center gap-2 rounded-xl bg-orange-600/85 hover:bg-orange-600 text-zinc-950 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
                   >
                     <Printer className="w-4 h-4 shrink-0" />
                     <span>Deslinde Oficial (A4 / PDF)</span>
@@ -1136,7 +1136,7 @@ export default function RegistrationModal({
                       Formatos aceptados: JPG, PNG, WEBP o PDF (máx. 8 MB).
                     </p>
                     <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                      <label className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 cursor-pointer transition-colors">
+                      <label className="inline-flex items-center gap-2 rounded-xl bg-orange-600/85 hover:bg-orange-600 text-zinc-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 cursor-pointer transition-colors">
                         <Upload className="w-4 h-4" />
                         {receiptFile ? 'Cambiar Comprobante' : 'Adjuntar Comprobante'}
                         <input
