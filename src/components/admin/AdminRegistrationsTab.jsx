@@ -417,7 +417,7 @@ export default function AdminRegistrationsTab({
 
       {/* Controles de filtro y exportación */}
       <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3 space-y-2.5">
-        <div className="flex flex-wrap lg:flex-nowrap items-center gap-1.5 sm:gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <select
             aria-label="Filtrar por distancia"
             value={regDistanceFilter}
