@@ -100,8 +100,27 @@ service cloud.firestore {
     match /publicStatus/{lookupId} {
       allow get: if true;
       allow list: if false;
-      allow create: if isAdmin() || isValidPublicStatusCreate(request.resource.data);
+      allow create: if isAdmin()
+        || (isValidPublicStatusCreate(request.resource.data)
+            && lookupId == 'code-' + request.resource.data.code);
       allow update, delete: if isAdmin();
+    }
+
+    // Contadores agregados. El admin escribe libremente; el público solo puede
+    // sumar +1 (nueva inscripción pendiente) sobre un documento ya existente.
+    function isPublicStatsIncrement() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['total', 'pending', 'd27k', 'd13k', 'updatedAt'])
+        && request.resource.data.total == resource.data.total + 1
+        && request.resource.data.pending == resource.data.pending + 1
+        && (request.resource.data.d27k + request.resource.data.d13k)
+            == (resource.data.d27k + resource.data.d13k + 1);
+    }
+
+    match /stats/summary {
+      allow read: if isAdmin();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || isPublicStatsIncrement();
     }
 
     match /{document=**} {

@@ -32,6 +32,7 @@ import {
   signOutAdmin,
   isFirebaseConfigured,
   fetchRegistrations,
+  fetchRegistrationStats,
   updateRegistrationStatus,
   deleteRegistrationRecord,
   syncPublicRunnerStatus,
@@ -121,6 +122,7 @@ export default function AdminModal({
 
   const regsAbortRef = useRef(null);
   const regsLoadedAtRef = useRef(0);
+  const [remoteStats, setRemoteStats] = useState(null);
   const [syncingPublic, setSyncingPublic] = useState(false);
   const [syncMessage, setSyncMessage] = useState(null);
 
@@ -134,6 +136,10 @@ export default function AdminModal({
     regsAbortRef.current = controller;
     setRegsLoading(true);
     setRegsError('');
+    // Contadores agregados (1 lectura) para mostrar totales mientras carga la lista completa.
+    fetchRegistrationStats().then((s) => {
+      if (s && !controller.signal.aborted) setRemoteStats(s);
+    });
     try {
       const res = await fetchRegistrations({ signal: controller.signal });
       if (controller.signal.aborted || res.aborted) return;
@@ -204,6 +210,18 @@ export default function AdminModal({
   );
 
   const regStats = useMemo(() => {
+    if (registrations.length === 0 && remoteStats) {
+      return {
+        total: remoteStats.total,
+        confirmed: remoteStats.confirmed,
+        pending: remoteStats.pending,
+        count27k: remoteStats.d27k,
+        count13k: remoteStats.d13k,
+        checkedInCount: remoteStats.checkedIn,
+        pendingCheckInCount: Math.max(0, remoteStats.confirmed - remoteStats.checkedIn),
+        shirtSizes: [],
+      };
+    }
     let confirmed = 0;
     let pending = 0;
     let count27k = 0;
@@ -250,7 +268,7 @@ export default function AdminModal({
       pendingCheckInCount,
       shirtSizes: Array.from(shirtMap.values()),
     };
-  }, [registrations]);
+  }, [registrations, remoteStats]);
 
   const duplicateInfo = useMemo(() => {
     const savedBibCounts = new Map();
@@ -690,7 +708,7 @@ export default function AdminModal({
       await updateRegistrationStatus(reg.id, {
         status: 'confirmado',
         assignedBib,
-      });
+      }, reg);
       const updatedReg = {
         ...reg,
         status: 'confirmado',
@@ -716,7 +734,7 @@ export default function AdminModal({
       await updateRegistrationStatus(reg.id, {
         status: nextStatus,
         assignedBib,
-      });
+      }, reg);
       const updatedReg = {
         ...reg,
         status: nextStatus,
@@ -743,7 +761,7 @@ export default function AdminModal({
       await updateRegistrationStatus(reg.id, {
         checkedIn: nextCheckedIn,
         checkedInAt,
-      });
+      }, reg);
       const updatedReg = {
         ...reg,
         checkedIn: nextCheckedIn,

@@ -528,12 +528,31 @@ export async function uploadImageToCloudinary(
   };
 }
 
+/**
+ * Proyección mínima para almacenamiento local: SOLO id, código RAF, estado y fecha.
+ * Nunca se persisten datos personales (DNI, teléfono, datos médicos, etc.) en el navegador.
+ */
+function toLocalRegistrationStub(item) {
+  return {
+    id: String(item?.id || ''),
+    code: String(item?.code || '').trim().toUpperCase().slice(0, 30),
+    status: String(item?.status || 'pendiente'),
+    createdAt: Number(item?.createdAt) || 0,
+  };
+}
+
 function readLocalRegistrations() {
   try {
     const raw = window.localStorage.getItem(LOCAL_REGISTRATIONS_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+
+    const stubs = parsed.map(toLocalRegistrationStub);
+    // Migración: si había datos personales guardados por versiones anteriores, se purgan.
+    const hasLegacyPii = parsed.some((item) => item && Object.keys(item).length > 4);
+    if (hasLegacyPii) writeLocalRegistrations(stubs);
+    return stubs;
   } catch {
     return [];
   }
@@ -541,9 +560,81 @@ function readLocalRegistrations() {
 
 function writeLocalRegistrations(list) {
   try {
-    window.localStorage.setItem(LOCAL_REGISTRATIONS_STORAGE_KEY, JSON.stringify(list));
+    const stubs = (Array.isArray(list) ? list : []).map(toLocalRegistrationStub);
+    window.localStorage.setItem(LOCAL_REGISTRATIONS_STORAGE_KEY, JSON.stringify(stubs));
   } catch {
     // Ignorar errores de almacenamiento local
+  }
+}
+
+// Purga inmediata de datos personales guardados por versiones anteriores.
+if (typeof window !== 'undefined') readLocalRegistrations();
+
+// ---------------------------------------------------------------------------
+// stats/summary: contadores agregados (1 lectura en vez de N) mantenidos con increment()
+// ---------------------------------------------------------------------------
+const STATS_FIELDS = ['total', 'pending', 'confirmed', 'rejected', 'd27k', 'd13k', 'checkedIn'];
+
+function statsContribution(record) {
+  const out = Object.fromEntries(STATS_FIELDS.map((f) => [f, 0]));
+  if (!record) return out;
+  const st = String(record.status || '').trim().toLowerCase();
+  const confirmed = st === 'confirmado' || st === 'confirmed';
+  const rejected = st === 'rechazado' || st === 'rejected';
+  out.total = 1;
+  if (confirmed) out.confirmed = 1;
+  else if (rejected) out.rejected = 1;
+  else out.pending = 1;
+  const dist = String(record.distance || '').toUpperCase();
+  if (dist === '27K' || dist === '21K') out.d27k = 1;
+  else if (dist === '13K' || dist === '10K') out.d13k = 1;
+  if (confirmed && record.checkedIn) out.checkedIn = 1;
+  return out;
+}
+
+function buildStatsDelta(before, after) {
+  const a = statsContribution(before);
+  const b = statsContribution(after);
+  const delta = {};
+  for (const f of STATS_FIELDS) {
+    if (b[f] - a[f] !== 0) delta[f] = b[f] - a[f];
+  }
+  return delta;
+}
+
+async function applyStatsDelta(before, after) {
+  const delta = buildStatsDelta(before, after);
+  if (Object.keys(delta).length === 0 || !isFirebaseConfigured()) return;
+  try {
+    const bundle = await getFirestoreDb();
+    if (!bundle) return;
+    const { db, firestore } = bundle;
+    const { doc, setDoc, increment } = firestore;
+    const payload = { updatedAt: Date.now() };
+    for (const [field, value] of Object.entries(delta)) payload[field] = increment(value);
+    await setDoc(doc(db, 'stats', 'summary'), payload, { merge: true });
+  } catch (error) {
+    // No bloquea el flujo: el admin puede recalcular con el botón "Sincronizar".
+    console.warn('[Reto al Filo] No se pudo actualizar stats/summary:', error?.code || error?.message);
+  }
+}
+
+/**
+ * Lee los contadores agregados (1 sola lectura). Devuelve null si no existe o no hay permisos.
+ */
+export async function fetchRegistrationStats() {
+  if (!isFirebaseConfigured()) return null;
+  try {
+    const bundle = await getFirestoreDb();
+    if (!bundle) return null;
+    const { db, firestore } = bundle;
+    const { doc, getDoc } = firestore;
+    const snap = await getDoc(doc(db, 'stats', 'summary'));
+    if (!snap.exists()) return null;
+    const data = snap.data();
+    return Object.fromEntries(STATS_FIELDS.map((f) => [f, Math.max(0, Number(data[f]) || 0)]));
+  } catch {
+    return null;
   }
 }
 
@@ -637,7 +728,10 @@ export async function submitRunnerRegistration(payload) {
   writeLocalRegistrations([savedRecord, ...localList]);
 
   if (persistedTo === 'firestore') {
-    await syncPublicRunnerStatus(savedRecord).catch(() => {});
+    await Promise.allSettled([
+      syncPublicRunnerStatus(savedRecord),
+      applyStatsDelta(null, savedRecord),
+    ]);
   }
 
   return {
@@ -698,7 +792,7 @@ export async function fetchRegistrations({ signal } = {}) {
 /**
  * Actualiza el estado o el número de dorsal asignado de una inscripción.
  */
-export async function updateRegistrationStatus(registrationId, updates) {
+export async function updateRegistrationStatus(registrationId, updates, previousRecord = null) {
   if (!registrationId) {
     throw new Error('ID de inscripción inválido.');
   }
@@ -719,6 +813,9 @@ export async function updateRegistrationStatus(registrationId, updates) {
       await setDoc(doc(db, 'registrations', registrationId), cleanUpdates, {
         merge: true,
       });
+      if (previousRecord) {
+        await applyStatsDelta(previousRecord, { ...previousRecord, ...cleanUpdates });
+      }
     }
   }
 
@@ -753,8 +850,10 @@ export async function deleteRegistrationRecord(registrationId, registrationRecor
       await deleteDoc(doc(db, 'registrations', registrationId));
 
       if (targetRecord) {
+        await applyStatsDelta(targetRecord, null);
         const keysToDelete = [];
         const codeKey = normalizeCodeKey(targetRecord.code);
+        // `dni-*` es un formato legado (ya no se crea); se limpia por compatibilidad.
         const dniKey = normalizeDniKey(targetRecord.dni);
         if (codeKey) keysToDelete.push(codeKey);
         if (dniKey) keysToDelete.push(dniKey);
@@ -832,7 +931,7 @@ export async function syncPublicRunnerStatus(record) {
     const { doc, setDoc } = firestore;
     const payload = buildPublicStatusPayload(record);
 
-    const keys = [normalizeCodeKey(record.code), normalizeDniKey(record.dni)].filter(Boolean);
+    const keys = [normalizeCodeKey(record.code)].filter(Boolean);
     if (keys.length === 0) return { ok: false };
 
     await Promise.allSettled(
@@ -858,68 +957,62 @@ export async function syncAllPublicRunnerStatuses(registrationsList = []) {
     if (!bundle) return { ok: false, count: 0 };
 
     const { db, firestore } = bundle;
-    const { doc, writeBatch } = firestore;
+    const { doc, writeBatch, setDoc } = firestore;
 
-    const statusPriority = { confirmed: 3, pending: 2, rejected: 1 };
+    // Un único documento público por corredor (clave: código RAF).
     const docMap = new Map();
-
-    // Ordenar de menor a mayor prioridad para que la más importante (confirmed > pending > rejected) gane en `dni-...`
-    const ordered = [...registrationsList].sort((a, b) => {
-      const pa = statusPriority[mapStatusToPublic(a.status)] || 0;
-      const pb = statusPriority[mapStatusToPublic(b.status)] || 0;
-      if (pa !== pb) return pa - pb;
-      return Number(a.createdAt || 0) - Number(b.createdAt || 0);
-    });
-
-    for (const reg of ordered) {
-      const payload = buildPublicStatusPayload(reg);
+    const legacyDniKeys = new Set();
+    for (const reg of registrationsList) {
       const codeKey = normalizeCodeKey(reg.code);
+      if (codeKey) docMap.set(codeKey, buildPublicStatusPayload(reg));
       const dniKey = normalizeDniKey(reg.dni);
-      if (codeKey) docMap.set(codeKey, payload);
-      if (dniKey) docMap.set(dniKey, payload);
+      if (dniKey) legacyDniKeys.add(dniKey);
     }
 
-    const entries = Array.from(docMap.entries());
+    const ops = [
+      ...Array.from(docMap.entries()).map(([key, payload]) => ({ type: 'set', key, payload })),
+      // Limpieza única de documentos `dni-*` del esquema anterior.
+      ...Array.from(legacyDniKeys).map((key) => ({ type: 'delete', key })),
+    ];
+
     const CHUNK_SIZE = 400;
-    for (let i = 0; i < entries.length; i += CHUNK_SIZE) {
+    for (let i = 0; i < ops.length; i += CHUNK_SIZE) {
       const batch = writeBatch(db);
-      const slice = entries.slice(i, i + CHUNK_SIZE);
-      slice.forEach(([key, payload]) => {
-        batch.set(doc(db, 'publicStatus', key), payload, { merge: true });
+      ops.slice(i, i + CHUNK_SIZE).forEach((op) => {
+        const ref = doc(db, 'publicStatus', op.key);
+        if (op.type === 'set') batch.set(ref, op.payload, { merge: true });
+        else batch.delete(ref);
       });
       await batch.commit();
     }
 
-    return { ok: true, count: entries.length };
-  } catch (error) {
+    // Recalcula stats/summary desde la lista (fuente de verdad) por si hubo desvíos.
+    const totals = Object.fromEntries(STATS_FIELDS.map((f) => [f, 0]));
+    for (const reg of registrationsList) {
+      const c = statsContribution(reg);
+      for (const f of STATS_FIELDS) totals[f] += c[f];
+    }
+    await setDoc(doc(db, 'stats', 'summary'), { ...totals, updatedAt: Date.now() });
+
+    return { ok: true, count: docMap.size };  } catch (error) {
     console.warn('[Reto al Filo] No se pudo sincronizar lote publicStatus:', error?.code || error?.message);
     return { ok: false, count: 0 };
   }
 }
 
 function buildLookupCandidates(rawQuery) {
-  const trimmed = String(rawQuery || '').trim();
-  if (!trimmed) return [];
+  const upper = String(rawQuery || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
+  if (!upper) return [];
 
-  const upper = trimmed.toUpperCase().replace(/[^A-Z0-9-]/g, '');
-  const digits = trimmed.replace(/\D/g, '');
-  const candidates = [];
-
-  if (upper.startsWith('RAF') || /[A-Z]/.test(upper)) {
-    candidates.push(`code-${upper}`);
-    if (upper.startsWith('RAF') && !upper.includes('-') && upper.length > 3) {
-      candidates.push(`code-RAF-${upper.slice(3)}`);
-    }
-  } else if (digits.length >= 6) {
-    candidates.push(`dni-${digits}`);
-  } else if (digits.length >= 4) {
-    candidates.push(`code-RAF-${digits}`);
-    candidates.push(`dni-${digits}`);
+  // La consulta pública es solo por código RAF (el DNI ya no se usa como clave pública).
+  if (/^RAF-?\d{4,}$/.test(upper)) {
+    return [`code-RAF-${upper.replace(/^RAF-?/, '')}`];
   }
-
-  return Array.from(new Set(candidates));
+  if (/^\d{4,}$/.test(upper)) {
+    return [`code-RAF-${upper}`];
+  }
+  return [];
 }
-
 /**
  * Consulta pública segura de estado/dorsal por DNI o código RAF-XXXXX.
  */
@@ -957,17 +1050,11 @@ export async function fetchPublicRunnerStatus(rawQuery) {
 
   // Fallback local (registraciones guardadas en el mismo navegador / modo sin rules o local)
   const localList = readLocalRegistrations();
-  const digits = String(rawQuery || '').replace(/\D/g, '');
   const upperCode = String(rawQuery || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
   const localMatch = localList.find((reg) => {
-    const regDni = String(reg.dni || '').replace(/\D/g, '');
     const regCode = String(reg.code || '').trim().toUpperCase();
-    return (
-      (digits && regDni === digits) ||
-      (upperCode && (regCode === upperCode || regCode === `RAF-${upperCode}`))
-    );
+    return upperCode && (regCode === upperCode || regCode === `RAF-${upperCode}`);
   });
-
   if (localMatch) {
     return {
       found: true,
