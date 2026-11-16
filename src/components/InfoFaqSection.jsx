@@ -256,7 +256,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
               </p>
             </div>
 
-            <div className="mt-5 flex-1 flex flex-col gap-2.5">
+            <div className="mt-5 flex-1 flex flex-col justify-start gap-2.5">
             {(raceConfig.faqs || []).map((faq) => {
               const isOpen = openFaqId === faq.id;
               const IconComponent = faqIcons[faq.id] || HelpCircle;
@@ -417,7 +417,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             })}
 
             {/* Acceso directo permanente a Documentos Imprimibles A4 */}
-            <div className="mt-auto rounded-2xl bg-zinc-950 border border-orange-500/70 p-4 flex flex-col sm:flex-row xl:flex-col sm:items-center xl:items-stretch justify-between gap-3">
+            <div className="rounded-2xl bg-zinc-950 border border-orange-500/70 p-4 flex flex-col sm:flex-row xl:flex-col sm:items-center xl:items-stretch justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <span className="block text-[10px] font-medium uppercase tracking-widest text-orange-400">
                   Documentación para Acreditación (Imprimible A4)
