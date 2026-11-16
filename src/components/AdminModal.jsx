@@ -1203,7 +1203,7 @@ export default function AdminModal({
       onClick={handleSafeClose}
     >
       <div
-        className={`w-full max-w-5xl ${unlocked ? 'h-[88vh] max-h-[850px]' : 'h-auto max-h-[90dvh]'} rounded-3xl bg-stone-900 border border-stone-700 shadow-2xl flex flex-col justify-start overflow-hidden overscroll-contain text-stone-100`}
+        className={`w-full max-w-5xl ${unlocked ? 'h-[88vh] max-h-[850px]' : 'h-auto max-h-[90dvh]'} rounded-2xl bg-stone-900 border border-orange-500/80 shadow-2xl flex flex-col justify-start overflow-hidden overscroll-contain text-stone-100`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header del Modal */}

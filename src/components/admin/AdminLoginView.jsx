@@ -51,7 +51,7 @@ export default function AdminLoginView({
           type="button"
           onClick={onGoogleSignIn}
           disabled={authLoading || !firebaseReady}
-          className="w-full min-h-[46px] inline-flex items-center justify-center gap-3 rounded-xl bg-white hover:bg-stone-100 text-stone-900 font-bold text-sm px-4 py-3 shadow-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full min-h-[46px] inline-flex items-center justify-center gap-3 rounded-xl bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 font-semibold text-sm px-4 py-3 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -86,22 +86,23 @@ export default function AdminLoginView({
         {/* Acceso con Correo electrónico y Contraseña */}
         <form
           onSubmit={onEmailSignIn}
-          autoComplete="off"
+          autoComplete="on"
           className="rounded-2xl bg-stone-950/80 border border-stone-800 p-4 space-y-3"
         >
           <div>
             <label
-              htmlFor="admin-email-input"
+              htmlFor="admin-email"
               className="block text-xs font-semibold text-stone-300 mb-1"
             >
               Correo electrónico autorizado
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Mail className="w-4 h-4 text-orange-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
-                id="admin-email-input"
+                id="admin-email"
+                name="email"
                 type="email"
-                autoComplete="off"
+                autoComplete="username"
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
                 placeholder=""
@@ -114,17 +115,18 @@ export default function AdminLoginView({
 
           <div>
             <label
-              htmlFor="admin-password-input"
+              htmlFor="admin-password"
               className="block text-xs font-semibold text-stone-300 mb-1"
             >
               Contraseña
             </label>
             <div className="relative">
-              <KeyRound className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <KeyRound className="w-4 h-4 text-orange-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
-                id="admin-password-input"
+                id="admin-password"
+                name="password"
                 type="password"
-                autoComplete="new-password"
+                autoComplete="current-password"
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
                 placeholder=""
@@ -139,7 +141,7 @@ export default function AdminLoginView({
           <button
             type="submit"
             disabled={!firebaseReady || authLoading}
-            className="w-full min-h-[44px] rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-black uppercase text-xs sm:text-sm py-2.5 cursor-pointer transition-colors disabled:opacity-50"
+            className="w-full min-h-[44px] rounded-xl bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 font-display font-semibold uppercase text-xs sm:text-sm py-2.5 cursor-pointer transition-colors disabled:opacity-50"
           >
             {authLoading ? 'Ingresando...' : 'Ingresar con Correo'}
           </button>
@@ -149,7 +151,7 @@ export default function AdminLoginView({
               type="button"
               onClick={onPasswordReset}
               disabled={!firebaseReady || authLoading}
-              className="text-xs text-amber-400 hover:text-amber-300 underline underline-offset-2 cursor-pointer disabled:opacity-50"
+              className="text-xs text-orange-400 hover:text-orange-300 underline underline-offset-2 cursor-pointer disabled:opacity-50"
             >
               ¿Olvidaste tu contraseña? Enviar enlace por mail
             </button>
