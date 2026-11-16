@@ -1236,10 +1236,10 @@ export default function AdminModal({
                     ? 'Confirmar cierre de sesión de administrador'
                     : 'Cerrar sesión de administrador'
                 }
-                className={`inline-flex items-center gap-1.5 rounded-xl text-xs font-semibold px-3 py-2 cursor-pointer transition-colors ${
+                className={`inline-flex items-center gap-1.5 rounded-xl text-xs font-semibold px-3.5 py-1.5 cursor-pointer transition-colors ${
                   confirmingLogout
                     ? 'bg-zinc-950 border border-red-500 text-red-400'
-                    : 'bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-200'
+                    : 'bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 hover:text-red-500'
                 }`}
               >
                 <LogOut className="w-3.5 h-3.5" />
