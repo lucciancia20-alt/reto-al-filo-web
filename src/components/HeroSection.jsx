@@ -146,9 +146,9 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
           <a
             href="#circuito"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm text-orange-400 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:scale-[1.01] font-semibold text-sm sm:text-base px-6 py-3 sm:py-3.5 transition-all"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm text-orange-400 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:scale-[1.01] font-semibold uppercase text-xs sm:text-[13px] tracking-wider whitespace-nowrap px-6 py-3 sm:py-3.5 transition-all"
           >
-            Ver Circuito y Altimetría
+            VER CIRCUITO Y ALTIMETRÍA
           </a>
         </div>
 
