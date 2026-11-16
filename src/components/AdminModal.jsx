@@ -1512,29 +1512,40 @@ export default function AdminModal({
 
             {/* Footer fijo con altura constante en todas las pestañas */}
             <div className="relative px-4 sm:px-5 py-3.5 bg-stone-950 border-t border-stone-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
-              {activeTab === 'photos' || activeTab === 'registrations' ? (
-                <button
-                  type="button"
-                  onClick={handleSafeClose}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 text-xs font-semibold px-4 py-2.5 transition-colors cursor-pointer"
-                >
-                  Cerrar Panel
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  disabled={saving}
-                  className={`inline-flex items-center gap-1.5 rounded-xl text-xs font-semibold px-4 py-2.5 cursor-pointer transition-colors ${
-                    confirmingReset
-                      ? 'bg-zinc-950 border border-red-500 text-red-400'
-                      : 'bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400'
-                  }`}
-                >
-                  <RotateCcw className={`w-3.5 h-3.5 ${confirmingReset ? 'text-red-400' : 'text-orange-500'}`} />
-                  {confirmingReset ? '¿Confirmar restauración?' : 'Restaurar valores originales'}
-                </button>
-              )}
+              <div className="flex flex-wrap items-center gap-3">
+                {activeTab === 'photos' || activeTab === 'registrations' ? (
+                  <button
+                    type="button"
+                    onClick={handleSafeClose}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 text-xs font-semibold px-4 py-2.5 transition-colors cursor-pointer"
+                  >
+                    Cerrar Panel
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    disabled={saving}
+                    className={`inline-flex items-center gap-1.5 rounded-xl text-xs font-semibold px-4 py-2.5 cursor-pointer transition-colors ${
+                      confirmingReset
+                        ? 'bg-zinc-950 border border-red-500 text-red-400'
+                        : 'bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400'
+                    }`}
+                  >
+                    <RotateCcw className={`w-3.5 h-3.5 ${confirmingReset ? 'text-red-400' : 'text-orange-500'}`} />
+                    {confirmingReset ? '¿Confirmar restauración?' : 'Restaurar valores originales'}
+                  </button>
+                )}
+
+                {activeTab === 'registrations' && syncMessage && (
+                  <span
+                    role="status"
+                    className={`text-xs font-medium ${syncMessage.ok ? 'text-emerald-400' : 'text-red-400'}`}
+                  >
+                    {syncMessage.text}
+                  </span>
+                )}
+              </div>
 
               {canScrollMore && (
                 <button
@@ -1542,7 +1553,7 @@ export default function AdminModal({
                   onClick={handleScrollDown}
                   title="Ir abajo"
                   aria-label="Ir abajo"
-                  className="w-8 h-8 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-orange-500/80 text-orange-400 flex items-center justify-center shadow-none transition-colors cursor-pointer sm:absolute sm:left-1/2 sm:-translate-x-1/2"
+                  className="w-8 h-8 rounded-full bg-transparent hover:bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 flex items-center justify-center shadow-none transition-colors cursor-pointer sm:absolute sm:left-1/2 sm:-translate-x-1/2"
                 >
                   <ChevronDown className="w-4 h-4 text-orange-400 animate-bounce" />
                 </button>
@@ -1580,22 +1591,14 @@ export default function AdminModal({
                 )
               ) : activeTab === 'registrations' ? (
                 <div className="flex flex-wrap items-center justify-end gap-2">
-                  {syncMessage && (
-                    <span
-                      role="status"
-                      className={`text-xs ${syncMessage.ok ? 'text-emerald-400' : 'text-red-400'}`}
-                    >
-                      {syncMessage.text}
-                    </span>
-                  )}
                   <button
                     type="button"
                     onClick={handleSyncPublicStatuses}
                     disabled={syncingPublic || regsLoading || registrations.length === 0 || regsSource !== 'firestore'}
                     title="Escribe el estado público de todos los inscriptos (consume escrituras). Usar solo cuando haga falta."
-                    className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-zinc-700 hover:border-orange-400 text-zinc-300 hover:text-orange-400 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-4 py-2.5 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <ShieldCheck className={`w-4 h-4 ${syncingPublic ? 'animate-pulse' : ''}`} />
+                    <ShieldCheck className={`w-4 h-4 text-orange-500 ${syncingPublic ? 'animate-pulse' : ''}`} />
                     {syncingPublic ? 'Sincronizando...' : 'Sincronizar'}
                   </button>
                   <button
