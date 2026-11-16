@@ -130,9 +130,9 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
           <button
             type="button"
             onClick={() => onOpenModal()}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-2xl bg-orange-600/85 hover:bg-orange-600 active:scale-[0.99] text-zinc-950 font-display font-semibold text-base sm:text-lg uppercase tracking-wider px-8 py-3 sm:py-3.5 transition-all cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-2xl bg-zinc-950 hover:bg-zinc-950 border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-950 active:scale-[0.99] text-orange-400 font-display font-semibold text-base sm:text-lg uppercase tracking-wider px-8 py-3 sm:py-3.5 transition-all cursor-pointer"
           >
-            <Flame className="w-5 h-5 fill-zinc-950" />
+            <Flame className="w-5 h-5 text-orange-400" />
             Quiero Inscribirme
           </button>
 

@@ -66,10 +66,10 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
           <button
             type="button"
             onClick={() => onOpenModal()}
-            className="inline-flex items-center gap-1.5 rounded-full bg-orange-600/85 hover:bg-orange-600 active:scale-[0.99] text-zinc-950 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2.5 transition-all cursor-pointer whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 rounded-full bg-zinc-950 hover:bg-zinc-950 border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-950 active:scale-[0.99] text-orange-400 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2.5 transition-all cursor-pointer whitespace-nowrap"
           >
             Quiero Inscribirme
-            <ArrowUpRight className="w-4 h-4" />
+            <ArrowUpRight className="w-4 h-4 text-orange-400" />
           </button>
         </div>
 
@@ -114,10 +114,10 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
               setMobileMenuOpen(false);
               onOpenModal();
             }}
-            className="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-orange-600/85 hover:bg-orange-600 active:scale-[0.99] text-zinc-950 font-display font-semibold text-sm uppercase tracking-wider py-3.5 transition-all cursor-pointer"
+            className="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-950 hover:bg-zinc-950 border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-950 active:scale-[0.99] text-orange-400 font-display font-semibold text-sm uppercase tracking-wider py-3.5 transition-all cursor-pointer"
           >
             Quiero Inscribirme
-            <ArrowUpRight className="w-4 h-4" />
+            <ArrowUpRight className="w-4 h-4 text-orange-400" />
           </button>
         </div>
       )}
