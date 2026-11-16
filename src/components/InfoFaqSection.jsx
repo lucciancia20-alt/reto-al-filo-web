@@ -660,11 +660,11 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                             href={raceConfig.googleMapsUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-colors"
+                            className="w-full flex items-center justify-center gap-2 rounded-xl bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 font-display font-medium text-xs uppercase tracking-wider px-4 py-2.5 transition-colors"
                           >
-                            <MapPin className="w-4 h-4 text-orange-500" />
+                            <MapPin className="w-4 h-4 text-orange-400" />
                             Abrir ubicación en Google Maps
-                            <ExternalLink className="w-3.5 h-3.5 text-orange-500" />
+                            <ExternalLink className="w-3.5 h-3.5 text-orange-400" />
                           </a>
                         </div>
                       )}
