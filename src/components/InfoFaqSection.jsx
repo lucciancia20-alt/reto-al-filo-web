@@ -86,9 +86,9 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
     <>
       {/* Grilla de 3 columnas en escritorio (xl:grid-cols-3) y 1 columna en móviles/tablets */}
       <div className="bg-stone-950 border-t-2 border-orange-500/50 py-8 sm:py-10 relative">
-        <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-6 xl:px-10 grid grid-cols-1 xl:grid-cols-3 gap-10 xl:gap-6 items-start">
+        <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-6 xl:px-10 grid grid-cols-1 xl:grid-cols-3 gap-10 xl:gap-6 items-stretch">
           {/* Columna 1: Línea de Tiempo (Cronograma del Día) */}
-          <section id="cronograma" className="scroll-mt-20 min-w-0">
+          <section id="cronograma" className="scroll-mt-20 min-w-0 flex flex-col h-full">
             <div className="text-center">
               <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
                 <Clock className="w-3.5 h-3.5 shrink-0" />
@@ -105,15 +105,15 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             </div>
 
             {/* Línea de tiempo vertical con los horarios del día */}
-            <div className="mt-5 relative pl-6 sm:pl-8 before:content-[''] before:absolute before:left-2.5 sm:before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-orange-500 before:via-orange-500/50 before:to-stone-800 space-y-2.5">
+            <div className="mt-5 flex-1 flex flex-col justify-between gap-2.5 relative pl-6 sm:pl-8 before:content-[''] before:absolute before:left-2.5 sm:before:left-3.5 before:top-7 before:bottom-7 before:w-0.5 before:bg-gradient-to-b before:from-orange-500 before:via-orange-500/50 before:to-stone-800">
               {syncedSchedule.map((item, idx) => (
                 <div
                   key={`${item.time}-${idx}`}
-                  className="relative rounded-2xl bg-zinc-950 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] p-3.5 sm:p-4 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
+                  className="relative flex-1 flex flex-col justify-center rounded-2xl bg-zinc-950 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] p-3.5 sm:p-4 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
                 >
-                  {/* Punto indicador en la línea vertical */}
+                  {/* Punto indicador centrado exactamente sobre la línea vertical */}
                   <span
-                    className={`absolute -left-[25px] sm:-left-[29px] top-5 w-4 h-4 rounded-full border-2 ${
+                    className={`absolute -left-[22px] sm:-left-[26px] top-5 w-4 h-4 rounded-full border-2 ${
                       idx === 2
                         ? 'bg-orange-500 border-stone-950 ring-4 ring-orange-500/30'
                         : 'bg-stone-950 border-orange-500'
@@ -123,23 +123,23 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2">
                       {item.day && (
-                        <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-orange-300 bg-zinc-950 border border-orange-500/60 px-3 py-1 rounded-lg">
+                        <span className="inline-flex items-center h-7 text-xs font-extrabold uppercase tracking-wider leading-none text-orange-300 bg-zinc-950 border border-orange-500/60 px-2.5 rounded-lg whitespace-nowrap">
                           {item.day}
                         </span>
                       )}
-                      <span className="font-mono text-sm sm:text-base font-extrabold text-orange-400 bg-zinc-950 border border-orange-500/50 px-3 py-1 rounded-lg">
+                      <span className="inline-flex items-center h-7 font-mono tabular-nums text-xs sm:text-sm font-extrabold leading-none text-orange-400 bg-zinc-950 border border-orange-500/50 px-2.5 rounded-lg whitespace-nowrap">
                         {item.time}
                       </span>
                     </div>
-                    <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 bg-zinc-950 px-2.5 py-1 rounded-md border border-orange-500/60">
+                    <span className="inline-flex items-center h-7 text-[11px] font-semibold uppercase tracking-wider leading-none text-stone-400 bg-zinc-950 px-2.5 rounded-md border border-orange-500/60 whitespace-nowrap">
                       {item.tag}
                     </span>
                   </div>
 
-                  <h3 className="mt-1.5 font-display text-lg sm:text-xl font-extrabold text-white">
+                  <h3 className="mt-2 font-display text-lg sm:text-xl font-extrabold text-white">
                     {item.title}
                   </h3>
-                  <p className="mt-0.5 text-xs sm:text-sm text-stone-300 leading-relaxed">
+                  <p className="mt-1 text-xs sm:text-sm text-stone-300 leading-relaxed">
                     {item.description}
                   </p>
                 </div>
@@ -150,7 +150,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
           {/* Columna 2: Tabla Pública de Categorías por Edad y Premiación */}
           <section
             id="categorias"
-            className="scroll-mt-20 min-w-0 pt-8 border-t-2 border-orange-500/40 xl:pt-0 xl:border-t-0"
+            className="scroll-mt-20 min-w-0 pt-8 border-t-2 border-orange-500/40 xl:pt-0 xl:border-t-0 flex flex-col h-full"
           >
             <div className="text-center">
               <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
@@ -167,7 +167,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
               </p>
             </div>
 
-            <div className="mt-5 space-y-3">
+            <div className="mt-5 flex-1 flex flex-col gap-3">
               {/* Resumen de Premiación */}
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2.5">
               <div className="rounded-2xl bg-zinc-950 border border-orange-500/70 p-3.5">
@@ -228,7 +228,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             )}
 
             {ageCategories.ruleNote && (
-              <div className="rounded-xl bg-zinc-950 border border-orange-500/60 px-4 py-2.5 text-xs text-orange-100 leading-relaxed">
+              <div className="mt-auto rounded-xl bg-zinc-950 border border-orange-500/60 px-4 py-2.5 text-xs text-orange-100 leading-relaxed">
                 <strong className="text-orange-400">Criterio reglamentario: </strong>
                 {ageCategories.ruleNote}
               </div>
@@ -239,7 +239,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
           {/* Columna 3: Acordeón Desplegable de Preguntas Frecuentes */}
           <section
             id="faq"
-            className="scroll-mt-20 min-w-0 pt-8 border-t-2 border-orange-500/40 xl:pt-0 xl:border-t-0"
+            className="scroll-mt-20 min-w-0 pt-8 border-t-2 border-orange-500/40 xl:pt-0 xl:border-t-0 flex flex-col h-full"
           >
             <div className="text-center">
               <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
@@ -252,7 +252,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
               </h2>
             </div>
 
-            <div className="mt-5 space-y-2.5">
+            <div className="mt-5 flex-1 flex flex-col gap-2.5">
             {(raceConfig.faqs || []).map((faq) => {
               const isOpen = openFaqId === faq.id;
               const IconComponent = faqIcons[faq.id] || HelpCircle;
@@ -413,7 +413,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             })}
 
             {/* Acceso directo permanente a Documentos Imprimibles A4 */}
-            <div className="rounded-2xl bg-zinc-950 border border-orange-500/70 p-4 flex flex-col sm:flex-row xl:flex-col sm:items-center xl:items-stretch justify-between gap-3">
+            <div className="mt-auto rounded-2xl bg-zinc-950 border border-orange-500/70 p-4 flex flex-col sm:flex-row xl:flex-col sm:items-center xl:items-stretch justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <span className="block text-[10px] font-medium uppercase tracking-widest text-orange-400">
                   Documentación para Acreditación (Imprimible A4)
