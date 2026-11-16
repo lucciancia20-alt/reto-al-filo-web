@@ -641,19 +641,19 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
 
             {/* Acceso directo permanente a Documentos Imprimibles A4 */}
             <div className="rounded-2xl bg-stone-900/90 border border-orange-500/70 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
+              <div className="min-w-0 flex-1">
                 <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
                   Documentación para Acreditación (Imprimible A4)
                 </span>
-                <p className="mt-0.5 text-xs sm:text-[13px] md:whitespace-nowrap font-medium text-white">
+                <p className="mt-0.5 font-mono text-xs leading-relaxed font-medium text-white">
                   Descargá e imprimí tu Deslinde y el Modelo de Certificado / Apto Médico
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2 shrink-0">
+              <div className="shrink-0 flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={() => openPrintableWaiver({ raceConfig })}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-bold text-xs uppercase tracking-wider px-3 py-1.5 whitespace-nowrap transition-colors cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5 shrink-0 text-orange-500" />
                   <span>Deslinde A4</span>
@@ -661,7 +661,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 <button
                   type="button"
                   onClick={() => openPrintableMedicalCert({ raceConfig })}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-bold text-xs uppercase tracking-wider px-3 py-1.5 whitespace-nowrap transition-colors cursor-pointer"
                 >
                   <FileCheck2 className="w-3.5 h-3.5 shrink-0 text-orange-500" />
                   <span>Apto Médico A4</span>
