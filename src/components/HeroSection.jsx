@@ -90,7 +90,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         </div>
 
         <div className="mt-3 max-w-2xl mx-auto px-6 py-3.5 rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.28)]">
-          <p className="text-balance text-sm sm:text-base text-white leading-relaxed">
+          <p className="text-balance text-center text-sm sm:text-base text-white leading-relaxed tracking-[0.035em] [word-spacing:0.12em]">
             Desafiá las crestas técnicas, el bosque de altura y los senderos serranos en dos
             distancias diseñadas para corredores de montaña: <strong className="text-white">27K Competitivo</strong> y{' '}
             <strong className="text-white">13K Competitivo</strong>.
