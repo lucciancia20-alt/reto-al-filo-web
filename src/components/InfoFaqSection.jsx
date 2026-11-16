@@ -89,7 +89,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
         <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-6 xl:px-10 grid grid-cols-1 xl:grid-cols-3 gap-10 xl:gap-6 items-stretch">
           {/* Columna 1: Línea de Tiempo (Cronograma del Día) */}
           <section id="cronograma" className="scroll-mt-20 min-w-0 flex flex-col h-full">
-            <div className="text-center">
+            <div className="text-center xl:min-h-[124px] flex flex-col items-center justify-start">
               <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
                 <Clock className="w-3.5 h-3.5 shrink-0" />
                 <span>Cronograma Oficial · {formattedFullDate}</span>
@@ -152,7 +152,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             id="categorias"
             className="scroll-mt-20 min-w-0 pt-8 border-t-2 border-orange-500/40 xl:pt-0 xl:border-t-0 flex flex-col h-full"
           >
-            <div className="text-center">
+            <div className="text-center xl:min-h-[124px] flex flex-col items-center justify-start">
               <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
                 <Award className="w-3.5 h-3.5 shrink-0" />
                 <span>Clasificación Oficial · Damas y Caballeros</span>
@@ -241,7 +241,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             id="faq"
             className="scroll-mt-20 min-w-0 pt-8 border-t-2 border-orange-500/40 xl:pt-0 xl:border-t-0 flex flex-col h-full"
           >
-            <div className="text-center">
+            <div className="text-center xl:min-h-[124px] flex flex-col items-center justify-start">
               <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
                 <HelpCircle className="w-3.5 h-3.5 shrink-0" />
                 <span>Información Clave para el Corredor</span>
@@ -250,6 +250,10 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
               <h2 className="mt-2 text-balance font-display text-3xl md:text-4xl xl:text-2xl font-black text-white uppercase tracking-tight section-title-stroke">
                 Preguntas Frecuentes (FAQ)
               </h2>
+              <p className="mt-1.5 text-balance text-xs sm:text-sm text-stone-300">
+                Resolvé todas tus dudas antes del día de la carrera. Toda la información importante
+                para los corredores.
+              </p>
             </div>
 
             <div className="mt-5 flex-1 flex flex-col gap-2.5">

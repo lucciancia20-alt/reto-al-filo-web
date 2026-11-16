@@ -316,7 +316,7 @@ export default function CircuitSection({
                     {currentCircuit.summaryBadge}
                   </span>
                 </div>
-                <p className="text-xs leading-relaxed text-stone-400 mt-0.5 min-h-[3rem] md:min-h-[2.75rem]">
+                <p className="text-xs leading-relaxed text-stone-400 mt-0.5 min-h-[60px]">
                   {currentCircuit.description}
                 </p>
               </div>
