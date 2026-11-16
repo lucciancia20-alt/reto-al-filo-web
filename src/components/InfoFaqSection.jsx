@@ -174,7 +174,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             {/* Resumen de Premiación */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div className="rounded-2xl bg-zinc-950 border border-orange-500/70 p-3.5">
-                <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
+                <span className="block text-[10px] font-medium uppercase tracking-widest text-orange-400">
                   Clasificación General
                 </span>
                 <p className="mt-1 text-xs sm:text-sm font-medium text-white">
@@ -182,7 +182,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 </p>
               </div>
               <div className="rounded-2xl bg-zinc-950 border border-orange-500/70 p-3.5">
-                <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
+                <span className="block text-[10px] font-medium uppercase tracking-widest text-orange-400">
                   Premiación por Categorías
                 </span>
                 <p className="mt-1 text-xs sm:text-sm font-medium text-white">
@@ -198,8 +198,8 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   <table className="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
                       <tr className="bg-zinc-950 border-b border-orange-500/35 text-[11px] uppercase tracking-wider text-orange-400">
-                        <th className="px-3 sm:px-6 py-2.5 font-extrabold">Franja Etaria</th>
-                        <th className="px-3 sm:px-6 py-2.5 font-extrabold text-right">Ramas y Distancias</th>
+                        <th className="px-3 sm:px-6 py-2.5 font-medium">Franja Etaria</th>
+                        <th className="px-3 sm:px-6 py-2.5 font-medium text-right">Ramas y Distancias</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-800/80">
@@ -622,9 +622,9 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
 
                       {faq.id === 'como-llegar' && (
                         <div className="mt-3.5 grid grid-cols-1 md:grid-cols-3 gap-2.5">
-                          <div className="rounded-xl bg-zinc-950 border border-orange-500/50 p-3 space-y-1.5">
-                            <span className="flex items-center min-h-[1.75rem] gap-1.5 text-[10px] lg:text-[11px] font-display font-bold uppercase tracking-tight whitespace-nowrap text-orange-400">
-                              <PackageCheck className="w-4 h-4 shrink-0" />
+                          <div className="rounded-xl bg-zinc-950 border border-orange-500/80 p-3 space-y-1.5">
+                            <span className="flex items-center min-h-[1.75rem] gap-1.5 text-[10px] lg:text-[11px] font-display font-medium uppercase tracking-wider whitespace-nowrap text-orange-400">
+                              <PackageCheck className="w-4 h-4 shrink-0 text-orange-400" />
                               Checklist para Retirar Kit
                             </span>
                             <p className="text-[11px] sm:text-xs text-stone-200 leading-relaxed text-justify [text-align-last:left]">
@@ -632,9 +632,9 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                             </p>
                           </div>
 
-                          <div className="rounded-xl bg-zinc-950 border border-cyan-500/45 p-3 space-y-1.5">
-                            <span className="flex items-center min-h-[1.75rem] gap-1.5 text-[10px] lg:text-[11px] font-display font-bold uppercase tracking-tight whitespace-nowrap text-cyan-300">
-                              <Wifi className="w-4 h-4 shrink-0" />
+                          <div className="rounded-xl bg-zinc-950 border border-orange-500/80 p-3 space-y-1.5">
+                            <span className="flex items-center min-h-[1.75rem] gap-1.5 text-[10px] lg:text-[11px] font-display font-medium uppercase tracking-wider whitespace-nowrap text-orange-400">
+                              <Wifi className="w-4 h-4 shrink-0 text-orange-400" />
                               Wi-Fi Starlink + Track Offline
                             </span>
                             <p className="text-[11px] sm:text-xs text-stone-200 leading-relaxed text-justify [text-align-last:left]">
@@ -642,9 +642,9 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                             </p>
                           </div>
 
-                          <div className="rounded-xl bg-zinc-950 border border-emerald-500/45 p-3 space-y-1.5">
-                            <span className="flex items-center min-h-[1.75rem] gap-1.5 text-[10px] lg:text-[11px] font-display font-bold uppercase tracking-tight whitespace-nowrap text-emerald-300">
-                              <Car className="w-4 h-4 shrink-0 text-emerald-400" />
+                          <div className="rounded-xl bg-zinc-950 border border-orange-500/80 p-3 space-y-1.5">
+                            <span className="flex items-center min-h-[1.75rem] gap-1.5 text-[10px] lg:text-[11px] font-display font-medium uppercase tracking-wider whitespace-nowrap text-orange-400">
+                              <Car className="w-4 h-4 shrink-0 text-orange-400" />
                               Servicios en Cerro Providencia
                             </span>
                             <p className="text-[11px] sm:text-xs text-stone-200 leading-relaxed text-justify [text-align-last:left]">
@@ -677,7 +677,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             {/* Acceso directo permanente a Documentos Imprimibles A4 */}
             <div className="rounded-2xl bg-zinc-950 border border-orange-500/70 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
+                <span className="block text-[10px] font-medium uppercase tracking-widest text-orange-400">
                   Documentación para Acreditación (Imprimible A4)
                 </span>
                 <p className="mt-0.5 font-mono text-[11px] font-normal tracking-tight leading-relaxed text-white">
