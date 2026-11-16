@@ -211,9 +211,16 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                           <td className="px-4 py-2.5 font-display font-bold text-white">
                             {cat.label || cat.range}
                           </td>
-                          <td className="px-4 py-2.5 text-right text-[11px] sm:text-xs text-stone-300">
-                            Damas / Caballeros · <span className="text-cyan-400 font-bold">27K</span> y{' '}
-                            <span className="text-red-500 font-bold">13K</span>
+                          <td className="px-4 py-2.5 text-[11px] sm:text-xs text-stone-300">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end sm:gap-1.5 text-right">
+                              <span>
+                                Damas / Caballeros <span className="hidden sm:inline">·</span>
+                              </span>
+                              <span className="whitespace-nowrap">
+                                <span className="text-cyan-400 font-bold">27K</span> y{' '}
+                                <span className="text-red-500 font-bold">13K</span>
+                              </span>
+                            </div>
                           </td>
                         </tr>
                       ))}
