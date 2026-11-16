@@ -1195,7 +1195,7 @@ export default function RegistrationModal({
                     type="button"
                     aria-expanded={showTermsModal}
                     onClick={() => setShowTermsModal((prev) => !prev)}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 hover:bg-stone-800 border border-orange-500/60 text-amber-300 text-[11px] font-bold px-3 py-1.5 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-950 border border-orange-500/80 text-orange-400 hover:text-orange-400 text-[11px] font-semibold px-3 py-1.5 cursor-pointer"
                   >
                     <BookOpen className="w-3.5 h-3.5 shrink-0" />
                     <span>
@@ -1217,9 +1217,9 @@ export default function RegistrationModal({
                         },
                       })
                     }
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 hover:bg-stone-800 border border-stone-700 text-stone-200 text-[11px] font-semibold px-2.5 py-1.5 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-950 border border-orange-500/80 text-orange-400 hover:text-orange-400 text-[11px] font-semibold px-3 py-1.5 cursor-pointer"
                   >
-                    <Printer className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <Printer className="w-3.5 h-3.5 shrink-0" />
                     <span>Deslinde A4</span>
                   </button>
 
@@ -1235,9 +1235,9 @@ export default function RegistrationModal({
                         },
                       })
                     }
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 hover:bg-stone-800 border border-stone-700 text-stone-200 text-[11px] font-semibold px-2.5 py-1.5 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-950 border border-orange-500/80 text-orange-400 hover:text-orange-400 text-[11px] font-semibold px-3 py-1.5 cursor-pointer"
                   >
-                    <FileCheck2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <FileCheck2 className="w-3.5 h-3.5 shrink-0" />
                     <span>Modelo Apto Médico A4</span>
                   </button>
                 </div>
@@ -1335,7 +1335,7 @@ export default function RegistrationModal({
                 type="button"
                 onClick={onClose}
                 disabled={submitting}
-                className="min-h-[44px] rounded-xl bg-zinc-950 border border-orange-500/80 text-red-400 hover:text-red-300 text-xs font-semibold px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
+                className="min-h-[44px] rounded-xl bg-zinc-950 border border-orange-500/80 text-red-500 hover:text-red-500 text-xs font-semibold px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
               >
                 Cancelar
               </button>
