@@ -102,9 +102,15 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
           <p className="my-4 text-center text-xs sm:text-sm font-medium uppercase tracking-wider text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
             <Timer className="inline-block w-4 h-4 sm:w-[18px] sm:h-[18px] text-orange-400 mr-1.5 -mt-0.5 align-middle" />
             <span>
-              {countdown.expired
-                ? '¡Largada en curso!'
-                : `Cuenta regresiva hacia la largada (${targetDateParts.formattedShortDate})`}
+              {countdown.expired ? (
+                '¡Largada en curso!'
+              ) : (
+                <>
+                  Cuenta regresiva hacia la largada
+                  <br className="sm:hidden" />{' '}
+                  <span className="whitespace-nowrap">({targetDateParts.formattedShortDate})</span>
+                </>
+              )}
             </span>
           </p>
 

@@ -198,8 +198,8 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   <table className="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
                       <tr className="bg-zinc-950 border-b border-orange-500/35 text-[11px] uppercase tracking-wider text-orange-400">
-                        <th className="px-4 py-2.5 font-extrabold">Franja Etaria</th>
-                        <th className="px-4 py-2.5 font-extrabold text-right">Ramas y Distancias</th>
+                        <th className="px-3 sm:px-6 py-2.5 font-extrabold">Franja Etaria</th>
+                        <th className="px-3 sm:px-6 py-2.5 font-extrabold text-right">Ramas y Distancias</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-800/80">
@@ -208,15 +208,15 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                           key={cat.id || idx}
                           className="hover:bg-stone-950/60 transition-colors"
                         >
-                          <td className="px-4 py-2.5 font-display font-bold text-white">
+                          <td className="px-3 sm:px-6 py-2.5 font-display font-bold text-white text-xs sm:text-sm whitespace-nowrap">
                             {cat.label || cat.range}
                           </td>
-                          <td className="px-4 py-2.5 text-[11px] sm:text-xs text-stone-300">
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end sm:gap-1.5 text-right">
+                          <td className="px-3 sm:px-6 py-2.5 text-[11px] sm:text-xs text-stone-300">
+                            <div className="flex flex-row items-center justify-end gap-1.5 whitespace-nowrap">
                               <span>
-                                Damas / Caballeros <span className="hidden sm:inline">·</span>
+                                Damas / Caballeros <span>·</span>
                               </span>
-                              <span className="whitespace-nowrap">
+                              <span>
                                 <span className="text-cyan-400 font-bold">27K</span> y{' '}
                                 <span className="text-red-500 font-bold">13K</span>
                               </span>
