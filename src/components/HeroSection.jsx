@@ -100,7 +100,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         {/* Contador regresivo dinámico hacia la fecha y hora de largada */}
         <div className="w-full max-w-md">
           <div className="my-4 flex items-center justify-center gap-2 text-center text-xs sm:text-sm font-medium uppercase tracking-wider text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-            <Timer className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-white shrink-0" />
+            <Timer className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-orange-400 shrink-0" />
             <span>
               {countdown.expired
                 ? '¡Largada en curso!'
