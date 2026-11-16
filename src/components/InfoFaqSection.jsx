@@ -296,19 +296,19 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                     const isRejected = st.status === 'rejected';
                     const badgeConfig = isConfirmed
                       ? {
-                          wrapper: 'border-emerald-500/60 bg-emerald-500/10',
-                          pill: 'bg-emerald-500/20 border-emerald-400 text-emerald-300',
+                          wrapper: 'border-emerald-500/80 bg-zinc-950',
+                          pill: 'bg-zinc-950 border-emerald-500/80 text-emerald-400',
                           label: 'Inscripción Confirmada',
                         }
                       : isRejected
                         ? {
-                            wrapper: 'border-red-500/60 bg-red-500/10',
-                            pill: 'bg-red-500/20 border-red-500 text-red-400',
+                            wrapper: 'border-red-500/80 bg-zinc-950',
+                            pill: 'bg-zinc-950 border-red-500/80 text-red-400',
                             label: 'Observada / Rechazada',
                           }
                         : {
-                            wrapper: 'border-orange-500/60 bg-orange-500/10',
-                            pill: 'bg-orange-500/20 border-orange-500 text-orange-400',
+                            wrapper: 'border-orange-500/80 bg-zinc-950',
+                            pill: 'bg-zinc-950 border-orange-500/80 text-orange-400',
                             label: 'Pendiente de Verificación',
                           };
 
@@ -328,7 +328,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                               )}
                               {badgeConfig.label}
                             </span>
-                            <span className="font-mono text-xs text-stone-200 bg-stone-950/80 border border-stone-700 rounded-lg px-2 py-0.5">
+                            <span className="font-mono text-xs text-stone-200 bg-zinc-950 border border-stone-700 rounded-lg px-2 py-0.5">
                               {st.code}
                             </span>
                             <span className="text-xs font-bold text-stone-100">
@@ -353,7 +353,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                          <div className="rounded-xl bg-stone-950/75 border border-stone-800 px-3 py-2">
+                          <div className="rounded-xl bg-zinc-950 border border-orange-500/75 px-3 py-2">
                             <span className="text-stone-400 block text-[10px] uppercase font-bold">
                               Distancia
                             </span>
@@ -366,14 +366,14 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                             </strong>
                           </div>
 
-                          <div className="rounded-xl bg-stone-950/75 border border-stone-800 px-3 py-2">
+                          <div className="rounded-xl bg-zinc-950 border border-orange-500/75 px-3 py-2">
                             <span className="text-stone-400 block text-[10px] uppercase font-bold">
                               Talle Reservado
                             </span>
                             <strong className="text-orange-400">{st.shirtSize || 'A confirmar'}</strong>
                           </div>
 
-                          <div className="rounded-xl bg-stone-950/75 border border-stone-800 px-3 py-2">
+                          <div className="rounded-xl bg-zinc-950 border border-orange-500/75 px-3 py-2">
                             <span className="text-stone-400 block text-[10px] uppercase font-bold">
                               Acreditación Presencial
                             </span>
