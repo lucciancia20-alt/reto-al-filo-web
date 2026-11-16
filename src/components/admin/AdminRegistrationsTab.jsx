@@ -303,8 +303,8 @@ export default function AdminRegistrationsTab({
             label: 'Total',
             value: regStats.total,
             tone: 'text-stone-100',
-            inactiveClass: 'bg-zinc-950 border-white/25 hover:border-white/60',
-            activeClass: 'bg-zinc-950 border-white ring-2 ring-white/80 ring-offset-1 ring-offset-zinc-950',
+            inactiveClass: 'bg-zinc-950 border-white',
+            activeClass: 'bg-zinc-950 border-white ring-2 ring-white/85 ring-offset-2 ring-offset-zinc-950',
             labelClass: 'text-white',
             dotClass: 'bg-white',
             isActive: !hasSpecificFilter,
@@ -320,8 +320,8 @@ export default function AdminRegistrationsTab({
             label: 'Confirmados',
             value: regStats.confirmed,
             tone: 'text-emerald-400',
-            inactiveClass: 'bg-zinc-950 border-emerald-500/35 hover:border-emerald-400/70',
-            activeClass: 'bg-zinc-950 border-emerald-400 ring-2 ring-emerald-400/80 ring-offset-1 ring-offset-zinc-950',
+            inactiveClass: 'bg-zinc-950 border-emerald-400 hover:border-emerald-300',
+            activeClass: 'bg-zinc-950 border-emerald-400 ring-2 ring-emerald-400/85 ring-offset-2 ring-offset-zinc-950',
             labelClass: 'text-emerald-400',
             dotClass: 'bg-emerald-400',
             isActive: regStatusFilter === 'confirmado' && regDuplicateFilter === 'none',
@@ -339,8 +339,8 @@ export default function AdminRegistrationsTab({
             label: 'Pendientes',
             value: regStats.pending,
             tone: 'text-orange-400',
-            inactiveClass: 'bg-zinc-950 border-orange-500/40 hover:border-orange-400/70',
-            activeClass: 'bg-zinc-950 border-orange-400 ring-2 ring-orange-400/80 ring-offset-1 ring-offset-zinc-950',
+            inactiveClass: 'bg-zinc-950 border-orange-400 hover:border-orange-300',
+            activeClass: 'bg-zinc-950 border-orange-400 ring-2 ring-orange-400/85 ring-offset-2 ring-offset-zinc-950',
             labelClass: 'text-orange-400',
             dotClass: 'bg-orange-400',
             isActive: regStatusFilter === 'pendiente' && regDuplicateFilter === 'none',
@@ -358,8 +358,8 @@ export default function AdminRegistrationsTab({
             label: '27K',
             value: regStats.count27k,
             tone: 'text-cyan-400',
-            inactiveClass: 'bg-zinc-950 border-cyan-500/35 hover:border-cyan-400/70',
-            activeClass: 'bg-zinc-950 border-cyan-400 ring-2 ring-cyan-400/80 ring-offset-1 ring-offset-zinc-950',
+            inactiveClass: 'bg-zinc-950 border-cyan-400 hover:border-cyan-300',
+            activeClass: 'bg-zinc-950 border-cyan-400 ring-2 ring-cyan-400/85 ring-offset-2 ring-offset-zinc-950',
             labelClass: 'text-cyan-400',
             dotClass: 'bg-cyan-300',
             isActive: regDistanceFilter === '27K' && regDuplicateFilter === 'none',
@@ -377,8 +377,8 @@ export default function AdminRegistrationsTab({
             label: '13K',
             value: regStats.count13k,
             tone: 'text-red-500',
-            inactiveClass: 'bg-zinc-950 border-red-500/35 hover:border-red-400/70',
-            activeClass: 'bg-zinc-950 border-red-500 ring-2 ring-red-500/80 ring-offset-1 ring-offset-zinc-950',
+            inactiveClass: 'bg-zinc-950 border-red-500 hover:border-red-400',
+            activeClass: 'bg-zinc-950 border-red-500 ring-2 ring-red-500/85 ring-offset-2 ring-offset-zinc-950',
             labelClass: 'text-red-500',
             dotClass: 'bg-red-400',
             isActive: regDistanceFilter === '13K' && regDuplicateFilter === 'none',
@@ -400,7 +400,7 @@ export default function AdminRegistrationsTab({
             aria-pressed={stat.isActive}
             className={`rounded-2xl border-2 p-2.5 text-center cursor-pointer transition-all ${stat.tone} ${
               stat.isActive ? stat.activeClass : stat.inactiveClass
-            } ${hasSpecificFilter && !stat.isActive ? 'opacity-55 hover:opacity-100' : 'opacity-100'}`}
+            }`}
           >
             <span
               className={`flex items-center justify-center gap-1.5 text-[10px] leading-4 uppercase tracking-wider font-bold ${
