@@ -1457,10 +1457,10 @@ export default function AdminModal({
                   className={`inline-flex items-center gap-1.5 rounded-xl text-xs font-semibold px-4 py-2.5 cursor-pointer transition-colors ${
                     confirmingReset
                       ? 'bg-zinc-950 border border-red-500 text-red-400'
-                      : 'bg-stone-800 hover:bg-stone-700 text-stone-300'
+                      : 'bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400'
                   }`}
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
+                  <RotateCcw className={`w-3.5 h-3.5 ${confirmingReset ? 'text-red-400' : 'text-orange-500'}`} />
                   {confirmingReset ? '¿Confirmar restauración?' : 'Restaurar valores originales'}
                 </button>
               )}
@@ -1525,7 +1525,7 @@ export default function AdminModal({
                   className={`inline-flex items-center gap-2 rounded-xl font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 py-3 transition-colors ${
                     hasUnsavedChanges || saving
                       ? 'bg-amber-400 hover:bg-amber-300 text-black shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50'
-                      : 'bg-zinc-800 border border-zinc-700 text-zinc-500 cursor-default'
+                      : 'bg-zinc-950 border border-orange-500/80 text-zinc-400 cursor-default'
                   }`}
                 >
                   {hasUnsavedChanges || saving ? (
@@ -1535,8 +1535,9 @@ export default function AdminModal({
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="w-4 h-4" />
-                      Cambios Guardados ✓
+                      <CheckCircle2 className="w-4 h-4 text-orange-500" />
+                      <span>Cambios Guardados</span>
+                      <span className="text-orange-400">✓</span>
                     </>
                   )}
                 </button>
