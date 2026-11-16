@@ -417,12 +417,12 @@ export default function AdminRegistrationsTab({
 
       {/* Controles de filtro y exportación */}
       <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3 space-y-2.5">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap lg:flex-nowrap items-center gap-1.5">
           <select
             aria-label="Filtrar por distancia"
             value={regDistanceFilter}
             onChange={(e) => setRegDistanceFilter(e.target.value)}
-            className={`rounded-xl bg-zinc-950 border focus:outline-none pl-2.5 pr-5 py-1.5 text-xs font-mono transition-colors shrink-0 ${
+            className={`w-fit rounded-xl bg-zinc-950 border focus:outline-none pl-2.5 pr-1.5 py-1.5 text-xs transition-colors shrink-0 ${
               regDistanceFilter === '27K'
                 ? 'text-cyan-400 font-medium border-cyan-500/60 focus:border-cyan-400'
                 : regDistanceFilter === '13K'
@@ -448,7 +448,7 @@ export default function AdminRegistrationsTab({
               setRegDuplicateFilter?.('none');
               setRegStatusFilter(e.target.value);
             }}
-            className={`rounded-xl bg-zinc-950 border focus:outline-none pl-2.5 pr-5 py-1.5 text-xs font-mono transition-colors shrink-0 ${
+            className={`w-fit rounded-xl bg-zinc-950 border focus:outline-none pl-2.5 pr-1.5 py-1.5 text-xs transition-colors shrink-0 ${
               regStatusFilter === 'pendiente'
                 ? 'text-amber-400 border-amber-500/60 focus:border-amber-400 font-medium'
                 : regStatusFilter === 'confirmado'
@@ -474,7 +474,7 @@ export default function AdminRegistrationsTab({
             type="button"
             onClick={onExportExcel}
             disabled={registrationsCount === 0}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 text-xs font-medium px-2.5 sm:px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 text-xs font-medium px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
           >
             <Download className="w-3.5 h-3.5 shrink-0" />
             Exportar Excel (.XLSX)
@@ -485,7 +485,7 @@ export default function AdminRegistrationsTab({
             onClick={onPrintAccreditationSheet}
             disabled={(regStats.confirmed || 0) === 0}
             title="Imprimir planilla A4 de acreditación y seguridad SOS ordenada por dorsal"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900/80 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-xs font-medium px-2.5 sm:px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900/80 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-xs font-medium px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
           >
             <Printer className="w-3.5 h-3.5 shrink-0" />
             Imprimir Planilla Acreditación / SOS
@@ -496,7 +496,7 @@ export default function AdminRegistrationsTab({
             target="_blank"
             rel="noopener noreferrer"
             title="Abrir actividad y transferencias recibidas en Mercado Pago"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-sky-400 border border-sky-500/60 text-xs font-medium px-2.5 sm:px-3 py-1.5 transition-colors whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-sky-400 border border-sky-500/60 text-xs font-medium px-2.5 py-1.5 transition-colors whitespace-nowrap shrink-0"
           >
             <Wallet className="w-3.5 h-3.5 shrink-0" />
             <span>Mercado Pago</span>
