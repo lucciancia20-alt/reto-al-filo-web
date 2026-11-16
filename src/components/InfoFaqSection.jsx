@@ -177,7 +177,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
                   Clasificación General
                 </span>
-                <p className="mt-1 text-xs sm:text-sm font-bold text-white">
+                <p className="mt-1 text-xs sm:text-sm font-medium text-white">
                   {ageCategories.generalPodium || RACE_CONFIG.ageCategories.generalPodium}
                 </p>
               </div>
@@ -185,7 +185,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
                   Premiación por Categorías
                 </span>
-                <p className="mt-1 text-xs sm:text-sm font-bold text-white">
+                <p className="mt-1 text-xs sm:text-sm font-medium text-white">
                   {ageCategories.categoryPodium || RACE_CONFIG.ageCategories.categoryPodium}
                 </p>
               </div>
@@ -645,7 +645,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 <span className="block text-[10px] font-bold uppercase tracking-widest text-orange-400">
                   Documentación para Acreditación (Imprimible A4)
                 </span>
-                <p className="mt-0.5 text-xs sm:text-[13px] md:whitespace-nowrap font-bold text-white">
+                <p className="mt-0.5 text-xs sm:text-[13px] md:whitespace-nowrap font-medium text-white">
                   Descargá e imprimí tu Deslinde y el Modelo de Certificado / Apto Médico
                 </p>
               </div>

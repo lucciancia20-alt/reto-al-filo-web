@@ -177,7 +177,7 @@ export default function GallerySection() {
                     <span className="text-[11px] font-bold uppercase tracking-wider text-orange-400">
                       1ra Edición · Reto al Filo
                     </span>
-                    <p className="text-sm font-bold text-white">{photo.sector}</p>
+                    <p className="text-sm font-medium text-white">{photo.sector}</p>
                   </div>
                 </div>
               </article>
@@ -244,7 +244,7 @@ export default function GallerySection() {
                 <span className="text-xs font-bold uppercase tracking-wider text-orange-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
                   1ra Edición · Reto al Filo
                 </span>
-                <p className="mt-0.5 text-sm sm:text-base font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                <p className="mt-0.5 text-sm sm:text-base font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
                   {selectedPhoto.sector}
                 </p>
               </div>
