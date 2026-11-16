@@ -104,3 +104,23 @@ textarea:-webkit-autofill:active {
     scrollbar-color: #f97316 #09090b;
   }
 }
+
+@keyframes cta-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.animate-cta-pulse {
+  animation: cta-pulse 2.2s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-cta-pulse {
+    animation: none;
+  }
+}
