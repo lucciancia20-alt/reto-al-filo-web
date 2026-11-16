@@ -47,6 +47,8 @@ import AdminRegistrationsTab from './admin/AdminRegistrationsTab';
 const DEFAULT_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '';
 const DEFAULT_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'reto_al_filo';
 
+const REGS_CACHE_TTL_MS = 5 * 60 * 1000;
+
 const sanitizeExcelCell = (value) => {
   const str = String(value ?? '');
   return /^\s*[=+\-@]/.test(str) ? `'${str}` : str;
@@ -117,12 +119,26 @@ export default function AdminModal({
   const [bibDrafts, setBibDrafts] = useState({});
   const [regBusyId, setRegBusyId] = useState('');
 
-  const loadRegistrations = async () => {
+  const regsAbortRef = useRef(null);
+  const regsLoadedAtRef = useRef(0);
+  const [syncingPublic, setSyncingPublic] = useState(false);
+  const [syncMessage, setSyncMessage] = useState(null);
+
+  // Carga con caché (TTL), deduplicación de llamadas en vuelo y cancelación al cerrar/desmontar.
+  const loadRegistrations = async ({ force = false } = {}) => {
+    if (regsAbortRef.current) return;
+    const fresh = Date.now() - regsLoadedAtRef.current < REGS_CACHE_TTL_MS;
+    if (!force && regsLoadedAtRef.current && fresh) return;
+
+    const controller = new AbortController();
+    regsAbortRef.current = controller;
     setRegsLoading(true);
     setRegsError('');
     try {
-      const res = await fetchRegistrations();
+      const res = await fetchRegistrations({ signal: controller.signal });
+      if (controller.signal.aborted || res.aborted) return;
       const list = res.registrations || [];
+      if (res.source === 'firestore') regsLoadedAtRef.current = Date.now();
       setRegistrations(list);
       setRegsSource(res.source || 'local');
       setBibDrafts((prev) => {
@@ -134,13 +150,33 @@ export default function AdminModal({
         }
         return next;
       });
-      if (res.source === 'firestore' && list.length > 0) {
-        syncAllPublicRunnerStatuses(list).catch(() => {});
-      }
     } catch (err) {
-      setRegsError(err?.message || 'No se pudieron cargar los inscriptos.');
+      if (!controller.signal.aborted) {
+        setRegsError(err?.message || 'No se pudieron cargar los inscriptos.');
+      }
     } finally {
-      setRegsLoading(false);
+      if (regsAbortRef.current === controller) {
+        regsAbortRef.current = null;
+        if (!controller.signal.aborted) setRegsLoading(false);
+      }
+    }
+  };
+
+  const handleSyncPublicStatuses = async () => {
+    if (syncingPublic || registrations.length === 0) return;
+    setSyncingPublic(true);
+    setSyncMessage(null);
+    try {
+      const res = await syncAllPublicRunnerStatuses(registrations);
+      setSyncMessage(
+        res.ok
+          ? { ok: true, text: `Sincronizados ${res.count} registros públicos.` }
+          : { ok: false, text: 'No se pudo sincronizar. Reintentá.' }
+      );
+    } catch {
+      setSyncMessage({ ok: false, text: 'No se pudo sincronizar. Reintentá.' });
+    } finally {
+      setSyncingPublic(false);
     }
   };
 
@@ -149,6 +185,23 @@ export default function AdminModal({
       loadRegistrations();
     }
   }, [isOpen, unlocked, activeTab]);
+
+  // Al cerrar el modal, cerrar sesión o desmontar: cancelar lectura en vuelo e invalidar caché.
+  useEffect(() => {
+    if (isOpen && unlocked) return undefined;
+    regsAbortRef.current?.abort();
+    regsAbortRef.current = null;
+    regsLoadedAtRef.current = 0;
+    setRegsLoading(false);
+    return undefined;
+  }, [isOpen, unlocked]);
+
+  useEffect(
+    () => () => {
+      regsAbortRef.current?.abort();
+    },
+    []
+  );
 
   const regStats = useMemo(() => {
     let confirmed = 0;
@@ -1508,15 +1561,35 @@ export default function AdminModal({
                   </button>
                 )
               ) : activeTab === 'registrations' ? (
-                <button
-                  type="button"
-                  onClick={loadRegistrations}
-                  disabled={regsLoading}
-                  className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
-                >
-                  <RefreshCw className={`w-4 h-4 text-orange-500 ${regsLoading ? 'animate-spin' : ''}`} />
-                  {regsLoading ? 'Actualizando...' : 'Actualizar Inscriptos'}
-                </button>
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  {syncMessage && (
+                    <span
+                      role="status"
+                      className={`text-xs ${syncMessage.ok ? 'text-emerald-400' : 'text-red-400'}`}
+                    >
+                      {syncMessage.text}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleSyncPublicStatuses}
+                    disabled={syncingPublic || regsLoading || registrations.length === 0 || regsSource !== 'firestore'}
+                    title="Escribe el estado público de todos los inscriptos (consume escrituras). Usar solo cuando haga falta."
+                    className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-zinc-700 hover:border-orange-400 text-zinc-300 hover:text-orange-400 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-4 py-2.5 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ShieldCheck className={`w-4 h-4 ${syncingPublic ? 'animate-pulse' : ''}`} />
+                    {syncingPublic ? 'Sincronizando...' : 'Sincronizar'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => loadRegistrations({ force: true })}
+                    disabled={regsLoading}
+                    className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-4 h-4 text-orange-500 ${regsLoading ? 'animate-spin' : ''}`} />
+                    {regsLoading ? 'Actualizando...' : 'Actualizar Inscriptos'}
+                  </button>
+                </div>
               ) : (
                 <button
                   type="button"

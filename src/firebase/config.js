@@ -650,7 +650,7 @@ export async function submitRunnerRegistration(payload) {
 /**
  * Obtiene las inscripciones registradas desde Firestore ordenadas de la más reciente a la más antigua.
  */
-export async function fetchRegistrations() {
+export async function fetchRegistrations({ signal } = {}) {
   const localList = readLocalRegistrations().sort(
     (a, b) => (b.createdAt || 0) - (a.createdAt || 0)
   );
@@ -666,8 +666,12 @@ export async function fetchRegistrations() {
     }
 
     const { db, firestore } = bundle;
+    if (signal?.aborted) return { registrations: localList, source: 'local', aborted: true };
+
     const { collection, getDocs } = firestore;
     const snapshot = await getDocs(collection(db, 'registrations'));
+
+    if (signal?.aborted) return { registrations: localList, source: 'local', aborted: true };
 
     const remoteList = snapshot.docs
       .map((docSnap) => ({
