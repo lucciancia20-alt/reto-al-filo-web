@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AlertCircle,
   Mail,
@@ -20,6 +20,13 @@ export default function AdminLoginView({
   onEmailSignIn,
   onPasswordReset,
 }) {
+  const [inputsEditable, setInputsEditable] = useState(false);
+
+  const unlockAutofill = (e) => {
+    setInputsEditable(true);
+    e.currentTarget.removeAttribute('readOnly');
+  };
+
   return (
     <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6 sm:py-6 flex items-center justify-center">
       <div className="w-full max-w-md space-y-4">
@@ -103,6 +110,9 @@ export default function AdminLoginView({
                 name="email"
                 type="email"
                 autoComplete="username"
+                readOnly={!inputsEditable}
+                onFocus={unlockAutofill}
+                onClick={unlockAutofill}
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
                 placeholder=""
@@ -127,6 +137,9 @@ export default function AdminLoginView({
                 name="password"
                 type="password"
                 autoComplete="current-password"
+                readOnly={!inputsEditable}
+                onFocus={unlockAutofill}
+                onClick={unlockAutofill}
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
                 placeholder=""

@@ -389,6 +389,8 @@ export default function AdminModal({
       setAuthInfo('');
       setConfirmingLogout(false);
       setConfirmingReset(false);
+      setEmailInput('');
+      setPasswordInput('');
     }
     return () => {
       if (logoutTimerRef.current) {
