@@ -25,7 +25,7 @@ Los cambios que hace el admin (confirmar, rechazar, dorsal, check-in, borrar) si
 ## Cambios por archivo
 
 ### 1. `functions/` (nuevo)
-- `functions/package.json`: Node 20, `firebase-admin`, `firebase-functions` (v2).
+- `functions/package.json`: Node 22, `firebase-admin`, `firebase-functions` (v2).
 - `functions/index.js`:
   - `exports.onRegistrationCreate = onDocumentCreated({ document: 'registrations/{id}', region: 'southamerica-east1', retry: false, maxInstances: 5 }, handler)`
   - Handler:
