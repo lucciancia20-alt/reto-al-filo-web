@@ -83,7 +83,16 @@ function openPrintableHtmlWindow(title, bodyHtml, { landscape = false, autoPrint
         font-size: 12px;
         cursor: pointer;
       }
+      .sheet-wrapper {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 0 8px 16px;
+      }
       .sheet {
+        width: ${sheetMaxWidth};
+        min-width: ${sheetMaxWidth};
         max-width: ${sheetMaxWidth};
         min-height: ${sheetMinHeight};
         margin: 14px auto;
@@ -359,7 +368,13 @@ function openPrintableHtmlWindow(title, bodyHtml, { landscape = false, autoPrint
         .no-print {
           display: none !important;
         }
+        .sheet-wrapper {
+          overflow: visible;
+          padding: 0;
+        }
         .sheet {
+          width: auto;
+          min-width: 0;
           max-width: none;
           min-height: auto;
           margin: 0;
@@ -393,9 +408,11 @@ function openPrintableHtmlWindow(title, bodyHtml, { landscape = false, autoPrint
         <button type="button" class="btn-close" onclick="window.close()">Cerrar</button>
       </div>
     </div>
-    <main class="sheet">
-      ${bodyHtml}
-    </main>
+    <div class="sheet-wrapper">
+      <main class="sheet">
+        ${bodyHtml}
+      </main>
+    </div>
     ${autoPrint ? `<script>
       window.addEventListener('load', function () {
         setTimeout(function () {
