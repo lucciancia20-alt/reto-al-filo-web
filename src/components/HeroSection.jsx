@@ -132,33 +132,35 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         </div>
 
         {/* Botón CTA principal */}
-        <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
-          <button
-            type="button"
-            onClick={() => onOpenModal()}
-            className="w-full sm:w-auto inline-flex items-center justify-center rounded-2xl bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-950 active:scale-[0.99] text-orange-400 font-display font-semibold text-base sm:text-lg uppercase tracking-wider px-8 py-3 sm:py-3.5 transition-all cursor-pointer"
-          >
-            <span className="inline-flex items-center gap-2.5 animate-cta-pulse">
-              <Flame className="w-5 h-5 text-orange-400" />
-              <span>Quiero Inscribirme</span>
-            </span>
-          </button>
+        <div className="mt-5 w-full max-w-2xl mx-auto space-y-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 items-stretch w-full">
+            <button
+              type="button"
+              onClick={() => onOpenModal()}
+              className="w-full min-h-[54px] h-full flex items-center justify-center rounded-2xl bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-950 active:scale-[0.99] text-orange-400 font-display font-semibold text-base sm:text-lg uppercase tracking-wider px-6 py-3 transition-all cursor-pointer"
+            >
+              <span className="inline-flex items-center gap-2.5 animate-cta-pulse">
+                <Flame className="w-5 h-5 text-orange-400" />
+                <span>Quiero Inscribirme</span>
+              </span>
+            </button>
+
+            <a
+              href="#circuito"
+              className="w-full min-h-[54px] h-full flex items-center justify-center gap-2 rounded-2xl bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm text-orange-400 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:scale-[1.01] font-semibold uppercase text-xs sm:text-[13px] tracking-wider whitespace-nowrap px-6 py-3 transition-all"
+            >
+              VER CIRCUITO Y ALTIMETRÍA
+            </a>
+          </div>
 
           <a
-            href="#circuito"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm text-orange-400 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:scale-[1.01] font-semibold uppercase text-xs sm:text-[13px] tracking-wider whitespace-nowrap px-6 py-3 sm:py-3.5 transition-all"
+            href="#consultar-dorsal"
+            className="w-full flex items-center justify-center gap-2 rounded-full bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm border border-orange-500/70 px-4 py-2 text-xs font-semibold text-orange-400 hover:scale-[1.01] transition-all"
           >
-            VER CIRCUITO Y ALTIMETRÍA
+            <Search className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+            <span>¿Ya te inscribiste? Consultar mi estado y dorsal →</span>
           </a>
         </div>
-
-        <a
-          href="#consultar-dorsal"
-          className="mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm border border-orange-500/70 px-3.5 py-1.5 text-xs font-semibold text-orange-400 hover:scale-[1.01] transition-all"
-        >
-          <Search className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-          <span>¿Ya te inscribiste? Consultar mi estado y dorsal →</span>
-        </a>
 
         {/* Ubicación rápida */}
         <div className="mt-4 inline-flex items-center gap-2 text-xs sm:text-sm text-stone-300">
