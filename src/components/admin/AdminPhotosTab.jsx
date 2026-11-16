@@ -323,7 +323,7 @@ export default function AdminPhotosTab({
                     draggable={false}
                     className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
                   />
-                  <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 rounded-full bg-orange-500 text-zinc-950 font-bold text-[10px] px-2 py-0.5 shadow-md">
+                  <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 rounded-full bg-zinc-950/20 backdrop-blur-sm border border-orange-500/80 text-orange-400 font-semibold text-[10px] px-2 py-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
                     ✓ Publicada en la web
                   </span>
                   <button
