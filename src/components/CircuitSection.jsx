@@ -360,14 +360,14 @@ export default function CircuitSection({
                     <Compass className="w-3.5 h-3.5 text-orange-400" />
                     Trazado GPS ({String(track.totalKm).replace('.', ',')} km)
                   </span>
-                  <span className="font-mono text-[10px] text-stone-400 bg-zinc-950 px-2 py-0.5 rounded border border-orange-500/50">
+                  <span className="font-mono text-[10px] text-white font-bold bg-zinc-950/90 px-2 py-0.5 rounded border border-zinc-500/80">
                     N ↑
                   </span>
                 </div>
 
                 <svg
                   viewBox={`0 0 ${mapSvg.width} ${mapSvg.height}`}
-                  className="w-full h-36 sm:h-44 max-h-44 rounded-xl bg-[radial-gradient(#292524_1px,transparent_1px)] [background-size:16px_16px] bg-stone-950"
+                  className="w-full h-36 sm:h-44 max-h-44 rounded-xl bg-[radial-gradient(rgba(255,255,255,0.24)_1px,transparent_1px)] [background-size:16px_16px] bg-stone-950"
                   role="img"
                   aria-label={`Mapa del recorrido GPS para ${currentCircuit.tabLabel}`}
                 >
@@ -529,7 +529,8 @@ export default function CircuitSection({
                             y1={y}
                             x2={elevationSvg.width - elevationSvg.padRight}
                             y2={y}
-                            stroke="#292524"
+                            stroke="#a1a1aa"
+                            strokeOpacity="0.42"
                             strokeDasharray="4 4"
                             strokeWidth="1"
                           />
@@ -537,11 +538,30 @@ export default function CircuitSection({
                             x={elevationSvg.padLeft - 6}
                             y={y + 4}
                             textAnchor="end"
-                            className="fill-stone-500 text-[10px] font-mono"
+                            className="fill-zinc-100 text-[11px] font-mono font-semibold [paint-order:stroke] stroke-stone-950 stroke-[3px]"
                           >
                             {alt}m
                           </text>
                         </g>
+                      );
+                    })}
+
+                    {/* Líneas guía verticales de kilometraje */}
+                    {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+                      const kmTick = Number((elevationSvg.safeMaxKm * ratio).toFixed(1));
+                      const { x } = elevationSvg.toCoords(kmTick, elevationSvg.minAlt);
+                      return (
+                        <line
+                          key={`vgrid-${ratio}`}
+                          x1={x}
+                          y1={elevationSvg.padTop}
+                          x2={x}
+                          y2={elevationSvg.baselineY}
+                          stroke="#a1a1aa"
+                          strokeOpacity="0.32"
+                          strokeDasharray="4 4"
+                          strokeWidth="1"
+                        />
                       );
                     })}
 
@@ -568,7 +588,7 @@ export default function CircuitSection({
                           x={x}
                           y={elevationSvg.baselineY + 18}
                           textAnchor="middle"
-                          className="fill-stone-400 text-[10px] font-mono"
+                          className="fill-zinc-100 text-[11px] font-mono font-semibold [paint-order:stroke] stroke-stone-950 stroke-[3px]"
                         >
                           {kmTick}K
                         </text>
@@ -586,9 +606,9 @@ export default function CircuitSection({
                             x2={pos.x}
                             y2={elevationSvg.baselineY}
                             stroke="#f97316"
-                            strokeDasharray="2 3"
-                            strokeWidth="1.2"
-                            opacity="0.7"
+                            strokeDasharray="3 3"
+                            strokeWidth="1.4"
+                            opacity="0.9"
                           />
                           <circle
                             cx={pos.x}
@@ -621,9 +641,9 @@ export default function CircuitSection({
                             x2={pos.x}
                             y2={elevationSvg.baselineY}
                             stroke="#38bdf8"
-                            strokeDasharray="2 3"
-                            strokeWidth="1.2"
-                            opacity="0.7"
+                            strokeDasharray="3 3"
+                            strokeWidth="1.4"
+                            opacity="0.9"
                           />
                           <circle
                             cx={pos.x}
