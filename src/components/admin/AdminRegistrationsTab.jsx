@@ -663,10 +663,10 @@ export default function AdminRegistrationsTab({
             const armedKitAction = pendingKitAction[reg.id];
             const statusBadgeClass =
               reg.status === 'confirmado'
-                ? 'bg-stone-950 text-emerald-400 border-emerald-500/60'
+                ? 'bg-zinc-950 text-emerald-400 border-emerald-500/60'
                 : reg.status === 'rechazado'
-                  ? 'bg-stone-950 text-rose-400 border-rose-500/60'
-                  : 'bg-stone-950 text-amber-400 border-amber-500/60';
+                  ? 'bg-zinc-950 text-rose-400 border-rose-500/60'
+                  : 'bg-zinc-950 text-amber-400 border-amber-500/60';
 
             return (
               <div
@@ -707,7 +707,7 @@ export default function AdminRegistrationsTab({
                         {reg.status}
                       </span>
                       {reg.checkedIn && (
-                        <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-full border border-emerald-500/60 bg-emerald-500/15 text-emerald-300 shrink-0">
+                        <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-full border border-emerald-500/60 bg-zinc-950 text-emerald-400 shrink-0">
                           Kit ✓
                         </span>
                       )}
@@ -785,12 +785,12 @@ export default function AdminRegistrationsTab({
                       }
                       className={`inline-flex items-center gap-1 rounded-lg font-display font-medium text-[10px] sm:text-[11px] uppercase px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
                         armedStatusAction === 'unconfirm'
-                          ? 'bg-zinc-950 text-red-400 border border-red-500 ring-1 ring-red-500/60'
+                          ? 'bg-zinc-950 text-red-400 border border-red-500'
                           : armedStatusAction === 'confirm'
-                            ? 'bg-zinc-950 text-orange-400 border border-orange-500 ring-1 ring-orange-500/60'
+                            ? 'bg-zinc-950 text-orange-400 border border-orange-500'
                             : isAlreadySaved
-                              ? 'bg-zinc-900/80 text-zinc-300 border border-zinc-700 hover:border-zinc-500'
-                              : 'bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/70'
+                              ? 'bg-zinc-950 text-zinc-300 border border-zinc-700 hover:border-zinc-500'
+                              : 'bg-zinc-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/70'
                       }`}
                     >
                       <CheckCircle2
@@ -827,14 +827,14 @@ export default function AdminRegistrationsTab({
                                 ? 'Kit acreditado y entregado (clic para desmarcar)'
                                 : 'Marcar kit entregado / corredor acreditado en mesa'
                         }
-                        className={`inline-flex items-center gap-1 rounded-lg border text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
+                        className={`inline-flex items-center justify-center gap-1 md:w-[116px] whitespace-nowrap rounded-lg border text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
                           armedKitAction === 'revoke'
-                            ? 'bg-zinc-950 border-red-500 ring-1 ring-red-500/60 text-red-400'
+                            ? 'bg-zinc-950 border-red-500 text-red-400'
                             : armedKitAction === 'deliver'
-                              ? 'bg-zinc-950 border-orange-500 ring-1 ring-orange-500/60 text-orange-300'
+                              ? 'bg-zinc-950 border-orange-500 text-orange-300'
                               : reg.checkedIn
-                                ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 hover:bg-emerald-500/30'
-                                : 'bg-zinc-900/80 border-orange-500/70 text-orange-400 hover:border-orange-400'
+                                ? 'bg-zinc-950 border-emerald-500/70 text-emerald-400 hover:border-emerald-400'
+                                : 'bg-zinc-950 border-orange-500/70 text-orange-400 hover:border-orange-400'
                         }`}
                       >
                         <PackageCheck className="w-3.5 h-3.5 shrink-0" />
@@ -856,7 +856,7 @@ export default function AdminRegistrationsTab({
                         target="_blank"
                         rel="noopener noreferrer"
                         title="Ver comprobante adjunto"
-                        className="inline-flex items-center gap-1 rounded-lg bg-stone-950 hover:bg-white/5 text-sky-400 border border-sky-500/60 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
+                        className="inline-flex items-center gap-1 rounded-lg bg-zinc-950 hover:bg-white/5 text-sky-400 border border-sky-500/60 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">Comprobante</span>
@@ -870,7 +870,7 @@ export default function AdminRegistrationsTab({
                         rel="noopener noreferrer"
                         title="Enviar confirmación por WhatsApp"
                         aria-label={`Enviar WhatsApp a ${reg.fullName}`}
-                        className="inline-flex items-center gap-1 rounded-lg bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
+                        className="inline-flex items-center gap-1 rounded-lg bg-zinc-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
                       >
                         <MessageCircle className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">WhatsApp</span>
