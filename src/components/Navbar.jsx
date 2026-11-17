@@ -33,7 +33,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
   ];
 
   return (
-    <header className="fixed top-0 inset-x-0 z-40 bg-stone-950/85 backdrop-blur-md border-b-2 border-orange-500/50">
+    <header className="fixed top-0 inset-x-0 z-40 bg-zinc-900/65 backdrop-blur-md border-b border-orange-500/80">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-16 py-2 flex items-center justify-between gap-3">
         <a
           href="#inicio"
@@ -72,7 +72,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
               href={sponsorWaUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 text-xs font-semibold px-3.5 py-2.5 transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 rounded-full bg-zinc-900/65 hover:bg-zinc-900/80 backdrop-blur-md border border-orange-500/80 hover:border-orange-400 text-orange-400 text-xs font-semibold px-3.5 py-2.5 transition-colors whitespace-nowrap"
             >
               <Handshake className="w-3.5 h-3.5 text-orange-500 shrink-0" />
               ¿Querés ser sponsor?
@@ -81,10 +81,12 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
           <button
             type="button"
             onClick={() => onOpenModal()}
-            className="inline-flex items-center gap-1.5 rounded-full bg-zinc-950 hover:bg-zinc-950 border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-950 active:scale-[0.99] text-orange-400 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2.5 transition-all cursor-pointer whitespace-nowrap"
+            className="inline-flex items-center justify-center rounded-full bg-zinc-900/70 hover:bg-zinc-900/80 backdrop-blur-md border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-900 active:scale-[0.99] text-orange-400 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2.5 transition-all cursor-pointer whitespace-nowrap"
           >
-            Quiero Inscribirme
-            <ArrowUpRight className="w-4 h-4 text-orange-400" />
+            <span className="inline-flex items-center gap-1.5 animate-cta-pulse">
+              <span>Quiero Inscribirme</span>
+              <ArrowUpRight className="w-4 h-4 text-orange-400 shrink-0" />
+            </span>
           </button>
         </div>
 
@@ -93,14 +95,14 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
           onClick={() => setMobileMenuOpen((prev) => !prev)}
           aria-expanded={mobileMenuOpen}
           aria-label="Abrir menú de navegación"
-          className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-lg border border-orange-500/60 text-orange-400 hover:bg-stone-800/80 transition-colors"
+          className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-lg bg-zinc-900/65 backdrop-blur-md border border-orange-500/60 text-orange-400 hover:bg-zinc-900/80 transition-colors"
         >
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden bg-stone-950/98 border-b border-orange-500/40 px-4 pt-2 pb-5 space-y-3">
+        <div className="md:hidden bg-zinc-900/65 backdrop-blur-md border-b border-orange-500/80 px-4 pt-2 pb-5 space-y-3">
           {navLinks.map((link) => (
             <a
               key={link.href}
@@ -117,7 +119,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 text-sm font-semibold py-3 transition-colors"
+              className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-zinc-900/65 hover:bg-zinc-900/80 backdrop-blur-md border border-orange-500/80 hover:border-orange-400 text-orange-400 text-sm font-semibold py-3 transition-colors"
             >
               <Handshake className="w-4 h-4 text-orange-500 shrink-0" />
               ¿Querés ser sponsor?
@@ -129,10 +131,12 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
               setMobileMenuOpen(false);
               onOpenModal();
             }}
-            className="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-950 hover:bg-zinc-950 border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-950 active:scale-[0.99] text-orange-400 font-display font-semibold text-sm uppercase tracking-wider py-3.5 transition-all cursor-pointer"
+            className="w-full mt-2 inline-flex items-center justify-center rounded-xl bg-zinc-900/70 hover:bg-zinc-900/80 backdrop-blur-md border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-900 active:scale-[0.99] text-orange-400 font-display font-semibold text-sm uppercase tracking-wider py-3.5 transition-all cursor-pointer"
           >
-            Quiero Inscribirme
-            <ArrowUpRight className="w-4 h-4 text-orange-400" />
+            <span className="inline-flex items-center gap-2 animate-cta-pulse">
+              <span>Quiero Inscribirme</span>
+              <ArrowUpRight className="w-4 h-4 text-orange-400 shrink-0" />
+            </span>
           </button>
         </div>
       )}
