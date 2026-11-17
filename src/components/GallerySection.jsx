@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Camera, Maximize2, X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { RACE_CONFIG } from '../data/raceConfig';
+import { RACE_CONFIG, getRaceTitle } from '../data/raceConfig';
 import {
   fetchGalleryPhotos,
   filterDemoPhotos,
   getLocalCachedGalleryPhotos,
 } from '../firebase/config';
 
-export default function GallerySection() {
+export default function GallerySection({ raceConfig = RACE_CONFIG }) {
+  const raceTitle = getRaceTitle(raceConfig);
   const [photos, setPhotos] = useState(() => getLocalCachedGalleryPhotos() || []);
   const [isLoadingGallery, setIsLoadingGallery] = useState(
     () => !getLocalCachedGalleryPhotos()
@@ -144,7 +145,7 @@ export default function GallerySection() {
                 <div className={`w-full overflow-hidden bg-zinc-950 ${photo.aspectClass}`}>
                   <img
                     src={photo.cloudinaryThumb}
-                    alt={`Postal de Reto al Filo — ${photo.sector}`}
+                    alt={`Postal de ${raceTitle} — ${photo.sector}`}
                     loading="lazy"
                     decoding="async"
                     onError={(e) => {
@@ -175,7 +176,7 @@ export default function GallerySection() {
 
                   <div>
                     <span className="text-[11px] font-bold uppercase tracking-wider text-orange-400">
-                      1ra Edición · Reto al Filo
+                      1ra Edición · {raceTitle}
                     </span>
                     <p className="text-sm font-medium text-white">{photo.sector}</p>
                   </div>
@@ -242,7 +243,7 @@ export default function GallerySection() {
             <div className="absolute bottom-0 inset-x-0 z-10 p-4 sm:p-5 bg-zinc-950/15 backdrop-blur-sm border-t-2 border-orange-500/85 flex items-center justify-between gap-2">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-orange-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
-                  1ra Edición · Reto al Filo
+                  1ra Edición · {raceTitle}
                 </span>
                 <p className="mt-0.5 text-sm sm:text-base font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
                   {selectedPhoto.sector}

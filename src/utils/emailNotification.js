@@ -23,6 +23,7 @@ export async function sendRegistrationNotificationEmail({
   notificationEmail,
   registration,
   uploadedUrl = '',
+  raceTitle = '',
 }) {
   const toEmail = resolveNotificationEmail(notificationEmail);
   const runnerEmail = String(registration?.email || '').trim();
@@ -31,6 +32,7 @@ export async function sendRegistrationNotificationEmail({
     to_email: toEmail,
     email: toEmail,
     reply_to: runnerEmail || toEmail,
+    carrera: String(raceTitle || '').trim() || 'RETO AL FILO',
     codigo: registration?.code || '-',
     nombre: registration?.fullName || '-',
     distancia: registration?.distance || '-',

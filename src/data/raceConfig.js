@@ -1,7 +1,11 @@
+export const DEFAULT_RACE_TITLE = 'Reto al Filo';
+export const DEFAULT_TARGET_DATE_ISO = '2027-04-10T09:00:00-03:00';
+
 export const RACE_CONFIG = {
-  title: 'Reto al Filo - 2da Edición',
+  title: DEFAULT_RACE_TITLE,
+  edition: '2da Edición',
   subtitle: 'Abril 2027',
-  targetDateIso: '2027-04-10T08:00:00-03:00',
+  targetDateIso: DEFAULT_TARGET_DATE_ISO,
   whatsappNumber: '5492915228310',
   notificationEmail: 'lciancia1972@gmail.com',
   heroImage: '/images/hero-trail-runners.jpg',
@@ -182,7 +186,7 @@ export const RACE_CONFIG = {
     },
     {
       day: 'Sábado 10',
-      time: '08:00 hs',
+      time: '09:00 hs',
       title: 'Largada 27K y 13K',
       description:
         'Salida puntual de ambas distancias desde el arco principal del predio hacia el sendero de ascenso.',
@@ -300,9 +304,9 @@ const MONTHS_SHORT_ES = [
  * Extrae fecha y hora local de Argentina (-03:00) y sus textos formateados desde un string ISO.
  */
 export function parseTargetDateParts(isoString = RACE_CONFIG.targetDateIso) {
-  const raw = String(isoString || RACE_CONFIG.targetDateIso || '2027-04-10T08:00:00-03:00').trim();
+  const raw = String(isoString || DEFAULT_TARGET_DATE_ISO).trim();
   let datePart = '2027-04-10';
-  let timePart = '08:00';
+  let timePart = '09:00';
 
   const parsedMs = Date.parse(raw);
   if (!Number.isNaN(parsedMs)) {
@@ -346,7 +350,16 @@ export function parseTargetDateParts(isoString = RACE_CONFIG.targetDateIso) {
     formattedDayMonth: `${dayNum} de ${monthFull}`,
     formattedShortDate: `${dayNum} ${monthShort} ${yearStr || '2027'}`,
     formattedFullDate: `${dayNum} de ${monthFull} ${yearStr || '2027'}`,
+    year: yearStr || '2027',
   };
+}
+
+/**
+ * Devuelve un ISO de largada válido (parseable) o el fallback seguro DEFAULT_TARGET_DATE_ISO.
+ */
+export function resolveTargetDateIso(isoString) {
+  const raw = String(isoString ?? '').trim();
+  return raw && !Number.isNaN(Date.parse(raw)) ? raw : DEFAULT_TARGET_DATE_ISO;
 }
 
 /**
@@ -428,9 +441,47 @@ export function computeClosingTime(startTime, cutoffTime) {
   return `${hh}:${mm} hs`;
 }
 
-export function buildWhatsAppUrl(distance = '27K', whatsappNumber = RACE_CONFIG.whatsappNumber) {
+/** Nombre de la carrera con fallback seguro (nunca vacío). */
+export function getRaceTitle(cfg) {
+  return String(cfg?.title ?? '').trim() || DEFAULT_RACE_TITLE;
+}
+
+/** Edición opcional ('' = oculta). Si el campo no existe se usa el valor por defecto. */
+export function getRaceEdition(cfg) {
+  return typeof cfg?.edition === 'string' ? cfg.edition.trim() : RACE_CONFIG.edition;
+}
+
+/** Título completo: "Nombre - Edición" (o solo el nombre si la edición está vacía). */
+export function getRaceFullTitle(cfg, separator = ' - ') {
+  const edition = getRaceEdition(cfg);
+  return edition ? `${getRaceTitle(cfg)}${separator}${edition}` : getRaceTitle(cfg);
+}
+
+const LEGACY_EDITION_IN_TITLE = /^(.*?)\s*[-–—·|]\s*(\d+\s*[a-zº°]*\.?\s*edici[oó]n.*)$/i;
+
+/**
+ * Resuelve título/edición. Migra configs legacy donde la edición venía embebida
+ * en el título ("Reto al Filo - 2da Edición") y aún no existía el campo `edition`.
+ */
+function resolveTitleAndEdition(override) {
+  const rawTitle = String(override?.title ?? '').trim();
+  if (typeof override?.edition === 'string') {
+    return { title: rawTitle || DEFAULT_RACE_TITLE, edition: override.edition.trim() };
+  }
+  const legacy = rawTitle.match(LEGACY_EDITION_IN_TITLE);
+  if (legacy && legacy[1].trim()) {
+    return { title: legacy[1].trim(), edition: legacy[2].trim() };
+  }
+  return { title: rawTitle || DEFAULT_RACE_TITLE, edition: RACE_CONFIG.edition };
+}
+
+export function buildWhatsAppUrl(
+  distance = '27K',
+  whatsappNumber = RACE_CONFIG.whatsappNumber,
+  raceConfig = RACE_CONFIG
+) {
   const cleanPhone = String(whatsappNumber || RACE_CONFIG.whatsappNumber).replace(/[^\d]/g, '');
-  const message = `Hola! Quiero inscribirme al Reto al Filo - 2da Edición en la distancia de ${distance}`;
+  const message = `Hola! Quiero inscribirme al ${getRaceFullTitle(raceConfig)} en la distancia de ${distance}`;
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 }
 
@@ -483,7 +534,7 @@ export function mergeRaceConfig(override) {
       ? RACE_CONFIG.heroImage
       : override.heroImage;
 
-  const resolvedTargetDateIso = override.targetDateIso || RACE_CONFIG.targetDateIso;
+  const resolvedTargetDateIso = resolveTargetDateIso(override.targetDateIso);
 
   const rawSchedule = Array.isArray(override.schedule)
     ? override.schedule.map((item) => ({
@@ -552,9 +603,13 @@ export function mergeRaceConfig(override) {
       : RACE_CONFIG.ageCategories.brackets,
   };
 
+  const { title: resolvedTitle, edition: resolvedEdition } = resolveTitleAndEdition(override);
+
   return {
     ...RACE_CONFIG,
     ...override,
+    title: resolvedTitle,
+    edition: resolvedEdition,
     whatsappNumber:
       String(override.whatsappNumber || '').trim() || RACE_CONFIG.whatsappNumber,
     notificationEmail:

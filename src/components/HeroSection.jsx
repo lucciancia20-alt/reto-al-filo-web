@@ -1,9 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Flame, ChevronDown, Timer, Search } from 'lucide-react';
-import { RACE_CONFIG, parseTargetDateParts } from '../data/raceConfig';
+import {
+  RACE_CONFIG,
+  parseTargetDateParts,
+  resolveTargetDateIso,
+  getRaceTitle,
+  getRaceEdition,
+} from '../data/raceConfig';
+
+const ORDINAL_EDITION = /^(\d+)\s*(ra|da|ta|ma|na|va|er|do|to|vo|no|mo|°|º)\.?\s+(.*)$/i;
+
+/** Renderiza "2da Edición" como "2ᵈᵃ EDICIÓN" conservando el estilo original del Hero. */
+function EditionLabel({ edition }) {
+  const match = edition.match(ORDINAL_EDITION);
+  if (!match) return edition;
+  return (
+    <>
+      {match[1]}
+      <span className="lowercase text-2xl md:text-4xl font-black align-baseline">{match[2]}</span>{' '}
+      {match[3]}
+    </>
+  );
+}
 
 function calculateTimeLeft(targetIso) {
-  const targetMs = Date.parse(targetIso);
+  const targetMs = Date.parse(resolveTargetDateIso(targetIso));
   const nowMs = Date.now();
   const diff = Math.max(0, targetMs - nowMs);
 
@@ -22,17 +43,16 @@ function calculateTimeLeft(targetIso) {
 }
 
 export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
-  const [countdown, setCountdown] = useState(() =>
-    calculateTimeLeft(raceConfig.targetDateIso)
-  );
+  const targetDateIso = resolveTargetDateIso(raceConfig?.targetDateIso);
+  const [countdown, setCountdown] = useState(() => calculateTimeLeft(targetDateIso));
 
   useEffect(() => {
-    setCountdown(calculateTimeLeft(raceConfig.targetDateIso));
+    setCountdown(calculateTimeLeft(targetDateIso));
     const interval = setInterval(() => {
-      setCountdown(calculateTimeLeft(raceConfig.targetDateIso));
+      setCountdown(calculateTimeLeft(targetDateIso));
     }, 1000);
     return () => clearInterval(interval);
-  }, [raceConfig.targetDateIso]);
+  }, [targetDateIso]);
 
   const timeUnits = [
     { label: 'Días', value: countdown.days },
@@ -48,7 +68,9 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
           .join(', ')
       : undefined;
 
-  const targetDateParts = parseTargetDateParts(raceConfig.targetDateIso);
+  const targetDateParts = parseTargetDateParts(targetDateIso);
+  const raceTitle = getRaceTitle(raceConfig);
+  const raceEdition = getRaceEdition(raceConfig);
 
   return (
     <section
@@ -71,22 +93,31 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         <div className="inline-flex items-center gap-2 rounded-full bg-zinc-900/35 backdrop-blur-sm border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-orange-400 mb-3.5 shadow-[0_0_14px_rgba(249,115,22,0.3)]">
           <Calendar className="w-4 h-4 text-orange-500 shrink-0" />
           <span>
-            {raceConfig.subtitle} · {targetDateParts.formattedDayMonth} · {targetDateParts.formattedTime}
+            {[raceConfig.subtitle, targetDateParts.formattedDayMonth, targetDateParts.formattedTime]
+              .filter(Boolean)
+              .join(' · ')}
           </span>
         </div>
 
         {/* Título central imponente */}
         <div className="max-w-3xl mx-auto px-6 py-4 rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.28)]">
           <h1 className="text-balance font-display text-3xl md:text-4xl font-black tracking-tight text-white uppercase leading-[1.08] section-title-stroke">
-            RETO AL FILO{' '}
-            <span className="whitespace-nowrap">
-              2<span className="lowercase text-2xl md:text-4xl font-black align-baseline">da</span> EDICIÓN
-            </span>
+            {raceTitle}
+            {raceEdition && (
+              <>
+                {' '}
+                <span className="whitespace-nowrap">
+                  <EditionLabel edition={raceEdition} />
+                </span>
+              </>
+            )}
           </h1>
 
-          <p className="mt-2 text-lg sm:text-2xl font-bold uppercase tracking-[0.22em] text-orange-500">
-            {raceConfig.subtitle}
-          </p>
+          {raceConfig.subtitle && (
+            <p className="mt-2 text-lg sm:text-2xl font-bold uppercase tracking-[0.22em] text-orange-500">
+              {raceConfig.subtitle}
+            </p>
+          )}
         </div>
 
         <div className="mt-3 max-w-2xl mx-auto px-6 sm:px-8 py-3.5 rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.28)]">

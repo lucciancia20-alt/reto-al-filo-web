@@ -17,7 +17,12 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { GPX_TRACKS, parseGpxXml } from '../data/gpxTracks';
-import { syncScheduleWithTargetDate, resolveRunnerCategory } from '../data/raceConfig';
+import {
+  syncScheduleWithTargetDate,
+  resolveRunnerCategory,
+  getRaceTitle,
+  getRaceFullTitle,
+} from '../data/raceConfig';
 import { openPrintableAccreditationSheet } from '../utils/printableDocs';
 import {
   addPhotoToFirestore,
@@ -821,7 +826,7 @@ export default function AdminModal({
       digits.length === 10 && !digits.startsWith('54') ? `549${digits}` : digits;
     const bib = String(bibDrafts[reg.id] ?? reg.assignedBib ?? '').trim();
     const bibText = bib ? ` Tu dorsal asignado es el #${bib}.` : '';
-    const msg = `¡Hola ${reg.fullName}! Te confirmamos desde Reto al Filo - 2da Edición que tu inscripción (${reg.code}) en ${reg.distance} está CONFIRMADA.${bibText} ¡Nos vemos en Tornquist!`;
+    const msg = `¡Hola ${reg.fullName}! Te confirmamos desde ${getRaceFullTitle(draft || raceConfig)} que tu inscripción (${reg.code}) en ${reg.distance} está CONFIRMADA.${bibText} ¡Nos vemos en Tornquist!`;
     return `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`;
   };
 
@@ -885,7 +890,7 @@ export default function AdminModal({
       });
 
       const titleRow = [
-        `${(draft?.raceTitle || 'RETO AL FILO - 2DA EDICIÓN').toUpperCase()} · PLANILLA DE CORREDORES INSCRIPTOS`,
+        `${getRaceFullTitle(draft || raceConfig).toUpperCase()} · PLANILLA DE CORREDORES INSCRIPTOS`,
       ];
       const subtitleRow = [
         `Exportado el ${new Date().toLocaleString('es-AR')} · Total: ${registrations.length} inscriptos`,
@@ -1272,7 +1277,7 @@ export default function AdminModal({
       className="fixed inset-0 z-50 bg-stone-950/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overscroll-contain"
       role="dialog"
       aria-modal="true"
-      aria-label="Panel de Administración Reto al Filo"
+      aria-label={`Panel de Administración ${getRaceTitle(draft || raceConfig)}`}
       onClick={handleSafeClose}
     >
       <div
@@ -1287,7 +1292,7 @@ export default function AdminModal({
             </span>
             <div className="min-w-0">
               <h2 className="font-display text-base sm:text-lg font-medium text-white uppercase tracking-wide truncate">
-                Panel de Organización · Reto al Filo
+                Panel de Organización · {getRaceTitle(draft || raceConfig)}
               </h2>
               <p className="text-xs text-stone-400 truncate">
                 {unlocked && adminUser?.email
@@ -1429,6 +1434,7 @@ export default function AdminModal({
 
               {activeTab === 'photos' && (
                 <AdminPhotosTab
+                  raceTitle={getRaceTitle(draft)}
                   defaultCloudName={DEFAULT_CLOUD_NAME}
                   photoFiles={photoFiles}
                   photoPreviews={photoPreviews}

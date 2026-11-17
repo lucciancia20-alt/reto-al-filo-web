@@ -1,14 +1,27 @@
 import React, { useState } from 'react';
 import { Menu, X, ArrowUpRight, Handshake } from 'lucide-react';
-import { RACE_CONFIG } from '../data/raceConfig';
+import {
+  RACE_CONFIG,
+  getRaceTitle,
+  getRaceEdition,
+  getRaceFullTitle,
+  parseTargetDateParts,
+} from '../data/raceConfig';
 
 export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const raceTitle = getRaceTitle(raceConfig);
+  const raceEdition = getRaceEdition(raceConfig);
+  const { year } = parseTargetDateParts(raceConfig?.targetDateIso);
+  const brandSubline = [raceEdition, year].filter(Boolean).join(' · ');
+
   const orgDigits = String(raceConfig?.whatsappNumber || '').replace(/\D/g, '');
   const sponsorWaUrl = orgDigits
     ? `https://wa.me/${orgDigits}?text=${encodeURIComponent(
-        'Hola! Me interesa recibir información para ser sponsor de Reto al Filo · 2da Edición (Abril 2027).'
+        `Hola! Me interesa recibir información para ser sponsor de ${getRaceFullTitle(raceConfig, ' · ')}${
+          raceConfig?.subtitle ? ` (${raceConfig.subtitle})` : ''
+        }.`
       )}`
     : '#';
 
@@ -24,18 +37,20 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-16 py-2 flex items-center justify-between gap-3">
         <a
           href="#inicio"
-          className="flex items-center gap-2.5 text-stone-100 font-display font-extrabold tracking-tight text-lg"
+          className="flex items-center gap-2.5 min-w-0 text-stone-100 font-display font-extrabold tracking-tight text-lg"
         >
           <img
             src="/logo-raf.png"
-            alt="Logo Reto al Filo"
+            alt={`Logo ${raceTitle}`}
             className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-md shrink-0"
           />
-          <span className="leading-none">
-            RETO AL FILO
-            <span className="block text-[10px] font-sans font-semibold tracking-widest text-orange-400 uppercase mt-0.5">
-              2da Edición · 2027
-            </span>
+          <span className="leading-none uppercase min-w-0">
+            <span className="block truncate max-w-[52vw] sm:max-w-xs">{raceTitle}</span>
+            {brandSubline && (
+              <span className="block text-[10px] font-sans font-semibold tracking-widest text-orange-400 uppercase mt-0.5">
+                {brandSubline}
+              </span>
+            )}
           </span>
         </a>
 

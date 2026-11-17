@@ -19,7 +19,12 @@ import {
   Car,
   MessageCircle,
 } from 'lucide-react';
-import { RACE_CONFIG, parseTargetDateParts, syncScheduleWithTargetDate } from '../data/raceConfig';
+import {
+  RACE_CONFIG,
+  parseTargetDateParts,
+  syncScheduleWithTargetDate,
+  getRaceTitle,
+} from '../data/raceConfig';
 import { openPrintableWaiver, openPrintableMedicalCert } from '../utils/printableDocs';
 import { fetchPublicRunnerStatus } from '../firebase/config';
 
@@ -52,7 +57,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
 
   const orgDigits = String(raceConfig?.whatsappNumber || '').replace(/\D/g, '');
   const orgWaUrl = orgDigits
-    ? `https://wa.me/${orgDigits}?text=${encodeURIComponent('Hola! Consulto por el estado de mi inscripción en Reto al Filo.')}`
+    ? `https://wa.me/${orgDigits}?text=${encodeURIComponent(`Hola! Consulto por el estado de mi inscripción en ${getRaceTitle(raceConfig)}.`)}`
     : '#';
 
   const { formattedFullDate } = parseTargetDateParts(raceConfig.targetDateIso);
@@ -298,6 +303,11 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                       id={`faq-panel-${faq.id}`}
                       className="px-4 sm:px-5 pb-4 pt-1 text-xs sm:text-sm text-stone-300 leading-relaxed border-t border-orange-500/30"
                     >
+                      {faq.id === 'reglamento' && (
+                        <p className="mt-2.5 font-display text-xs font-bold uppercase tracking-wider text-orange-400">
+                          Reglamento Oficial · {getRaceFullTitle(raceConfig)}
+                        </p>
+                      )}
                       <p className={`mt-2.5 ${faq.id === 'como-llegar' ? 'text-justify [text-align-last:left]' : ''}`}>{faq.answer}</p>
 
                       {faq.id === 'elementos-obligatorios' && (

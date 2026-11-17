@@ -1,4 +1,9 @@
-import { RACE_CONFIG, parseTargetDateParts, resolveRunnerCategory } from '../data/raceConfig';
+import {
+  RACE_CONFIG,
+  parseTargetDateParts,
+  resolveRunnerCategory,
+  getRaceFullTitle,
+} from '../data/raceConfig';
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -468,7 +473,7 @@ function buildEventMeta(raceConfig) {
   const cfg = raceConfig || RACE_CONFIG;
   const dateParts = parseTargetDateParts(cfg.targetDateIso);
   return {
-    raceTitle: cfg.title || RACE_CONFIG.title,
+    raceTitle: getRaceFullTitle(cfg),
     raceSubtitle: cfg.subtitle || RACE_CONFIG.subtitle,
     locationName: cfg.locationName || RACE_CONFIG.locationName,
     eventDate: dateParts.formattedFullDate,

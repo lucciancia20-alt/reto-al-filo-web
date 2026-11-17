@@ -11,6 +11,9 @@ import {
 } from 'lucide-react';
 import {
   RACE_CONFIG,
+  DEFAULT_RACE_TITLE,
+  getRaceTitle,
+  getRaceFullTitle,
   parseTargetDateParts,
   buildTargetDateIso,
   syncScheduleWithTargetDate,
@@ -27,7 +30,8 @@ export default function AdminGeneralTab({
   onUpdateCircuitField,
   onUpdatePaymentField,
 }) {
-  const { datePart, timePart, formattedTime } = parseTargetDateParts(draft.targetDateIso);
+  const { datePart, timePart, formattedTime, formattedShortDate, formattedDayMonth } =
+    parseTargetDateParts(draft.targetDateIso);
   const [testingEmail, setTestingEmail] = useState(false);
   const [emailTestStatus, setEmailTestStatus] = useState(null);
 
@@ -38,6 +42,7 @@ export default function AdminGeneralTab({
     try {
       const response = await sendRegistrationNotificationEmail({
         notificationEmail: targetEmail,
+        raceTitle: getRaceFullTitle(draft),
         registration: {
           code: 'RAF-PRUEBA',
           fullName: 'Prueba Panel Organización',
@@ -47,7 +52,7 @@ export default function AdminGeneralTab({
           phone: draft.whatsappNumber || '5492915228310',
           email: targetEmail,
           city: 'Tornquist, Buenos Aires',
-          team: 'Reto al Filo',
+          team: getRaceTitle(draft),
           shirtSize: 'M',
           receiptUrl: 'Envío de prueba desde Panel de Organización',
         },
@@ -90,8 +95,21 @@ export default function AdminGeneralTab({
           </label>
           <input
             type="text"
-            value={draft.title}
+            value={draft.title ?? ''}
+            placeholder={DEFAULT_RACE_TITLE}
             onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+            className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-stone-300 mb-1">
+            Edición <span className="text-[11px] font-normal text-stone-400">(opcional · ej: 2da EDICIÓN)</span>
+          </label>
+          <input
+            type="text"
+            value={draft.edition ?? ''}
+            placeholder="Dejar vacío para ocultar"
+            onChange={(e) => setDraft({ ...draft, edition: e.target.value })}
             className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
           />
         </div>
@@ -126,6 +144,11 @@ export default function AdminGeneralTab({
               className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-sm font-mono font-semibold text-white [color-scheme:dark]"
             />
           </div>
+          <p className="mt-1 text-[11px] text-stone-400">
+            Cuenta regresiva del Hero → <span className="font-mono text-orange-400">{formattedShortDate}</span>
+            {' · '}
+            {formattedDayMonth} · {formattedTime}
+          </p>
         </div>
         <div>
           <label className="block text-xs font-semibold text-stone-300 mb-1">

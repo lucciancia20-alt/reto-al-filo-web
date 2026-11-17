@@ -12,6 +12,7 @@ import {
   saveLiveRaceConfig,
   resetLiveRaceConfig,
 } from './firebase/config';
+import { getRaceFullTitle } from './data/raceConfig';
 
 const AdminModal = lazy(() => import('./components/AdminModal'));
 
@@ -69,6 +70,13 @@ export default function App() {
     };
   }, []);
 
+  const raceFullTitle = getRaceFullTitle(raceConfig);
+
+  // Pestaña del navegador sincronizada con el título editable del Panel Admin
+  useEffect(() => {
+    document.title = `${raceFullTitle} | Trail Running`;
+  }, [raceFullTitle]);
+
   const handleOpenModal = (distanceOverride) => {
     if (distanceOverride === '27K' || distanceOverride === '13K') {
       setActiveDistance(distanceOverride);
@@ -119,7 +127,7 @@ export default function App() {
           onOpenModalWithDistance={(dist) => handleOpenModal(dist)}
         />
 
-        <GallerySection />
+        <GallerySection raceConfig={raceConfig} />
 
         <InfoFaqSection raceConfig={raceConfig} />
       </main>

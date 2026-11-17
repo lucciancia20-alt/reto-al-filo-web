@@ -24,6 +24,7 @@ import {
 import {
   RACE_CONFIG,
   buildWhatsAppUrl,
+  getRaceFullTitle,
   calculateRunnerAgeAtRace,
   resolveRunnerCategory,
   getMaxBirthDateIso,
@@ -355,11 +356,12 @@ export default function RegistrationModal({
         try {
           await sendRegistrationNotificationEmail({
             notificationEmail: raceConfig?.notificationEmail,
+            raceTitle: getRaceFullTitle(raceConfig),
             registration: created,
             uploadedUrl: uploaded.secureUrl,
           });
         } catch (err) {
-          console.error('[Reto al Filo] Error enviando notificación EmailJS en segundo plano:', {
+          console.error('[Inscripción] Error enviando notificación EmailJS en segundo plano:', {
             status: err?.status,
             text: err?.text,
             err,
@@ -383,13 +385,14 @@ export default function RegistrationModal({
 
   const confirmationWhatsappHref = confirmedReg
     ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-        `¡Hola! Acabo de inscribirme a Reto al Filo 2027. Mi código es *${confirmedReg.code}* - *${confirmedReg.fullName}* (*${confirmedReg.distance}*). Ya adjunté el comprobante en la web.`
+        `¡Hola! Acabo de inscribirme a ${getRaceFullTitle(raceConfig)}. Mi código es *${confirmedReg.code}* - *${confirmedReg.fullName}* (*${confirmedReg.distance}*). Ya adjunté el comprobante en la web.`
       )}`
-    : buildWhatsAppUrl(selectedDistance, raceConfig.whatsappNumber);
+    : buildWhatsAppUrl(selectedDistance, raceConfig.whatsappNumber, raceConfig);
 
   const supportWhatsappHref = buildWhatsAppUrl(
     selectedDistance,
-    raceConfig.whatsappNumber
+    raceConfig.whatsappNumber,
+    raceConfig
   );
 
   return (
@@ -414,7 +417,8 @@ export default function RegistrationModal({
             </span>
             <div className="min-w-0">
               <span className="block text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-amber-400 truncate">
-                Inscripción Oficial Online · {raceConfig.subtitle || 'Abril 2027'}
+                Inscripción Oficial Online · {getRaceFullTitle(raceConfig, ' · ')}
+                {raceConfig.subtitle ? ` · ${raceConfig.subtitle}` : ''}
               </span>
               <h3
                 id="modal-inscripcion-title"
@@ -1246,7 +1250,7 @@ export default function RegistrationModal({
                   <div className="rounded-xl bg-zinc-950 border border-stone-700 p-3.5 max-h-60 overflow-y-auto overscroll-contain space-y-2.5 text-[11px] text-stone-300 leading-relaxed">
                     <div>
                       <h4 className="font-display font-bold text-amber-400 uppercase text-xs">
-                        Reglamento General · {raceConfig.title || RACE_CONFIG.title}
+                        Reglamento General · {getRaceFullTitle(raceConfig)}
                       </h4>
                       <p className="mt-1">
                         {reglamentFaq?.answer || RACE_CONFIG.faqs[2].answer}
