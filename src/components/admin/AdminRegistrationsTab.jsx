@@ -417,12 +417,12 @@ export default function AdminRegistrationsTab({
 
       {/* Controles de filtro y exportación */}
       <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3 space-y-2.5">
-        <div className="flex flex-wrap lg:flex-nowrap items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-2">
           <select
             aria-label="Filtrar por distancia"
             value={regDistanceFilter}
             onChange={(e) => setRegDistanceFilter(e.target.value)}
-            className={`w-fit rounded-xl bg-zinc-950 border focus:outline-none pl-2.5 pr-1.5 py-1.5 text-xs transition-colors shrink-0 ${
+            className={`w-fit rounded-xl bg-zinc-950 border focus:outline-none pl-2 pr-1.5 py-1.5 text-[11px] xl:text-xs transition-colors shrink-0 ${
               regDistanceFilter === '27K'
                 ? 'text-cyan-400 font-medium border-cyan-500/60 focus:border-cyan-400'
                 : regDistanceFilter === '13K'
@@ -448,7 +448,7 @@ export default function AdminRegistrationsTab({
               setRegDuplicateFilter?.('none');
               setRegStatusFilter(e.target.value);
             }}
-            className={`w-fit rounded-xl bg-zinc-950 border focus:outline-none pl-2.5 pr-1.5 py-1.5 text-xs transition-colors shrink-0 ${
+            className={`w-fit rounded-xl bg-zinc-950 border focus:outline-none pl-2 pr-1.5 py-1.5 text-[11px] xl:text-xs transition-colors shrink-0 ${
               regStatusFilter === 'pendiente'
                 ? 'text-amber-400 border-amber-500/60 focus:border-amber-400 font-medium'
                 : regStatusFilter === 'confirmado'
@@ -474,7 +474,7 @@ export default function AdminRegistrationsTab({
             type="button"
             onClick={onExportExcel}
             disabled={registrationsCount === 0}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 text-xs font-medium px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
           >
             <Download className="w-3.5 h-3.5 shrink-0" />
             Exportar Excel (.XLSX)
@@ -485,7 +485,7 @@ export default function AdminRegistrationsTab({
             onClick={onPrintAccreditationSheet}
             disabled={(regStats.confirmed || 0) === 0}
             title="Imprimir planilla A4 de acreditación y seguridad SOS ordenada por dorsal"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900/80 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-xs font-medium px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900/80 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
           >
             <Printer className="w-3.5 h-3.5 shrink-0" />
             Imprimir Planilla Acreditación / SOS
@@ -496,7 +496,7 @@ export default function AdminRegistrationsTab({
             target="_blank"
             rel="noopener noreferrer"
             title="Abrir actividad y transferencias recibidas en Mercado Pago"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-sky-400 border border-sky-500/60 text-xs font-medium px-2.5 py-1.5 transition-colors whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-sky-400 border border-sky-500/60 text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors whitespace-nowrap shrink-0"
           >
             <Wallet className="w-3.5 h-3.5 shrink-0" />
             <span>Mercado Pago</span>
@@ -505,11 +505,11 @@ export default function AdminRegistrationsTab({
         </div>
 
         {/* Resumen en vivo de Talles (Confirmados / Activos) y Acreditación */}
-        <div className="pt-2 border-t border-stone-800/80 flex flex-col xl:flex-row xl:items-center justify-between gap-2 text-[11px]">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-stone-400 mr-1">
-              <Shirt className="w-3.5 h-3.5 text-amber-400" />
-              Talles (Conf/Tot):
+        <div className="pt-2 border-t border-stone-800/80 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-[11px]">
+          <div className="flex flex-wrap items-center gap-1">
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-stone-400 mr-0.5 shrink-0">
+              <Shirt className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              Talles:
             </span>
             {(regStats.shirtSizes || []).map((item) => {
               const isSelected = regShirtFilter === item.size;
@@ -519,7 +519,7 @@ export default function AdminRegistrationsTab({
                   type="button"
                   onClick={() => setRegShirtFilter?.(isSelected ? 'all' : item.size)}
                   title={`Filtrar por talle ${item.size}: ${item.confirmed} confirmados de ${item.total} inscriptos no rechazados`}
-                  className={`inline-flex items-center gap-1 rounded-lg border px-2 py-0.5 font-mono transition-colors cursor-pointer ${
+                  className={`inline-flex items-center gap-0.5 rounded-lg border px-1.5 py-0.5 text-[10px] sm:text-[11px] font-mono whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
                     isSelected
                       ? 'bg-amber-500/20 border-amber-400 ring-1 ring-amber-400/70 shadow-sm text-white font-medium'
                       : 'bg-zinc-900/80 border-amber-500/60 text-white hover:border-amber-400'
@@ -544,8 +544,8 @@ export default function AdminRegistrationsTab({
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5 shrink-0">
-            <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-stone-400 mr-0.5">
-              <PackageCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-stone-400 mr-0.5 shrink-0">
+              <PackageCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               Mesa Kit:
             </span>
             <button
@@ -553,7 +553,7 @@ export default function AdminRegistrationsTab({
               onClick={() =>
                 setRegCheckInFilter?.(regCheckInFilter === 'checked' ? 'all' : 'checked')
               }
-              className={`rounded-lg border px-2 py-0.5 text-[11px] font-semibold transition-colors cursor-pointer ${
+              className={`rounded-lg border px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                 regCheckInFilter === 'checked'
                   ? 'bg-zinc-950 border-orange-500 ring-1 ring-orange-500/70 text-white font-medium'
                   : 'bg-zinc-950 border-orange-500/60 text-white hover:border-orange-400'
@@ -568,7 +568,7 @@ export default function AdminRegistrationsTab({
                   regCheckInFilter === 'pending_checkin' ? 'all' : 'pending_checkin'
                 )
               }
-              className={`rounded-lg border px-2 py-0.5 text-[11px] font-semibold transition-colors cursor-pointer ${
+              className={`rounded-lg border px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                 regCheckInFilter === 'pending_checkin'
                   ? 'bg-zinc-950 border-orange-500 ring-1 ring-orange-500/70 text-white font-medium'
                   : 'bg-zinc-950 border-orange-500/60 text-white hover:border-orange-400'
