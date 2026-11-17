@@ -16,12 +16,12 @@ import { RACE_CONFIG, computeClosingTime, getStartTime } from '../data/raceConfi
 import { GPX_TRACKS, interpolatePointAtKm } from '../data/gpxTracks';
 
 function buildElevationSvg(points, totalKm, minAltRaw, maxAltRaw) {
-  const width = 800;
-  const height = 210;
-  const padLeft = 48;
-  const padRight = 24;
-  const padTop = 26;
-  const padBottom = 26;
+  const width = 600;
+  const height = 200;
+  const padLeft = 44;
+  const padRight = 18;
+  const padTop = 22;
+  const padBottom = 22;
 
   const plotW = width - padLeft - padRight;
   const plotH = height - padTop - padBottom;
@@ -355,22 +355,25 @@ export default function CircuitSection({
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
               {/* Columna Izquierda: Recorrido GPS Vectorial */}
               <div className="lg:col-span-5 rounded-2xl bg-stone-950/90 border border-orange-500/80 p-2.5 sm:p-3 flex flex-col justify-between">
-                <div className="flex items-center justify-between text-xs mb-1.5">
-                  <span className="font-display font-bold uppercase tracking-wider text-stone-200 flex items-center gap-1.5">
-                    <Compass className="w-3.5 h-3.5 text-orange-400" />
-                    Trazado GPS ({String(track.totalKm).replace('.', ',')} km)
+                <div className="flex items-center justify-between gap-2 min-h-[26px] text-xs mb-1.5">
+                  <span className="font-display font-bold uppercase tracking-wider text-stone-200 flex items-center gap-1.5 truncate">
+                    <Compass className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                    <span className="truncate">
+                      Trazado GPS ({String(track.totalKm).replace('.', ',')} km)
+                    </span>
                   </span>
-                  <span className="font-mono text-[10px] text-white font-bold bg-zinc-950/90 px-2 py-0.5 rounded border border-zinc-500/80">
+                  <span className="font-mono text-[10px] text-white font-bold bg-zinc-950/90 px-2 py-0.5 rounded border border-zinc-500/80 shrink-0">
                     N ↑
                   </span>
                 </div>
 
-                <svg
-                  viewBox={`0 0 ${mapSvg.width} ${mapSvg.height}`}
-                  className="w-full h-36 sm:h-44 max-h-44 rounded-xl bg-[radial-gradient(rgba(255,255,255,0.24)_1px,transparent_1px)] [background-size:16px_16px] bg-stone-950"
-                  role="img"
-                  aria-label={`Mapa del recorrido GPS para ${currentCircuit.tabLabel}`}
-                >
+                <div className="flex-1 flex items-center">
+                  <svg
+                    viewBox={`0 0 ${mapSvg.width} ${mapSvg.height}`}
+                    className="w-full h-44 sm:h-48 rounded-xl bg-[radial-gradient(rgba(255,255,255,0.24)_1px,transparent_1px)] [background-size:16px_16px] bg-stone-950"
+                    role="img"
+                    aria-label={`Mapa del recorrido GPS para ${currentCircuit.tabLabel}`}
+                  >
                   {/* Halo de ruta */}
                   <path
                     d={mapSvg.path}
@@ -465,9 +468,10 @@ export default function CircuitSection({
                       </g>
                     );
                   })()}
-                </svg>
+                  </svg>
+                </div>
 
-                <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-[11px] text-stone-400">
+                <div className="mt-1.5 min-h-[20px] flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-[11px] text-stone-400">
                   <span className="inline-flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
                     Largada / Meta
@@ -485,23 +489,25 @@ export default function CircuitSection({
 
               {/* Columna Derecha: Perfil de Altimetría Real SVG */}
               <div className="lg:col-span-7 rounded-2xl bg-stone-950/90 border border-orange-500/80 p-2.5 sm:p-3 flex flex-col justify-between">
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5 text-xs">
-                  <span className="font-display font-bold uppercase tracking-wider text-stone-200 flex items-center gap-1.5">
-                    <Mountain className="w-3.5 h-3.5 text-orange-400" />
-                    Perfil de Altimetría Real ({track.minAlt}m – {track.maxAlt}m)
+                <div className="flex items-center justify-between gap-2 min-h-[26px] mb-1.5 text-xs">
+                  <span className="font-display font-bold uppercase tracking-wider text-stone-200 flex items-center gap-1.5 truncate">
+                    <Mountain className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                    <span className="truncate">
+                      Perfil de Altimetría Real ({track.minAlt}m – {track.maxAlt}m)
+                    </span>
                   </span>
-                  <span className="font-mono text-[11px] text-orange-400 bg-zinc-950 px-2.5 py-0.5 rounded border border-orange-500/60">
+                  <span className="font-mono text-[10px] sm:text-[11px] text-orange-400 bg-zinc-950 px-2.5 py-0.5 rounded border border-orange-500/60 whitespace-nowrap shrink-0">
                     {hoverPoint
                       ? `KM ${hoverPoint.km.toFixed(1)} · ${hoverPoint.alt} msnm`
                       : `Pasá el dedo o mouse para ver altitud`}
                   </span>
                 </div>
 
-                <div className="w-full overflow-x-auto">
+                <div className="w-full flex-1 flex items-center overflow-x-auto">
                   <svg
                     ref={elevationSvgRef}
                     viewBox={`0 0 ${elevationSvg.width} ${elevationSvg.height}`}
-                    className="w-full h-36 sm:h-44 max-h-44 select-none touch-pan-y cursor-crosshair"
+                    className="w-full h-44 sm:h-48 rounded-xl bg-stone-950 select-none touch-pan-y cursor-crosshair"
                     role="img"
                     aria-label={`Gráfico de altimetría real para ${currentCircuit.tabLabel}`}
                     onPointerDown={handleSvgPointerMove}
@@ -694,7 +700,7 @@ export default function CircuitSection({
                   </svg>
                 </div>
 
-                <div className="mt-1.5 flex items-center justify-between text-[10px] sm:text-[11px] text-stone-400">
+                <div className="mt-1.5 min-h-[20px] flex items-center justify-between text-[10px] sm:text-[11px] text-stone-400">
                   <span>Mín: {track.minAlt} msnm</span>
                   <span>Desnivel positivo acumulado: {currentCircuit.elevationGain}</span>
                   <span>Máx: {track.maxAlt} msnm</span>
