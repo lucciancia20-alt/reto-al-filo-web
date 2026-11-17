@@ -30,9 +30,7 @@ import { openPrintableWaiver, openPrintableMedicalCert } from '../utils/printabl
 import { fetchPublicRunnerStatus } from '../firebase/config';
 
 export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
-  const [openFaqId, setOpenFaqId] = useState(
-    raceConfig?.faqs?.[0]?.id || RACE_CONFIG.faqs[0].id
-  );
+  const [openFaqs, setOpenFaqs] = useState({});
   const [lookupQuery, setLookupQuery] = useState('');
   const [lookupLoading, setLookupLoading] = useState(false);
   const [lookupResult, setLookupResult] = useState(null);
@@ -95,13 +93,13 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
         <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-6 xl:px-10 grid grid-cols-1 xl:grid-cols-3 gap-10 xl:gap-6 items-start">
           {/* Columna 1: Línea de Tiempo (Cronograma del Día) */}
           <section id="cronograma" className="scroll-mt-20 min-w-0 flex flex-col justify-start">
-            <div className="text-center xl:min-h-[124px] flex flex-col items-center justify-start">
-              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
+            <div className="text-center xl:min-h-[145px] flex flex-col items-center justify-between mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap">
                 <Clock className="w-3.5 h-3.5 shrink-0" />
                 <span>Cronograma Oficial · {formattedFullDate}</span>
               </div>
 
-              <h2 className="mt-2 text-balance font-display text-3xl md:text-4xl xl:text-2xl font-black text-white uppercase tracking-tight section-title-stroke">
+              <h2 className="mt-2 font-display text-3xl md:text-4xl xl:text-[22px] 2xl:text-2xl font-black text-white uppercase tracking-tight xl:whitespace-nowrap section-title-stroke">
                 Horarios del Día de Carrera
               </h2>
               <p className="mt-1.5 text-balance text-xs sm:text-sm text-stone-300">
@@ -111,7 +109,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             </div>
 
             {/* Línea de tiempo vertical con los horarios del día */}
-            <div className="mt-5 flex flex-col justify-start gap-2.5 relative pl-6 sm:pl-8 before:content-[''] before:absolute before:left-2.5 sm:before:left-3.5 before:top-7 before:bottom-7 before:w-0.5 before:bg-gradient-to-b before:from-orange-500 before:via-orange-500/50 before:to-stone-800">
+            <div className="flex flex-col justify-start gap-2.5 relative pl-6 sm:pl-8 before:content-[''] before:absolute before:left-2.5 sm:before:left-3.5 before:top-7 before:bottom-7 before:w-0.5 before:bg-gradient-to-b before:from-orange-500 before:via-orange-500/50 before:to-stone-800">
               {syncedSchedule.map((item, idx) => (
                 <div
                   key={`${item.time}-${idx}`}
@@ -158,13 +156,13 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             id="categorias"
             className="scroll-mt-20 min-w-0 pt-8 border-t-2 border-orange-500/40 xl:pt-0 xl:border-t-0 flex flex-col justify-start"
           >
-            <div className="text-center xl:min-h-[124px] flex flex-col items-center justify-start">
-              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
+            <div className="text-center xl:min-h-[145px] flex flex-col items-center justify-between mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap">
                 <Award className="w-3.5 h-3.5 shrink-0" />
                 <span>Clasificación Oficial · Damas y Caballeros</span>
               </div>
 
-              <h2 className="mt-2 text-balance font-display text-3xl md:text-4xl xl:text-2xl font-black text-white uppercase tracking-tight section-title-stroke">
+              <h2 className="mt-2 font-display text-3xl md:text-4xl xl:text-[22px] 2xl:text-2xl font-black text-white uppercase tracking-tight xl:whitespace-nowrap section-title-stroke">
                 {ageCategories.title || 'Categorías por Edad y Premiación'}
               </h2>
               <p className="mt-1.5 text-balance text-xs sm:text-sm text-stone-300">
@@ -173,7 +171,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
               </p>
             </div>
 
-            <div className="mt-5 flex flex-col justify-start gap-3">
+            <div className="flex flex-col justify-start gap-3">
               {/* Resumen de Premiación */}
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2.5">
               <div className="rounded-2xl bg-zinc-950 border border-orange-500/70 p-3.5">
@@ -247,13 +245,13 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             id="faq"
             className="scroll-mt-20 min-w-0 pt-8 border-t-2 border-orange-500/40 xl:pt-0 xl:border-t-0 flex flex-col justify-start"
           >
-            <div className="text-center xl:min-h-[124px] flex flex-col items-center justify-start">
-              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
+            <div className="text-center xl:min-h-[145px] flex flex-col items-center justify-between mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap">
                 <HelpCircle className="w-3.5 h-3.5 shrink-0" />
                 <span>Información Clave para el Corredor</span>
               </div>
 
-              <h2 className="mt-2 text-balance font-display text-3xl md:text-4xl xl:text-2xl font-black text-white uppercase tracking-tight section-title-stroke">
+              <h2 className="mt-2 font-display text-3xl md:text-4xl xl:text-[22px] 2xl:text-2xl font-black text-white uppercase tracking-tight xl:whitespace-nowrap section-title-stroke">
                 Preguntas Frecuentes (FAQ)
               </h2>
               <p className="mt-1.5 text-balance text-xs sm:text-sm text-stone-300">
@@ -262,9 +260,10 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
               </p>
             </div>
 
-            <div className="mt-5 flex flex-col justify-start gap-2.5">
+            <div className="flex flex-col justify-start gap-2.5">
             {(raceConfig.faqs || []).map((faq) => {
-              const isOpen = openFaqId === faq.id;
+              const isAlwaysOpen = faq.id === 'elementos-obligatorios';
+              const isOpen = isAlwaysOpen ? true : Boolean(openFaqs[faq.id]);
               const IconComponent = faqIcons[faq.id] || HelpCircle;
 
               return (
@@ -276,28 +275,46 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                       : 'border-orange-500/80 shadow-[0_0_12px_rgba(249,115,22,0.18)] hover:border-orange-400'
                   }`}
                 >
-                  <button
-                    type="button"
-                    aria-expanded={isOpen}
-                    aria-controls={`faq-panel-${faq.id}`}
-                    onClick={() => setOpenFaqId(isOpen ? null : faq.id)}
-                    className="w-full px-4 sm:px-5 py-3.5 sm:py-4 text-left flex items-center justify-between gap-4 cursor-pointer"
-                  >
-                    <div className="flex items-center gap-3.5">
-                      <span className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/40 text-orange-400 flex items-center justify-center shrink-0">
-                        <IconComponent className="w-5 h-5" />
-                      </span>
-                      <span className="font-display text-base sm:text-lg font-extrabold text-white">
-                        {faq.question}
-                      </span>
+                  {isAlwaysOpen ? (
+                    <div className="w-full px-4 sm:px-5 py-3.5 sm:py-4 text-left flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3.5">
+                        <span className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/40 text-orange-400 flex items-center justify-center shrink-0">
+                          <IconComponent className="w-5 h-5" />
+                        </span>
+                        <span className="font-display text-base sm:text-lg font-extrabold text-white">
+                          {faq.question}
+                        </span>
+                      </div>
                     </div>
+                  ) : (
+                    <button
+                      type="button"
+                      aria-expanded={isOpen}
+                      aria-controls={`faq-panel-${faq.id}`}
+                      onClick={() =>
+                        setOpenFaqs((prev) => ({
+                          ...prev,
+                          [faq.id]: !prev[faq.id],
+                        }))
+                      }
+                      className="w-full px-4 sm:px-5 py-3.5 sm:py-4 text-left flex items-center justify-between gap-4 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <span className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/40 text-orange-400 flex items-center justify-center shrink-0">
+                          <IconComponent className="w-5 h-5" />
+                        </span>
+                        <span className="font-display text-base sm:text-lg font-extrabold text-white">
+                          {faq.question}
+                        </span>
+                      </div>
 
-                    <ChevronDown
-                      className={`w-5 h-5 text-orange-400 shrink-0 transition-transform duration-200 ${
-                        isOpen ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
+                      <ChevronDown
+                        className={`w-5 h-5 text-orange-400 shrink-0 transition-transform duration-200 ${
+                          isOpen ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
+                  )}
 
                   {isOpen && (
                     <div
