@@ -1039,11 +1039,24 @@ export default function CircuitSection({
                 <button
                   type="button"
                   onClick={() => onOpenModalWithDistance(activeDistance)}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-950 border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-950 active:scale-[0.99] text-orange-400 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2 transition-all cursor-pointer shrink-0"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-950 border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-950 active:scale-[0.99] text-orange-400 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2 transition-all cursor-pointer shrink-0 whitespace-nowrap"
                 >
-                  <Flame className="w-3.5 h-3.5 text-orange-400" />
-                  <span>
-                    Inscribirme · {activeDistance} ({currentCircuit.price})
+                  <Flame className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                  <span className="inline-grid place-items-center">
+                    {Object.values(circuits).map((c) => {
+                      const isActive = c.id === activeDistance;
+                      return (
+                        <span
+                          key={`cta-${c.id}`}
+                          aria-hidden={!isActive}
+                          className={`[grid-area:1/1] ${
+                            isActive ? '' : 'invisible pointer-events-none select-none'
+                          }`}
+                        >
+                          Inscribirme · {c.id} ({c.price})
+                        </span>
+                      );
+                    })}
                   </span>
                 </button>
               </div>
