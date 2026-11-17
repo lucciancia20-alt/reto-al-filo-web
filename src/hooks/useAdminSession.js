@@ -16,6 +16,9 @@ import {
   claimAdminSession,
   releaseAdminSession,
   subscribeToAdminSession,
+  getAdminDeviceId,
+  getAdminClientSessionId,
+  adoptAdminClientSessionId,
 } from '../firebase/config';
 
 const INACTIVITY_MS = 20 * 60 * 1000; // 20 minutos
@@ -166,13 +169,31 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
         if (cancelled) return;
 
         const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
-        const isConflict =
+        const isLive =
           snap?.isActive === true &&
           snap?.sessionId &&
           Date.now() - (snap?.startedAt || 0) < TWO_HOURS_MS;
 
-        if (isConflict) {
-          // Hay otra sesión activa → mostrar modal de conflicto
+        // Mismo navegador: coincide el sessionId de la pestaña (F5) o el deviceId + uid
+        const isSameClient =
+          isLive &&
+          (snap.sessionId === getAdminClientSessionId() ||
+            (snap.deviceId &&
+              snap.deviceId === getAdminDeviceId() &&
+              snap.adminUid &&
+              snap.adminUid === adminUser.uid));
+
+        if (isSameClient) {
+          // Reconexión transparente: 0 escrituras, sin modal
+          adoptAdminClientSessionId(snap.sessionId);
+          sessionIdRef.current = snap.sessionId;
+          setSessionState('active');
+          cleanupSession = startSession();
+          return;
+        }
+
+        if (isLive) {
+          // Hay otra sesión activa en otro dispositivo/navegador → modal de conflicto
           setConflictInfo({
             deviceInfo: snap.deviceInfo || 'otro dispositivo',
             startedAt: snap.startedAt,

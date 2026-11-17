@@ -1316,6 +1316,71 @@ function generateSessionId() {
   return `SES-${Date.now()}-${rnd}`;
 }
 
+const ADMIN_DEVICE_ID_KEY = 'raf_admin_device_id';
+const ADMIN_CLIENT_SESSION_KEY = 'raf_admin_client_session_id';
+
+function safeStorageGet(storage, key) {
+  try {
+    return storage?.getItem(key) || '';
+  } catch {
+    return '';
+  }
+}
+
+function safeStorageSet(storage, key, value) {
+  try {
+    storage?.setItem(key, value);
+  } catch {
+    // Navegación privada estricta: se mantiene solo en memoria
+  }
+}
+
+let memoryDeviceId = '';
+let memoryClientSessionId = '';
+
+/**
+ * Identificador persistente del navegador (localStorage). No cambia entre recargas ni pestañas.
+ */
+export function getAdminDeviceId() {
+  const store = typeof window !== 'undefined' ? window.localStorage : null;
+  let id = safeStorageGet(store, ADMIN_DEVICE_ID_KEY) || memoryDeviceId;
+  if (!id) {
+    id = `DEV-${Date.now()}-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+    safeStorageSet(store, ADMIN_DEVICE_ID_KEY, id);
+  }
+  memoryDeviceId = id;
+  return id;
+}
+
+/**
+ * Identificador de sesión de la pestaña (sessionStorage). Sobrevive a F5 y a
+ * montar/desmontar AdminModal; no se borra en pagehide/beforeunload.
+ */
+export function getAdminClientSessionId() {
+  const store = typeof window !== 'undefined' ? window.sessionStorage : null;
+  let id = safeStorageGet(store, ADMIN_CLIENT_SESSION_KEY) || memoryClientSessionId;
+  if (!id) {
+    id = generateSessionId();
+    safeStorageSet(store, ADMIN_CLIENT_SESSION_KEY, id);
+  }
+  memoryClientSessionId = id;
+  return id;
+}
+
+/**
+ * Adopta un sessionId existente (reconexión del mismo dispositivo) para que las próximas
+ * recargas coincidan directamente por sessionId.
+ */
+export function adoptAdminClientSessionId(sessionId) {
+  if (!sessionId) return;
+  memoryClientSessionId = sessionId;
+  safeStorageSet(
+    typeof window !== 'undefined' ? window.sessionStorage : null,
+    ADMIN_CLIENT_SESSION_KEY,
+    sessionId
+  );
+}
+
 function buildDeviceInfo() {
   const ua = navigator?.userAgent || '';
   if (/iPhone|iPad|iPod/i.test(ua)) return 'iPhone / iPad';
@@ -1351,16 +1416,18 @@ export async function checkAdminSession() {
  * @returns {Promise<{ sessionId: string }>}
  */
 export async function claimAdminSession(adminUser) {
-  if (!isFirebaseConfigured()) return { sessionId: generateSessionId() };
+  const sessionId = getAdminClientSessionId();
+  if (!isFirebaseConfigured()) return { sessionId };
   const bundle = await getFirestoreDb();
-  if (!bundle) return { sessionId: generateSessionId() };
+  if (!bundle) return { sessionId };
 
   const { db, firestore } = bundle;
   const { doc, setDoc } = firestore;
-  const sessionId = generateSessionId();
 
   await setDoc(doc(db, 'settings', 'adminSession'), {
     sessionId,
+    deviceId: getAdminDeviceId(),
+    adminUid: String(adminUser?.uid || ''),
     deviceInfo: buildDeviceInfo(),
     adminEmail: String(adminUser?.email || '').trim().toLowerCase(),
     startedAt: Date.now(),
