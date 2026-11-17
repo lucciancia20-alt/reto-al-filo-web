@@ -40,6 +40,15 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
   const inactivityRef     = useRef(null);
   const lastActivityRef   = useRef(Date.now());
   const isReleasedRef     = useRef(false);
+  const cleanupRef        = useRef(null);  // cleanup de listeners locales (actividad / pagehide)
+  const transferringRef   = useRef(false); // true durante el traspaso de sesión
+  const adminUserRef      = useRef(adminUser);
+  adminUserRef.current = adminUser;
+
+  const stopLocalListeners = useCallback(() => {
+    if (typeof cleanupRef.current === 'function') cleanupRef.current();
+    cleanupRef.current = null;
+  }, []);
 
   // ─── Liberar sesión (1 escritura) ───────────────────────────────────────────
   const release = useCallback(async () => {
@@ -54,10 +63,11 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
     }
 
     clearTimeout(inactivityRef.current);
+    stopLocalListeners();
     await releaseAdminSession(sessionIdRef.current);
     sessionIdRef.current = null;
     setSessionState('idle');
-  }, []);
+  }, [stopLocalListeners]);
 
   // ─── Montar el listener onSnapshot + timer de inactividad ───────────────────
   const startSession = useCallback(() => {
@@ -65,7 +75,7 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
 
     // ── 1) listener onSnapshot liviano: reacciona SOLO si el sessionId cambia ──
     unsubscribeRef.current = subscribeToAdminSession((snap) => {
-      if (!snap) return;
+      if (!snap || transferringRef.current) return;
       const remoteSessionId = snap.sessionId;
       // Si el doc se actualizó con un sessionId distinto al nuestro → nos expulsaron
       if (
@@ -81,6 +91,7 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
         }
         clearTimeout(inactivityRef.current);
         sessionIdRef.current = null;
+        stopLocalListeners();
         onForceClose?.();
       }
     });
@@ -118,6 +129,7 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
     window.addEventListener('beforeunload', onPageHide);
 
     // Guardar cleanup completo
+    stopLocalListeners();
     const cleanup = () => {
       window.removeEventListener('mousemove', onActivity);
       window.removeEventListener('keydown', onActivity);
@@ -127,23 +139,42 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
       window.removeEventListener('beforeunload', onPageHide);
       clearTimeout(inactivityRef.current);
     };
+    cleanupRef.current = cleanup;
     return cleanup;
-  }, [release, onForceClose]);
+  }, [release, onForceClose, stopLocalListeners]);
 
-  // ─── Tomar control explícitamente (desde el modal de conflicto) ─────────────
+  // ─── Tomar control en 1 paso (desde el modal de conflicto), sin cerrar el panel ──
   const takeover = useCallback(async () => {
-    if (!adminUser) return;
-    setSessionState('checking');
+    const user = adminUserRef.current;
+    if (!user || transferringRef.current) return;
+
+    // 1) Ocultar el modal y fijar el sessionId local ANTES de escribir, para que
+    //    el listener nunca interprete el traspaso como una expulsión.
+    transferringRef.current = true;
+    const previousConflict = conflictInfo;
+    setConflictInfo(null);
+    sessionIdRef.current = getAdminClientSessionId();
+    setSessionState('active');
+
     try {
-      const { sessionId } = await claimAdminSession(adminUser);
+      // 2) Única escritura: reclamar la sesión
+      const { sessionId } = await claimAdminSession(user);
       sessionIdRef.current = sessionId;
-      setConflictInfo(null);
-      setSessionState('active');
+      // 3) Listener + timer locales (si ya existían se reemplazan sin duplicar)
+      if (typeof unsubscribeRef.current === 'function') {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
       startSession();
     } catch {
-      setSessionState('idle');
+      // Falló la escritura: volver al modal de conflicto
+      sessionIdRef.current = null;
+      setConflictInfo(previousConflict);
+      setSessionState('conflict');
+    } finally {
+      transferringRef.current = false;
     }
-  }, [adminUser, startSession]);
+  }, [conflictInfo, startSession]);
 
   // ─── Cancelar: no entrar al panel ───────────────────────────────────────────
   const cancelEntry = useCallback(() => {
@@ -217,11 +248,12 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
     return () => {
       cancelled = true;
       if (typeof cleanupSession === 'function') cleanupSession();
+      stopLocalListeners();
       // Liberar sesión al desmontar o al cerrar el panel
       release();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, adminUser]);
+  }, [enabled, adminUser?.uid]);
 
   return {
     sessionState,   // 'idle' | 'checking' | 'conflict' | 'active' | 'releasing'
