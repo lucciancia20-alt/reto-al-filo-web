@@ -531,7 +531,7 @@ export default function CircuitSection({
   return (
     <section
       id="circuito"
-      className="scroll-mt-16 min-h-[calc(100dvh-4rem)] pt-6 sm:pt-8 pb-8 sm:pb-10 bg-stone-950 border-t-2 border-orange-500/50 relative flex flex-col justify-center"
+      className="scroll-mt-16 pt-6 sm:pt-8 pb-8 sm:pb-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Encabezado */}
@@ -566,8 +566,8 @@ export default function CircuitSection({
                   ? 'bg-zinc-950 text-red-500 border-2 border-red-500'
                   : 'bg-zinc-950 text-cyan-400 border-2 border-cyan-400'
                 : is13K
-                  ? 'bg-zinc-950 text-red-500 border border-red-500/50 opacity-80 hover:opacity-100 hover:border-red-500'
-                  : 'bg-zinc-950 text-cyan-400 border border-cyan-500/50 opacity-80 hover:opacity-100 hover:border-cyan-400';
+                  ? 'bg-zinc-950 text-red-500 border-2 border-red-500/40 opacity-80 hover:opacity-100 hover:border-red-500'
+                  : 'bg-zinc-950 text-cyan-400 border-2 border-cyan-500/40 opacity-80 hover:opacity-100 hover:border-cyan-400';
               return (
                 <button
                   key={circuit.id}
@@ -590,12 +590,12 @@ export default function CircuitSection({
         {/* Contenedor principal del Circuito GPX + Altimetría */}
         <div className="mt-3 rounded-3xl bg-zinc-950 border border-orange-500 overflow-hidden">
           {/* Barra superior */}
-          <div className="px-3.5 sm:px-5 py-2 bg-stone-950/75 border-b border-orange-500/40 flex flex-wrap items-center justify-between gap-2.5">
-            <div className="flex items-center gap-2.5">
+          <div className="px-3.5 sm:px-5 py-2.5 bg-stone-950/75 border-b border-orange-500/40 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2.5">
+            <div className="flex items-start sm:items-center gap-2.5 flex-1 min-w-0">
               <span className="w-8 h-8 rounded-xl bg-zinc-950 border border-orange-500/60 text-orange-400 flex items-center justify-center shrink-0">
                 <MapIcon className="w-4 h-4" />
               </span>
-              <div>
+              <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="font-display font-extrabold text-sm sm:text-base text-white uppercase">
                     Track GPX Real · {currentCircuit.tabLabel}
@@ -604,13 +604,26 @@ export default function CircuitSection({
                     {currentCircuit.summaryBadge}
                   </span>
                 </div>
-                <p className="text-xs leading-relaxed text-stone-400 mt-0.5 min-h-[60px]">
-                  {currentCircuit.description}
-                </p>
+                <div className="grid mt-0.5">
+                  {Object.values(circuits).map((c) => {
+                    const isActive = c.id === currentCircuit.id;
+                    return (
+                      <p
+                        key={`desc-${c.id}`}
+                        aria-hidden={!isActive}
+                        className={`[grid-area:1/1] text-xs leading-relaxed text-stone-400 ${
+                          isActive ? '' : 'invisible pointer-events-none select-none'
+                        }`}
+                      >
+                        {c.description}
+                      </p>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
+            <div className="flex flex-wrap items-center gap-2 text-xs font-semibold shrink-0">
               {track.gpxDownloadUrl && (
                 <a
                   href={track.gpxDownloadUrl}
@@ -954,7 +967,7 @@ export default function CircuitSection({
             </div>
 
             {/* Lista de Puestos de Hidratación */}
-            <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-orange-500/30">
+            <div className="mt-2.5 min-h-[34px] flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-orange-500/30">
               <div className="flex flex-wrap gap-1.5">
                 {stations.map((st) => (
                   <span
