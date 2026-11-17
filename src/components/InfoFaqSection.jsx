@@ -93,16 +93,16 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
         <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-6 xl:px-10 grid grid-cols-1 xl:grid-cols-3 gap-10 xl:gap-6 items-start">
           {/* Columna 1: Línea de Tiempo (Cronograma del Día) */}
           <section id="cronograma" className="scroll-mt-20 min-w-0 flex flex-col justify-start">
-            <div className="text-center xl:min-h-[145px] flex flex-col items-center justify-between mb-6">
-              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap">
+            <div className="text-center xl:min-h-[140px] flex flex-col items-center justify-start mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap mb-3">
                 <Clock className="w-3.5 h-3.5 shrink-0" />
                 <span>Cronograma Oficial · {formattedFullDate}</span>
               </div>
 
-              <h2 className="mt-2 font-display text-3xl md:text-4xl xl:text-[22px] 2xl:text-2xl font-black text-white uppercase tracking-tight xl:whitespace-nowrap section-title-stroke">
+              <h2 className="mt-0 mb-2 font-display text-3xl md:text-4xl xl:text-[22px] 2xl:text-2xl font-black text-white uppercase tracking-tight xl:whitespace-nowrap section-title-stroke">
                 Horarios del Día de Carrera
               </h2>
-              <p className="mt-1.5 text-balance text-xs sm:text-sm text-stone-300">
+              <p className="mt-0 text-balance text-xs sm:text-sm text-stone-300">
                 Planificá tu llegada al predio con anticipación. La charla técnica y el control de
                 equipamiento son obligatorios para todas las distancias.
               </p>
@@ -156,16 +156,16 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             id="categorias"
             className="scroll-mt-20 min-w-0 pt-8 border-t-2 border-orange-500/40 xl:pt-0 xl:border-t-0 flex flex-col justify-start"
           >
-            <div className="text-center xl:min-h-[145px] flex flex-col items-center justify-between mb-6">
-              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap">
+            <div className="text-center xl:min-h-[140px] flex flex-col items-center justify-start mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap mb-3">
                 <Award className="w-3.5 h-3.5 shrink-0" />
                 <span>Clasificación Oficial · Damas y Caballeros</span>
               </div>
 
-              <h2 className="mt-2 font-display text-3xl md:text-4xl xl:text-[22px] 2xl:text-2xl font-black text-white uppercase tracking-tight xl:whitespace-nowrap section-title-stroke">
+              <h2 className="mt-0 mb-2 font-display text-3xl md:text-4xl xl:text-[22px] 2xl:text-2xl font-black text-white uppercase tracking-tight xl:whitespace-nowrap section-title-stroke">
                 {ageCategories.title || 'Categorías por Edad y Premiación'}
               </h2>
-              <p className="mt-1.5 text-balance text-xs sm:text-sm text-stone-300">
+              <p className="mt-0 text-balance text-xs sm:text-sm text-stone-300">
                 Aplicable tanto para <strong className="text-cyan-400">27K Competitivo</strong> como para{' '}
                 <strong className="text-red-500">13K Competitivo</strong> en ramas Damas y Caballeros.
               </p>
@@ -245,16 +245,16 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             id="faq"
             className="scroll-mt-20 min-w-0 pt-8 border-t-2 border-orange-500/40 xl:pt-0 xl:border-t-0 flex flex-col justify-start"
           >
-            <div className="text-center xl:min-h-[145px] flex flex-col items-center justify-between mb-6">
-              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap">
+            <div className="text-center xl:min-h-[140px] flex flex-col items-center justify-start mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap mb-3">
                 <HelpCircle className="w-3.5 h-3.5 shrink-0" />
                 <span>Información Clave para el Corredor</span>
               </div>
 
-              <h2 className="mt-2 font-display text-3xl md:text-4xl xl:text-[22px] 2xl:text-2xl font-black text-white uppercase tracking-tight xl:whitespace-nowrap section-title-stroke">
+              <h2 className="mt-0 mb-2 font-display text-3xl md:text-4xl xl:text-[22px] 2xl:text-2xl font-black text-white uppercase tracking-tight xl:whitespace-nowrap section-title-stroke">
                 Preguntas Frecuentes (FAQ)
               </h2>
-              <p className="mt-1.5 text-balance text-xs sm:text-sm text-stone-300">
+              <p className="mt-0 text-balance text-xs sm:text-sm text-stone-300">
                 Resolvé todas tus dudas antes del día de la carrera. Toda la información importante
                 para los corredores.
               </p>
