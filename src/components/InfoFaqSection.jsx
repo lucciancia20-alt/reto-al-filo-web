@@ -24,6 +24,7 @@ import {
   parseTargetDateParts,
   syncScheduleWithTargetDate,
   getRaceTitle,
+  getRaceFullTitle,
 } from '../data/raceConfig';
 import { openPrintableWaiver, openPrintableMedicalCert } from '../utils/printableDocs';
 import { fetchPublicRunnerStatus } from '../firebase/config';
