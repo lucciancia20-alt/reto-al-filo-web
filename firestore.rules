@@ -64,6 +64,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Control de sesión única activa del panel admin (1 doc, solo admins)
+    match /settings/adminSession {
+      allow read, write: if isAdmin();
+    }
+
     match /photos/{photoId} {
       allow read: if true;
       allow write: if isAdmin();

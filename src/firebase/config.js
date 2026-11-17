@@ -1301,6 +1301,137 @@ export async function sendAdminPasswordReset(email) {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Sesión Única Activa (Single Active Session) — Panel de Administración
+//
+// Documento: settings/adminSession
+// Campos: { sessionId, deviceInfo, startedAt, isActive }
+//
+// Presupuesto: 1 lectura al entrar · 1 escritura al entrar · 1 listener liviano
+//              · 1 escritura al salir o por inactividad
+// ─────────────────────────────────────────────────────────────────────────────
+
+function generateSessionId() {
+  const rnd = Math.random().toString(36).slice(2, 10).toUpperCase();
+  return `SES-${Date.now()}-${rnd}`;
+}
+
+function buildDeviceInfo() {
+  const ua = navigator?.userAgent || '';
+  if (/iPhone|iPad|iPod/i.test(ua)) return 'iPhone / iPad';
+  if (/Android/i.test(ua)) return 'Android';
+  if (/Macintosh|Mac OS X/i.test(ua)) return 'Mac';
+  if (/Windows/i.test(ua)) return 'Windows';
+  if (/Linux/i.test(ua)) return 'Linux';
+  return 'Navegador desconocido';
+}
+
+/**
+ * Lee 1 sola vez el documento de control de sesión.
+ * @returns {Promise<{sessionId,deviceInfo,startedAt,isActive}|null>}
+ */
+export async function checkAdminSession() {
+  if (!isFirebaseConfigured()) return null;
+  try {
+    const bundle = await getFirestoreDb();
+    if (!bundle) return null;
+    const { db, firestore } = bundle;
+    const { doc, getDoc } = firestore;
+    const snap = await getDoc(doc(db, 'settings', 'adminSession'));
+    return snap.exists() ? snap.data() : null;
+  } catch (error) {
+    console.warn('[Reto al Filo] No se pudo leer settings/adminSession:', error?.code || error?.message);
+    return null;
+  }
+}
+
+/**
+ * Escribe 1 sola vez reclamando la sesión activa para este dispositivo.
+ * @param {{ uid, email, displayName }} adminUser
+ * @returns {Promise<{ sessionId: string }>}
+ */
+export async function claimAdminSession(adminUser) {
+  if (!isFirebaseConfigured()) return { sessionId: generateSessionId() };
+  const bundle = await getFirestoreDb();
+  if (!bundle) return { sessionId: generateSessionId() };
+
+  const { db, firestore } = bundle;
+  const { doc, setDoc } = firestore;
+  const sessionId = generateSessionId();
+
+  await setDoc(doc(db, 'settings', 'adminSession'), {
+    sessionId,
+    deviceInfo: buildDeviceInfo(),
+    adminEmail: String(adminUser?.email || '').trim().toLowerCase(),
+    startedAt: Date.now(),
+    isActive: true,
+  });
+
+  return { sessionId };
+}
+
+/**
+ * Escribe 1 sola vez marcando la sesión como inactiva.
+ * Solo escribe si el sessionId sigue siendo el nuestro (evita pisar la sesión nueva).
+ * @param {string} sessionId
+ */
+export async function releaseAdminSession(sessionId) {
+  if (!isFirebaseConfigured() || !sessionId) return;
+  try {
+    const bundle = await getFirestoreDb();
+    if (!bundle) return;
+    const { db, firestore } = bundle;
+    const { doc, getDoc, setDoc } = firestore;
+    // Verificar que nadie tomó el control entre medio
+    const snap = await getDoc(doc(db, 'settings', 'adminSession'));
+    if (!snap.exists()) return;
+    if (snap.data()?.sessionId !== sessionId) return; // ya fue reemplazada
+    await setDoc(doc(db, 'settings', 'adminSession'), {
+      ...snap.data(),
+      isActive: false,
+      endedAt: Date.now(),
+    });
+  } catch (error) {
+    console.warn('[Reto al Filo] No se pudo liberar settings/adminSession:', error?.code || error?.message);
+  }
+}
+
+/**
+ * Listener onSnapshot liviano sobre settings/adminSession.
+ * El callback recibe el contenido del documento (o null si no existe).
+ * @param {(data: object|null) => void} onChange
+ * @returns {() => void} unsubscribe
+ */
+export function subscribeToAdminSession(onChange) {
+  if (!isFirebaseConfigured()) return () => {};
+
+  let active = true;
+  let unsubscribeInner = null;
+
+  getFirestoreDb()
+    .then((bundle) => {
+      if (!active || !bundle) return;
+      const { db, firestore } = bundle;
+      const { doc, onSnapshot } = firestore;
+      unsubscribeInner = onSnapshot(
+        doc(db, 'settings', 'adminSession'),
+        (snap) => {
+          if (!active) return;
+          onChange(snap.exists() ? snap.data() : null);
+        },
+        (error) => {
+          console.warn('[Reto al Filo] Error en listener adminSession:', error?.code || error?.message);
+        }
+      );
+    })
+    .catch(() => {});
+
+  return () => {
+    active = false;
+    if (typeof unsubscribeInner === 'function') unsubscribeInner();
+  };
+}
+
 /**
  * Cierra la sesión actual de Firebase Auth y elimina datos locales sensibles.
  */

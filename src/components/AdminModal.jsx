@@ -49,6 +49,8 @@ import AdminCircuitsTab from './admin/AdminCircuitsTab';
 import AdminScheduleFaqTab from './admin/AdminScheduleFaqTab';
 import AdminPhotosTab from './admin/AdminPhotosTab';
 import AdminRegistrationsTab from './admin/AdminRegistrationsTab';
+import AdminSessionConflictModal from './AdminSessionConflictModal';
+import { useAdminSession } from '../hooks/useAdminSession';
 
 const DEFAULT_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '';
 const DEFAULT_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'reto_al_filo';
@@ -88,6 +90,26 @@ export default function AdminModal({
   const resetTimerRef = useRef(null);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
+
+  // ── Sesión Única Activa ────────────────────────────────────────────────────
+  const handleForceClose = useCallback(() => {
+    // Cierre forzado por expulsión (otra sesión tomó el control) o inactividad
+    setUnlocked(false);
+    setAdminUser(null);
+    onClose();
+  }, [onClose]);
+
+  const {
+    sessionState,
+    conflictInfo,
+    takeover,
+    cancelEntry,
+    releaseSession,
+  } = useAdminSession({
+    enabled: isOpen && unlocked,
+    adminUser,
+    onForceClose: handleForceClose,
+  });
 
   const [activeTab, setActiveTab] = useState('general');
   const [editDistance, setEditDistance] = useState('27K');
@@ -675,6 +697,8 @@ export default function AdminModal({
       logoutTimerRef.current = null;
     }
     setConfirmingLogout(false);
+    // 1 escritura: marcar sesión como inactiva antes de cerrar
+    await releaseSession();
     await signOutAdmin();
     setAdminUser(null);
     setUnlocked(false);
@@ -1280,6 +1304,14 @@ export default function AdminModal({
       aria-label={`Panel de Administración ${getRaceTitle(draft || raceConfig)}`}
       onClick={handleSafeClose}
     >
+      {/* Modal de conflicto de sesión — se muestra por encima del panel (z-[60]) */}
+      {sessionState === 'conflict' && (
+        <AdminSessionConflictModal
+          conflictInfo={conflictInfo}
+          onTakeover={takeover}
+          onCancel={cancelEntry}
+        />
+      )}
       <div
         className={`w-full max-w-5xl ${unlocked ? 'h-[88vh] max-h-[850px]' : 'h-auto max-h-[90dvh]'} rounded-2xl bg-stone-900 border border-orange-500/80 shadow-2xl flex flex-col justify-start overflow-hidden overscroll-contain text-stone-100`}
         onClick={(e) => e.stopPropagation()}
