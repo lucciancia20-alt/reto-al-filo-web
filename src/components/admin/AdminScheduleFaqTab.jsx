@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Trash2, ShieldCheck, Award } from 'lucide-react';
 import { RACE_CONFIG } from '../../data/raceConfig';
 import ResizableTextarea from './ResizableTextarea';
-
 export default function AdminScheduleFaqTab({
   schedule,
   faqs,
@@ -13,6 +12,7 @@ export default function AdminScheduleFaqTab({
   onAddSchedule,
   onRemoveSchedule,
   onFaqChange,
+  circuits,
 }) {
   const [confirmingKey, setConfirmingKey] = useState(null);
   const confirmTimerRef = useRef(null);
@@ -72,6 +72,10 @@ export default function AdminScheduleFaqTab({
   const brackets = Array.isArray(cats.brackets)
     ? cats.brackets
     : RACE_CONFIG.ageCategories.brackets;
+
+  // Nombres de distancia dinámicos desde circuits (con fallback)
+  const label27 = circuits?.['27K']?.tabLabel || RACE_CONFIG.circuits['27K'].tabLabel || '27K Competitivo';
+  const label13 = circuits?.['13K']?.tabLabel || RACE_CONFIG.circuits['13K'].tabLabel || '13K Competitivo';
 
   const updateGearList = (dist, nextList) => {
     setDraft((prev) => ({
@@ -247,7 +251,7 @@ export default function AdminScheduleFaqTab({
           <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
           <div>
             <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
-              Elementos Obligatorios Diferenciados (27K vs. 13K)
+              Elementos Obligatorios Diferenciados ({label27} vs. {label13})
             </h4>
             <p className="text-[11px] text-stone-400">
               Se muestran en la sección Elementos Obligatorios del FAQ y en la vista previa del
@@ -260,7 +264,7 @@ export default function AdminScheduleFaqTab({
           {[
             {
               dist: '27K',
-              title: '27K Cumbre Técnica',
+              title: label27,
               items: gear27,
               accentText: 'text-cyan-400',
               borderClass: 'border-cyan-500/50 focus:border-cyan-400',
@@ -268,7 +272,7 @@ export default function AdminScheduleFaqTab({
             },
             {
               dist: '13K',
-              title: '13K Competitivo',
+              title: label13,
               items: gear13,
               accentText: 'text-red-500',
               borderClass: 'border-red-500/50 focus:border-red-400',

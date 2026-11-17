@@ -79,6 +79,11 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
     (item) => String(item || '').trim()
   );
 
+  // Nombres de distancia dinámicos desde circuits (con fallback al hardcode original)
+  const circuits = raceConfig?.circuits || RACE_CONFIG.circuits;
+  const label27 = circuits?.['27K']?.tabLabel || '27K Competitivo';
+  const label13 = circuits?.['13K']?.tabLabel || '13K Competitivo';
+
   const ageCategories = raceConfig?.ageCategories || RACE_CONFIG.ageCategories;
   const categoryBrackets = (
     Array.isArray(ageCategories?.brackets)
@@ -166,8 +171,8 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 {ageCategories.title || 'Categorías por Edad y Premiación'}
               </h2>
               <p className="mt-0 text-balance text-xs sm:text-sm text-stone-300">
-                Aplicable tanto para <strong className="text-cyan-400">27K Competitivo</strong> como para{' '}
-                <strong className="text-red-500">13K Competitivo</strong> en ramas Damas y Caballeros.
+                Aplicable tanto para <strong className="text-cyan-400">{label27}</strong> como para{' '}
+                <strong className="text-red-500">{label13}</strong> en ramas Damas y Caballeros.
               </p>
             </div>
 
@@ -333,7 +338,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3">
                             <div className="rounded-xl bg-zinc-950 border border-cyan-500/60 p-3.5">
                               <span className="inline-flex items-center gap-1.5 text-xs font-display font-black uppercase tracking-wider text-cyan-400">
-                                27K Cumbre Técnica
+                                {label27}
                               </span>
                               <ul className="mt-2 space-y-1.5 text-xs text-stone-200">
                                 {gear27.map((item, idx) => (
@@ -347,7 +352,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
 
                             <div className="rounded-xl bg-zinc-950 border border-red-500/60 p-3.5">
                               <span className="inline-flex items-center gap-1.5 text-xs font-display font-black uppercase tracking-wider text-red-500">
-                                13K Competitivo
+                                {label13}
                               </span>
                               <ul className="mt-2 space-y-1.5 text-xs text-stone-200">
                                 {gear13.map((item, idx) => (

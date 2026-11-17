@@ -1456,6 +1456,7 @@ export default function AdminModal({
                   faqs={draft.faqs}
                   mandatoryGear={draft.mandatoryGear}
                   ageCategories={draft.ageCategories}
+                  circuits={draft.circuits}
                   setDraft={setDraft}
                   onScheduleChange={handleScheduleChange}
                   onAddSchedule={handleAddSchedule}

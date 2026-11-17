@@ -163,6 +163,10 @@ export default function RegistrationModal({
   const reglamentFaq = (raceConfig?.faqs || RACE_CONFIG.faqs).find((f) => f.id === 'reglamento');
   const ageCategories = raceConfig?.ageCategories || RACE_CONFIG.ageCategories;
 
+  // Nombres de distancia dinámicos desde circuits (con fallback)
+  const label27 = circuits?.['27K']?.tabLabel || '27K Competitivo';
+  const label13 = circuits?.['13K']?.tabLabel || '13K Competitivo';
+
   const distances = ['27K', '13K'].map((id) => {
     const c = circuits[id] || RACE_CONFIG.circuits[id];
     const stationCount = Array.isArray(c.hydrationStations)
@@ -170,7 +174,7 @@ export default function RegistrationModal({
       : c.hydrationCount;
     return {
       id,
-      title: id === '13K' ? '13K Competitivo' : '27K Competitivo',
+      title: c.tabLabel || (id === '13K' ? '13K Competitivo' : '27K Competitivo'),
       price: c.price || RACE_CONFIG.circuits[id].price,
       elevation: `${c.elevationGain} D+`,
       details: `${stationCount} Puestos de Hidratación · Corte ${c.cutoffTime}`,
@@ -1260,7 +1264,7 @@ export default function RegistrationModal({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                       <div className="rounded-lg bg-zinc-950 border border-cyan-500/40 p-2.5">
                         <span className="block font-bold text-cyan-400 text-[10px] uppercase">
-                          Obligatorios 27K
+                          Obligatorios {label27}
                         </span>
                         <ul className="mt-1 space-y-0.5 list-disc pl-3.5">
                           {gear27.map((g, i) => (
@@ -1270,7 +1274,7 @@ export default function RegistrationModal({
                       </div>
                       <div className="rounded-lg bg-zinc-950 border border-red-500/40 p-2.5">
                         <span className="block font-bold text-red-400 text-[10px] uppercase">
-                          Obligatorios 13K
+                          Obligatorios {label13}
                         </span>
                         <ul className="mt-1 space-y-0.5 list-disc pl-3.5">
                           {gear13.map((g, i) => (
