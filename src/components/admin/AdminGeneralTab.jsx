@@ -8,10 +8,15 @@ import {
   PackageCheck,
   Plus,
   Trash2,
+  FileText,
+  RotateCcw,
+  Eye,
 } from 'lucide-react';
 import {
   RACE_CONFIG,
   DEFAULT_RACE_TITLE,
+  DEFAULT_WAIVER_CLAUSES,
+  DEFAULT_MEDICAL_BODY_TEXT,
   getRaceTitle,
   getRaceFullTitle,
   parseTargetDateParts,
@@ -22,6 +27,7 @@ import {
   resolveNotificationEmail,
   sendRegistrationNotificationEmail,
 } from '../../utils/emailNotification';
+import { openPrintableWaiver, openPrintableMedicalCert } from '../../utils/printableDocs';
 import ResizableTextarea from './ResizableTextarea';
 
 export default function AdminGeneralTab({
@@ -416,6 +422,132 @@ export default function AdminGeneralTab({
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Documentos Legales: Deslinde A4 y Apto Médico A4 */}
+      {(() => {
+        const DEFAULT_WAIVER_TEXT = DEFAULT_WAIVER_CLAUSES.join('\n');
+        const DEFAULT_MEDICAL_TEXT = DEFAULT_MEDICAL_BODY_TEXT;
+
+        const waiverText =
+          typeof draft.waiverCustomText === 'string' && draft.waiverCustomText.trim()
+            ? draft.waiverCustomText
+            : DEFAULT_WAIVER_TEXT;
+
+        const medicalText =
+          typeof draft.medicalCustomText === 'string' && draft.medicalCustomText.trim()
+            ? draft.medicalCustomText
+            : DEFAULT_MEDICAL_TEXT;
+
+        const waiverIsDefault = !draft.waiverCustomText || draft.waiverCustomText.trim() === '';
+        const medicalIsDefault = !draft.medicalCustomText || draft.medicalCustomText.trim() === '';
+
+        return (
+          <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-4">
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4 text-orange-500 shrink-0" />
+              <div>
+                <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
+                  Documentos Legales (Deslinde y Apto Médico A4)
+                </h4>
+                <p className="text-[11px] text-stone-400">
+                  Editá el texto que aparece impreso en el Deslinde y en el Apto Médico. Usá{' '}
+                  <code className="text-orange-400 bg-zinc-900 px-1 rounded">{'{RACE_TITLE}'}</code>{' '}
+                  donde quieras que aparezca el nombre del evento.
+                </p>
+              </div>
+            </div>
+
+            {/* Deslinde de Responsabilidad */}
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <label className="text-xs font-semibold text-stone-300">
+                  Cláusulas del Deslinde Oficial A4{' '}
+                  <span className="text-[11px] font-normal text-stone-400">
+                    (una cláusula por línea · formato: «Título: texto completo»)
+                  </span>
+                </label>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openPrintableWaiver({ raceConfig: draft })}
+                    title="Vista previa A4 del Deslinde con el texto actual"
+                    className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-medium px-2.5 py-1.5 cursor-pointer transition-colors"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Vista previa A4</span>
+                  </button>
+                  {!waiverIsDefault && (
+                    <button
+                      type="button"
+                      onClick={() => setDraft((prev) => ({ ...prev, waiverCustomText: '' }))}
+                      title="Restaurar el texto original del Deslinde"
+                      className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-stone-400 border border-stone-700 hover:border-rose-500 hover:text-rose-400 text-xs font-medium px-2.5 py-1.5 cursor-pointer transition-colors"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Restaurar original</span>
+                    </button>
+                  )}
+                  {waiverIsDefault && (
+                    <span className="text-[11px] text-emerald-500 font-medium">✓ Texto oficial</span>
+                  )}
+                </div>
+              </div>
+              <ResizableTextarea
+                rows={8}
+                value={waiverText}
+                onChange={(e) => setDraft((prev) => ({ ...prev, waiverCustomText: e.target.value }))}
+                placeholder={DEFAULT_WAIVER_TEXT}
+                className="rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-xs text-stone-200 font-mono"
+              />
+            </div>
+
+            {/* Apto Médico */}
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <label className="text-xs font-semibold text-stone-300">
+                  Cuerpo del Certificado de Aptitud Médica A4
+                </label>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openPrintableMedicalCert({ raceConfig: draft })}
+                    title="Vista previa A4 del Apto Médico con el texto actual"
+                    className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-medium px-2.5 py-1.5 cursor-pointer transition-colors"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Vista previa A4</span>
+                  </button>
+                  {!medicalIsDefault && (
+                    <button
+                      type="button"
+                      onClick={() => setDraft((prev) => ({ ...prev, medicalCustomText: '' }))}
+                      title="Restaurar el texto original del Apto Médico"
+                      className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-stone-400 border border-stone-700 hover:border-rose-500 hover:text-rose-400 text-xs font-medium px-2.5 py-1.5 cursor-pointer transition-colors"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Restaurar original</span>
+                    </button>
+                  )}
+                  {medicalIsDefault && (
+                    <span className="text-[11px] text-emerald-500 font-medium">✓ Texto oficial</span>
+                  )}
+                </div>
+              </div>
+              <ResizableTextarea
+                rows={4}
+                value={medicalText}
+                onChange={(e) => setDraft((prev) => ({ ...prev, medicalCustomText: e.target.value }))}
+                placeholder={DEFAULT_MEDICAL_TEXT}
+                className="rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-xs text-stone-200 font-mono"
+              />
+              <p className="text-[11px] text-stone-500">
+                Este texto aparece luego del nombre y DNI del corredor en la sección «Certifico que…».
+                Los campos de Nombre, DNI, Distancia, Firma y Sello Médico siempre se imprimen fijos y no se ven afectados.
+              </p>
             </div>
           </div>
         );

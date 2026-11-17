@@ -1,6 +1,26 @@
 export const DEFAULT_RACE_TITLE = 'Reto al Filo';
 export const DEFAULT_TARGET_DATE_ISO = '2027-04-10T09:00:00-03:00';
 
+/**
+ * Texto por defecto de las cláusulas del Deslinde de Responsabilidad A4.
+ * Cada elemento del array es una cláusula numerada (renderizada como <li>).
+ */
+export const DEFAULT_WAIVER_CLAUSES = [
+  'Estado físico y entrenamiento: Declaro bajo juramento encontrarme física, clínica y psicológicamente apto/a para participar en la competencia de trail running / carrera de montaña denominada {RACE_TITLE} en la distancia en la que me inscribo, habiendo realizado los controles médicos pertinentes y comprometiéndome a presentar el Certificado / Apto Médico vigente en la acreditación.',
+  'Asunción de riesgos de montaña: Comprendo que el trail running en ambiente serrano implica riesgos inherentes tales como terreno irregular, piedra suelta, desniveles pronunciados, cruces de arroyo, exposición al viento, frío o lluvia, fauna silvestre y eventual retraso en la evacuación por accesos agrestes. Asumo dichos riesgos libre y voluntariamente.',
+  'Exención de responsabilidad: Eximo expresamente a la Organización de {RACE_TITLE}, su Dirección Técnica, propietarios de los campos y predios atravesados, sponsors, voluntarios, personal médico y municipios involucrados de toda responsabilidad civil, penal o patrimonial por accidentes, lesiones, extravíos, daños materiales o muerte que pudiera sufrir o provocar antes, durante o después del evento, salvo dolo comprobado.',
+  'Reglamento, equipamiento y cortes horarios: Acepto íntegramente el reglamento de carrera, la obligación de portar en todo momento el equipamiento obligatorio exigido para mi distancia, respetar las marcaciones del circuito y acatar los cortes horarios o decisiones de suspensión/evacuación dispuestas por el equipo de seguridad o Dirección de Carrera.',
+  'Cuidado del ambiente serrano: Me comprometo a no arrojar ningún tipo de residuo ni envoltorio fuera de los cestos habilitados en los Puestos de Abastecimiento y llegada (causal de descalificación directa) y a respetar la flora, fauna y tranqueras de la zona.',
+  'Derechos de imagen y datos médicos: Autorizo a la Organización a utilizar fotografías, videos e imágenes captadas durante el evento con fines informativos o promocionales sin compensación económica, y autorizo al personal médico y de rescate a brindarme atención de urgencia utilizando la información médica declarada.',
+];
+
+/**
+ * Texto por defecto del cuerpo del Certificado de Aptitud Médica A4.
+ * El placeholder {RACE_TITLE} se reemplaza en tiempo de ejecución.
+ */
+export const DEFAULT_MEDICAL_BODY_TEXT =
+  'ha sido evaluado/a clínicamente y mediante los estudios complementarios que consideré pertinentes en función de su edad y antecedentes, encontrándose actualmente APTO/A FÍSICAMENTE y sin contraindicaciones médicas aparentes para participar en competencias de Trail Running / Carrera de Montaña de esfuerzo físico intenso y competitivo (modalidad indicada en el campo de distancia, en ambiente serrano), correspondiente al evento {RACE_TITLE}.';
+
 export const RACE_CONFIG = {
   title: DEFAULT_RACE_TITLE,
   edition: '2da Edición',
@@ -268,6 +288,11 @@ export const RACE_CONFIG = {
       { id: 'cat-60-plus', label: '60+ años' },
     ],
   },
+
+  // Textos editables de los documentos legales (Deslinde y Apto Médico).
+  // Vacío = se usa el texto por defecto definido en DEFAULT_WAIVER_CLAUSES / DEFAULT_MEDICAL_BODY_TEXT.
+  waiverCustomText: '',
+  medicalCustomText: '',
 };
 
 const ARGENTINA_TIMEZONE = 'America/Argentina/Buenos_Aires';
@@ -629,6 +654,8 @@ export function mergeRaceConfig(override) {
     kitIncludes: nextKitIncludes,
     mandatoryGear: nextMandatoryGear,
     ageCategories: nextAgeCategories,
+    waiverCustomText: typeof override.waiverCustomText === 'string' ? override.waiverCustomText : '',
+    medicalCustomText: typeof override.medicalCustomText === 'string' ? override.medicalCustomText : '',
   };
 }
 

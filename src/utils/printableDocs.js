@@ -3,6 +3,8 @@ import {
   parseTargetDateParts,
   resolveRunnerCategory,
   getRaceFullTitle,
+  DEFAULT_WAIVER_CLAUSES,
+  DEFAULT_MEDICAL_BODY_TEXT,
 } from '../data/raceConfig';
 
 function escapeHtml(value) {
@@ -482,6 +484,33 @@ function buildEventMeta(raceConfig) {
 }
 
 /**
+ * Resuelve las cláusulas del Deslinde.
+ * Si raceConfig.waiverCustomText está completo, lo parte por línea nueva y filtra vacíos.
+ * Si está vacío usa DEFAULT_WAIVER_CLAUSES, interpolando {RACE_TITLE}.
+ */
+function resolveWaiverClauses(raceConfig, raceTitle) {
+  const custom = String((raceConfig || RACE_CONFIG).waiverCustomText || '').trim();
+  if (custom) {
+    return custom
+      .split('\n')
+      .map((l) => l.trim())
+      .filter(Boolean)
+      .map((l) => l.replace(/\{RACE_TITLE\}/g, raceTitle));
+  }
+  return DEFAULT_WAIVER_CLAUSES.map((c) => c.replace(/\{RACE_TITLE\}/g, raceTitle));
+}
+
+/**
+ * Resuelve el cuerpo del certificado médico.
+ * Si raceConfig.medicalCustomText está completo lo usa; si no, DEFAULT_MEDICAL_BODY_TEXT.
+ */
+function resolveMedicalBodyText(raceConfig, raceTitle) {
+  const custom = String((raceConfig || RACE_CONFIG).medicalCustomText || '').trim();
+  const raw = custom || DEFAULT_MEDICAL_BODY_TEXT;
+  return raw.replace(/\{RACE_TITLE\}/g, raceTitle);
+}
+
+/**
  * Abre una vista A4 imprimible / guardable como PDF del Deslinde de Responsabilidad oficial.
  */
 export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } = {}) {
@@ -496,6 +525,21 @@ export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } 
   const storageKeyPrefix = 'raf_doc_profile_';
   const initialDniDigits = String(runner?.dni || '').replace(/\D/g, '');
   const hasPrefilledRunner = Boolean(runner && (runner.dni || runner.code || runner.distance));
+
+  // Cláusulas: custom o defaults, con {RACE_TITLE} resuelto
+  const waiverClauses = resolveWaiverClauses(raceConfig, meta.raceTitle);
+  const clausesHtml = waiverClauses
+    .map((clause) => {
+      // Si la cláusula tiene formato "Título: cuerpo" la convierte en <strong>Título:</strong> cuerpo
+      const colonIdx = clause.indexOf(':');
+      if (colonIdx > 0 && colonIdx < 60) {
+        const title = escapeHtml(clause.slice(0, colonIdx));
+        const body = escapeHtml(clause.slice(colonIdx + 1).trimStart());
+        return `<li><strong>${title}:</strong> ${body}</li>`;
+      }
+      return `<li>${escapeHtml(clause)}</li>`;
+    })
+    .join('\n      ');
 
   const bodyHtml = `
     <header class="doc-header">
@@ -529,12 +573,7 @@ export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } 
 
     <div class="section-title">2 · Declaración Jurada y Deslinde de Responsabilidad</div>
     <ol class="clauses">
-      <li><strong>Estado físico y entrenamiento:</strong> Declaro bajo juramento encontrarme física, clínica y psicológicamente apto/a para participar en la competencia de trail running / carrera de montaña denominada <strong>${escapeHtml(meta.raceTitle)}</strong> en la distancia en la que me inscribo, habiendo realizado los controles médicos pertinentes y comprometiéndome a presentar el Certificado / Apto Médico vigente en la acreditación.</li>
-      <li><strong>Asunción de riesgos de montaña:</strong> Comprendo que el trail running en ambiente serrano implica riesgos inherentes tales como terreno irregular, piedra suelta, desniveles pronunciados, cruces de arroyo, exposición al viento, frío o lluvia, fauna silvestre y eventual retraso en la evacuación por accesos agrestes. Asumo dichos riesgos libre y voluntariamente.</li>
-      <li><strong>Exención de responsabilidad:</strong> Eximo expresamente a la Organización de ${escapeHtml(meta.raceTitle)}, su Dirección Técnica, propietarios de los campos y predios atravesados, sponsors, voluntarios, personal médico y municipios involucrados de toda responsabilidad civil, penal o patrimonial por accidentes, lesiones, extravíos, daños materiales o muerte que pudiera sufrir o provocar antes, durante o después del evento, salvo dolo comprobado.</li>
-      <li><strong>Reglamento, equipamiento y cortes horarios:</strong> Acepto íntegramente el reglamento de carrera, la obligación de portar en todo momento el equipamiento obligatorio exigido para mi distancia, respetar las marcaciones del circuito y acatar los cortes horarios o decisiones de suspensión/evacuación dispuestas por el equipo de seguridad o Dirección de Carrera.</li>
-      <li><strong>Cuidado del ambiente serrano:</strong> Me comprometo a no arrojar ningún tipo de residuo ni envoltorio fuera de los cestos habilitados en los Puestos de Abastecimiento y llegada (causal de descalificación directa) y a respetar la flora, fauna y tranqueras de la zona.</li>
-      <li><strong>Derechos de imagen y datos médicos:</strong> Autorizo a la Organización a utilizar fotografías, videos e imágenes captadas durante el evento con fines informativos o promocionales sin compensación económica, y autorizo al personal médico y de rescate a brindarme atención de urgencia utilizando la información médica declarada.</li>
+      ${clausesHtml}
     </ol>
 
     <div class="note-box">
@@ -629,6 +668,9 @@ export function openPrintableMedicalCert({ raceConfig = RACE_CONFIG, runner = nu
   const initialDniDigits = String(runner?.dni || '').replace(/\D/g, '');
   const hasPrefilledRunner = Boolean(runner && (runner.dni || runner.code || runner.distance));
 
+  // Texto del cuerpo del certificado médico: custom o default
+  const medicalBodyText = resolveMedicalBodyText(raceConfig, meta.raceTitle);
+
   const bodyHtml = `
     <header class="doc-header">
       <div>
@@ -660,12 +702,9 @@ export function openPrintableMedicalCert({ raceConfig = RACE_CONFIG, runner = nu
     <div class="med-box">
       <p class="med-text">
         Certifico que el/la Sr./Sra. <input type="text" id="med-name-2" class="doc-input doc-input-inline" style="width: 245px;" value="${escapeHtml(runner?.fullName || '')}" />,
-        DNI N° <input type="text" id="med-dni-2" class="doc-input doc-input-inline" style="width: 115px;" value="${escapeHtml(runner?.dni || '')}" />, ha sido evaluado/a clínicamente y mediante los estudios
-        complementarios que consideré pertinentes en función de su edad y antecedentes, encontrándose actualmente
-        <strong>APTO/A FÍSICAMENTE</strong> y sin contraindicaciones médicas aparentes para participar en competencias
-        de <strong>Trail Running / Carrera de Montaña de esfuerzo físico intenso y competitivo</strong>
-        (modalidad <input type="text" class="doc-input doc-input-inline" style="width: 72px; text-align:center;" value="${escapeHtml(runner?.distance || '')}" placeholder="27K / 13K" /> en ambiente serrano),
-        correspondiente al evento <strong>${escapeHtml(meta.raceTitle)}</strong>.
+        DNI N° <input type="text" id="med-dni-2" class="doc-input doc-input-inline" style="width: 115px;" value="${escapeHtml(runner?.dni || '')}" />,
+        Distancia: <input type="text" class="doc-input doc-input-inline" style="width: 72px; text-align:center;" value="${escapeHtml(runner?.distance || '')}" placeholder="27K / 13K" /> —
+        ${escapeHtml(medicalBodyText)}
       </p>
 
       <div class="grid-2" style="margin-top: 8px;">
@@ -858,6 +897,21 @@ export function openPrintableAccreditationSheet({
           })
           .join('')
       : `<tr><td colspan="7" style="text-align:center;padding:18px;color:#4b5563;">No hay corredores confirmados para imprimir todavía.</td></tr>`;
+
+  // Cláusulas: custom o defaults, con {RACE_TITLE} resuelto
+  const waiverClauses = resolveWaiverClauses(raceConfig, meta.raceTitle);
+  const clausesHtml = waiverClauses
+    .map((clause) => {
+      // Si la cláusula tiene formato "Título: cuerpo" la convierte en <strong>Título:</strong> cuerpo
+      const colonIdx = clause.indexOf(':');
+      if (colonIdx > 0 && colonIdx < 60) {
+        const title = escapeHtml(clause.slice(0, colonIdx));
+        const body = escapeHtml(clause.slice(colonIdx + 1).trimStart());
+        return `<li><strong>${title}:</strong> ${body}</li>`;
+      }
+      return `<li>${escapeHtml(clause)}</li>`;
+    })
+    .join('\n      ');
 
   const bodyHtml = `
     <header class="doc-header" style="margin-bottom:8px;">
