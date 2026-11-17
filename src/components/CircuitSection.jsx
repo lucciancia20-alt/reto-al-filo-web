@@ -20,14 +20,14 @@ function buildElevationSvg(points, totalKm, minAltRaw, maxAltRaw) {
   const height = 200;
   const padLeft = 44;
   const padRight = 18;
-  const padTop = 22;
+  const padTop = 30;
   const padBottom = 22;
 
   const plotW = width - padLeft - padRight;
   const plotH = height - padTop - padBottom;
 
   const minAlt = Math.floor((minAltRaw - 30) / 50) * 50;
-  const maxAlt = Math.ceil((maxAltRaw + 40) / 50) * 50;
+  const maxAlt = Math.ceil((maxAltRaw + 55) / 50) * 50;
   const altSpan = Math.max(100, maxAlt - minAlt);
   const safeMaxKm = Math.max(1, totalKm || points[points.length - 1]?.km || 1);
 
@@ -80,10 +80,11 @@ function buildElevationSvg(points, totalKm, minAltRaw, maxAltRaw) {
 function buildGpsMapSvg(points) {
   const width = 460;
   const height = 240;
-  const pad = 26;
+  const padX = 50;
+  const padY = 34;
 
   if (!points || points.length === 0) {
-    return { width, height, path: '', project: () => ({ x: 0, y: 0 }) };
+    return { width, height, path: '', mappedPoints: [], project: () => ({ x: 0, y: 0 }) };
   }
 
   let minLat = Infinity;
@@ -104,8 +105,8 @@ function buildGpsMapSvg(points) {
   const dLat = Math.max(0.0005, maxLat - minLat);
   const dLonScaled = Math.max(0.0005, (maxLon - minLon) * lonScale);
 
-  const availW = width - pad * 2;
-  const availH = height - pad * 2;
+  const availW = width - padX * 2;
+  const availH = height - padY * 2;
   const scale = Math.min(availW / dLonScaled, availH / dLat);
 
   const contentW = dLonScaled * scale;
@@ -119,14 +120,187 @@ function buildGpsMapSvg(points) {
     return { x, y };
   };
 
-  const path = points
-    .map((pt, idx) => {
-      const { x, y } = project(pt.lat, pt.lon);
-      return `${idx === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
-    })
+  const mappedPoints = points.map((pt) => project(pt.lat, pt.lon));
+
+  const path = mappedPoints
+    .map((pt, idx) => `${idx === 0 ? 'M' : 'L'} ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`)
     .join(' ');
 
-  return { width, height, path, project };
+  return { width, height, path, mappedPoints, project };
+}
+
+/**
+ * Ubica las etiquetas del mapa GPS en la zona libre más despejada alrededor de cada punto,
+ * evitando que se pisen con el trazo naranja, con otros puntos o con los bordes del recuadro.
+ */
+function placeMapLabels(markers, trackPts, width, height) {
+  const placed = [];
+  const candidates = [
+    { dx: 0, dy: -22, anchor: 'middle' },
+    { dx: 0, dy: 22, anchor: 'middle' },
+    { dx: -14, dy: 0, anchor: 'end' },
+    { dx: 14, dy: 0, anchor: 'start' },
+    { dx: -12, dy: -16, anchor: 'end' },
+    { dx: 12, dy: -16, anchor: 'start' },
+    { dx: -12, dy: 18, anchor: 'end' },
+    { dx: 12, dy: 18, anchor: 'start' },
+    { dx: 0, dy: -34, anchor: 'middle' },
+    { dx: 0, dy: 34, anchor: 'middle' },
+  ];
+
+  for (const m of markers) {
+    const boxW = m.text.length * 6.1 + 14;
+    const boxH = 18;
+    let best = null;
+    let bestScore = -Infinity;
+
+    for (const c of candidates) {
+      const rawCx =
+        c.anchor === 'middle'
+          ? m.x + c.dx
+          : c.anchor === 'start'
+            ? m.x + c.dx + boxW / 2
+            : m.x + c.dx - boxW / 2;
+      const cx = Math.min(Math.max(boxW / 2 + 6, rawCx), width - boxW / 2 - 6);
+      const cy = Math.min(Math.max(boxH / 2 + 6, m.y + c.dy), height - boxH / 2 - 6);
+      const left = cx - boxW / 2;
+      const right = cx + boxW / 2;
+      const top = cy - boxH / 2;
+      const bottom = cy + boxH / 2;
+
+      let score = 0;
+
+      // Distancia mínima al trazado GPS naranja
+      let minTrackDist = Infinity;
+      for (let i = 0; i < trackPts.length; i += 2) {
+        const p = trackPts[i];
+        const dx = Math.max(left - p.x, 0, p.x - right);
+        const dy = Math.max(top - p.y, 0, p.y - bottom);
+        const d = Math.hypot(dx, dy);
+        if (d < minTrackDist) minTrackDist = d;
+      }
+      score += Math.min(minTrackDist, 28) * 14;
+      if (minTrackDist < 4) score -= (4 - minTrackDist) * 180;
+
+      // Distancia a todos los círculos marcadores
+      for (const other of markers) {
+        const dx = Math.max(left - other.x, 0, other.x - right);
+        const dy = Math.max(top - other.y, 0, other.y - bottom);
+        const d = Math.hypot(dx, dy);
+        if (d < 9) score -= (9 - d) * 120;
+      }
+
+      // Evitar superposición entre etiquetas ya ubicadas
+      for (const pl of placed) {
+        const overlapX = Math.max(
+          0,
+          Math.min(right + 5, pl.right + 5) - Math.max(left - 5, pl.left - 5)
+        );
+        const overlapY = Math.max(
+          0,
+          Math.min(bottom + 4, pl.bottom + 4) - Math.max(top - 4, pl.top - 4)
+        );
+        if (overlapX > 0 && overlapY > 0) {
+          score -= 3000 + overlapX * overlapY * 15;
+        }
+      }
+
+      if (Math.abs(c.dy) <= 22 && c.dx === 0) score += 12;
+
+      if (score > bestScore) {
+        bestScore = score;
+        best = { ...m, cx, cy, left, right, top, bottom, boxW, boxH };
+      }
+    }
+    placed.push(best);
+  }
+  return placed;
+}
+
+/**
+ * Ubica las etiquetas del perfil de altimetría por encima de la curva en espacios despejados.
+ */
+function placeElevationLabels(markers, curvePts, padLeft, width, padRight) {
+  const placed = [];
+  const candidates = [
+    { dx: 0, dy: -22 },
+    { dx: -22, dy: -24 },
+    { dx: 22, dy: -24 },
+    { dx: 0, dy: -34 },
+    { dx: -28, dy: -34 },
+    { dx: 28, dy: -34 },
+    { dx: -34, dy: -42 },
+    { dx: 34, dy: -42 },
+    { dx: 0, dy: -46 },
+  ];
+
+  for (const m of markers) {
+    const boxW = m.text.length * 5.9 + 12;
+    const boxH = 17;
+    let best = null;
+    let bestScore = -Infinity;
+
+    for (const c of candidates) {
+      const cx = Math.min(
+        Math.max(padLeft + boxW / 2 + 2, m.x + c.dx),
+        width - padRight - boxW / 2 - 2
+      );
+      const cy = Math.max(boxH / 2 + 3, m.y + c.dy);
+      const left = cx - boxW / 2;
+      const right = cx + boxW / 2;
+      const top = cy - boxH / 2;
+      const bottom = cy + boxH / 2;
+
+      let score = 0;
+
+      // Despeje respecto de la curva de montaña en todo el ancho de la pastilla
+      let minCurveClearance = Infinity;
+      for (const p of curvePts) {
+        if (p.x >= left - 6 && p.x <= right + 6) {
+          const clearance = p.y - bottom;
+          if (clearance < minCurveClearance) minCurveClearance = clearance;
+        }
+      }
+      if (minCurveClearance < 3) {
+        score -= (3 - minCurveClearance) * 280;
+      } else {
+        score += Math.min(minCurveClearance, 22) * 8;
+      }
+
+      // Evitar pisar otros puntos marcadores
+      for (const other of markers) {
+        const dx = Math.max(left - other.x, 0, other.x - right);
+        const dy = Math.max(top - other.y, 0, other.y - bottom);
+        const d = Math.hypot(dx, dy);
+        if (d < 8) score -= (8 - d) * 100;
+      }
+
+      // Evitar superposición entre etiquetas
+      for (const pl of placed) {
+        const overlapX = Math.max(
+          0,
+          Math.min(right + 5, pl.right + 5) - Math.max(left - 5, pl.left - 5)
+        );
+        const overlapY = Math.max(
+          0,
+          Math.min(bottom + 4, pl.bottom + 4) - Math.max(top - 4, pl.top - 4)
+        );
+        if (overlapX > 0 && overlapY > 0) {
+          score -= 4000 + overlapX * overlapY * 20;
+        }
+      }
+
+      score -= Math.abs(cx - m.x) * 0.55;
+      score -= Math.abs(c.dy + 22) * 0.4;
+
+      if (score > bestScore) {
+        bestScore = score;
+        best = { ...m, cx, cy, left, right, top, bottom, boxW, boxH };
+      }
+    }
+    placed.push(best);
+  }
+  return placed;
 }
 
 export default function CircuitSection({
@@ -181,12 +355,102 @@ export default function CircuitSection({
 
   const mapSvg = useMemo(() => buildGpsMapSvg(track.points), [track.points]);
 
-  const peakPoint = useMemo(
-    () => interpolatePointAtKm(track.points, track.peakKm),
-    [track.points, track.peakKm]
-  );
+  const peakPoint = useMemo(() => {
+    if (!track.points || track.points.length === 0) {
+      return { lat: 0, lon: 0, km: 0, alt: 0 };
+    }
+    let highest = track.points[0];
+    for (const pt of track.points) {
+      if (pt.alt > highest.alt) highest = pt;
+    }
+    const byKm = interpolatePointAtKm(track.points, track.peakKm);
+    const chosen = highest.alt >= (byKm?.alt || 0) ? highest : byKm;
+    return {
+      ...chosen,
+      alt: Math.max(chosen.alt, track.maxAlt || 0),
+    };
+  }, [track.points, track.peakKm, track.maxAlt]);
 
   const startPoint = track.points[0] || { lat: 0, lon: 0, km: 0, alt: 0 };
+
+  const mapLabels = useMemo(() => {
+    const startPos = mapSvg.project(startPoint.lat, startPoint.lon);
+    const peakPos = mapSvg.project(peakPoint.lat, peakPoint.lon);
+    const rawMarkers = [
+      {
+        id: 'start',
+        text: 'Largada/Meta',
+        x: startPos.x,
+        y: startPos.y,
+        dotFill: '#10b981',
+        textClass: 'fill-emerald-300 font-bold',
+        pillStroke: 'rgba(16, 185, 129, 0.7)',
+        r: 6.5,
+      },
+      {
+        id: 'peak',
+        text: `Cumbre ${track.maxAlt}m`,
+        x: peakPos.x,
+        y: peakPos.y,
+        dotFill: '#f97316',
+        textClass: 'fill-orange-300 font-bold',
+        pillStroke: 'rgba(249, 115, 22, 0.75)',
+        r: 6.5,
+      },
+      ...stations.map((st) => {
+        const pos = mapSvg.project(st.lat, st.lon);
+        return {
+          id: st.id || st.shortCode,
+          text: st.shortCode,
+          x: pos.x,
+          y: pos.y,
+          dotFill: '#0ea5e9',
+          textClass: 'fill-sky-300 font-mono font-bold',
+          pillStroke: 'rgba(56, 189, 248, 0.75)',
+          r: 6,
+        };
+      }),
+    ];
+    return placeMapLabels(rawMarkers, mapSvg.mappedPoints || [], mapSvg.width, mapSvg.height);
+  }, [mapSvg, startPoint, peakPoint, track.maxAlt, stations]);
+
+  const elevationLabels = useMemo(() => {
+    const peakPos = elevationSvg.toCoords(peakPoint.km, peakPoint.alt);
+    const rawMarkers = [
+      {
+        id: 'peak',
+        text: `Cumbre ${peakPoint.alt}m`,
+        x: peakPos.x,
+        y: peakPos.y,
+        dotFill: '#f97316',
+        lineStroke: '#f97316',
+        textClass: 'fill-orange-300 font-bold',
+        pillStroke: 'rgba(249, 115, 22, 0.75)',
+        r: 6,
+      },
+      ...stations.map((st) => {
+        const pos = elevationSvg.toCoords(st.km, st.alt);
+        return {
+          id: st.id || st.shortCode,
+          text: `${st.shortCode} (${st.km}K)`,
+          x: pos.x,
+          y: pos.y,
+          dotFill: '#38bdf8',
+          lineStroke: '#38bdf8',
+          textClass: 'fill-sky-300 font-mono font-bold',
+          pillStroke: 'rgba(56, 189, 248, 0.75)',
+          r: 5.5,
+        };
+      }),
+    ];
+    return placeElevationLabels(
+      rawMarkers,
+      elevationSvg.mapped || [],
+      elevationSvg.padLeft,
+      elevationSvg.width,
+      elevationSvg.padRight
+    );
+  }, [elevationSvg, peakPoint, stations]);
 
   const handleSvgPointerMove = (e) => {
     const svgEl = e.currentTarget;
@@ -394,80 +658,51 @@ export default function CircuitSection({
                     strokeLinejoin="round"
                   />
 
-                  {/* Marcadores de puestos de hidratación sobre coordenadas GPS reales */}
-                  {stations.map((st) => {
-                    const pos = mapSvg.project(st.lat, st.lon);
-                    return (
-                      <g key={st.id || st.shortCode}>
-                        <circle
-                          cx={pos.x}
-                          cy={pos.y}
-                          r="7"
-                          fill="#0ea5e9"
-                          stroke="#0c0a09"
-                          strokeWidth="2"
-                        />
-                        <text
-                          x={pos.x}
-                          y={pos.y - 11}
-                          textAnchor="middle"
-                          className="fill-sky-300 text-[10px] font-mono font-bold"
-                        >
-                          {st.shortCode}
-                        </text>
-                      </g>
-                    );
-                  })}
-
-                  {/* Marcador de Cumbre */}
-                  {(() => {
-                    const peakPos = mapSvg.project(peakPoint.lat, peakPoint.lon);
-                    return (
-                      <g>
-                        <circle
-                          cx={peakPos.x}
-                          cy={peakPos.y}
-                          r="7"
-                          fill="#f97316"
-                          stroke="#0c0a09"
-                          strokeWidth="2"
-                        />
-                        <text
-                          x={peakPos.x}
-                          y={peakPos.y - 11}
-                          textAnchor="middle"
-                          className="fill-orange-400 text-[10px] font-bold"
-                        >
-                          Cumbre {track.maxAlt}m
-                        </text>
-                      </g>
-                    );
-                  })()}
-
-                  {/* Largada / Meta */}
-                  {(() => {
-                    const startPos = mapSvg.project(startPoint.lat, startPoint.lon);
-                    return (
-                      <g>
-                        <circle
-                          cx={startPos.x}
-                          cy={startPos.y}
-                          r="7"
-                          fill="#10b981"
-                          stroke="#0c0a09"
-                          strokeWidth="2"
-                        />
-                        <text
-                          x={startPos.x}
-                          y={startPos.y + 18}
-                          textAnchor="middle"
-                          className="fill-emerald-400 text-[10px] font-bold"
-                        >
-                          Largada/Meta
-                        </text>
-                      </g>
-                    );
-                  })()}
+                  {/* Puntos marcadores y etiquetas auto-ubicadas en zonas despejadas */}
+                  {mapLabels.map((m) => (
+                    <g key={`line-${m.id}`}>
+                      <line
+                        x1={m.x}
+                        y1={m.y}
+                        x2={m.cx}
+                        y2={m.cy}
+                        stroke={m.pillStroke}
+                        strokeWidth="1.2"
+                        strokeDasharray="2 2"
+                      />
+                      <circle
+                        cx={m.x}
+                        cy={m.y}
+                        r={m.r}
+                        fill={m.dotFill}
+                        stroke="#0c0a09"
+                        strokeWidth="2"
+                      />
+                    </g>
+                  ))}
+                  {mapLabels.map((m) => (
+                    <g key={`pill-${m.id}`}>
+                      <rect
+                        x={m.left}
+                        y={m.top}
+                        width={m.boxW}
+                        height={m.boxH}
+                        rx="5"
+                        fill="#09090b"
+                        fillOpacity="0.92"
+                        stroke={m.pillStroke}
+                        strokeWidth="1"
+                      />
+                      <text
+                        x={m.cx}
+                        y={m.cy + 3.5}
+                        textAnchor="middle"
+                        className={`text-[10px] ${m.textClass}`}
+                      >
+                        {m.text}
+                      </text>
+                    </g>
+                  ))}
                   </svg>
                 </div>
 
@@ -601,75 +836,61 @@ export default function CircuitSection({
                       );
                     })}
 
-                    {/* Cumbre */}
-                    {(() => {
-                      const pos = elevationSvg.toCoords(peakPoint.km, peakPoint.alt);
-                      return (
-                        <g>
-                          <line
-                            x1={pos.x}
-                            y1={pos.y}
-                            x2={pos.x}
-                            y2={elevationSvg.baselineY}
-                            stroke="#f97316"
-                            strokeDasharray="3 3"
-                            strokeWidth="1.4"
-                            opacity="0.9"
-                          />
-                          <circle
-                            cx={pos.x}
-                            cy={pos.y}
-                            r="6"
-                            fill="#f97316"
-                            stroke="#0c0a09"
-                            strokeWidth="2"
-                          />
-                          <text
-                            x={pos.x}
-                            y={pos.y - 10}
-                            textAnchor="middle"
-                            className="fill-orange-400 text-[10px] font-bold"
-                          >
-                            Cumbre {peakPoint.alt}m
-                          </text>
-                        </g>
-                      );
-                    })()}
-
-                    {/* Puestos de Hidratación posicionados automáticamente por KM */}
-                    {stations.map((st) => {
-                      const pos = elevationSvg.toCoords(st.km, st.alt);
-                      return (
-                        <g key={st.id || st.shortCode}>
-                          <line
-                            x1={pos.x}
-                            y1={pos.y}
-                            x2={pos.x}
-                            y2={elevationSvg.baselineY}
-                            stroke="#38bdf8"
-                            strokeDasharray="3 3"
-                            strokeWidth="1.4"
-                            opacity="0.9"
-                          />
-                          <circle
-                            cx={pos.x}
-                            cy={pos.y}
-                            r="5.5"
-                            fill="#38bdf8"
-                            stroke="#0c0a09"
-                            strokeWidth="2"
-                          />
-                          <text
-                            x={pos.x}
-                            y={pos.y - 10}
-                            textAnchor="middle"
-                            className="fill-sky-300 text-[10px] font-mono font-bold"
-                          >
-                            {st.shortCode} ({st.km}K)
-                          </text>
-                        </g>
-                      );
-                    })}
+                    {/* Cumbre y Puestos de Hidratación con etiquetas auto-ubicadas */}
+                    {elevationLabels.map((m) => (
+                      <g key={`elev-pt-${m.id}`}>
+                        <line
+                          x1={m.x}
+                          y1={m.y}
+                          x2={m.x}
+                          y2={elevationSvg.baselineY}
+                          stroke={m.lineStroke}
+                          strokeDasharray="3 3"
+                          strokeWidth="1.4"
+                          opacity="0.9"
+                        />
+                        <line
+                          x1={m.x}
+                          y1={m.y}
+                          x2={m.cx}
+                          y2={m.cy}
+                          stroke={m.pillStroke}
+                          strokeWidth="1.1"
+                          strokeDasharray="2 2"
+                        />
+                        <circle
+                          cx={m.x}
+                          cy={m.y}
+                          r={m.r}
+                          fill={m.dotFill}
+                          stroke="#0c0a09"
+                          strokeWidth="2"
+                        />
+                      </g>
+                    ))}
+                    {elevationLabels.map((m) => (
+                      <g key={`elev-pill-${m.id}`}>
+                        <rect
+                          x={m.left}
+                          y={m.top}
+                          width={m.boxW}
+                          height={m.boxH}
+                          rx="5"
+                          fill="#09090b"
+                          fillOpacity="0.92"
+                          stroke={m.pillStroke}
+                          strokeWidth="1"
+                        />
+                        <text
+                          x={m.cx}
+                          y={m.cy + 3.5}
+                          textAnchor="middle"
+                          className={`text-[10px] ${m.textClass}`}
+                        >
+                          {m.text}
+                        </text>
+                      </g>
+                    ))}
 
                     {/* Cursor interactivo */}
                     {hoverPoint &&
