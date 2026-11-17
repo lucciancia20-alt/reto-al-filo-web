@@ -138,14 +138,26 @@ function placeMapLabels(markers, trackPts, width, height) {
   const candidates = [
     { dx: 0, dy: -22, anchor: 'middle' },
     { dx: 0, dy: 22, anchor: 'middle' },
-    { dx: -14, dy: 0, anchor: 'end' },
-    { dx: 14, dy: 0, anchor: 'start' },
-    { dx: -12, dy: -16, anchor: 'end' },
-    { dx: 12, dy: -16, anchor: 'start' },
-    { dx: -12, dy: 18, anchor: 'end' },
-    { dx: 12, dy: 18, anchor: 'start' },
+    { dx: -16, dy: 0, anchor: 'end' },
+    { dx: 16, dy: 0, anchor: 'start' },
+    { dx: -14, dy: -18, anchor: 'end' },
+    { dx: 14, dy: -18, anchor: 'start' },
+    { dx: -14, dy: 18, anchor: 'end' },
+    { dx: 14, dy: 18, anchor: 'start' },
     { dx: 0, dy: -34, anchor: 'middle' },
     { dx: 0, dy: 34, anchor: 'middle' },
+    { dx: -28, dy: 0, anchor: 'end' },
+    { dx: 28, dy: 0, anchor: 'start' },
+    { dx: -24, dy: -26, anchor: 'end' },
+    { dx: 24, dy: -26, anchor: 'start' },
+    { dx: -24, dy: 26, anchor: 'end' },
+    { dx: 24, dy: 26, anchor: 'start' },
+    { dx: 32, dy: 36, anchor: 'start' },
+    { dx: -32, dy: 36, anchor: 'end' },
+    { dx: 32, dy: -36, anchor: 'start' },
+    { dx: -32, dy: -36, anchor: 'end' },
+    { dx: 0, dy: 46, anchor: 'middle' },
+    { dx: 0, dy: -46, anchor: 'middle' },
   ];
 
   for (const m of markers) {
@@ -172,40 +184,41 @@ function placeMapLabels(markers, trackPts, width, height) {
 
       // Distancia mínima al trazado GPS naranja
       let minTrackDist = Infinity;
-      for (let i = 0; i < trackPts.length; i += 2) {
+      for (let i = 0; i < trackPts.length; i += 1) {
         const p = trackPts[i];
         const dx = Math.max(left - p.x, 0, p.x - right);
         const dy = Math.max(top - p.y, 0, p.y - bottom);
         const d = Math.hypot(dx, dy);
         if (d < minTrackDist) minTrackDist = d;
       }
-      score += Math.min(minTrackDist, 28) * 14;
-      if (minTrackDist < 4) score -= (4 - minTrackDist) * 180;
+      score += Math.min(minTrackDist, 26) * 16;
+      if (minTrackDist < 6) score -= (6 - minTrackDist) * 260;
 
       // Distancia a todos los círculos marcadores
       for (const other of markers) {
         const dx = Math.max(left - other.x, 0, other.x - right);
         const dy = Math.max(top - other.y, 0, other.y - bottom);
         const d = Math.hypot(dx, dy);
-        if (d < 9) score -= (9 - d) * 120;
+        if (d < 10) score -= (10 - d) * 180;
       }
 
       // Evitar superposición entre etiquetas ya ubicadas
       for (const pl of placed) {
         const overlapX = Math.max(
           0,
-          Math.min(right + 5, pl.right + 5) - Math.max(left - 5, pl.left - 5)
+          Math.min(right + 6, pl.right + 6) - Math.max(left - 6, pl.left - 6)
         );
         const overlapY = Math.max(
           0,
-          Math.min(bottom + 4, pl.bottom + 4) - Math.max(top - 4, pl.top - 4)
+          Math.min(bottom + 5, pl.bottom + 5) - Math.max(top - 5, pl.top - 5)
         );
         if (overlapX > 0 && overlapY > 0) {
-          score -= 3000 + overlapX * overlapY * 15;
+          score -= 20000 + overlapX * overlapY * 50;
         }
       }
 
-      if (Math.abs(c.dy) <= 22 && c.dx === 0) score += 12;
+      const leaderDist = Math.hypot(cx - m.x, cy - m.y);
+      score -= leaderDist * 1.2;
 
       if (score > bestScore) {
         bestScore = score;
@@ -218,20 +231,29 @@ function placeMapLabels(markers, trackPts, width, height) {
 }
 
 /**
- * Ubica las etiquetas del perfil de altimetría por encima de la curva en espacios despejados.
+ * Ubica las etiquetas del perfil de altimetría por encima de la curva en espacios despejados,
+ * incluyendo separación lateral amplia cuando un puesto PA coincide con la Cumbre (ej. 13K KM 8).
  */
 function placeElevationLabels(markers, curvePts, padLeft, width, padRight) {
   const placed = [];
   const candidates = [
     { dx: 0, dy: -22 },
-    { dx: -22, dy: -24 },
-    { dx: 22, dy: -24 },
-    { dx: 0, dy: -34 },
-    { dx: -28, dy: -34 },
-    { dx: 28, dy: -34 },
-    { dx: -34, dy: -42 },
-    { dx: 34, dy: -42 },
-    { dx: 0, dy: -46 },
+    { dx: -24, dy: -22 },
+    { dx: 24, dy: -22 },
+    { dx: 0, dy: -36 },
+    { dx: -34, dy: -34 },
+    { dx: 34, dy: -34 },
+    { dx: -56, dy: -20 },
+    { dx: 56, dy: -20 },
+    { dx: -78, dy: -16 },
+    { dx: 78, dy: -16 },
+    { dx: -86, dy: -32 },
+    { dx: 86, dy: -32 },
+    { dx: -44, dy: -44 },
+    { dx: 44, dy: -44 },
+    { dx: 0, dy: -48 },
+    { dx: -105, dy: -22 },
+    { dx: 105, dy: -22 },
   ];
 
   for (const m of markers) {
@@ -262,7 +284,7 @@ function placeElevationLabels(markers, curvePts, padLeft, width, padRight) {
         }
       }
       if (minCurveClearance < 3) {
-        score -= (3 - minCurveClearance) * 280;
+        score -= (3 - minCurveClearance) * 320;
       } else {
         score += Math.min(minCurveClearance, 22) * 8;
       }
@@ -272,26 +294,26 @@ function placeElevationLabels(markers, curvePts, padLeft, width, padRight) {
         const dx = Math.max(left - other.x, 0, other.x - right);
         const dy = Math.max(top - other.y, 0, other.y - bottom);
         const d = Math.hypot(dx, dy);
-        if (d < 8) score -= (8 - d) * 100;
+        if (d < 8) score -= (8 - d) * 150;
       }
 
       // Evitar superposición entre etiquetas
       for (const pl of placed) {
         const overlapX = Math.max(
           0,
-          Math.min(right + 5, pl.right + 5) - Math.max(left - 5, pl.left - 5)
+          Math.min(right + 6, pl.right + 6) - Math.max(left - 6, pl.left - 6)
         );
         const overlapY = Math.max(
           0,
           Math.min(bottom + 4, pl.bottom + 4) - Math.max(top - 4, pl.top - 4)
         );
         if (overlapX > 0 && overlapY > 0) {
-          score -= 4000 + overlapX * overlapY * 20;
+          score -= 25000 + overlapX * overlapY * 60;
         }
       }
 
-      score -= Math.abs(cx - m.x) * 0.55;
-      score -= Math.abs(c.dy + 22) * 0.4;
+      score -= Math.abs(cx - m.x) * 0.5;
+      score -= Math.abs(cy - (m.y - 22)) * 0.4;
 
       if (score > bestScore) {
         bestScore = score;
@@ -395,10 +417,11 @@ export default function CircuitSection({
         dotFill: '#f97316',
         textClass: 'fill-orange-300 font-bold',
         pillStroke: 'rgba(249, 115, 22, 0.75)',
-        r: 6.5,
+        r: 7.5,
       },
       ...stations.map((st) => {
         const pos = mapSvg.project(st.lat, st.lon);
+        const nearPeak = Math.hypot(pos.x - peakPos.x, pos.y - peakPos.y) < 5;
         return {
           id: st.id || st.shortCode,
           text: st.shortCode,
@@ -407,7 +430,7 @@ export default function CircuitSection({
           dotFill: '#0ea5e9',
           textClass: 'fill-sky-300 font-mono font-bold',
           pillStroke: 'rgba(56, 189, 248, 0.75)',
-          r: 6,
+          r: nearPeak ? 4.2 : 6,
         };
       }),
     ];
@@ -426,10 +449,11 @@ export default function CircuitSection({
         lineStroke: '#f97316',
         textClass: 'fill-orange-300 font-bold',
         pillStroke: 'rgba(249, 115, 22, 0.75)',
-        r: 6,
+        r: 7,
       },
       ...stations.map((st) => {
         const pos = elevationSvg.toCoords(st.km, st.alt);
+        const nearPeak = Math.hypot(pos.x - peakPos.x, pos.y - peakPos.y) < 5;
         return {
           id: st.id || st.shortCode,
           text: `${st.shortCode} (${st.km}K)`,
@@ -439,7 +463,7 @@ export default function CircuitSection({
           lineStroke: '#38bdf8',
           textClass: 'fill-sky-300 font-mono font-bold',
           pillStroke: 'rgba(56, 189, 248, 0.75)',
-          r: 5.5,
+          r: nearPeak ? 4 : 5.5,
         };
       }),
     ];
