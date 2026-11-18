@@ -16,6 +16,19 @@ function formatEdition(edition) {
   return match ? `${match[1]}ª ${match[3]}` : edition;
 }
 
+/** Renderiza "2ª EDICIÓN" usando el glifo nativo de la fuente deportiva para el ordinal elevado. */
+function EditionChromeLabel({ edition }) {
+  const match = edition.match(ORDINAL_EDITION);
+  if (!match) return edition;
+  return (
+    <>
+      {match[1]}
+      <span className="sport-chrome-ordinal" aria-hidden="true">a</span>{' '}
+      {match[3]}
+    </>
+  );
+}
+
 function calculateTimeLeft(targetIso) {
   const targetMs = Date.parse(resolveTargetDateIso(targetIso));
   const nowMs = Date.now();
@@ -100,7 +113,9 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
           >
             <span className="sport-chrome-title whitespace-nowrap">{raceTitle}</span>
             {raceEdition && (
-              <span className="sport-chrome-title whitespace-nowrap">{formatEdition(raceEdition)}</span>
+              <span className="sport-chrome-title whitespace-nowrap">
+                <EditionChromeLabel edition={raceEdition} />
+              </span>
             )}
           </h1>
 
