@@ -48,6 +48,26 @@
     paint-order: stroke fill;
     -webkit-text-stroke: 0.8px #f97316;
   }
+
+  /* Título deportivo cromado estilo motor/racing (Hero) */
+  .sport-chrome-title {
+    display: inline-block;
+    /* El padding extiende el área del fondo para no recortar la cola de las itálicas */
+    padding: 0.04em 0.14em;
+    font-family: 'Kanit', 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    line-height: 1.05;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    transform: skewX(-8deg) scaleX(1.08);
+    background-image: linear-gradient(180deg, #ffffff 0%, #f4f4f5 43%, #3f3f46 50%, #9ca3af 73%, #ffffff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0px 3px 0px #18181b) drop-shadow(0px 6px 16px rgba(0, 0, 0, 0.8));
+  }
 }
 
 /* Mantiene fondo oscuro y texto blanco al autocompletar campos en Chrome/Edge/Safari */

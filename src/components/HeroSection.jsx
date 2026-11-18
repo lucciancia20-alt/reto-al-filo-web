@@ -8,19 +8,12 @@ import {
   getRaceEdition,
 } from '../data/raceConfig';
 
-const ORDINAL_EDITION = /^(\d+)\s*(ra|da|ta|ma|na|va|er|do|to|vo|no|mo|°|º)\.?\s+(.*)$/i;
+const ORDINAL_EDITION = /^(\d+)\s*(ra|da|ta|ma|na|va|er|do|to|vo|no|mo|°|º|ª)\.?\s+(.*)$/i;
 
-/** Renderiza "2da Edición" como "2ᵈᵃ EDICIÓN" conservando el estilo original del Hero. */
-function EditionLabel({ edition }) {
+/** Normaliza "2da Edición" / "2° Edición" al ordinal tipográfico "2ª Edición". */
+function formatEdition(edition) {
   const match = edition.match(ORDINAL_EDITION);
-  if (!match) return edition;
-  return (
-    <>
-      {match[1]}
-      <span className="lowercase text-2xl md:text-4xl font-black align-baseline">{match[2]}</span>{' '}
-      {match[3]}
-    </>
-  );
+  return match ? `${match[1]}ª ${match[3]}` : edition;
 }
 
 function calculateTimeLeft(targetIso) {
@@ -101,15 +94,13 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
         {/* Título central imponente */}
         <div className="max-w-3xl mx-auto px-6 py-4 rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.28)]">
-          <h1 className="text-balance font-display text-3xl md:text-4xl font-black tracking-tight text-white uppercase leading-[1.08] section-title-stroke">
-            {raceTitle}
+          <h1
+            aria-label={[raceTitle, raceEdition && formatEdition(raceEdition)].filter(Boolean).join(' ')}
+            className="flex flex-wrap items-center justify-center gap-x-[0.5em] gap-y-1 px-[0.3em] text-[1.85rem] sm:text-4xl md:text-[2.6rem] lg:text-5xl"
+          >
+            <span className="sport-chrome-title whitespace-nowrap">{raceTitle}</span>
             {raceEdition && (
-              <>
-                {' '}
-                <span className="whitespace-nowrap">
-                  <EditionLabel edition={raceEdition} />
-                </span>
-              </>
+              <span className="sport-chrome-title whitespace-nowrap">{formatEdition(raceEdition)}</span>
             )}
           </h1>
 
