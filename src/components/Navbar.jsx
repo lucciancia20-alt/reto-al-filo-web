@@ -5,6 +5,7 @@ import {
   getRaceTitle,
   getRaceEdition,
   getRaceFullTitle,
+  expandOrdinalEdition,
   parseTargetDateParts,
 } from '../data/raceConfig';
 
@@ -12,9 +13,13 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const raceTitle = getRaceTitle(raceConfig);
-  const raceEdition = getRaceEdition(raceConfig);
+  const titleWords = raceTitle.trim().split(/\s+/);
+  const firstTitleWord = titleWords[0] || '';
+  const restTitleWords = titleWords.slice(1).join(' ');
+  const editionText = expandOrdinalEdition(getRaceEdition(raceConfig), 'SEGUNDA EDICIÓN');
+  const editionChars = Array.from(editionText);
   const { year } = parseTargetDateParts(raceConfig?.targetDateIso);
-  const brandSubline = [raceEdition, year].filter(Boolean).join(' · ');
+  const yearChars = Array.from(String(year || '').trim());
 
   const orgDigits = String(raceConfig?.whatsappNumber || '').replace(/\D/g, '');
   const sponsorWaUrl = orgDigits
@@ -44,11 +49,33 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
             alt={`Logo ${raceTitle}`}
             className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-md shrink-0"
           />
-          <span className="leading-none uppercase min-w-0">
-            <span className="block truncate max-w-[52vw] sm:max-w-xs font-display-athletic">{raceTitle}</span>
-            {brandSubline && (
-              <span className="block text-[10px] font-display-athletic tracking-widest text-orange-400 uppercase mt-0.5">
-                {brandSubline}
+          <span className="inline-flex flex-col items-stretch leading-none gap-[3px] uppercase min-w-0 font-display-athletic">
+            <span className="block whitespace-nowrap text-[17px] sm:text-lg leading-none">
+              <span className="text-orange-500">{firstTitleWord}</span>
+              {restTitleWords && <span className="text-white"> {restTitleWords}</span>}
+            </span>
+            {editionChars.length > 0 && (
+              <span
+                aria-label={editionText}
+                className="w-full flex items-center justify-between text-[9.5px] sm:text-[10px] leading-none text-orange-400 select-none"
+              >
+                {editionChars.map((ch, idx) => (
+                  <span key={idx} aria-hidden="true">
+                    {ch === ' ' ? '\u00A0' : ch}
+                  </span>
+                ))}
+              </span>
+            )}
+            {yearChars.length > 0 && (
+              <span
+                aria-label={year}
+                className="w-full flex items-center justify-between text-[9.5px] sm:text-[10px] leading-none text-orange-400 select-none"
+              >
+                {yearChars.map((ch, idx) => (
+                  <span key={idx} aria-hidden="true">
+                    {ch}
+                  </span>
+                ))}
               </span>
             )}
           </span>

@@ -99,7 +99,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
           {/* Columna 1: Línea de Tiempo (Cronograma del Día) */}
           <section id="cronograma" className="scroll-mt-20 min-w-0 flex flex-col justify-start">
             <div className="text-center xl:min-h-[140px] flex flex-col items-center justify-start mb-6">
-              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap mb-3">
+              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_var(--theme-glow)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap mb-3">
                 <Clock className="w-3.5 h-3.5 shrink-0" />
                 <span>Cronograma Oficial · {formattedFullDate}</span>
               </div>
@@ -118,7 +118,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
               {syncedSchedule.map((item, idx) => (
                 <div
                   key={`${item.time}-${idx}`}
-                  className="relative flex flex-col justify-center rounded-2xl bg-zinc-950 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] p-3.5 sm:p-4 hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all"
+                  className="relative flex flex-col justify-center rounded-2xl bg-zinc-950 border border-orange-500 shadow-[0_0_15px_var(--theme-glow)] p-3.5 sm:p-4 hover:border-orange-400 hover:shadow-[0_0_20px_var(--theme-glow)] transition-all"
                 >
                   {/* Punto indicador centrado exactamente sobre la línea vertical */}
                   <span
@@ -162,7 +162,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             className="scroll-mt-20 min-w-0 pt-8 border-t-2 border-orange-500/40 xl:pt-0 xl:border-t-0 flex flex-col justify-start"
           >
             <div className="text-center xl:min-h-[140px] flex flex-col items-center justify-start mb-6">
-              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap mb-3">
+              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_var(--theme-glow)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap mb-3">
                 <Award className="w-3.5 h-3.5 shrink-0" />
                 <span>Clasificación Oficial · Damas y Caballeros</span>
               </div>
@@ -199,7 +199,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
 
             {/* Tabla de Franjas Etarias */}
             {categoryBrackets.length > 0 && (
-              <div className="rounded-2xl bg-zinc-950 border border-orange-500/80 overflow-hidden shadow-[0_0_16px_rgba(249,115,22,0.18)]">
+              <div className="rounded-2xl bg-zinc-950 border border-orange-500/80 overflow-hidden shadow-[0_0_16px_var(--theme-glow)]">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
@@ -251,7 +251,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
             className="scroll-mt-20 min-w-0 pt-8 border-t-2 border-orange-500/40 xl:pt-0 xl:border-t-0 flex flex-col justify-start"
           >
             <div className="text-center xl:min-h-[140px] flex flex-col items-center justify-start mb-6">
-              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap mb-3">
+              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_var(--theme-glow)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-orange-400 whitespace-nowrap mb-3">
                 <HelpCircle className="w-3.5 h-3.5 shrink-0" />
                 <span>Información Clave para el Corredor</span>
               </div>
@@ -276,8 +276,8 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   key={faq.id}
                   className={`rounded-2xl border transition-all overflow-hidden bg-zinc-950 ${
                     isOpen
-                      ? 'border-orange-500 shadow-[0_0_18px_rgba(249,115,22,0.3)]'
-                      : 'border-orange-500/80 shadow-[0_0_12px_rgba(249,115,22,0.18)] hover:border-orange-400'
+                      ? 'border-orange-500 shadow-[0_0_18px_var(--theme-glow)]'
+                      : 'border-orange-500/80 shadow-[0_0_12px_var(--theme-glow)] hover:border-orange-400'
                   }`}
                 >
                   {isAlwaysOpen ? (
@@ -489,7 +489,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
         className="scroll-mt-20 py-8 sm:py-10 bg-stone-900/70 border-t-2 border-orange-500/50"
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="rounded-3xl bg-zinc-950 border border-orange-500/80 shadow-[0_0_24px_rgba(249,115,22,0.18)] p-5 sm:p-6">
+          <div className="rounded-3xl bg-zinc-950 border border-orange-500/80 shadow-[0_0_24px_var(--theme-glow)] p-5 sm:p-6">
             <div className="text-center">
               <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-orange-400">
                 <Search className="w-3.5 h-3.5" />

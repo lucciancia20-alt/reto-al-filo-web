@@ -93,7 +93,7 @@ export default function GallerySection({ raceConfig = RACE_CONFIG }) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Encabezado limpio de muestra fotográfica de la 1ra Edición */}
         <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
+          <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950 border border-orange-500/70 shadow-[0_0_12px_var(--theme-glow)] px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-orange-400">
             <Camera className="w-3.5 h-3.5" />
             <span>Galería · 1ra Edición</span>
           </div>
@@ -140,7 +140,7 @@ export default function GallerySection({ raceConfig = RACE_CONFIG }) {
                     setSelectedIndex(idx);
                   }
                 }}
-                className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-zinc-950 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.22)] hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+                className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-zinc-950 border border-orange-500 shadow-[0_0_15px_var(--theme-glow)] hover:border-orange-400 hover:shadow-[0_0_20px_var(--theme-glow)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
               >
                 <div className={`w-full overflow-hidden bg-zinc-950 ${photo.aspectClass}`}>
                   <img
@@ -197,7 +197,7 @@ export default function GallerySection({ raceConfig = RACE_CONFIG }) {
           onClick={() => setSelectedIndex(null)}
         >
           <div
-            className="relative w-fit h-fit min-w-[280px] min-h-[200px] max-w-[92vw] max-h-[85vh] flex items-center justify-center rounded-2xl overflow-hidden overscroll-contain border border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
+            className="relative w-fit h-fit min-w-[280px] min-h-[200px] max-w-[92vw] max-h-[85vh] flex items-center justify-center rounded-2xl overflow-hidden overscroll-contain border border-orange-500 shadow-[0_0_25px_var(--theme-glow)]"
             onClick={(e) => e.stopPropagation()}
           >
             <button

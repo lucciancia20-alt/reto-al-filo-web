@@ -6,31 +6,8 @@ import {
   resolveTargetDateIso,
   getRaceTitle,
   getRaceEdition,
+  expandOrdinalEdition,
 } from '../data/raceConfig';
-
-const ORDINAL_WORDS = {
-  1: 'PRIMERA',
-  2: 'SEGUNDA',
-  3: 'TERCERA',
-  4: 'CUARTA',
-  5: 'QUINTA',
-  6: 'SEXTA',
-  7: 'SÉPTIMA',
-  8: 'OCTAVA',
-  9: 'NOVENA',
-  10: 'DÉCIMA',
-};
-
-function expandHeroEdition(rawEdition) {
-  const trimmed = String(rawEdition ?? '').trim();
-  if (!trimmed) return '';
-  return trimmed
-    .replace(
-      /\b(\d+)\s*(?:ra|da|ta|ma|na|va|er|do|to|vo|no|mo|ª|º|°)\.?(?=\s|$)/gi,
-      (full, num) => ORDINAL_WORDS[Number(num)] || full
-    )
-    .toUpperCase();
-}
 
 function calculateTimeLeft(targetIso) {
   const targetMs = Date.parse(resolveTargetDateIso(targetIso));
@@ -80,7 +57,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
   const targetDateParts = parseTargetDateParts(targetDateIso);
   const raceTitle = getRaceTitle(raceConfig);
   const rawEdition = getRaceEdition(raceConfig);
-  const raceEdition = expandHeroEdition(rawEdition) || 'SEGUNDA EDICIÓN';
+  const raceEdition = expandOrdinalEdition(rawEdition, 'SEGUNDA EDICIÓN');
   const titleWords = raceTitle.trim().split(/\s+/);
   const firstTitleWord = titleWords[0] || '';
   const restTitleWords = titleWords.slice(1).join(' ');
@@ -112,7 +89,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-2 pb-8 sm:pt-3 sm:pb-10 -mt-2 md:-mt-4 text-center flex flex-col items-center">
         {/* Etiqueta superior de aventura */}
-        <div className="inline-flex items-center gap-2 rounded-full bg-zinc-900/35 backdrop-blur-sm border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-orange-400 mb-3.5 shadow-[0_0_14px_rgba(249,115,22,0.3)]">
+        <div className="inline-flex items-center gap-2 rounded-full bg-zinc-900/35 backdrop-blur-sm border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-orange-400 mb-3.5 shadow-[0_0_14px_var(--theme-glow)]">
           <Calendar className="w-4 h-4 text-orange-500 shrink-0" />
           <span>
             {[topBadgeSubtitle, targetDateParts.formattedDayMonth, targetDateParts.formattedTime]
@@ -122,7 +99,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         </div>
 
         {/* Título central imponente */}
-        <div className="max-w-4xl mx-auto px-5 sm:px-8 py-4 sm:py-5 rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.28)]">
+        <div className="max-w-4xl mx-auto px-5 sm:px-8 py-4 sm:py-5 rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500/80 shadow-[0_0_16px_var(--theme-glow)]">
           <div className="inline-flex flex-col items-stretch mx-auto max-w-full">
             <h1 className="hero-title-athletic text-[clamp(1.25rem,5.6vw,3.85rem)] whitespace-nowrap">
               <span className="hero-word-accent">{firstTitleWord}</span>
@@ -149,7 +126,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
           </div>
         </div>
 
-        <div className="mt-3 max-w-2xl mx-auto px-6 sm:px-8 py-3.5 rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.28)]">
+        <div className="mt-3 max-w-2xl mx-auto px-6 sm:px-8 py-3.5 rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500/80 shadow-[0_0_16px_var(--theme-glow)]">
           <p className="w-full max-w-none text-center text-sm sm:text-base text-white leading-relaxed tracking-[0.075em] [word-spacing:0.28em]">
             Desafiá las crestas técnicas, el bosque de altura y los senderos serranos en dos
             distancias diseñadas para corredores de montaña:{' '}
@@ -178,7 +155,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
             {timeUnits.map((unit) => (
               <div
                 key={unit.label}
-                className="rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500 py-2.5 px-2 sm:py-3 shadow-[0_0_16px_rgba(249,115,22,0.35)]"
+                className="rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500 py-2.5 px-2 sm:py-3 shadow-[0_0_16px_var(--theme-glow)]"
               >
                 <div className="section-title-athletic text-2xl sm:text-4xl text-white tabular-nums">
                   {unit.value}
@@ -207,7 +184,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
             <a
               href="#circuito"
-              className="w-full min-h-[54px] h-full flex items-center justify-center gap-2 rounded-2xl bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm text-orange-400 border border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:scale-[1.01] font-semibold uppercase text-xs sm:text-[13px] tracking-wider whitespace-nowrap px-6 py-3 transition-all"
+              className="w-full min-h-[54px] h-full flex items-center justify-center gap-2 rounded-2xl bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-sm text-orange-400 border border-orange-500 shadow-[0_0_15px_var(--theme-glow)] hover:scale-[1.01] font-semibold uppercase text-xs sm:text-[13px] tracking-wider whitespace-nowrap px-6 py-3 transition-all"
             >
               VER CIRCUITO Y ALTIMETRÍA
             </a>

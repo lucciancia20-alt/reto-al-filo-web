@@ -508,6 +508,19 @@ export default function AdminModal({
     }
   }, [isOpen, raceConfig]);
 
+  // Previsualización en vivo del tema mientras el panel está abierto; al cerrar sin guardar restaura el tema guardado
+  useEffect(() => {
+    if (isOpen && unlocked) {
+      document.documentElement.setAttribute(
+        'data-theme',
+        draft?.themeColor || raceConfig?.themeColor || 'orange'
+      );
+    }
+    return () => {
+      document.documentElement.setAttribute('data-theme', raceConfig?.themeColor || 'orange');
+    };
+  }, [isOpen, unlocked, draft?.themeColor, raceConfig?.themeColor]);
+
   useEffect(() => {
     if (!isOpen) return undefined;
     const unsubscribe = subscribeToAdminAuth((user) => {

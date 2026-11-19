@@ -414,9 +414,9 @@ export default function CircuitSection({
         text: `Cumbre ${track.maxAlt}m`,
         x: peakPos.x,
         y: peakPos.y,
-        dotFill: '#f97316',
+        dotFill: 'var(--theme-primary)',
         textClass: 'fill-orange-300 font-bold',
-        pillStroke: 'rgba(249, 115, 22, 0.75)',
+        pillStroke: 'var(--theme-primary)',
         r: 7.5,
       },
       ...stations.map((st) => {
@@ -445,10 +445,10 @@ export default function CircuitSection({
         text: `Cumbre ${peakPoint.alt}m`,
         x: peakPos.x,
         y: peakPos.y,
-        dotFill: '#f97316',
-        lineStroke: '#f97316',
+        dotFill: 'var(--theme-primary)',
+        lineStroke: 'var(--theme-primary)',
         textClass: 'fill-orange-300 font-bold',
-        pillStroke: 'rgba(249, 115, 22, 0.75)',
+        pillStroke: 'var(--theme-primary)',
         r: 7,
       },
       ...stations.map((st) => {
@@ -679,7 +679,7 @@ export default function CircuitSection({
                   <path
                     d={mapSvg.path}
                     fill="none"
-                    stroke="#f97316"
+                    stroke="var(--theme-primary)"
                     strokeOpacity="0.2"
                     strokeWidth="8"
                     strokeLinecap="round"
@@ -689,7 +689,7 @@ export default function CircuitSection({
                   <path
                     d={mapSvg.path}
                     fill="none"
-                    stroke="#f97316"
+                    stroke="var(--theme-primary)"
                     strokeWidth="2.8"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -792,8 +792,8 @@ export default function CircuitSection({
                   >
                     <defs>
                       <linearGradient id="elevationFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#f97316" stopOpacity="0.45" />
-                        <stop offset="100%" stopColor="#f97316" stopOpacity="0.02" />
+                        <stop offset="0%" stopColor="var(--theme-primary)" stopOpacity="0.45" />
+                        <stop offset="100%" stopColor="var(--theme-primary)" stopOpacity="0.02" />
                       </linearGradient>
                     </defs>
 
@@ -850,7 +850,7 @@ export default function CircuitSection({
                     <path
                       d={elevationSvg.linePath}
                       fill="none"
-                      stroke="#f97316"
+                      stroke="var(--theme-primary)"
                       strokeWidth="3"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -949,7 +949,7 @@ export default function CircuitSection({
                               cy={hp.y}
                               r="5"
                               fill="#ffffff"
-                              stroke="#f97316"
+                              stroke="var(--theme-primary)"
                               strokeWidth="2.5"
                             />
                           </g>

@@ -338,11 +338,11 @@ export default function AdminRegistrationsTab({
           {
             label: 'Pendientes',
             value: regStats.pending,
-            tone: 'text-orange-400',
-            inactiveClass: 'bg-zinc-950 border-orange-400 hover:border-orange-300',
-            activeClass: 'bg-zinc-950 border-orange-400 ring-2 ring-orange-400/85 ring-offset-2 ring-offset-zinc-950',
-            labelClass: 'text-orange-400',
-            dotClass: 'bg-orange-400',
+            tone: 'text-amber-400',
+            inactiveClass: 'bg-zinc-950 border-amber-400 hover:border-amber-300',
+            activeClass: 'bg-zinc-950 border-amber-400 ring-2 ring-amber-400/85 ring-offset-2 ring-offset-zinc-950',
+            labelClass: 'text-amber-400',
+            dotClass: 'bg-amber-400',
             isActive: regStatusFilter === 'pendiente' && regDuplicateFilter === 'none',
             onClick: () => {
               const isAlreadyActive =
@@ -508,7 +508,7 @@ export default function AdminRegistrationsTab({
         <div className="pt-2 border-t border-stone-800/80 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-[11px]">
           <div className="flex flex-wrap items-center gap-1">
             <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-stone-400 mr-0.5 shrink-0">
-              <Shirt className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <Shirt className="w-3.5 h-3.5 text-orange-400 shrink-0" />
               Talles:
             </span>
             {(regStats.shirtSizes || []).map((item) => {
@@ -521,8 +521,8 @@ export default function AdminRegistrationsTab({
                   title={`Filtrar por talle ${item.size}: ${item.confirmed} confirmados de ${item.total} inscriptos no rechazados`}
                   className={`inline-flex items-center gap-0.5 rounded-lg border px-1.5 py-0.5 text-[10px] sm:text-[11px] font-mono whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
                     isSelected
-                      ? 'bg-amber-500/20 border-amber-400 ring-1 ring-amber-400/70 shadow-sm text-white font-medium'
-                      : 'bg-zinc-900/80 border-amber-500/60 text-white hover:border-amber-400'
+                      ? 'bg-orange-500/20 border-orange-400 ring-1 ring-orange-400/70 shadow-sm text-white font-medium'
+                      : 'bg-zinc-900/80 border-orange-500/60 text-white hover:border-orange-400'
                   }`}
                 >
                   <span className="text-white font-semibold">{item.size}:</span>

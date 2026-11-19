@@ -12,7 +12,7 @@ import {
   saveLiveRaceConfig,
   resetLiveRaceConfig,
 } from './firebase/config';
-import { getRaceFullTitle } from './data/raceConfig';
+import { getRaceFullTitle, VALID_THEME_COLORS } from './data/raceConfig';
 
 const AdminModal = lazy(() => import('./components/AdminModal'));
 
@@ -76,6 +76,14 @@ export default function App() {
   useEffect(() => {
     document.title = `${raceFullTitle} | Trail Running`;
   }, [raceFullTitle]);
+
+  // Tema visual sincronizado con raceConfig.themeColor
+  useEffect(() => {
+    const theme = VALID_THEME_COLORS.includes(raceConfig?.themeColor)
+      ? raceConfig.themeColor
+      : 'orange';
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [raceConfig?.themeColor]);
 
   const handleOpenModal = (distanceOverride) => {
     if (distanceOverride === '27K' || distanceOverride === '13K') {

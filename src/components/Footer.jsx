@@ -1,6 +1,12 @@
 import React from 'react';
 import { Flame, Settings } from 'lucide-react';
-import { RACE_CONFIG, getRaceTitle, getRaceFullTitle, parseTargetDateParts } from '../data/raceConfig';
+import {
+  RACE_CONFIG,
+  getRaceTitle,
+  getRaceEdition,
+  expandOrdinalEdition,
+  parseTargetDateParts,
+} from '../data/raceConfig';
 
 export default function Footer({
   raceConfig = RACE_CONFIG,
@@ -8,6 +14,7 @@ export default function Footer({
   onOpenAdmin,
 }) {
   const { formattedFullDate } = parseTargetDateParts(raceConfig?.targetDateIso);
+  const expandedEdition = expandOrdinalEdition(getRaceEdition(raceConfig), 'SEGUNDA EDICIÓN');
 
   return (
     <footer className="bg-stone-950 border-t-2 border-orange-500/50 py-6 sm:py-8 text-stone-400">
@@ -20,7 +27,7 @@ export default function Footer({
           />
           <div>
             <p className="font-display font-black text-white text-sm uppercase">
-              {getRaceFullTitle(raceConfig)}
+              {`${getRaceTitle(raceConfig)}${expandedEdition ? ` - ${expandedEdition}` : ''}`}
             </p>
             <p className="text-xs text-stone-400">
               {formattedFullDate} · {raceConfig.locationName}

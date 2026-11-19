@@ -21,10 +21,22 @@ export const DEFAULT_WAIVER_CLAUSES = [
 export const DEFAULT_MEDICAL_BODY_TEXT =
   'ha sido evaluado/a clínicamente y mediante los estudios complementarios que consideré pertinentes en función de su edad y antecedentes, encontrándose actualmente APTO/A FÍSICAMENTE y sin contraindicaciones médicas aparentes para participar en competencias de Trail Running / Carrera de Montaña de esfuerzo físico intenso y competitivo (modalidad indicada en el campo de distancia, en ambiente serrano), correspondiente al evento {RACE_TITLE}.';
 
+export const VALID_THEME_COLORS = ['orange', 'red', 'blue', 'green', 'yellow', 'cyan'];
+
+export const THEME_COLOR_OPTIONS = [
+  { id: 'orange', label: 'Naranja', hex: '#ff5e2b' },
+  { id: 'red', label: 'Rojo', hex: '#fb2c36' },
+  { id: 'blue', label: 'Azul', hex: '#3b82f6' },
+  { id: 'green', label: 'Verde', hex: '#22c55e' },
+  { id: 'yellow', label: 'Amarillo', hex: '#eab308' },
+  { id: 'cyan', label: 'Cian', hex: '#06b6d4' },
+];
+
 export const RACE_CONFIG = {
   title: DEFAULT_RACE_TITLE,
   edition: '2da Edición',
   subtitle: 'Abril 2027',
+  themeColor: 'orange',
   targetDateIso: DEFAULT_TARGET_DATE_ISO,
   whatsappNumber: '5492915228310',
   notificationEmail: 'lciancia1972@gmail.com',
@@ -476,6 +488,31 @@ export function getRaceEdition(cfg) {
   return typeof cfg?.edition === 'string' ? cfg.edition.trim() : RACE_CONFIG.edition;
 }
 
+const ORDINAL_WORDS = {
+  1: 'PRIMERA',
+  2: 'SEGUNDA',
+  3: 'TERCERA',
+  4: 'CUARTA',
+  5: 'QUINTA',
+  6: 'SEXTA',
+  7: 'SÉPTIMA',
+  8: 'OCTAVA',
+  9: 'NOVENA',
+  10: 'DÉCIMA',
+};
+
+/** Convierte ordinales abreviados ("2da Edición") a palabra completa en mayúsculas ("SEGUNDA EDICIÓN"). */
+export function expandOrdinalEdition(rawEdition, fallback = '') {
+  const trimmed = String(rawEdition ?? '').trim();
+  if (!trimmed) return fallback;
+  return trimmed
+    .replace(
+      /\b(\d+)\s*(?:ra|da|ta|ma|na|va|er|do|to|vo|no|mo|ª|º|°)\.?(?=\s|$)/gi,
+      (full, num) => ORDINAL_WORDS[Number(num)] || full
+    )
+    .toUpperCase();
+}
+
 /** Título completo: "Nombre - Edición" (o solo el nombre si la edición está vacía). */
 export function getRaceFullTitle(cfg, separator = ' - ') {
   const edition = getRaceEdition(cfg);
@@ -629,12 +666,16 @@ export function mergeRaceConfig(override) {
   };
 
   const { title: resolvedTitle, edition: resolvedEdition } = resolveTitleAndEdition(override);
+  const resolvedThemeColor = VALID_THEME_COLORS.includes(override.themeColor)
+    ? override.themeColor
+    : RACE_CONFIG.themeColor;
 
   return {
     ...RACE_CONFIG,
     ...override,
     title: resolvedTitle,
     edition: resolvedEdition,
+    themeColor: resolvedThemeColor,
     whatsappNumber:
       String(override.whatsappNumber || '').trim() || RACE_CONFIG.whatsappNumber,
     notificationEmail:

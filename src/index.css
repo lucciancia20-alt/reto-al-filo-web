@@ -1,5 +1,71 @@
 @import "tailwindcss";
 
+:root,
+[data-theme="orange"] {
+  --theme-primary: #ff5e2b;
+  --theme-secondary: #ff9914;
+  --theme-accent: #ff2a6d;
+  --theme-stroke: #ff4d4d;
+  --theme-glow: rgba(255, 77, 46, 0.55);
+}
+
+[data-theme="red"] {
+  --theme-primary: var(--color-red-500, #fb2c36);
+  --theme-secondary: var(--color-red-500, #fb2c36);
+  --theme-accent: #dc2626;
+  --theme-stroke: var(--color-red-500, #fb2c36);
+  --theme-glow: rgba(251, 44, 54, 0.55);
+}
+
+[data-theme="blue"] {
+  --theme-primary: #3b82f6;
+  --theme-secondary: #60a5fa;
+  --theme-accent: #1d4ed8;
+  --theme-stroke: #3b82f6;
+  --theme-glow: rgba(59, 130, 246, 0.55);
+}
+
+[data-theme="green"] {
+  --theme-primary: #22c55e;
+  --theme-secondary: #4ade80;
+  --theme-accent: #15803d;
+  --theme-stroke: #22c55e;
+  --theme-glow: rgba(34, 197, 94, 0.55);
+}
+
+[data-theme="yellow"] {
+  --theme-primary: #eab308;
+  --theme-secondary: #fde047;
+  --theme-accent: #ca8a04;
+  --theme-stroke: #eab308;
+  --theme-glow: rgba(234, 179, 8, 0.55);
+}
+
+[data-theme="cyan"] {
+  --theme-primary: #06b6d4;
+  --theme-secondary: #22d3ee;
+  --theme-accent: #0e7490;
+  --theme-stroke: #06b6d4;
+  --theme-glow: rgba(6, 182, 212, 0.55);
+}
+
+:root,
+[data-theme] {
+  --color-orange-300: var(--theme-secondary);
+  --color-orange-400: var(--theme-secondary);
+  --color-orange-500: var(--theme-primary);
+  --color-orange-600: var(--theme-accent);
+}
+
+/* Blinda los colores semánticos operativos dentro de la pestaña Inscriptos */
+[data-theme] .admin-registrations-shield,
+.admin-registrations-shield {
+  --color-orange-300: #fdba74;
+  --color-orange-400: #fb923c;
+  --color-orange-500: #f97316;
+  --color-orange-600: #ea580c;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -44,22 +110,6 @@
     letter-spacing: 0.02em;
   }
 
-  .section-title-athletic {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    color: #ffffff;
-    -webkit-text-stroke: 1.5px #ff4d4d;
-    paint-order: stroke fill;
-    filter: drop-shadow(0 0 8px rgba(255, 94, 43, 0.55)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.75));
-  }
-
-  .section-title-athletic sup {
-    -webkit-text-stroke: 1px #ff4d4d;
-    paint-order: stroke fill;
-  }
-
   .hero-title-athletic {
     font-family: 'Vipnagorgialla', 'Barlow Condensed', sans-serif;
     font-weight: 800;
@@ -73,18 +123,18 @@
     display: inline-block;
     padding-right: 0.14em;
     margin-right: -0.14em;
-    background: linear-gradient(180deg, #ff9914 0%, #ff5e2b 50%, #ff2a6d 100%);
+    background: linear-gradient(180deg, var(--theme-secondary) 0%, var(--theme-primary) 50%, var(--theme-accent) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 14px rgba(255, 77, 46, 0.55)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.75));
+    filter: drop-shadow(0 0 14px var(--theme-glow)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.75));
   }
 
   .hero-word-white {
     color: #ffffff;
-    -webkit-text-stroke: 2px #ff4d4d;
+    -webkit-text-stroke: 2px var(--theme-stroke);
     paint-order: stroke fill;
-    filter: drop-shadow(0 0 12px rgba(255, 94, 43, 0.65)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8));
+    filter: drop-shadow(0 0 12px var(--theme-glow)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8));
   }
 
   .hero-subtitle-edition {
@@ -95,6 +145,23 @@
     color: #ffffff;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
   }
+}
+
+.section-title-athletic {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  word-spacing: 0.06em;
+  color: #f4f4f5;
+  -webkit-text-stroke: 1px var(--theme-stroke);
+  paint-order: stroke fill;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 4px color-mix(in srgb, var(--theme-primary) 35%, transparent));
+}
+
+.section-title-athletic sup {
+  -webkit-text-stroke: 0.75px var(--theme-stroke);
+  paint-order: stroke fill;
 }
 
 /* Mantiene fondo oscuro y texto blanco al autocompletar campos en Chrome/Edge/Safari */
@@ -126,18 +193,18 @@ textarea:-webkit-autofill:active {
 
 ::-webkit-scrollbar-track {
   background: #09090b;
-  border: 1px solid rgba(249, 115, 22, 0.45);
+  border: 1px solid color-mix(in srgb, var(--theme-primary) 45%, transparent);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #f97316;
+  background: var(--theme-primary);
   border-radius: 9999px;
   border: 2px solid #09090b;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #fb923c;
+  background: var(--theme-secondary);
 }
 
 ::-webkit-scrollbar-corner {
@@ -148,7 +215,7 @@ textarea:-webkit-autofill:active {
 @supports (-moz-appearance: none) {
   * {
     scrollbar-width: thin;
-    scrollbar-color: #f97316 #09090b;
+    scrollbar-color: var(--theme-primary) #09090b;
   }
 }
 

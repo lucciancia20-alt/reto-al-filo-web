@@ -17,6 +17,7 @@ import {
   DEFAULT_RACE_TITLE,
   DEFAULT_WAIVER_CLAUSES,
   DEFAULT_MEDICAL_BODY_TEXT,
+  THEME_COLOR_OPTIONS,
   getRaceTitle,
   getRaceFullTitle,
   parseTargetDateParts,
@@ -235,6 +236,43 @@ export default function AdminGeneralTab({
             onChange={(e) => setDraft({ ...draft, locationName: e.target.value })}
             className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
           />
+        </div>
+
+        {/* Selector compacto de Tema / Marca Blanca */}
+        <div className="sm:col-span-2 rounded-xl bg-zinc-950 border border-stone-800 px-3 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
+          <div className="min-w-0">
+            <span className="block text-xs font-semibold text-stone-200">
+              Color de la Carrera / Tema
+            </span>
+            <span className="block text-[11px] text-stone-400">
+              Activo:{' '}
+              <strong className="text-white">
+                {(THEME_COLOR_OPTIONS.find((t) => t.id === (draft.themeColor || 'orange')) || THEME_COLOR_OPTIONS[0]).label}
+              </strong>
+            </span>
+          </div>
+          <div className="flex items-center gap-2.5 shrink-0" role="radiogroup" aria-label="Color de la Carrera / Tema">
+            {THEME_COLOR_OPTIONS.map((option) => {
+              const isSelected = (draft.themeColor || 'orange') === option.id;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  aria-label={option.label}
+                  title={option.label}
+                  onClick={() => setDraft((prev) => ({ ...prev, themeColor: option.id }))}
+                  style={{ backgroundColor: option.hex }}
+                  className={`w-7 h-7 rounded-full transition-transform cursor-pointer focus:outline-none ${
+                    isSelected
+                      ? 'ring-2 ring-white ring-offset-2 ring-offset-zinc-950 scale-110'
+                      : 'border border-white/25 hover:scale-105 opacity-85 hover:opacity-100'
+                  }`}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
 
