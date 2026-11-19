@@ -83,7 +83,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         srcSet={heroSrcSet}
         sizes="100vw"
         alt="Corredor de trail running en el filo de la montaña"
-        fetchPriority="high"
+        fetchpriority="high"
         className="absolute inset-0 w-full h-full object-cover object-[center_28%]"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/80" />
