@@ -267,6 +267,8 @@ export const RACE_CONFIG = {
     'Tercer Tiempo y sorteos en la base del cerro',
   ],
 
+  sponsors: [],
+
   mandatoryGear: {
     '27K': [
       'Mochila o chaleco de hidratación con capacidad mínima de 1,0 L',
@@ -634,6 +636,18 @@ export function mergeRaceConfig(override) {
     ? override.kitIncludes.map((item) => String(item ?? ''))
     : RACE_CONFIG.kitIncludes;
 
+  const nextSponsors = Array.isArray(override.sponsors)
+    ? override.sponsors
+        .filter((item) => item && typeof item === 'object')
+        .map((item, idx) => ({
+          id: String(item.id || `sponsor-${idx}`),
+          name: String(item.name || '').trim(),
+          logoUrl: String(item.logoUrl || '').trim(),
+          linkUrl: String(item.linkUrl || '').trim(),
+          invertOnDark: Boolean(item.invertOnDark),
+        }))
+    : RACE_CONFIG.sponsors;
+
   const incomingGear =
     override.mandatoryGear && typeof override.mandatoryGear === 'object'
       ? override.mandatoryGear
@@ -694,6 +708,7 @@ export function mergeRaceConfig(override) {
     schedule: nextSchedule,
     faqs: nextFaqs,
     kitIncludes: nextKitIncludes,
+    sponsors: nextSponsors,
     mandatoryGear: nextMandatoryGear,
     ageCategories: nextAgeCategories,
     waiverCustomText: typeof override.waiverCustomText === 'string' ? override.waiverCustomText : '',

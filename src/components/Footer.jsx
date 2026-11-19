@@ -10,6 +10,18 @@ import {
 } from '../data/raceConfig';
 import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
+function normalizeSponsorLink(rawLink) {
+  const trimmed = String(rawLink || '').trim();
+  if (!trimmed) return '';
+  if (trimmed.startsWith('@')) {
+    return `https://www.instagram.com/${trimmed.slice(1).replace(/^\/+|\/+$/g, '')}/`;
+  }
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+}
+
 export default function Footer({
   raceConfig = RACE_CONFIG,
   onOpenModal,
@@ -29,18 +41,68 @@ export default function Footer({
         }.`
       )}`
     : '#';
+  const activeSponsors = (Array.isArray(raceConfig?.sponsors) ? raceConfig.sponsors : []).filter(
+    (s) => s && (String(s.name || '').trim() || String(s.logoUrl || '').trim())
+  );
 
   return (
     <footer className="bg-stone-950 border-t-2 border-orange-500/50 py-6 sm:py-8 text-stone-400">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-5">
         <div className="pb-4 border-b border-stone-800/80 flex flex-wrap items-center justify-center sm:justify-between gap-3">
-          <div className="flex flex-wrap items-center justify-center gap-2.5">
-            <span className="inline-flex items-center px-3 py-1 rounded bg-[var(--theme-sub-bg)] border border-[var(--theme-sub-border)] text-[var(--theme-sub)] font-display-athletic text-xs tracking-widest -skew-x-6 [text-shadow:none]">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-4">
+            <span className="inline-flex items-center px-3 py-1 rounded bg-[var(--theme-sub-bg)] border border-[var(--theme-sub-border)] text-[var(--theme-sub)] font-display-athletic text-xs tracking-widest -skew-x-6 [text-shadow:none] shrink-0">
               <span className="skew-x-6">Nos acompañan:</span>
             </span>
-            <span className="text-xs text-stone-400">
-              Espacio disponible para marcas y sponsors oficiales
-            </span>
+            {activeSponsors.length > 0 ? (
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 sm:gap-6">
+                {activeSponsors.map((sp, idx) => {
+                  const href = normalizeSponsorLink(sp.linkUrl);
+                  const content = sp.logoUrl ? (
+                    <img
+                      src={optimizeCloudinaryUrl(sp.logoUrl, 280)}
+                      alt={sp.name || `Sponsor ${idx + 1}`}
+                      loading="lazy"
+                      decoding="async"
+                      className={`h-8 sm:h-10 w-auto max-w-[130px] object-contain transition-all duration-200 ${
+                        sp.invertOnDark
+                          ? 'brightness-0 invert opacity-90 group-hover:opacity-100'
+                          : 'opacity-90 group-hover:opacity-100'
+                      }`}
+                    />
+                  ) : (
+                    <span className="font-display font-bold text-xs sm:text-sm uppercase tracking-wider text-stone-200 group-hover:text-white transition-colors">
+                      {sp.name}
+                    </span>
+                  );
+
+                  return href ? (
+                    <a
+                      key={sp.id || `footer-sponsor-${idx}`}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={sp.name ? `Visitar ${sp.name}` : 'Visitar sponsor oficial'}
+                      aria-label={sp.name ? `Visitar ${sp.name}` : 'Visitar sponsor oficial'}
+                      className="group inline-flex items-center hover:scale-105 transition-transform"
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    <span
+                      key={sp.id || `footer-sponsor-${idx}`}
+                      title={sp.name || undefined}
+                      className="group inline-flex items-center"
+                    >
+                      {content}
+                    </span>
+                  );
+                })}
+              </div>
+            ) : (
+              <span className="text-xs text-stone-400">
+                Espacio disponible para marcas y sponsors oficiales
+              </span>
+            )}
           </div>
           {orgDigits && (
             <a

@@ -11,7 +11,10 @@ import {
   FileText,
   RotateCcw,
   Eye,
+  Handshake,
+  Upload,
 } from 'lucide-react';
+import { uploadImageToCloudinary } from '../../firebase/config';
 import {
   RACE_CONFIG,
   DEFAULT_RACE_TITLE,
@@ -41,6 +44,8 @@ export default function AdminGeneralTab({
     parseTargetDateParts(draft.targetDateIso);
   const [testingEmail, setTestingEmail] = useState(false);
   const [emailTestStatus, setEmailTestStatus] = useState(null);
+  const [uploadingSponsorIdx, setUploadingSponsorIdx] = useState(null);
+  const [sponsorUploadError, setSponsorUploadError] = useState('');
 
   const handleTestEmailSend = async () => {
     const targetEmail = resolveNotificationEmail(draft.notificationEmail);
@@ -467,6 +472,214 @@ export default function AdminGeneralTab({
                 </div>
               ))}
             </div>
+          </div>
+        );
+      })()}
+
+      {/* Sponsors Oficiales (Zócalo "Nos acompañan:") */}
+      {(() => {
+        const sponsorsList = Array.isArray(draft.sponsors) ? draft.sponsors : [];
+
+        const handleSponsorFieldChange = (index, field, value) => {
+          setDraft((prev) => {
+            const current = Array.isArray(prev.sponsors) ? [...prev.sponsors] : [];
+            current[index] = {
+              ...(current[index] || {}),
+              [field]: value,
+            };
+            return { ...prev, sponsors: current };
+          });
+        };
+
+        const handleAddSponsor = () => {
+          setSponsorUploadError('');
+          setDraft((prev) => {
+            const current = Array.isArray(prev.sponsors) ? [...prev.sponsors] : [];
+            current.push({
+              id: `sponsor-${Date.now()}-${current.length}`,
+              name: '',
+              logoUrl: '',
+              linkUrl: '',
+              invertOnDark: false,
+            });
+            return { ...prev, sponsors: current };
+          });
+        };
+
+        const handleRemoveSponsor = (index) => {
+          setSponsorUploadError('');
+          setDraft((prev) => {
+            const current = Array.isArray(prev.sponsors) ? prev.sponsors : [];
+            return {
+              ...prev,
+              sponsors: current.filter((_, idx) => idx !== index),
+            };
+          });
+        };
+
+        const handleUploadSponsorLogo = async (index, file) => {
+          if (!file) return;
+          setUploadingSponsorIdx(index);
+          setSponsorUploadError('');
+          try {
+            const uploaded = await uploadImageToCloudinary(file, {
+              folder: 'reto-al-filo/sponsors',
+              resourceType: 'image',
+            });
+            handleSponsorFieldChange(index, 'logoUrl', uploaded.secureUrl);
+          } catch (err) {
+            setSponsorUploadError(
+              err?.message || 'No se pudo subir el logo a Cloudinary. Revisá el archivo o pegá la URL.'
+            );
+          } finally {
+            setUploadingSponsorIdx(null);
+          }
+        };
+
+        return (
+          <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Handshake className="w-4 h-4 text-orange-500 shrink-0" />
+                <div>
+                  <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
+                    Sponsors Oficiales (Zócalo «Nos acompañan:»)
+                  </h4>
+                  <p className="text-[11px] text-stone-400">
+                    Subí el logo de cada sponsor y agregá su link a Instagram o sitio web. Si el logo es negro (ej. ENA), activá «Blanco sobre oscuro».
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleAddSponsor}
+                className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-medium px-3 py-1.5 cursor-pointer transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Agregar Sponsor</span>
+              </button>
+            </div>
+
+            {sponsorUploadError && (
+              <p className="text-xs text-rose-400 flex items-center gap-1.5">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>{sponsorUploadError}</span>
+              </p>
+            )}
+
+            {sponsorsList.length === 0 ? (
+              <p className="text-xs text-stone-500 italic py-1">
+                Todavía no hay sponsors cargados. Mientras esté vacío, en el pie de página se muestra «Espacio disponible para marcas y sponsors oficiales».
+              </p>
+            ) : (
+              <div className="space-y-2.5">
+                {sponsorsList.map((sp, idx) => {
+                  const isUploading = uploadingSponsorIdx === idx;
+                  return (
+                    <div
+                      key={sp.id || `sponsor-row-${idx}`}
+                      className="rounded-xl bg-zinc-950 border border-stone-800 p-2.5 flex flex-col sm:flex-row sm:items-center gap-2.5"
+                    >
+                      {/* Vista previa del logo sobre fondo oscuro */}
+                      <div className="w-24 h-12 rounded-lg bg-stone-950 border border-stone-800 flex items-center justify-center px-2 shrink-0 overflow-hidden">
+                        {sp.logoUrl ? (
+                          <img
+                            src={sp.logoUrl}
+                            alt={sp.name || `Sponsor ${idx + 1}`}
+                            className={`max-h-9 max-w-full object-contain ${
+                              sp.invertOnDark ? 'brightness-0 invert' : ''
+                            }`}
+                          />
+                        ) : (
+                          <span className="text-[10px] text-stone-500 text-center leading-tight">
+                            Sin logo
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <input
+                          type="text"
+                          value={sp.name || ''}
+                          onChange={(e) => handleSponsorFieldChange(idx, 'name', e.target.value)}
+                          placeholder="Nombre (ej. ENA Sport)"
+                          aria-label={`Nombre del sponsor ${idx + 1}`}
+                          className="w-full rounded-lg bg-stone-950 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-xs font-mono font-semibold text-white"
+                        />
+                        <input
+                          type="text"
+                          value={sp.linkUrl || ''}
+                          onChange={(e) => handleSponsorFieldChange(idx, 'linkUrl', e.target.value)}
+                          placeholder="Instagram o Web (ej. @enasport o https://...)"
+                          aria-label={`Link web o Instagram del sponsor ${idx + 1}`}
+                          className="w-full rounded-lg bg-stone-950 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-xs font-mono text-white"
+                        />
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="text"
+                            value={sp.logoUrl || ''}
+                            onChange={(e) => handleSponsorFieldChange(idx, 'logoUrl', e.target.value)}
+                            placeholder="URL del logo o subir →"
+                            aria-label={`URL del logo del sponsor ${idx + 1}`}
+                            className="flex-1 min-w-0 rounded-lg bg-stone-950 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-xs font-mono text-stone-300"
+                          />
+                          <label
+                            title="Subir archivo de logo (PNG, WebP, SVG o JPG)"
+                            className={`inline-flex items-center gap-1 rounded-lg bg-stone-950 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-[11px] font-medium px-2 py-1.5 shrink-0 transition-colors ${
+                              isUploading ? 'opacity-50 cursor-wait' : 'cursor-pointer'
+                            }`}
+                          >
+                            {isUploading ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Upload className="w-3.5 h-3.5" />
+                            )}
+                            <span>{isUploading ? '...' : 'Subir'}</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              disabled={isUploading}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                e.target.value = '';
+                                handleUploadSponsorLogo(idx, file);
+                              }}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleSponsorFieldChange(idx, 'invertOnDark', !sp.invertOnDark)
+                          }
+                          title="Invierte logos negros a blanco puro para que contrasten en el pie de página oscuro"
+                          className={`rounded-lg border px-2 py-1 text-[10px] font-semibold transition-colors cursor-pointer ${
+                            sp.invertOnDark
+                              ? 'bg-white text-stone-950 border-white'
+                              : 'bg-stone-950 text-stone-400 border-stone-700 hover:border-stone-500 hover:text-stone-200'
+                          }`}
+                        >
+                          {sp.invertOnDark ? 'Blanco ✓' : 'Color original'}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSponsor(idx)}
+                          aria-label={`Quitar sponsor ${idx + 1}`}
+                          className="p-1.5 rounded-lg text-stone-400 hover:text-rose-400 hover:bg-stone-900 cursor-pointer shrink-0"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         );
       })()}
