@@ -1,4 +1,5 @@
 import emailjs from '@emailjs/browser';
+import { resolveFrozenRegistrationPricing } from '../data/raceConfig';
 
 export const EMAILJS_SERVICE_ID = 'service_g95to2m';
 export const EMAILJS_TEMPLATE_ID = 'template_huzo9hw';
@@ -27,6 +28,11 @@ export async function sendRegistrationNotificationEmail({
 }) {
   const toEmail = resolveNotificationEmail(notificationEmail);
   const runnerEmail = String(registration?.email || '').trim();
+  const pricing = resolveFrozenRegistrationPricing(registration);
+  const baseDistance = registration?.distance || '-';
+  const distanceSummary = pricing.isLocalResident
+    ? `${baseDistance} · ${pricing.finalAmount} (${pricing.badgeText} - Verificar DNI)`
+    : baseDistance;
 
   const templateParams = {
     to_email: toEmail,
@@ -35,7 +41,7 @@ export async function sendRegistrationNotificationEmail({
     carrera: String(raceTitle || '').trim() || 'RETO AL FILO',
     codigo: registration?.code || '-',
     nombre: registration?.fullName || '-',
-    distancia: registration?.distance || '-',
+    distancia: distanceSummary,
     dni: registration?.dni || '-',
     categoria: registration?.gender || '-',
     celular: registration?.phone || '-',

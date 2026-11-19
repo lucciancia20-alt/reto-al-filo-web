@@ -20,7 +20,10 @@ import {
   Check,
   X,
 } from 'lucide-react';
-import { resolveRunnerCategory } from '../../data/raceConfig';
+import {
+  resolveRunnerCategory,
+  resolveFrozenRegistrationPricing,
+} from '../../data/raceConfig';
 
 const DNI_HEADER_KEYS = new Set([
   'dni',
@@ -1363,6 +1366,7 @@ export default function AdminRegistrationsTab({
             sortedRegistrations.map((reg) => {
             const isBusy = regBusyId === reg.id;
             const isExpanded = expandedId === reg.id;
+            const pricing = resolveFrozenRegistrationPricing(reg);
             const bibValue = bibDrafts[reg.id] ?? reg.assignedBib ?? '';
             const isConfirmed = reg.status === 'confirmado';
             const isEditingBib = Boolean(editingBibIds[reg.id]);
@@ -1422,6 +1426,32 @@ export default function AdminRegistrationsTab({
                       >
                         {reg.status}
                       </span>
+                      {pricing.finalAmount && (
+                        <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-stone-200 shrink-0">
+                          {pricing.isLocalResident &&
+                            pricing.originalPrice &&
+                            pricing.originalPrice !== pricing.finalAmount && (
+                              <span className="text-[10px] text-stone-500 line-through font-normal">
+                                {pricing.originalPrice}
+                              </span>
+                            )}
+                          <span
+                            className={
+                              pricing.isLocalResident ? 'text-emerald-300' : 'text-stone-200'
+                            }
+                          >
+                            {pricing.finalAmount}
+                          </span>
+                        </span>
+                      )}
+                      {pricing.isLocalResident && (
+                        <span
+                          title="Verificar domicilio del Partido de Tornquist en el DNI"
+                          className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-emerald-500/60 bg-emerald-500/15 text-emerald-300 shrink-0"
+                        >
+                          {pricing.badgeText}
+                        </span>
+                      )}
                       {reg.checkedIn && (
                         <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-full border border-emerald-500/60 bg-zinc-950 text-emerald-400 shrink-0">
                           Kit ✓
@@ -1647,6 +1677,26 @@ export default function AdminRegistrationsTab({
                             {reg.checkedIn ? 'Kit entregado ✓' : 'Pendiente de retiro'}
                           </span>
                         </span>
+                        {pricing.finalAmount && (
+                          <span className="inline-flex flex-wrap items-center gap-1.5 rounded-lg bg-zinc-900/80 border border-emerald-500/50 px-2.5 py-1 text-[11px] text-zinc-200">
+                            Monto:{' '}
+                            {pricing.isLocalResident &&
+                              pricing.originalPrice &&
+                              pricing.originalPrice !== pricing.finalAmount && (
+                                <span className="text-stone-500 line-through font-mono">
+                                  {pricing.originalPrice}
+                                </span>
+                              )}
+                            <span className="text-emerald-300 font-mono font-semibold">
+                              {pricing.finalAmount}
+                            </span>
+                            {pricing.isLocalResident && (
+                              <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                                {pricing.badgeText} · Verificar domicilio en DNI
+                              </span>
+                            )}
+                          </span>
+                        )}
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[1.2fr_1fr_0.9fr_1.4fr] gap-x-4 gap-y-1.5">

@@ -1,5 +1,18 @@
 export const DEFAULT_RACE_TITLE = 'Reto al Filo';
 export const DEFAULT_TARGET_DATE_ISO = '2027-04-10T09:00:00-03:00';
+export const DEFAULT_RESIDENT_DISCOUNT_ENABLED = true;
+export const DEFAULT_RESIDENT_DISCOUNT_PERCENT = 20;
+export const DEFAULT_RESIDENT_LOCALITIES = [
+  'Tornquist',
+  'Sierra de la Ventana',
+  'Saldungaray',
+  'Villa Ventana',
+  'Chasicó',
+  'Tres Picos',
+  'Villa Serrana La Gruta',
+  'San Andrés de la Sierra',
+  'Pelicurá',
+];
 
 /**
  * Texto por defecto de las cláusulas del Deslinde de Responsabilidad A4.
@@ -308,6 +321,11 @@ export const RACE_CONFIG = {
   // Vacío = se usa el texto por defecto definido en DEFAULT_WAIVER_CLAUSES / DEFAULT_MEDICAL_BODY_TEXT.
   waiverCustomText: '',
   medicalCustomText: '',
+
+  // Descuento automático para residentes del Partido de Tornquist
+  residentDiscountEnabled: DEFAULT_RESIDENT_DISCOUNT_ENABLED,
+  residentDiscountPercent: DEFAULT_RESIDENT_DISCOUNT_PERCENT,
+  residentLocalities: DEFAULT_RESIDENT_LOCALITIES,
 };
 
 const ARGENTINA_TIMEZONE = 'America/Argentina/Buenos_Aires';
@@ -685,6 +703,27 @@ export function mergeRaceConfig(override) {
     ? override.themeColor
     : RACE_CONFIG.themeColor;
 
+  const resolvedResidentDiscountEnabled =
+    typeof override.residentDiscountEnabled === 'boolean'
+      ? override.residentDiscountEnabled
+      : RACE_CONFIG.residentDiscountEnabled;
+
+  const rawDiscountPercent = override.residentDiscountPercent;
+  const parsedDiscountPercent =
+    rawDiscountPercent !== undefined &&
+    rawDiscountPercent !== null &&
+    String(rawDiscountPercent).trim() !== ''
+      ? Number(rawDiscountPercent)
+      : NaN;
+  const resolvedResidentDiscountPercent = Number.isFinite(parsedDiscountPercent)
+    ? Math.min(100, Math.max(1, Math.round(parsedDiscountPercent)))
+    : RACE_CONFIG.residentDiscountPercent;
+
+  const resolvedResidentLocalities =
+    override.residentLocalities === undefined
+      ? RACE_CONFIG.residentLocalities
+      : parseResidentLocalities(override.residentLocalities, RACE_CONFIG.residentLocalities);
+
   return {
     ...RACE_CONFIG,
     ...override,
@@ -713,6 +752,9 @@ export function mergeRaceConfig(override) {
     ageCategories: nextAgeCategories,
     waiverCustomText: typeof override.waiverCustomText === 'string' ? override.waiverCustomText : '',
     medicalCustomText: typeof override.medicalCustomText === 'string' ? override.medicalCustomText : '',
+    residentDiscountEnabled: resolvedResidentDiscountEnabled,
+    residentDiscountPercent: resolvedResidentDiscountPercent,
+    residentLocalities: resolvedResidentLocalities,
   };
 }
 
@@ -887,5 +929,143 @@ export function resolveRunnerCategory(runner, raceConfig = RACE_CONFIG) {
     bracketLabel,
     fullCategory,
     shortCategory,
+  };
+}
+
+/** Normaliza el nombre de una localidad sin tildes, minúsculas ni espacios extra. */
+export function normalizeLocalityText(value) {
+  return String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Parsea una lista de localidades desde array o string separado por comas, sin duplicados. */
+export function parseResidentLocalities(input, fallback = DEFAULT_RESIDENT_LOCALITIES) {
+  const rawItems = Array.isArray(input)
+    ? input
+    : typeof input === 'string'
+      ? input.split(',')
+      : [];
+
+  const seen = new Set();
+  const cleaned = [];
+  for (const raw of rawItems) {
+    const label = String(raw ?? '').replace(/\s+/g, ' ').trim();
+    if (!label) continue;
+    const norm = normalizeLocalityText(label);
+    if (!norm || seen.has(norm)) continue;
+    seen.add(norm);
+    cleaned.push(label);
+  }
+
+  return cleaned.length > 0 ? cleaned : fallback;
+}
+
+/** Verifica si el texto ingresado coincide con una localidad habilitada para el beneficio. */
+export function matchResidentLocality(cityInput, localities = DEFAULT_RESIDENT_LOCALITIES) {
+  const normInput = normalizeLocalityText(cityInput);
+  if (!normInput) return null;
+
+  const firstSegment = normalizeLocalityText(normInput.split(/[,/()-]/)[0]);
+  const list = Array.isArray(localities) ? localities : DEFAULT_RESIDENT_LOCALITIES;
+
+  for (const loc of list) {
+    const label = String(loc ?? '').trim();
+    const normLoc = normalizeLocalityText(label);
+    if (!normLoc) continue;
+    if (normInput === normLoc || firstSegment === normLoc) {
+      return label;
+    }
+  }
+
+  return null;
+}
+
+/** Extrae la parte entera positiva de un string de precio en pesos argentinos. */
+export function parseArsPriceNumber(rawPrice) {
+  const intPart = String(rawPrice ?? '').split(',')[0];
+  const digits = intPart.replace(/[^\d]/g, '');
+  if (!digits) return 0;
+  const num = Number.parseInt(digits, 10);
+  return Number.isFinite(num) && num > 0 ? num : 0;
+}
+
+/** Formatea un monto numérico entero en formato ARS ($45.000). */
+export function formatArsPrice(amount) {
+  const num = Math.max(0, Math.round(Number(amount) || 0));
+  return `$${String(num).replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
+}
+
+/** Calcula precios base y final aplicando el descuento configurable de residentes. */
+export function computeRegistrationPricing(
+  rawBasePrice,
+  raceConfig = RACE_CONFIG,
+  isResident = false
+) {
+  const discountEnabled = Boolean(
+    raceConfig?.residentDiscountEnabled ?? RACE_CONFIG.residentDiscountEnabled
+  );
+  const rawPercent = Number(
+    raceConfig?.residentDiscountPercent ?? RACE_CONFIG.residentDiscountPercent
+  );
+  const configuredPercent =
+    Number.isFinite(rawPercent) && rawPercent >= 1
+      ? Math.min(100, Math.max(1, Math.round(rawPercent)))
+      : DEFAULT_RESIDENT_DISCOUNT_PERCENT;
+
+  const baseNumber = parseArsPriceNumber(rawBasePrice);
+  const originalPrice =
+    baseNumber > 0 ? formatArsPrice(baseNumber) : String(rawBasePrice || '').trim();
+  const isLocalResident = Boolean(discountEnabled && isResident && baseNumber > 0);
+  const discountPercentApplied = isLocalResident ? configuredPercent : 0;
+  const finalAmountNumber = isLocalResident
+    ? Math.round(baseNumber * (1 - discountPercentApplied / 100))
+    : baseNumber;
+  const finalAmount = baseNumber > 0 ? formatArsPrice(finalAmountNumber) : originalPrice;
+
+  return {
+    isLocalResident,
+    discountEnabled,
+    configuredPercent,
+    discountPercentApplied,
+    baseNumber,
+    finalAmountNumber,
+    originalPrice,
+    finalAmount,
+  };
+}
+
+function formatStoredPrice(val) {
+  if (typeof val === 'number' && Number.isFinite(val)) {
+    return formatArsPrice(val);
+  }
+  return String(val ?? '').trim();
+}
+
+/** Lee los importes congelados en el documento del corredor sin recalcular con la config actual. */
+export function resolveFrozenRegistrationPricing(reg) {
+  const isLocalResident = Boolean(reg?.isLocalResident);
+  const discountPercentApplied = isLocalResident
+    ? Math.max(0, Math.round(Number(reg?.discountPercentApplied) || 0))
+    : 0;
+  const originalPrice =
+    formatStoredPrice(reg?.originalPrice) || formatStoredPrice(reg?.priceSnapshot);
+  const finalAmount =
+    formatStoredPrice(reg?.finalAmount) || formatStoredPrice(reg?.priceSnapshot) || originalPrice;
+  const badgeText = isLocalResident
+    ? discountPercentApplied > 0
+      ? `Residente (-${discountPercentApplied}%)`
+      : 'Residente'
+    : '';
+
+  return {
+    isLocalResident,
+    discountPercentApplied,
+    originalPrice,
+    finalAmount,
+    badgeText,
   };
 }

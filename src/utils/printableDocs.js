@@ -2,6 +2,7 @@ import {
   RACE_CONFIG,
   parseTargetDateParts,
   resolveRunnerCategory,
+  resolveFrozenRegistrationPricing,
   getRaceFullTitle,
   DEFAULT_WAIVER_CLAUSES,
   DEFAULT_MEDICAL_BODY_TEXT,
@@ -525,6 +526,7 @@ export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } 
   const storageKeyPrefix = 'raf_doc_profile_';
   const initialDniDigits = String(runner?.dni || '').replace(/\D/g, '');
   const hasPrefilledRunner = Boolean(runner && (runner.dni || runner.code || runner.distance));
+  const runnerPricing = resolveFrozenRegistrationPricing(runner);
 
   // Cláusulas: custom o defaults, con {RACE_TITLE} resuelto
   const waiverClauses = resolveWaiverClauses(raceConfig, meta.raceTitle);
@@ -593,6 +595,11 @@ export function openPrintableWaiver({ raceConfig = RACE_CONFIG, runner = null } 
           <label class="chk-label" style="font-weight:500;"><input type="checkbox" class="chk-input" /> Apto Médico recibido</label>
         </div>
         <div class="sig-sub" style="margin-top: 3px;">Dorsal N° asignado: <input type="text" class="doc-input doc-input-inline" style="width: 75px; text-align:center;" value="${escapeHtml(runner?.assignedBib ? `#${runner.assignedBib}` : '')}" /></div>
+        ${
+          runnerPricing.isLocalResident
+            ? `<div class="sig-sub" style="margin-top: 3px; color: #065f46; font-weight: 700;">${escapeHtml(runnerPricing.badgeText)} · Verificar domicilio en DNI</div>`
+            : ''
+        }
       </div>
     </div>
 
@@ -845,6 +852,7 @@ export function openPrintableAccreditationSheet({
           .map((reg, idx) => {
             const liveBib = String((bibDrafts[reg.id] ?? reg.assignedBib) || '').trim();
             const cat = resolveRunnerCategory(reg, raceConfig);
+            const pricing = resolveFrozenRegistrationPricing(reg);
             const blood = String(reg.bloodType || '').trim();
             const medNotes = String(reg.medicalNotes || '').trim();
             const emergencyName = String(reg.emergencyContactName || '').trim();
@@ -868,6 +876,16 @@ export function openPrintableAccreditationSheet({
                 <td style="white-space:nowrap;">
                   <strong>${escapeHtml(cat.distanceLabel || reg.distance || '-')}</strong>
                   <div style="font-size:8.8px;color:#374151;">Talle: <strong>${escapeHtml(reg.shirtSize || '-')}</strong></div>
+                  ${
+                    pricing.finalAmount
+                      ? `<div style="font-size:8.5px;color:#111827;">Monto: <strong>${escapeHtml(pricing.finalAmount)}</strong></div>`
+                      : ''
+                  }
+                  ${
+                    pricing.isLocalResident
+                      ? `<div style="margin-top:2px;display:inline-block;padding:1px 4px;border-radius:4px;background:#d1fae5;border:1px solid #6ee7b7;color:#065f46;font-weight:800;font-size:8px;">${escapeHtml(pricing.badgeText)}</div>`
+                      : ''
+                  }
                 </td>
                 <td>
                   ${blood ? `<span class="blood-pill">${escapeHtml(blood)}</span>` : '<span style="color:#6b7280;font-size:8.6px;">Grupo s/d</span>'}
@@ -890,6 +908,14 @@ export function openPrintableAccreditationSheet({
                     <span class="chk-box"></span>
                     <span>Apto + Deslinde OK</span>
                   </div>
+                  ${
+                    pricing.isLocalResident
+                      ? `<div class="chk-row" style="color:#065f46;font-weight:700;">
+                    <span class="chk-box" style="border-color:#065f46;"></span>
+                    <span>DNI domicilio Residente OK</span>
+                  </div>`
+                      : ''
+                  }
                   <div style="border-bottom:1px dotted #9ca3af;margin-top:6px;height:10px;font-size:7.8px;color:#6b7280;">Firma:</div>
                 </td>
               </tr>

@@ -20,6 +20,7 @@ import { GPX_TRACKS, parseGpxXml } from '../data/gpxTracks';
 import {
   syncScheduleWithTargetDate,
   resolveRunnerCategory,
+  resolveFrozenRegistrationPricing,
   getRaceTitle,
   getRaceFullTitle,
 } from '../data/raceConfig';
@@ -912,6 +913,9 @@ export default function AdminModal({
         'Dorsal',
         'Distancia',
         'Valor',
+        'Precio Base',
+        'Monto Final',
+        'Beneficio Residente',
         'Nombre y Apellido',
         'DNI',
         'Fecha de Nacimiento',
@@ -934,12 +938,19 @@ export default function AdminModal({
 
       const rows = registrations.map((r) => {
         const cat = resolveRunnerCategory(r, draft);
+        const pricing = resolveFrozenRegistrationPricing(r);
+        const valorDisplay = pricing.isLocalResident
+          ? `${pricing.finalAmount} (${pricing.badgeText})`
+          : pricing.finalAmount;
         return [
           r.code || '',
           (r.status || '').toUpperCase(),
           bibDrafts[r.id] ?? r.assignedBib ?? '',
           r.distance || '',
-          r.priceSnapshot || '',
+          valorDisplay,
+          pricing.originalPrice,
+          pricing.finalAmount,
+          pricing.isLocalResident ? `${pricing.badgeText} - Verificar DNI` : 'No',
           r.fullName || '',
           r.dni || '',
           r.birthDate || '',

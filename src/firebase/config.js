@@ -666,10 +666,17 @@ export async function submitRunnerRegistration(payload) {
   }
 
   const now = Date.now();
+  const isLocalResident = Boolean(payload.isLocalResident);
   const record = {
     code: generateRegistrationCode(),
     distance: payload.distance === '13K' ? '13K' : '27K',
     priceSnapshot: String(payload.priceSnapshot || '').trim(),
+    isLocalResident,
+    discountPercentApplied: isLocalResident
+      ? Math.max(0, Math.min(100, Math.round(Number(payload.discountPercentApplied) || 0)))
+      : 0,
+    originalPrice: String(payload.originalPrice || payload.priceSnapshot || '').trim(),
+    finalAmount: String(payload.finalAmount || payload.priceSnapshot || '').trim(),
     fullName: String(payload.fullName).trim(),
     dni: String(payload.dni).trim(),
     birthDate: String(payload.birthDate).trim(),

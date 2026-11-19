@@ -35,7 +35,8 @@ service cloud.firestore {
           'updatedAt'
         ])
         && data.keys().hasOnly([
-          'code', 'distance', 'priceSnapshot', 'fullName', 'dni', 'birthDate', 'gender',
+          'code', 'distance', 'priceSnapshot', 'isLocalResident', 'discountPercentApplied',
+          'originalPrice', 'finalAmount', 'fullName', 'dni', 'birthDate', 'gender',
           'phone', 'email', 'city', 'team', 'shirtSize', 'bloodType',
           'emergencyContactName', 'emergencyContactPhone', 'medicalNotes', 'acceptedTerms',
           'receiptUrl', 'receiptPublicId', 'receiptFormat', 'status', 'assignedBib',
@@ -44,6 +45,10 @@ service cloud.firestore {
         && hasNonEmptyString(data, 'code')
         && data.code.matches('^RAF-([0-9]{5}|[A-Z0-9]{8})$')
         && data.distance in ['27K', '13K']
+        && (!('isLocalResident' in data) || data.isLocalResident is bool)
+        && (!('discountPercentApplied' in data) || (data.discountPercentApplied is int && data.discountPercentApplied >= 0 && data.discountPercentApplied <= 100))
+        && (!('originalPrice' in data) || data.originalPrice is string)
+        && (!('finalAmount' in data) || data.finalAmount is string)
         && hasNonEmptyString(data, 'fullName')
         && hasNonEmptyString(data, 'dni')
         && hasNonEmptyString(data, 'birthDate')

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Landmark,
   Send,
@@ -13,6 +13,8 @@ import {
   Eye,
   Handshake,
   Upload,
+  MapPin,
+  X,
 } from 'lucide-react';
 import { uploadImageToCloudinary } from '../../firebase/config';
 import {
@@ -20,12 +22,16 @@ import {
   DEFAULT_RACE_TITLE,
   DEFAULT_WAIVER_CLAUSES,
   DEFAULT_MEDICAL_BODY_TEXT,
+  DEFAULT_RESIDENT_DISCOUNT_PERCENT,
+  DEFAULT_RESIDENT_LOCALITIES,
   THEME_COLOR_OPTIONS,
   getRaceTitle,
   getRaceFullTitle,
   parseTargetDateParts,
   buildTargetDateIso,
   syncScheduleWithTargetDate,
+  parseResidentLocalities,
+  computeRegistrationPricing,
 } from '../../data/raceConfig';
 import {
   resolveNotificationEmail,
@@ -46,6 +52,23 @@ export default function AdminGeneralTab({
   const [emailTestStatus, setEmailTestStatus] = useState(null);
   const [uploadingSponsorIdx, setUploadingSponsorIdx] = useState(null);
   const [sponsorUploadError, setSponsorUploadError] = useState('');
+  const [newLocalityInput, setNewLocalityInput] = useState('');
+  const [localitiesText, setLocalitiesText] = useState(() => {
+    const list = Array.isArray(draft.residentLocalities)
+      ? draft.residentLocalities
+      : DEFAULT_RESIDENT_LOCALITIES;
+    return list.join(', ');
+  });
+
+  useEffect(() => {
+    const currentList = Array.isArray(draft.residentLocalities)
+      ? draft.residentLocalities
+      : DEFAULT_RESIDENT_LOCALITIES;
+    const parsedCurrent = parseResidentLocalities(localitiesText, []);
+    if (JSON.stringify(parsedCurrent) !== JSON.stringify(currentList)) {
+      setLocalitiesText(currentList.join(', '));
+    }
+  }, [draft.residentLocalities, localitiesText]);
 
   const handleTestEmailSend = async () => {
     const targetEmail = resolveNotificationEmail(draft.notificationEmail);
@@ -386,6 +409,330 @@ export default function AdminGeneralTab({
           </div>
         </div>
       </div>
+
+      {/* Descuento Residentes del Distrito */}
+      {(() => {
+        const discountEnabled =
+          typeof draft.residentDiscountEnabled === 'boolean'
+            ? draft.residentDiscountEnabled
+            : RACE_CONFIG.residentDiscountEnabled;
+
+        const currentLocalities = Array.isArray(draft.residentLocalities)
+          ? draft.residentLocalities
+          : DEFAULT_RESIDENT_LOCALITIES;
+
+        const isDefaultLocalities =
+          JSON.stringify(currentLocalities) === JSON.stringify(DEFAULT_RESIDENT_LOCALITIES);
+
+        const previewConfig = {
+          ...draft,
+          residentDiscountEnabled: true,
+        };
+        const preview27 = computeRegistrationPricing(
+          draft.circuits?.['27K']?.price || RACE_CONFIG.circuits['27K'].price,
+          previewConfig,
+          true
+        );
+        const preview13 = computeRegistrationPricing(
+          draft.circuits?.['13K']?.price || RACE_CONFIG.circuits['13K'].price,
+          previewConfig,
+          true
+        );
+
+        const handleToggleResidentDiscount = () => {
+          setDraft((prev) => ({
+            ...prev,
+            residentDiscountEnabled: !(
+              typeof prev.residentDiscountEnabled === 'boolean'
+                ? prev.residentDiscountEnabled
+                : RACE_CONFIG.residentDiscountEnabled
+            ),
+          }));
+        };
+
+        const handlePercentChange = (rawVal) => {
+          if (rawVal === '') {
+            setDraft((prev) => ({ ...prev, residentDiscountPercent: '' }));
+            return;
+          }
+          const parsed = Number.parseInt(rawVal, 10);
+          if (!Number.isFinite(parsed)) return;
+          const clamped = Math.min(100, Math.max(1, parsed));
+          setDraft((prev) => ({ ...prev, residentDiscountPercent: clamped }));
+        };
+
+        const handlePercentBlur = () => {
+          setDraft((prev) => {
+            const parsed = Number(prev.residentDiscountPercent);
+            const normalized =
+              prev.residentDiscountPercent !== '' &&
+              prev.residentDiscountPercent !== null &&
+              Number.isFinite(parsed) &&
+              parsed >= 1
+                ? Math.min(100, Math.max(1, Math.round(parsed)))
+                : DEFAULT_RESIDENT_DISCOUNT_PERCENT;
+            return { ...prev, residentDiscountPercent: normalized };
+          });
+        };
+
+        const handleAddLocalities = () => {
+          const added = parseResidentLocalities(newLocalityInput, []);
+          if (added.length === 0) return;
+          setDraft((prev) => {
+            const existing = Array.isArray(prev.residentLocalities)
+              ? prev.residentLocalities
+              : DEFAULT_RESIDENT_LOCALITIES;
+            return {
+              ...prev,
+              residentLocalities: parseResidentLocalities([...existing, ...added], []),
+            };
+          });
+          setNewLocalityInput('');
+        };
+
+        const handleRemoveLocality = (index) => {
+          setDraft((prev) => {
+            const existing = Array.isArray(prev.residentLocalities)
+              ? prev.residentLocalities
+              : DEFAULT_RESIDENT_LOCALITIES;
+            return {
+              ...prev,
+              residentLocalities: existing.filter((_, idx) => idx !== index),
+            };
+          });
+        };
+
+        const handleLocalitiesTextChange = (value) => {
+          setLocalitiesText(value);
+          setDraft((prev) => ({
+            ...prev,
+            residentLocalities: parseResidentLocalities(value, []),
+          }));
+        };
+
+        const handleLocalitiesTextBlur = () => {
+          setDraft((prev) => {
+            const cleaned = parseResidentLocalities(
+              localitiesText,
+              DEFAULT_RESIDENT_LOCALITIES
+            );
+            setLocalitiesText(cleaned.join(', '));
+            return {
+              ...prev,
+              residentLocalities: cleaned,
+            };
+          });
+        };
+
+        const handleRestoreDefaultLocalities = () => {
+          setLocalitiesText(DEFAULT_RESIDENT_LOCALITIES.join(', '));
+          setDraft((prev) => ({
+            ...prev,
+            residentLocalities: [...DEFAULT_RESIDENT_LOCALITIES],
+          }));
+        };
+
+        return (
+          <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2 min-w-0">
+                <MapPin className="w-4 h-4 text-orange-500 shrink-0" />
+                <div className="min-w-0">
+                  <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
+                    Descuento Residentes del Distrito
+                  </h4>
+                  <p className="text-[11px] text-stone-400">
+                    Beneficio automático en el formulario de inscripción con verificación de DNI al
+                    retirar el kit.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2.5 shrink-0">
+                <span
+                  className={`text-[11px] font-semibold ${
+                    discountEnabled ? 'text-emerald-400' : 'text-stone-400'
+                  }`}
+                >
+                  {discountEnabled ? 'Beneficio Activo' : 'Desactivado'}
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={discountEnabled}
+                  aria-label="Activar o desactivar descuento para residentes del distrito"
+                  onClick={handleToggleResidentDiscount}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full border transition-colors cursor-pointer ${
+                    discountEnabled
+                      ? 'bg-emerald-500/25 border-emerald-400'
+                      : 'bg-zinc-900 border-stone-700'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
+                      discountEnabled
+                        ? 'translate-x-5.5 bg-emerald-400'
+                        : 'translate-x-1 bg-stone-400'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 items-stretch">
+              <div className="rounded-xl bg-zinc-950 border border-stone-800 p-2.5 flex flex-col justify-between">
+                <label
+                  htmlFor="admin-resident-percent"
+                  className="block text-xs font-semibold text-stone-300 mb-1.5"
+                >
+                  Porcentaje de Descuento (1% a 100%)
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    id="admin-resident-percent"
+                    type="number"
+                    min={1}
+                    max={100}
+                    step={1}
+                    value={draft.residentDiscountPercent ?? DEFAULT_RESIDENT_DISCOUNT_PERCENT}
+                    onChange={(e) => handlePercentChange(e.target.value)}
+                    onBlur={handlePercentBlur}
+                    className="w-24 rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-bold text-emerald-400 text-center"
+                  />
+                  <span className="text-sm font-mono font-bold text-stone-300">% OFF</span>
+                </div>
+              </div>
+
+              <div className="sm:col-span-2 rounded-xl bg-zinc-950 border border-stone-800 p-2.5 flex flex-col justify-between gap-1.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-300">
+                    Vista previa en vivo ({preview27.configuredPercent}% OFF)
+                  </span>
+                  {!discountEnabled && (
+                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-stone-900 border border-stone-700 text-stone-400">
+                      Apagado en formulario
+                    </span>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  <div className="rounded-lg bg-stone-950 border border-cyan-500/40 px-2.5 py-1.5 flex items-center justify-between gap-2">
+                    <span className="font-bold text-cyan-400">27K</span>
+                    <div className="flex items-center gap-1.5 font-mono">
+                      <span className="text-stone-500 line-through text-[11px]">
+                        {preview27.originalPrice}
+                      </span>
+                      <span className="text-stone-500">→</span>
+                      <span className="font-bold text-emerald-400">{preview27.finalAmount}</span>
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-stone-950 border border-red-500/40 px-2.5 py-1.5 flex items-center justify-between gap-2">
+                    <span className="font-bold text-red-400">13K</span>
+                    <div className="flex items-center gap-1.5 font-mono">
+                      <span className="text-stone-500 line-through text-[11px]">
+                        {preview13.originalPrice}
+                      </span>
+                      <span className="text-stone-500">→</span>
+                      <span className="font-bold text-emerald-400">{preview13.finalAmount}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Localidades habilitadas (chips + alta rápida + edición por comas) */}
+            <div className="rounded-xl bg-zinc-950 border border-stone-800 p-3 space-y-2.5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span className="block text-xs font-semibold text-stone-200">
+                    Localidades habilitadas ({currentLocalities.length})
+                  </span>
+                  <span className="block text-[11px] text-stone-400">
+                    El formulario detecta tildes, mayúsculas y espacios extras automáticamente.
+                  </span>
+                </div>
+                {!isDefaultLocalities && (
+                  <button
+                    type="button"
+                    onClick={handleRestoreDefaultLocalities}
+                    className="inline-flex items-center gap-1 rounded-xl bg-stone-950 text-stone-300 border border-stone-700 hover:border-orange-500/70 hover:text-orange-400 text-[11px] font-medium px-2.5 py-1 cursor-pointer transition-colors"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Restaurar localidades oficiales</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-1.5">
+                {currentLocalities.map((loc, idx) => (
+                  <span
+                    key={`${loc}-${idx}`}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-stone-950 border border-emerald-500/45 px-2.5 py-1 text-[11px] font-medium text-emerald-300"
+                  >
+                    <span>{loc}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveLocality(idx)}
+                      aria-label={`Quitar localidad ${loc}`}
+                      title={`Quitar ${loc}`}
+                      className="text-stone-400 hover:text-rose-400 cursor-pointer"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+                {currentLocalities.length === 0 && (
+                  <span className="text-[11px] text-amber-400 italic">
+                    Lista vacía: al guardar se restaurarán las localidades oficiales por defecto.
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={newLocalityInput}
+                  onChange={(e) => setNewLocalityInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddLocalities();
+                    }
+                  }}
+                  placeholder="Agregar localidad (ej. Dufaur o varias separadas por coma)"
+                  aria-label="Agregar nueva localidad habilitada"
+                  className="flex-1 min-w-0 rounded-xl bg-stone-950 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs text-white"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddLocalities}
+                  className="inline-flex items-center gap-1 rounded-xl bg-stone-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-medium px-3 py-1.5 cursor-pointer shrink-0 transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Agregar</span>
+                </button>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="admin-resident-localities-text"
+                  className="block text-[11px] text-stone-400 mb-1"
+                >
+                  Edición directa separada por comas:
+                </label>
+                <input
+                  id="admin-resident-localities-text"
+                  type="text"
+                  value={localitiesText}
+                  onChange={(e) => handleLocalitiesTextChange(e.target.value)}
+                  onBlur={handleLocalitiesTextBlur}
+                  placeholder={DEFAULT_RESIDENT_LOCALITIES.join(', ')}
+                  className="w-full rounded-xl bg-stone-950 border border-stone-800 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono text-stone-200"
+                />
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Qué incluye la inscripción (Kit del Corredor y Cobertura) */}
       {(() => {
