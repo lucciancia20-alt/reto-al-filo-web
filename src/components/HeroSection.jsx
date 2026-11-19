@@ -100,7 +100,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
   return (
     <section
       id="inicio"
-      className="relative min-h-[92dvh] md:min-h-[100dvh] flex items-center justify-center overflow-hidden bg-stone-950 pt-16 pb-12 md:pt-20 md:pb-16"
+      className="relative min-h-[92dvh] md:min-h-[100dvh] flex items-center justify-center overflow-hidden bg-stone-950 pt-20 pb-12 md:pt-24 md:pb-16"
     >
       {/* Imagen de fondo con srcSet responsivo y respaldo oscuro para lectura en exterior */}
       <img
@@ -204,16 +204,16 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
               type="button"
               onClick={() => onOpenModal()}
               aria-label={`Descuento para residentes del distrito: ${residentDiscountPercent}% OFF. Abrir inscripción.`}
-              className="mt-3 xl:mt-0 xl:absolute xl:left-full xl:ml-5 xl:top-1/2 xl:-translate-y-1/2 -rotate-2 xl:rotate-[6deg] hover:xl:rotate-[3deg] rounded-2xl bg-zinc-900/25 hover:bg-zinc-900/45 backdrop-blur-md border-2 border-[var(--theme-sub-border)] hover:border-[var(--theme-primary)] px-4 py-2.5 shadow-[0_8px_20px_rgba(0,0,0,0.55)] hover:scale-105 transition-all cursor-pointer text-center w-max"
+              className="mt-3 xl:mt-0 xl:absolute xl:left-full xl:ml-5 xl:top-1/2 xl:-translate-y-1/2 -rotate-2 xl:rotate-[4deg] hover:xl:rotate-[2deg] antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-slate-950/80 hover:bg-slate-950/90 backdrop-blur-md border-2 border-[var(--theme-sub-border)] hover:border-[var(--theme-primary)] px-4 py-2.5 shadow-[0_10px_25px_rgba(0,0,0,0.65)] hover:scale-105 transition-all cursor-pointer text-center w-max"
             >
-              <span className="inline-flex items-center justify-center gap-1.5 font-display-athletic text-[11px] sm:text-xs tracking-[0.1em] text-white uppercase whitespace-nowrap">
+              <span className="inline-flex items-center justify-center gap-1.5 font-display font-bold text-[11px] sm:text-xs tracking-wider text-white uppercase whitespace-nowrap">
                 <Tag className="w-3.5 h-3.5 text-[var(--theme-primary)] shrink-0" />
                 ¿SOS RESIDENTE DEL DISTRITO?
               </span>
-              <span className="block hero-title-athletic text-lg sm:text-xl text-[var(--theme-primary)] leading-tight whitespace-nowrap mt-0.5">
+              <span className="block font-display font-extrabold tracking-wide text-2xl sm:text-3xl leading-none text-[var(--theme-primary)] whitespace-nowrap mt-1">
                 {residentDiscountPercent}% OFF
               </span>
-              <span className="block text-[10px] font-bold uppercase tracking-wider text-[var(--theme-sub)] mt-0.5 whitespace-nowrap">
+              <span className="block font-display text-[11px] sm:text-xs font-medium tracking-wide text-white/90 uppercase mt-1 whitespace-nowrap">
                 EN TU INSCRIPCIÓN →
               </span>
             </button>
