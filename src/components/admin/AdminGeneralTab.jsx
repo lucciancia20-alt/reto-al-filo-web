@@ -15,6 +15,7 @@ import {
   Upload,
   MapPin,
   X,
+  Users,
 } from 'lucide-react';
 import { uploadImageToCloudinary } from '../../firebase/config';
 import {
@@ -24,6 +25,7 @@ import {
   DEFAULT_MEDICAL_BODY_TEXT,
   DEFAULT_RESIDENT_DISCOUNT_PERCENT,
   DEFAULT_RESIDENT_LOCALITIES,
+  DEFAULT_TEAMS_BENEFIT_EMAIL,
   THEME_COLOR_OPTIONS,
   getRaceTitle,
   getRaceFullTitle,
@@ -729,6 +731,98 @@ export default function AdminGeneralTab({
                   className="w-full rounded-xl bg-stone-950 border border-stone-800 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono text-stone-200"
                 />
               </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Beneficios para Teams (Tarjeta en Hero) */}
+      {(() => {
+        const teamsBenefitEnabled =
+          typeof draft.teamsBenefitEnabled === 'boolean'
+            ? draft.teamsBenefitEnabled
+            : RACE_CONFIG.teamsBenefitEnabled;
+
+        return (
+          <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2 min-w-0">
+                <Users className="w-4 h-4 text-orange-500 shrink-0" />
+                <div className="min-w-0">
+                  <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
+                    Beneficios para Teams (Tarjeta en Hero)
+                  </h4>
+                  <p className="text-[11px] text-stone-400">
+                    Muestra u oculta el cartel promocional de Running Teams en el costado izquierdo
+                    del Hero.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2.5 shrink-0">
+                <span
+                  className={`text-[11px] font-semibold ${
+                    teamsBenefitEnabled ? 'text-emerald-400' : 'text-stone-400'
+                  }`}
+                >
+                  {teamsBenefitEnabled ? 'Tarjeta Activa' : 'Oculta'}
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={teamsBenefitEnabled}
+                  aria-label="Mostrar u ocultar tarjeta de Beneficios para Teams en el Hero"
+                  onClick={() =>
+                    setDraft((prev) => ({
+                      ...prev,
+                      teamsBenefitEnabled: !(
+                        typeof prev.teamsBenefitEnabled === 'boolean'
+                          ? prev.teamsBenefitEnabled
+                          : RACE_CONFIG.teamsBenefitEnabled
+                      ),
+                    }))
+                  }
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full border transition-colors cursor-pointer ${
+                    teamsBenefitEnabled
+                      ? 'bg-emerald-500/25 border-emerald-400'
+                      : 'bg-zinc-900 border-stone-700'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
+                      teamsBenefitEnabled
+                        ? 'translate-x-5.5 bg-emerald-400'
+                        : 'translate-x-1 bg-stone-400'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="admin-teams-benefit-email"
+                className="block text-xs font-semibold text-stone-300 mb-1"
+              >
+                Email de coordinación para Profesores / Entrenadores
+              </label>
+              <input
+                id="admin-teams-benefit-email"
+                type="email"
+                value={draft.teamsBenefitEmail ?? DEFAULT_TEAMS_BENEFIT_EMAIL}
+                onChange={(e) =>
+                  setDraft((prev) => ({ ...prev, teamsBenefitEmail: e.target.value }))
+                }
+                onBlur={() =>
+                  setDraft((prev) => ({
+                    ...prev,
+                    teamsBenefitEmail:
+                      String(prev.teamsBenefitEmail ?? '').trim() || DEFAULT_TEAMS_BENEFIT_EMAIL,
+                  }))
+                }
+                placeholder={DEFAULT_TEAMS_BENEFIT_EMAIL}
+                className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
+              />
             </div>
           </div>
         );

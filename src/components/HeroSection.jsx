@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, Flame, ChevronDown, Timer, Search } from 'lucide-react';
+import { Calendar, MapPin, Flame, ChevronDown, Timer, Search, Mail } from 'lucide-react';
 import {
   RACE_CONFIG,
   DEFAULT_RESIDENT_DISCOUNT_PERCENT,
+  DEFAULT_TEAMS_BENEFIT_EMAIL,
   parseTargetDateParts,
   resolveTargetDateIso,
   getRaceTitle,
@@ -97,6 +98,12 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
       ? Math.min(100, Math.max(1, Math.round(rawDiscountPercent)))
       : DEFAULT_RESIDENT_DISCOUNT_PERCENT;
 
+  const teamsBenefitEnabled = Boolean(
+    raceConfig?.teamsBenefitEnabled ?? RACE_CONFIG.teamsBenefitEnabled
+  );
+  const teamsBenefitEmail =
+    String(raceConfig?.teamsBenefitEmail ?? '').trim() || DEFAULT_TEAMS_BENEFIT_EMAIL;
+
   return (
     <section
       id="inicio"
@@ -170,11 +177,11 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
           </span>
         </div>
 
-        {/* Título central imponente + sello inclinado de descuento para residentes */}
+        {/* Título central imponente + sellos inclinados de Teams y Residentes */}
         <div className="relative inline-flex flex-col items-center max-w-full">
-          <div className="max-w-4xl mx-auto px-5 sm:px-8 py-4 sm:py-5 rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500/80 shadow-[0_0_16px_var(--theme-glow)]">
+          <div className="max-w-4xl mx-auto px-5 sm:px-7 py-4 sm:py-5 rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500/80 shadow-[0_0_16px_var(--theme-glow)]">
             <div className="inline-flex flex-col items-stretch mx-auto max-w-full">
-              <h1 className="hero-title-athletic text-[clamp(1.25rem,5.6vw,3.85rem)] whitespace-nowrap">
+              <h1 className="hero-title-athletic text-[clamp(1.25rem,4.9vw,3.45rem)] whitespace-nowrap">
                 <span className="hero-word-accent">{firstTitleWord}</span>
                 {restTitleWords && (
                   <>
@@ -199,28 +206,68 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
             </div>
           </div>
 
-          {residentDiscountEnabled && (
-            <button
-              type="button"
-              onClick={() => onOpenModal()}
-              aria-label={`Descuento para residentes del distrito: ${residentDiscountPercent}% OFF. Abrir inscripción.`}
-              className="mt-3 xl:mt-0 xl:absolute xl:left-full xl:ml-5 xl:-top-6 -rotate-2 xl:rotate-[5deg] hover:xl:rotate-[2deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/80 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] px-4 pt-2.5 pb-3 transition-all cursor-pointer flex flex-col items-center w-max"
-            >
-              <span className="inline-flex items-stretch justify-center gap-1 text-white font-display-athletic drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] select-none">
-                <span className="text-[54px] sm:text-[64px] font-black leading-[0.82] tracking-tight">
-                  {residentDiscountPercent}
-                </span>
-                <span className="flex flex-col justify-between text-left leading-none py-[1px]">
-                  <span className="text-[26px] sm:text-[31px] font-black leading-[0.85]">%</span>
-                  <span className="text-[22px] sm:text-[26px] font-black leading-[0.85] tracking-tight">
-                    OFF
+          {(teamsBenefitEnabled || residentDiscountEnabled) && (
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-3.5 sm:gap-5 xl:mt-0 xl:contents">
+              {teamsBenefitEnabled && (
+                <a
+                  href={`mailto:${teamsBenefitEmail}?subject=${encodeURIComponent(`Beneficios para Teams - ${raceTitle}`)}`}
+                  aria-label={`Beneficios para Teams: Profesor/Entrenador FREE y 1 Corredor FREE cada 10 inscriptos. Coordinar al mail ${teamsBenefitEmail}`}
+                  className="xl:absolute xl:right-full xl:mr-4 2xl:mr-6 xl:-top-6 -rotate-2 xl:-rotate-[5deg] hover:xl:-rotate-[2deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/80 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] px-3.5 pt-2.5 pb-2.5 transition-all cursor-pointer flex flex-col items-stretch w-[226px] sm:w-[238px] text-center no-underline"
+                >
+                  <span className="block font-display-athletic font-black text-white uppercase leading-[0.88] tracking-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] select-none">
+                    <span className="block text-[30px] sm:text-[33px]">BENEFICIOS</span>
+                    <span className="block text-[29px] sm:text-[32px]">PARA TEAMS</span>
                   </span>
-                </span>
-              </span>
-              <span className="mt-1.5 block w-full rounded-md bg-[var(--theme-primary)] text-slate-950 font-display font-extrabold text-xs sm:text-[13px] tracking-wide px-3 py-1 leading-tight whitespace-nowrap shadow-sm">
-                Residentes del distrito
-              </span>
-            </button>
+                  <span className="mt-1.5 flex flex-col gap-1">
+                    <span className="block rounded-[3px] bg-[#f4f2e1] px-2 py-0.5 font-display text-[11px] sm:text-[11.5px] font-bold text-slate-950 leading-tight whitespace-nowrap shadow-sm">
+                      Profesor/Entrenador{' '}
+                      <strong className="font-black text-[var(--theme-accent)] uppercase">
+                        FREE
+                      </strong>
+                    </span>
+                    <span className="block rounded-[3px] bg-[#f4f2e1] px-2 py-0.5 font-display text-[11px] sm:text-[11.5px] font-bold text-slate-950 leading-tight whitespace-nowrap shadow-sm">
+                      <strong className="font-black text-[var(--theme-sub-strong)]">
+                        1 Corredor FREE
+                      </strong>{' '}
+                      cada 10 inscriptos
+                    </span>
+                  </span>
+                  <span className="mt-1.5 block font-display text-[9.5px] sm:text-[10px] font-semibold text-white/95 leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                    Se coordina con el profesor/entrenador al mail:
+                  </span>
+                  <span className="mt-1 inline-flex items-center justify-center gap-1.5 w-full rounded-md bg-[var(--theme-primary)] text-slate-950 font-display font-extrabold text-[11px] sm:text-xs tracking-tight px-2.5 py-1 leading-tight whitespace-nowrap shadow-sm">
+                    <Mail className="w-3.5 h-3.5 text-slate-950 shrink-0 stroke-[2.5]" />
+                    <span className="truncate">{teamsBenefitEmail}</span>
+                  </span>
+                </a>
+              )}
+
+              {residentDiscountEnabled && (
+                <button
+                  type="button"
+                  onClick={() => onOpenModal()}
+                  aria-label={`Descuento para residentes del distrito: ${residentDiscountPercent}% OFF. Abrir inscripción.`}
+                  className="xl:absolute xl:left-full xl:ml-4 2xl:ml-6 xl:-top-6 rotate-2 xl:rotate-[5deg] hover:xl:rotate-[2deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/80 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] px-4 pt-2.5 pb-3 transition-all cursor-pointer flex flex-col items-center w-max"
+                >
+                  <span className="inline-flex items-stretch justify-center gap-1 text-white font-display-athletic drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] select-none">
+                    <span className="text-[54px] sm:text-[64px] font-black leading-[0.82] tracking-tight">
+                      {residentDiscountPercent}
+                    </span>
+                    <span className="flex flex-col justify-between text-left leading-none py-[1px]">
+                      <span className="text-[26px] sm:text-[31px] font-black leading-[0.85]">
+                        %
+                      </span>
+                      <span className="text-[22px] sm:text-[26px] font-black leading-[0.85] tracking-tight">
+                        OFF
+                      </span>
+                    </span>
+                  </span>
+                  <span className="mt-1.5 block w-full rounded-md bg-[var(--theme-primary)] text-slate-950 font-display font-extrabold text-xs sm:text-[13px] tracking-wide px-3 py-1 leading-tight whitespace-nowrap shadow-sm">
+                    Residentes del distrito
+                  </span>
+                </button>
+              )}
+            </div>
           )}
         </div>
 

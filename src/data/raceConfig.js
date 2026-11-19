@@ -13,6 +13,8 @@ export const DEFAULT_RESIDENT_LOCALITIES = [
   'San Andrés de la Sierra',
   'Pelicurá',
 ];
+export const DEFAULT_TEAMS_BENEFIT_ENABLED = true;
+export const DEFAULT_TEAMS_BENEFIT_EMAIL = 'retoalfilo@gmail.com';
 
 /**
  * Texto por defecto de las cláusulas del Deslinde de Responsabilidad A4.
@@ -326,6 +328,10 @@ export const RACE_CONFIG = {
   residentDiscountEnabled: DEFAULT_RESIDENT_DISCOUNT_ENABLED,
   residentDiscountPercent: DEFAULT_RESIDENT_DISCOUNT_PERCENT,
   residentLocalities: DEFAULT_RESIDENT_LOCALITIES,
+
+  // Tarjeta promocional de Beneficios para Teams en el Hero
+  teamsBenefitEnabled: DEFAULT_TEAMS_BENEFIT_ENABLED,
+  teamsBenefitEmail: DEFAULT_TEAMS_BENEFIT_EMAIL,
 };
 
 const ARGENTINA_TIMEZONE = 'America/Argentina/Buenos_Aires';
@@ -724,6 +730,13 @@ export function mergeRaceConfig(override) {
       ? RACE_CONFIG.residentLocalities
       : parseResidentLocalities(override.residentLocalities, RACE_CONFIG.residentLocalities);
 
+  const resolvedTeamsBenefitEnabled =
+    typeof override.teamsBenefitEnabled === 'boolean'
+      ? override.teamsBenefitEnabled
+      : RACE_CONFIG.teamsBenefitEnabled;
+  const resolvedTeamsBenefitEmail =
+    String(override.teamsBenefitEmail ?? '').trim() || RACE_CONFIG.teamsBenefitEmail;
+
   return {
     ...RACE_CONFIG,
     ...override,
@@ -755,6 +768,8 @@ export function mergeRaceConfig(override) {
     residentDiscountEnabled: resolvedResidentDiscountEnabled,
     residentDiscountPercent: resolvedResidentDiscountPercent,
     residentLocalities: resolvedResidentLocalities,
+    teamsBenefitEnabled: resolvedTeamsBenefitEnabled,
+    teamsBenefitEmail: resolvedTeamsBenefitEmail,
   };
 }
 
