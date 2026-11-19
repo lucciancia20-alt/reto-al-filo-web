@@ -2,11 +2,11 @@
 
 :root,
 [data-theme="orange"] {
-  --theme-primary: #ff5e2b;
-  --theme-secondary: #ff9914;
-  --theme-accent: #ff2a6d;
-  --theme-stroke: #ff4d4d;
-  --theme-glow: rgba(255, 77, 46, 0.55);
+  --theme-primary: #f59e0b;
+  --theme-secondary: #fcd34d;
+  --theme-accent: #d97706;
+  --theme-stroke: #f59e0b;
+  --theme-glow: rgba(245, 158, 11, 0.55);
   --theme-sub: #7a8f49;
   --theme-sub-strong: #6b7f3e;
   --theme-sub-bg: rgba(74, 89, 43, 0.25);

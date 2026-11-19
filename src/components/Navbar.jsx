@@ -10,16 +10,6 @@ import {
 } from '../data/raceConfig';
 import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
-function normalizeSponsorLink(rawLink) {
-  const trimmed = String(rawLink || '').trim();
-  if (!trimmed) return '';
-  if (trimmed.startsWith('@')) {
-    return `https://www.instagram.com/${trimmed.slice(1).replace(/^\/+|\/+$/g, '')}/`;
-  }
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  return `https://${trimmed}`;
-}
-
 export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -41,10 +31,6 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
       )}`
     : '#';
 
-  const activeSponsors = (Array.isArray(raceConfig?.sponsors) ? raceConfig.sponsors : []).filter(
-    (s) => s && (String(s.name || '').trim() || String(s.logoUrl || '').trim())
-  );
-
   const navLinks = [
     { label: 'Circuito', href: '#circuito' },
     { label: 'Galería', href: '#galeria' },
@@ -55,9 +41,10 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
   return (
     <header className="fixed top-0 inset-x-0 z-40 bg-slate-950/60 backdrop-blur-md border-b border-orange-500/80">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-16 py-2 flex items-center justify-between gap-3">
+        {/* Logo + título RAF */}
         <a
           href="#inicio"
-          className="flex items-center gap-2.5 min-w-0 text-stone-100 font-display-athletic text-lg"
+          className="flex items-center gap-2.5 min-w-0 text-stone-100 font-display-athletic text-lg shrink-0"
         >
           <img
             src={optimizeCloudinaryUrl('/logo-raf.png', 400)}
@@ -98,70 +85,21 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
           </span>
         </a>
 
-        <nav className="hidden md:flex items-center gap-5 lg:gap-7 text-sm font-semibold text-orange-400">
+        {/* Nav links — desktop */}
+        <nav className="hidden md:flex items-center gap-5 lg:gap-7 text-sm font-semibold">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="text-orange-400 hover:opacity-85 transition-opacity"
+              className="text-[var(--theme-primary)] hover:opacity-85 transition-opacity whitespace-nowrap"
             >
               {link.label}
             </a>
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-3 shrink-0">
-          {/* Sponsors strip — solo visible cuando hay sponsors cargados */}
-          {activeSponsors.length > 0 && (
-            <div className="flex items-center gap-2.5 border-r border-stone-700/50 pr-3 mr-1">
-              <span className="inline-flex items-center px-2.5 py-1 rounded bg-[var(--theme-sub-bg)] border border-[var(--theme-sub-border)] text-[var(--theme-sub)] font-display-athletic text-[10px] tracking-widest -skew-x-6 shrink-0">
-                <span className="skew-x-6">Nos acompañan:</span>
-              </span>
-              <div className="flex items-center gap-3">
-                {activeSponsors.map((sp, idx) => {
-                  const href = normalizeSponsorLink(sp.linkUrl);
-                  const content = sp.logoUrl ? (
-                    <img
-                      src={optimizeCloudinaryUrl(sp.logoUrl, 180)}
-                      alt={sp.name || `Sponsor ${idx + 1}`}
-                      loading="lazy"
-                      decoding="async"
-                      className={`h-8 sm:h-9 w-auto max-w-[110px] object-contain transition-all duration-200 ${
-                        sp.invertOnDark
-                          ? 'brightness-0 invert opacity-80 group-hover:opacity-100'
-                          : 'opacity-80 group-hover:opacity-100'
-                      }`}
-                    />
-                  ) : (
-                    <span className="font-display font-bold text-[10px] uppercase tracking-wider text-stone-200 group-hover:text-white transition-colors">
-                      {sp.name}
-                    </span>
-                  );
-                  return href ? (
-                    <a
-                      key={sp.id || `nav-sponsor-${idx}`}
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={sp.name ? `Visitar ${sp.name}` : 'Visitar sponsor oficial'}
-                      aria-label={sp.name ? `Visitar ${sp.name}` : 'Visitar sponsor oficial'}
-                      className="group inline-flex items-center hover:scale-105 transition-transform"
-                    >
-                      {content}
-                    </a>
-                  ) : (
-                    <span
-                      key={sp.id || `nav-sponsor-${idx}`}
-                      title={sp.name || undefined}
-                      className="group inline-flex items-center"
-                    >
-                      {content}
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+        {/* Botones derecha — desktop */}
+        <div className="hidden md:flex items-center gap-2.5 shrink-0">
           {orgDigits && (
             <a
               href={sponsorWaUrl}
@@ -176,26 +114,28 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
           <button
             type="button"
             onClick={() => onOpenModal()}
-            className="inline-flex items-center justify-center rounded-full bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-900 active:scale-[0.99] text-orange-400 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2.5 transition-all cursor-pointer whitespace-nowrap"
+            className="inline-flex items-center justify-center rounded-full bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-900 active:scale-[0.99] text-[var(--theme-primary)] font-display font-semibold text-xs uppercase tracking-wider px-4 py-2.5 transition-all cursor-pointer whitespace-nowrap"
           >
             <span className="inline-flex items-center gap-1.5 animate-cta-pulse">
               <span>Quiero Inscribirme</span>
-              <ArrowUpRight className="w-4 h-4 text-orange-400 shrink-0" />
+              <ArrowUpRight className="w-4 h-4 shrink-0" />
             </span>
           </button>
         </div>
 
+        {/* Hamburguesa — mobile */}
         <button
           type="button"
           onClick={() => setMobileMenuOpen((prev) => !prev)}
           aria-expanded={mobileMenuOpen}
           aria-label="Abrir menú de navegación"
-          className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-lg bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500/60 text-orange-400 hover:bg-zinc-900/25 transition-colors"
+          className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-lg bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500/60 text-[var(--theme-primary)] hover:bg-zinc-900/25 transition-colors"
         >
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
+      {/* Menú mobile */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-zinc-900/65 backdrop-blur-md border-b border-orange-500/80 px-4 pt-2 pb-5 space-y-3">
           {navLinks.map((link) => (
@@ -203,53 +143,11 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
               key={link.href}
               href={link.href}
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-base font-semibold text-orange-400 hover:opacity-85 border-b border-orange-500/20"
+              className="block py-2 text-base font-semibold text-[var(--theme-primary)] hover:opacity-85 border-b border-orange-500/20"
             >
               {link.label}
             </a>
           ))}
-          {/* Sponsors en mobile */}
-          {activeSponsors.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 pt-1 pb-2 border-b border-stone-700/50">
-              <span className="inline-flex items-center px-2.5 py-1 rounded bg-[var(--theme-sub-bg)] border border-[var(--theme-sub-border)] text-[var(--theme-sub)] font-display-athletic text-[10px] tracking-widest -skew-x-6 shrink-0">
-                <span className="skew-x-6">Nos acompañan:</span>
-              </span>
-              {activeSponsors.map((sp, idx) => {
-                const href = normalizeSponsorLink(sp.linkUrl);
-                const content = sp.logoUrl ? (
-                  <img
-                    src={optimizeCloudinaryUrl(sp.logoUrl, 180)}
-                    alt={sp.name || `Sponsor ${idx + 1}`}
-                    loading="lazy"
-                    decoding="async"
-                    className={`h-6 w-auto max-w-[80px] object-contain ${
-                      sp.invertOnDark ? 'brightness-0 invert opacity-85' : 'opacity-85'
-                    }`}
-                  />
-                ) : (
-                  <span className="font-display font-bold text-[10px] uppercase tracking-wider text-stone-200">
-                    {sp.name}
-                  </span>
-                );
-                return href ? (
-                  <a
-                    key={sp.id || `mnav-sponsor-${idx}`}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="inline-flex items-center"
-                  >
-                    {content}
-                  </a>
-                ) : (
-                  <span key={sp.id || `mnav-sponsor-${idx}`} className="inline-flex items-center">
-                    {content}
-                  </span>
-                );
-              })}
-            </div>
-          )}
           {orgDigits && (
             <a
               href={sponsorWaUrl}
@@ -268,11 +166,11 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
               setMobileMenuOpen(false);
               onOpenModal();
             }}
-            className="w-full mt-2 inline-flex items-center justify-center rounded-xl bg-zinc-900/70 hover:bg-zinc-900/80 backdrop-blur-md border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-900 active:scale-[0.99] text-orange-400 font-display font-semibold text-sm uppercase tracking-wider py-3.5 transition-all cursor-pointer"
+            className="w-full mt-2 inline-flex items-center justify-center rounded-xl bg-zinc-900/70 hover:bg-zinc-900/80 backdrop-blur-md border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-900 active:scale-[0.99] text-[var(--theme-primary)] font-display font-semibold text-sm uppercase tracking-wider py-3.5 transition-all cursor-pointer"
           >
             <span className="inline-flex items-center gap-2 animate-cta-pulse">
               <span>Quiero Inscribirme</span>
-              <ArrowUpRight className="w-4 h-4 text-orange-400 shrink-0" />
+              <ArrowUpRight className="w-4 h-4 shrink-0" />
             </span>
           </button>
         </div>

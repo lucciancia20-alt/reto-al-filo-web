@@ -10,6 +10,15 @@ import {
 } from '../data/raceConfig';
 import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
+function normalizeSponsorLink(rawLink) {
+  const trimmed = String(rawLink || '').trim();
+  if (!trimmed) return '';
+  if (trimmed.startsWith('@'))
+    return `https://www.instagram.com/${trimmed.slice(1).replace(/^\/+|\/+$/g, '')}/`;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
 function calculateTimeLeft(targetIso) {
   const targetMs = Date.parse(resolveTargetDateIso(targetIso));
   const nowMs = Date.now();
@@ -72,6 +81,10 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
       ? raceConfig.subtitle
       : '';
 
+  const activeSponsors = (Array.isArray(raceConfig?.sponsors) ? raceConfig.sponsors : []).filter(
+    (s) => s && (String(s.name || '').trim() || String(s.logoUrl || '').trim())
+  );
+
   return (
     <section
       id="inicio"
@@ -98,6 +111,52 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
               .join(' · ')}
           </span>
         </div>
+
+        {/* Franja de sponsors — solo si hay sponsors cargados */}
+        {activeSponsors.length > 0 && (
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-4 px-2">
+            <span className="inline-flex items-center px-3 py-1 rounded bg-[var(--theme-sub-bg)] border border-[var(--theme-sub-border)] text-[var(--theme-sub)] font-display-athletic text-[10px] sm:text-xs tracking-widest -skew-x-6 shrink-0">
+              <span className="skew-x-6">Nos acompañan:</span>
+            </span>
+            {activeSponsors.map((sp, idx) => {
+              const href = normalizeSponsorLink(sp.linkUrl);
+              const content = sp.logoUrl ? (
+                <img
+                  src={optimizeCloudinaryUrl(sp.logoUrl, 240)}
+                  alt={sp.name || `Sponsor ${idx + 1}`}
+                  loading="lazy"
+                  decoding="async"
+                  className={`h-8 sm:h-10 w-auto max-w-[120px] object-contain transition-all duration-200 ${
+                    sp.invertOnDark
+                      ? 'brightness-0 invert opacity-85 hover:opacity-100'
+                      : 'opacity-85 hover:opacity-100'
+                  }`}
+                />
+              ) : (
+                <span className="font-display font-bold text-xs uppercase tracking-wider text-stone-200 hover:text-white transition-colors">
+                  {sp.name}
+                </span>
+              );
+              return href ? (
+                <a
+                  key={sp.id || `hero-sponsor-${idx}`}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={sp.name ? `Visitar ${sp.name}` : 'Visitar sponsor oficial'}
+                  aria-label={sp.name ? `Visitar ${sp.name}` : 'Visitar sponsor oficial'}
+                  className="inline-flex items-center hover:scale-105 transition-transform"
+                >
+                  {content}
+                </a>
+              ) : (
+                <span key={sp.id || `hero-sponsor-${idx}`} className="inline-flex items-center">
+                  {content}
+                </span>
+              );
+            })}
+          </div>
+        )}
 
         {/* Título central imponente */}
         <div className="max-w-4xl mx-auto px-5 sm:px-8 py-4 sm:py-5 rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500/80 shadow-[0_0_16px_var(--theme-glow)]">
