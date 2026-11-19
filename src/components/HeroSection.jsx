@@ -124,7 +124,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         {/* Título central imponente */}
         <div className="max-w-4xl mx-auto px-5 sm:px-8 py-4 sm:py-5 rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.28)]">
           <div className="inline-flex flex-col items-stretch mx-auto max-w-full">
-            <h1 className="hero-title-athletic text-5xl sm:text-7xl md:text-8xl lg:text-[6.5rem] whitespace-nowrap">
+            <h1 className="hero-title-athletic text-[clamp(1.25rem,5.6vw,3.85rem)] whitespace-nowrap">
               <span className="hero-word-accent">{firstTitleWord}</span>
               {restTitleWords && (
                 <>
@@ -137,7 +137,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
             {editionChars.length > 0 && (
               <p
                 aria-label={raceEdition}
-                className="hero-subtitle-edition mt-2 sm:mt-2.5 w-full flex items-center justify-between text-sm sm:text-xl md:text-2xl leading-none select-none"
+                className="hero-subtitle-edition mt-2 sm:mt-2.5 w-full flex items-center justify-between text-xs sm:text-base md:text-xl leading-none select-none"
               >
                 {editionChars.map((ch, idx) => (
                   <span key={idx} aria-hidden="true">

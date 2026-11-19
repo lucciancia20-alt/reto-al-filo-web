@@ -61,18 +61,18 @@
   }
 
   .hero-title-athletic {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Vipnagorgialla', 'Barlow Condensed', sans-serif;
     font-weight: 800;
     font-style: italic;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    line-height: 0.95;
+    line-height: 1.05;
   }
 
   .hero-word-accent {
     display: inline-block;
-    padding-right: 0.08em;
-    margin-right: -0.08em;
+    padding-right: 0.14em;
+    margin-right: -0.14em;
     background: linear-gradient(180deg, #ff9914 0%, #ff5e2b 50%, #ff2a6d 100%);
     -webkit-background-clip: text;
     background-clip: text;
