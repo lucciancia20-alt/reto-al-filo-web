@@ -37,8 +37,8 @@ export const DEFAULT_MEDICAL_BODY_TEXT =
 export const VALID_THEME_COLORS = ['orange', 'naranja', 'red', 'blue', 'green', 'yellow', 'cyan'];
 
 export const THEME_COLOR_OPTIONS = [
-  { id: 'orange', label: 'Naranja + Verde (Oficial RAF)', hex: '#ff5e2b', secondaryHex: '#7a8f49' },
-  { id: 'naranja', label: 'Naranja', hex: '#ff5e2b' },
+  { id: 'orange', label: 'Ámbar + Verde (Oficial RAF)', hex: '#fbbf24', secondaryHex: '#6b7f3e' },
+  { id: 'naranja', label: 'Naranja', hex: '#f97316' },
   { id: 'red', label: 'Rojo', hex: '#fb2c36' },
   { id: 'blue', label: 'Azul', hex: '#3b82f6' },
   { id: 'green', label: 'Verde', hex: '#22c55e' },

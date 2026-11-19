@@ -41,7 +41,7 @@ export default function Footer({
                 {restTitleWords && <span className="text-white"> {restTitleWords}</span>}
               </span>
               {expandedEdition && (
-                <span className="hero-subtitle-edition font-bold text-sm sm:text-base tracking-[0.12em] [text-shadow:none]">
+                <span className="hero-subtitle-edition font-bold text-[17.5px] sm:text-[20px] leading-none tracking-[0.12em] [text-shadow:none]">
                   <span className="text-white">- </span>
                   <span className="text-[var(--theme-edition-text)]">{expandedEdition}</span>
                 </span>
