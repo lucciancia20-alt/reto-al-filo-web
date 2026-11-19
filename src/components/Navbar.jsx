@@ -39,19 +39,19 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
   ];
 
   return (
-    <header className="fixed top-0 inset-x-0 z-40 overflow-visible bg-slate-950/60 backdrop-blur-md border-b border-orange-500/80">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-16 py-2 overflow-visible flex items-center justify-between gap-3">
+    <header className="fixed top-0 inset-x-0 z-40 bg-slate-950/60 backdrop-blur-md border-b border-orange-500/80">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-[72px] sm:min-h-20 py-2.5 sm:py-3 flex items-center justify-between gap-3">
         {/* Logo + título RAF */}
         <a
           href="#inicio"
-          className="flex items-center gap-2.5 min-w-0 overflow-visible text-stone-100 font-display-athletic text-lg shrink-0"
+          className="flex items-center gap-2.5 sm:gap-3 min-w-0 text-stone-100 font-display-athletic text-lg shrink-0"
         >
           <img
             src={optimizeCloudinaryUrl('/logo-raf.png', 400)}
             alt={`Logo ${raceTitle}`}
             loading="lazy"
             decoding="async"
-            className="w-14 h-14 sm:w-[60px] sm:h-[60px] -my-2 translate-y-2 sm:translate-y-2.5 object-contain drop-shadow-lg shrink-0 relative z-10"
+            className="w-14 h-14 sm:w-[58px] sm:h-[58px] object-contain drop-shadow-md shrink-0"
           />
           <span className="inline-flex flex-col items-stretch leading-none gap-[3px] uppercase min-w-0 font-display-athletic">
             <span className="block whitespace-nowrap hero-title-athletic text-[12px] sm:text-[13.5px] leading-none">
@@ -86,7 +86,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
         </a>
 
         {/* Nav links — desktop */}
-        <nav className="hidden md:flex items-center gap-5 lg:gap-7 text-sm font-semibold">
+        <nav className="hidden md:flex items-center gap-4 lg:gap-5 xl:gap-7 text-sm lg:text-base font-semibold">
           {navLinks.map((link) => (
             <a
               key={link.href}

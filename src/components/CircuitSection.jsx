@@ -537,7 +537,7 @@ export default function CircuitSection({
   return (
     <section
       id="circuito"
-      className="scroll-mt-16 pt-6 sm:pt-8 pb-8 sm:pb-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
+      className="scroll-mt-20 pt-6 sm:pt-8 pb-8 sm:pb-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Encabezado */}

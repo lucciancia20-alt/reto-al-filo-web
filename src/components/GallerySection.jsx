@@ -89,7 +89,7 @@ export default function GallerySection({ raceConfig = RACE_CONFIG }) {
   return (
     <section
       id="galeria"
-      className="scroll-mt-16 py-8 sm:py-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
+      className="scroll-mt-20 py-8 sm:py-10 bg-stone-950 border-t-2 border-orange-500/50 relative"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Encabezado limpio de muestra fotográfica de la 1ra Edición */}
