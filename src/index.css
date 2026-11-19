@@ -12,6 +12,12 @@
   --theme-sub-bg: rgba(74, 89, 43, 0.25);
   --theme-sub-border: rgba(122, 143, 73, 0.85);
   --theme-edition-text: #7a8f49;
+  --theme-ribbon-gradient: linear-gradient(
+    90deg,
+    rgba(234, 179, 8, 0.92) 0%,
+    rgba(250, 204, 21, 0.96) 50%,
+    rgba(245, 158, 11, 0.92) 100%
+  );
 }
 
 [data-theme="naranja"] {
@@ -100,6 +106,15 @@
   --color-orange-600: var(--theme-accent);
 }
 
+[data-theme]:not([data-theme="orange"]) {
+  --theme-ribbon-gradient: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--theme-primary) 90%, transparent) 0%,
+    color-mix(in srgb, var(--theme-secondary) 96%, #ffffff 8%) 50%,
+    color-mix(in srgb, var(--theme-primary) 92%, transparent) 100%
+  );
+}
+
 /* Blinda los colores semánticos operativos dentro de la pestaña Inscriptos */
 [data-theme] .admin-registrations-shield,
 .admin-registrations-shield {
@@ -151,6 +166,17 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.02em;
+  }
+
+  .font-poster-condensed {
+    font-family: 'Anton', 'Barlow Condensed', Impact, sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+
+  .theme-poster-ribbon {
+    background: var(--theme-ribbon-gradient);
   }
 
   .hero-title-athletic {

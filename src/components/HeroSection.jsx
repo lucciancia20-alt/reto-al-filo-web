@@ -214,9 +214,9 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                   aria-label={`Beneficios para Teams: Profesor/Entrenador FREE y 1 Corredor FREE cada 10 inscriptos. Coordinar al mail ${teamsBenefitEmail}`}
                   className="xl:absolute xl:right-full xl:mr-4 2xl:mr-6 xl:-top-6 -rotate-2 xl:-rotate-[5deg] hover:xl:-rotate-[2deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/80 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] px-3.5 pt-2.5 pb-2.5 transition-all cursor-pointer flex flex-col items-stretch w-[226px] sm:w-[238px] text-center no-underline"
                 >
-                  <span className="block font-display-athletic font-black text-white uppercase leading-[0.88] tracking-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] select-none">
-                    <span className="block text-[30px] sm:text-[33px]">BENEFICIOS</span>
-                    <span className="block text-[29px] sm:text-[32px]">PARA TEAMS</span>
+                  <span className="block font-poster-condensed text-white uppercase leading-[0.94] tracking-[0.015em] drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] select-none">
+                    <span className="block text-[31px] sm:text-[34px]">BENEFICIOS</span>
+                    <span className="block text-[30px] sm:text-[33px]">PARA TEAMS</span>
                   </span>
                   <span className="mt-1.5 flex flex-col gap-1">
                     <span className="block rounded-[3px] bg-[#f4f2e1] px-2 py-0.5 font-display text-[11px] sm:text-[11.5px] font-bold text-slate-950 leading-tight whitespace-nowrap shadow-sm">
@@ -235,7 +235,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                   <span className="mt-1.5 block font-display text-[9.5px] sm:text-[10px] font-semibold text-white/95 leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                     Se coordina con el profesor/entrenador al mail:
                   </span>
-                  <span className="mt-1 inline-flex items-center justify-center gap-1.5 w-full rounded-md bg-[var(--theme-primary)] text-slate-950 font-display font-extrabold text-[11px] sm:text-xs tracking-tight px-2.5 py-1 leading-tight whitespace-nowrap shadow-sm">
+                  <span className="mt-1 inline-flex items-center justify-center gap-1.5 w-full rounded-[2px] theme-poster-ribbon text-slate-950 font-display font-extrabold text-[11px] sm:text-xs tracking-tight px-2.5 py-1 leading-tight whitespace-nowrap shadow-sm">
                     <Mail className="w-3.5 h-3.5 text-slate-950 shrink-0 stroke-[2.5]" />
                     <span className="truncate">{teamsBenefitEmail}</span>
                   </span>
@@ -247,22 +247,20 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                   type="button"
                   onClick={() => onOpenModal()}
                   aria-label={`Descuento para residentes del distrito: ${residentDiscountPercent}% OFF. Abrir inscripción.`}
-                  className="xl:absolute xl:left-full xl:ml-4 2xl:ml-6 xl:-top-6 rotate-2 xl:rotate-[5deg] hover:xl:rotate-[2deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/80 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] px-4 pt-2.5 pb-3 transition-all cursor-pointer flex flex-col items-center w-max"
+                  className="xl:absolute xl:left-full xl:ml-4 2xl:ml-6 xl:-top-6 rotate-2 xl:rotate-[5deg] hover:xl:rotate-[2deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/80 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] px-3.5 pt-2.5 pb-2.5 transition-all cursor-pointer flex flex-col items-center w-max"
                 >
-                  <span className="inline-flex items-stretch justify-center gap-1 text-white font-display-athletic drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] select-none">
-                    <span className="text-[54px] sm:text-[64px] font-black leading-[0.82] tracking-tight">
+                  <span className="inline-flex items-stretch justify-center gap-1 text-white font-poster-condensed drop-shadow-[0_3px_8px_rgba(0,0,0,0.65)] select-none px-1">
+                    <span className="text-[74px] sm:text-[86px] leading-[0.82] tracking-[-0.02em] scale-y-[1.06] origin-bottom">
                       {residentDiscountPercent}
                     </span>
                     <span className="flex flex-col justify-between text-left leading-none py-[1px]">
-                      <span className="text-[26px] sm:text-[31px] font-black leading-[0.85]">
-                        %
-                      </span>
-                      <span className="text-[22px] sm:text-[26px] font-black leading-[0.85] tracking-tight">
+                      <span className="text-[38px] sm:text-[44px] leading-[0.82]">%</span>
+                      <span className="text-[31px] sm:text-[36px] leading-[0.82] tracking-[-0.01em]">
                         OFF
                       </span>
                     </span>
                   </span>
-                  <span className="mt-1.5 block w-full rounded-md bg-[var(--theme-primary)] text-slate-950 font-display font-extrabold text-xs sm:text-[13px] tracking-wide px-3 py-1 leading-tight whitespace-nowrap shadow-sm">
+                  <span className="relative z-10 -mt-2 sm:-mt-2.5 block w-full rounded-[2px] theme-poster-ribbon text-slate-950 font-display font-bold text-[12px] sm:text-[13px] tracking-tight px-3 py-[3px] leading-tight whitespace-nowrap shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
                     Residentes del distrito
                   </span>
                 </button>
