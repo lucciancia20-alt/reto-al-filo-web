@@ -102,7 +102,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
               href={sponsorWaUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/80 hover:bg-slate-950/90 backdrop-blur-md border border-[var(--theme-sub-border)] hover:border-[var(--theme-sub)] text-[var(--theme-sub)] text-xs font-bold px-3.5 py-2.5 transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 rounded-full bg-transparent hover:bg-zinc-900/25 backdrop-blur-[2px] border border-[var(--theme-sub-border)] hover:border-[var(--theme-sub)] text-[var(--theme-sub)] text-xs font-bold px-3.5 py-2.5 transition-colors whitespace-nowrap"
             >
               <Handshake className="w-3.5 h-3.5 text-[var(--theme-sub)] shrink-0" />
               ¿Querés ser sponsor?
