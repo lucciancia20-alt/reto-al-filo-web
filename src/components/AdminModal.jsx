@@ -39,6 +39,7 @@ import {
   fetchRegistrations,
   fetchRegistrationStats,
   updateRegistrationStatus,
+  batchUpdateRegistrationBibs,
   deleteRegistrationRecord,
   syncPublicRunnerStatus,
   syncAllPublicRunnerStatuses,
@@ -798,6 +799,36 @@ export default function AdminModal({
     }
   };
 
+  const handleBatchAssignBibs = async (bibUpdates) => {
+    setRegsError('');
+    try {
+      const res = await batchUpdateRegistrationBibs(bibUpdates, registrations);
+      if (res?.updatedMap && res.updatedMap.size > 0) {
+        setRegistrations((prev) =>
+          prev.map((item) =>
+            res.updatedMap.has(item.id) ? res.updatedMap.get(item.id) : item
+          )
+        );
+        setBibDrafts((prev) => {
+          const next = { ...prev };
+          for (const id of res.updatedMap.keys()) {
+            delete next[id];
+          }
+          return next;
+        });
+      }
+      return {
+        ok: true,
+        updatedCount: res?.updatedCount || 0,
+        writesCount: res?.writesCount || 0,
+      };
+    } catch (err) {
+      const msg = err?.message || 'No se pudieron actualizar los dorsales en lote.';
+      setRegsError(msg);
+      throw new Error(msg);
+    }
+  };
+
   const handleToggleCheckIn = async (reg) => {
     setRegBusyId(reg.id);
     setRegsError('');
@@ -1514,6 +1545,7 @@ export default function AdminModal({
                 <AdminRegistrationsTab
                   raceConfig={draft}
                   regStats={regStats}
+                  allRegistrations={registrations}
                   registrationsCount={registrations.length}
                   filteredRegistrations={filteredRegistrations}
                   regsLoading={regsLoading}
@@ -1536,6 +1568,7 @@ export default function AdminModal({
                   regBusyId={regBusyId}
                   onExportExcel={handleExportExcel}
                   onPrintAccreditationSheet={handlePrintAccreditationSheet}
+                  onBatchAssignBibs={handleBatchAssignBibs}
                   onConfirmRegistration={handleConfirmRegistration}
                   onChangeRegStatus={handleChangeRegStatus}
                   onToggleCheckIn={handleToggleCheckIn}

@@ -14,12 +14,345 @@ import {
   Printer,
   PackageCheck,
   Shirt,
+  Hash,
+  Upload,
+  Wand2,
+  Check,
+  X,
 } from 'lucide-react';
 import { resolveRunnerCategory } from '../../data/raceConfig';
+
+const DNI_HEADER_KEYS = new Set([
+  'dni',
+  'documento',
+  'nro documento',
+  'numero documento',
+  'numero de documento',
+  'doc',
+]);
+
+const CODE_HEADER_KEYS = new Set(['codigo', 'code', 'codigo raf', 'cod']);
+
+const BIB_HEADER_KEYS = new Set([
+  'dorsal',
+  'nro dorsal',
+  'numero dorsal',
+  'numero de dorsal',
+  'nro',
+  'numero',
+  'bib',
+  'chip',
+  'nro chip',
+  'numero chip',
+  '#',
+]);
+
+const stripSpreadsheetPrefix = (value) => String(value ?? '').replace(/^'+/, '').trim();
+
+const normalizeExcelHeader = (value) => {
+  const raw = String(value ?? '').trim();
+  if (raw === '#') return '#';
+  return raw
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9#]+/g, ' ')
+    .trim();
+};
+
+const normalizeLookupDni = (value) =>
+  stripSpreadsheetPrefix(value).replace(/[.\s-]+/g, '').trim().toUpperCase();
+
+const normalizeLookupCode = (value) =>
+  stripSpreadsheetPrefix(value).toUpperCase().replace(/[^A-Z0-9-]/g, '');
+
+const isConfirmedStatus = (status) => {
+  const st = String(status || '').toLowerCase();
+  return st === 'confirmado' || st === 'confirmed';
+};
+
+const is13kDistance = (distance) => distance === '13K' || distance === '10K';
+const is27kDistance = (distance) => distance === '27K' || distance === '21K';
+
+function collectDuplicateBibs(registrations, overrideBibById) {
+  const counts = new Map();
+  for (const reg of registrations) {
+    const bib = overrideBibById.has(reg.id)
+      ? overrideBibById.get(reg.id)
+      : String(reg.assignedBib ?? '').trim();
+    if (!bib) continue;
+    counts.set(bib, (counts.get(bib) || 0) + 1);
+  }
+  const duplicates = [];
+  for (const [bib, count] of counts.entries()) {
+    if (count > 1) duplicates.push(bib);
+  }
+  return duplicates.sort((a, b) => a.localeCompare(b, 'es', { numeric: true }));
+}
+
+function buildRangePreview({ registrations, start13k, start27k, scope, order }) {
+  const s13 = Number.parseInt(start13k, 10);
+  const s27 = Number.parseInt(start27k, 10);
+  if (!Number.isInteger(s13) || s13 < 1 || !Number.isInteger(s27) || s27 < 1) {
+    return { error: 'Los números iniciales de 13K y 27K deben ser enteros mayores o iguales a 1.' };
+  }
+
+  const confirmed = registrations.filter((r) => isConfirmedStatus(r.status));
+  if (confirmed.length === 0) {
+    return { error: 'No hay corredores confirmados para asignar dorsales.' };
+  }
+
+  const sorted = [...confirmed].sort((a, b) => {
+    if (order === 'alphabetical') {
+      const cmp = String(a.fullName || '').localeCompare(String(b.fullName || ''), 'es', {
+        sensitivity: 'base',
+      });
+      return cmp !== 0 ? cmp : (a.createdAt || 0) - (b.createdAt || 0);
+    }
+    const diff = (a.createdAt || 0) - (b.createdAt || 0);
+    if (diff !== 0) return diff;
+    return String(a.fullName || '').localeCompare(String(b.fullName || ''), 'es', {
+      sensitivity: 'base',
+    });
+  });
+
+  const list13 = sorted.filter((r) => is13kDistance(r.distance));
+  const list27 = sorted.filter((r) => is27kDistance(r.distance));
+
+  const assignments = [];
+
+  if (scope === 'all') {
+    if (list13.length > 0 && list27.length > 0) {
+      const end13 = s13 + list13.length - 1;
+      const end27 = s27 + list27.length - 1;
+      if (s13 <= end27 && s27 <= end13) {
+        return {
+          error: `Los rangos se superponen: 13K usa #${s13}–#${end13} y 27K usa #${s27}–#${end27}. Ajustá los números de inicio para evitar dorsales duplicados.`,
+        };
+      }
+    }
+    list13.forEach((reg, idx) => assignments.push({ reg, newBib: String(s13 + idx) }));
+    list27.forEach((reg, idx) => assignments.push({ reg, newBib: String(s27 + idx) }));
+  } else {
+    const usedBibs = new Set();
+    for (const r of registrations) {
+      const n = Number(String(r.assignedBib ?? '').trim());
+      if (Number.isInteger(n) && n > 0) usedBibs.add(n);
+    }
+
+    const assignFreeFrom = (targets, startNum) => {
+      let cursor = startNum;
+      for (const reg of targets) {
+        if (String(reg.assignedBib ?? '').trim()) continue;
+        while (usedBibs.has(cursor)) {
+          cursor += 1;
+        }
+        assignments.push({ reg, newBib: String(cursor) });
+        usedBibs.add(cursor);
+        cursor += 1;
+      }
+    };
+
+    assignFreeFrom(list13, s13);
+    assignFreeFrom(list27, s27);
+  }
+
+  const overrideById = new Map();
+  const changes = [];
+  let count13k = 0;
+  let count27k = 0;
+
+  for (const { reg, newBib } of assignments) {
+    overrideById.set(reg.id, newBib);
+    const oldBib = String(reg.assignedBib ?? '').trim();
+    if (oldBib === newBib) continue;
+    changes.push({
+      id: reg.id,
+      fullName: reg.fullName || 'Sin nombre',
+      dni: reg.dni || '',
+      distance: reg.distance || '',
+      oldBib,
+      newBib,
+    });
+    if (is13kDistance(reg.distance)) count13k += 1;
+    else if (is27kDistance(reg.distance)) count27k += 1;
+  }
+
+  if (changes.length === 0) {
+    return {
+      notice:
+        scope === 'missing'
+          ? 'Todos los corredores confirmados ya tienen dorsal asignado (0 escrituras en Firestore).'
+          : 'Los dorsales de todos los confirmados ya coinciden con el rango indicado (0 escrituras en Firestore).',
+    };
+  }
+
+  const duplicateWarnings = collectDuplicateBibs(registrations, overrideById);
+
+  return {
+    preview: {
+      source: 'range',
+      changes,
+      count13k,
+      count27k,
+      unchangedCount: assignments.length - changes.length,
+      duplicateWarnings,
+    },
+  };
+}
+
+function detectSpreadsheetColumns(rows) {
+  const limit = Math.min(rows.length, 20);
+  for (let r = 0; r < limit; r += 1) {
+    const row = Array.isArray(rows[r]) ? rows[r] : [];
+    const normalized = row.map(normalizeExcelHeader);
+
+    let dniCol = normalized.findIndex((h) => DNI_HEADER_KEYS.has(h));
+    if (dniCol === -1) {
+      dniCol = normalized.findIndex((h) => h.includes('dni') || h.includes('documento'));
+    }
+
+    let codeCol = normalized.findIndex((h) => CODE_HEADER_KEYS.has(h));
+    if (codeCol === -1) {
+      codeCol = normalized.findIndex((h) => h.includes('codigo raf'));
+    }
+
+    let bibCol = normalized.findIndex((h) => BIB_HEADER_KEYS.has(h));
+    if (bibCol === -1) {
+      bibCol = normalized.findIndex((h) => h.includes('dorsal') || h.includes('bib'));
+    }
+
+    if (bibCol !== -1 && (dniCol !== -1 || codeCol !== -1)) {
+      return { headerRowIdx: r, dniCol, codeCol, bibCol };
+    }
+  }
+  return null;
+}
+
+function buildExcelPreview({ rows, registrations, fileName }) {
+  const cols = detectSpreadsheetColumns(rows);
+  if (!cols) {
+    return {
+      error:
+        'No se detectaron las columnas necesarias en la primera hoja. Asegurate de tener una columna Dorsal / Bib / Chip y una columna DNI o Código RAF.',
+    };
+  }
+
+  const byCode = new Map();
+  const byDni = new Map();
+  for (const reg of registrations) {
+    const codeKey = normalizeLookupCode(reg.code);
+    if (codeKey) byCode.set(codeKey, reg);
+
+    const dniKey = normalizeLookupDni(reg.dni);
+    if (dniKey) {
+      if (!byDni.has(dniKey)) byDni.set(dniKey, []);
+      byDni.get(dniKey).push(reg);
+    }
+  }
+
+  const matchedById = new Map();
+  let unmatchedCount = 0;
+  let ambiguousCount = 0;
+  let emptyBibCount = 0;
+
+  for (let r = cols.headerRowIdx + 1; r < rows.length; r += 1) {
+    const row = Array.isArray(rows[r]) ? rows[r] : [];
+    if (row.every((cell) => String(cell ?? '').trim() === '')) continue;
+
+    const rawBib = stripSpreadsheetPrefix(row[cols.bibCol]).slice(0, 20);
+    if (!rawBib) {
+      emptyBibCount += 1;
+      continue;
+    }
+
+    const rawCode = cols.codeCol !== -1 ? normalizeLookupCode(row[cols.codeCol]) : '';
+    const rawDni = cols.dniCol !== -1 ? normalizeLookupDni(row[cols.dniCol]) : '';
+
+    let matchedReg = null;
+    if (rawCode) {
+      matchedReg =
+        byCode.get(rawCode) ||
+        (/^\d{4,}$/.test(rawCode) ? byCode.get(`RAF-${rawCode}`) : null) ||
+        null;
+    }
+
+    if (!matchedReg && rawDni) {
+      const dniMatches = byDni.get(rawDni) || [];
+      if (dniMatches.length === 1) {
+        matchedReg = dniMatches[0];
+      } else if (dniMatches.length > 1) {
+        ambiguousCount += 1;
+        continue;
+      }
+    }
+
+    if (!matchedReg) {
+      unmatchedCount += 1;
+      continue;
+    }
+
+    matchedById.set(matchedReg.id, { reg: matchedReg, newBib: rawBib });
+  }
+
+  const overrideById = new Map();
+  const changes = [];
+  let unchangedCount = 0;
+  let count13k = 0;
+  let count27k = 0;
+
+  for (const [id, { reg, newBib }] of matchedById.entries()) {
+    overrideById.set(id, newBib);
+    const oldBib = String(reg.assignedBib ?? '').trim();
+    if (oldBib === newBib) {
+      unchangedCount += 1;
+      continue;
+    }
+    changes.push({
+      id,
+      fullName: reg.fullName || 'Sin nombre',
+      dni: reg.dni || '',
+      distance: reg.distance || '',
+      oldBib,
+      newBib,
+    });
+    if (is13kDistance(reg.distance)) count13k += 1;
+    else if (is27kDistance(reg.distance)) count27k += 1;
+  }
+
+  if (changes.length === 0) {
+    if (matchedById.size === 0) {
+      return {
+        error: `No se pudo cruzar ninguna fila de "${fileName}" con los inscriptos actuales (revisá Código RAF o DNI, y que la columna Dorsal tenga valores).`,
+      };
+    }
+    return {
+      notice: `Todos los dorsales coincidentes (${unchangedCount}) ya estaban cargados con el mismo número (0 escrituras en Firestore).`,
+    };
+  }
+
+  const duplicateWarnings = collectDuplicateBibs(registrations, overrideById);
+
+  return {
+    preview: {
+      source: 'excel',
+      fileName,
+      changes,
+      count13k,
+      count27k,
+      unchangedCount,
+      unmatchedCount,
+      ambiguousCount,
+      emptyBibCount,
+      duplicateWarnings,
+    },
+  };
+}
 
 export default function AdminRegistrationsTab({
   raceConfig,
   regStats,
+  allRegistrations = [],
   registrationsCount,
   filteredRegistrations,
   regsLoading,
@@ -42,6 +375,7 @@ export default function AdminRegistrationsTab({
   regBusyId,
   onExportExcel,
   onPrintAccreditationSheet,
+  onBatchAssignBibs,
   onConfirmRegistration,
   onChangeRegStatus,
   onToggleCheckIn,
@@ -56,6 +390,16 @@ export default function AdminRegistrationsTab({
   const [sortConfig, setSortConfig] = useState({ field: null, direction: 'asc' });
   const [pendingStatusAction, setPendingStatusAction] = useState({});
   const [pendingKitAction, setPendingKitAction] = useState({});
+  const [showBibTools, setShowBibTools] = useState(false);
+  const [rangeStart13k, setRangeStart13k] = useState('1');
+  const [rangeStart27k, setRangeStart27k] = useState('201');
+  const [rangeScope, setRangeScope] = useState('missing');
+  const [rangeOrder, setRangeOrder] = useState('createdAt');
+  const [batchPreview, setBatchPreview] = useState(null);
+  const [batchSaving, setBatchSaving] = useState(false);
+  const [bibToolsError, setBibToolsError] = useState('');
+  const [bibToolsNotice, setBibToolsNotice] = useState('');
+  const excelInputRef = useRef(null);
   const statusTimersRef = useRef({});
   const kitTimersRef = useRef({});
 
@@ -287,6 +631,104 @@ export default function AdminRegistrationsTab({
     armPendingAction(kitTimersRef, setPendingKitAction, reg.id, targetAction);
   };
 
+  const handlePreviewRangeAssignment = () => {
+    setBibToolsError('');
+    setBibToolsNotice('');
+    const result = buildRangePreview({
+      registrations: allRegistrations,
+      start13k: rangeStart13k,
+      start27k: rangeStart27k,
+      scope: rangeScope,
+      order: rangeOrder,
+    });
+    if (result.error) {
+      setBatchPreview(null);
+      setBibToolsError(result.error);
+      return;
+    }
+    if (result.notice) {
+      setBatchPreview(null);
+      setBibToolsNotice(result.notice);
+      return;
+    }
+    setBatchPreview(result.preview);
+  };
+
+  const handleImportExcelFile = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    setBibToolsError('');
+    setBibToolsNotice('');
+    setBatchPreview(null);
+
+    try {
+      const XLSX = await import('xlsx');
+      const buffer = await file.arrayBuffer();
+      const wb = XLSX.read(buffer, { type: 'array' });
+      const firstSheetName = wb.SheetNames[0];
+      if (!firstSheetName) {
+        setBibToolsError('El archivo Excel no contiene hojas.');
+        return;
+      }
+      const ws = wb.Sheets[firstSheetName];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+      const result = buildExcelPreview({
+        rows,
+        registrations: allRegistrations,
+        fileName: file.name,
+      });
+
+      if (result.error) {
+        setBibToolsError(result.error);
+        return;
+      }
+      if (result.notice) {
+        setBibToolsNotice(result.notice);
+        return;
+      }
+      setBatchPreview(result.preview);
+    } catch (err) {
+      setBibToolsError(err?.message || 'No se pudo leer el archivo Excel o CSV.');
+    }
+  };
+
+  const handleConfirmBatchSave = async () => {
+    if (!batchPreview || batchPreview.changes.length === 0 || !onBatchAssignBibs) return;
+    setBatchSaving(true);
+    setBibToolsError('');
+    setBibToolsNotice('');
+    try {
+      const payload = batchPreview.changes.map((item) => ({
+        id: item.id,
+        assignedBib: item.newBib,
+      }));
+      const res = await onBatchAssignBibs(payload);
+      const updatedCount = res?.updatedCount ?? payload.length;
+      setEditingBibIds((prev) => {
+        const next = { ...prev };
+        for (const item of payload) {
+          delete next[item.id];
+        }
+        return next;
+      });
+      setBatchPreview(null);
+      setBibToolsNotice(
+        `¡Listo! Se actualizaron ${updatedCount} ${updatedCount === 1 ? 'dorsal' : 'dorsales'} en Firestore y en la consulta pública.`
+      );
+    } catch (err) {
+      setBibToolsError(err?.message || 'Error guardando los dorsales en lote.');
+    } finally {
+      setBatchSaving(false);
+    }
+  };
+
+  const handleCancelBatchPreview = () => {
+    setBatchPreview(null);
+    setBibToolsError('');
+  };
+
   const hasSpecificFilter =
     regDistanceFilter !== 'all' ||
     regStatusFilter !== 'all' ||
@@ -491,6 +933,26 @@ export default function AdminRegistrationsTab({
             Imprimir Planilla Acreditación / SOS
           </button>
 
+          <button
+            type="button"
+            onClick={() => {
+              setShowBibTools((prev) => !prev);
+              setBibToolsError('');
+              setBibToolsNotice('');
+            }}
+            disabled={registrationsCount === 0}
+            aria-expanded={showBibTools}
+            title="Auto-asignar dorsales por rango o importar planilla de Bahía Corre"
+            className={`inline-flex items-center gap-1.5 rounded-xl border text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0 ${
+              showBibTools
+                ? 'bg-orange-500/15 border-orange-400 text-orange-300'
+                : 'bg-zinc-900/80 border-orange-500/70 hover:border-orange-400 text-orange-400'
+            }`}
+          >
+            <Hash className="w-3.5 h-3.5 shrink-0" />
+            <span>Dorsales / Bahía Corre</span>
+          </button>
+
           <a
             href="https://www.mercadopago.com.ar/activities"
             target="_blank"
@@ -503,6 +965,258 @@ export default function AdminRegistrationsTab({
             <ExternalLink className="w-3 h-3 opacity-80 shrink-0" />
           </a>
         </div>
+
+        {/* Panel desplegable de asignación masiva de dorsales (Rangos + Importar Excel Bahía Corre) */}
+        {showBibTools && (
+          <div className="pt-2.5 border-t border-stone-800/80 space-y-2.5">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5">
+              {/* Bloque 1: Auto-asignar por rango */}
+              <div className="rounded-xl bg-zinc-950 border border-stone-800 p-3 space-y-2.5">
+                <div className="flex items-center justify-between gap-2">
+                  <h4 className="text-[11px] font-semibold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
+                    <Wand2 className="w-3.5 h-3.5 shrink-0" />
+                    Auto-asignar por rango (Confirmados)
+                  </h4>
+                  <span className="text-[10px] text-stone-400">0 lecturas extra</span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div>
+                    <label
+                      htmlFor="bib-range-13k"
+                      className="block text-[10px] font-medium text-red-400 mb-1"
+                    >
+                      Inicio 13K
+                    </label>
+                    <input
+                      id="bib-range-13k"
+                      type="number"
+                      min={1}
+                      value={rangeStart13k}
+                      onChange={(e) => setRangeStart13k(e.target.value)}
+                      className="w-full rounded-lg bg-stone-950 border border-red-500/60 focus:border-red-400 focus:outline-none px-2 py-1 text-xs font-mono text-white"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="bib-range-27k"
+                      className="block text-[10px] font-medium text-cyan-400 mb-1"
+                    >
+                      Inicio 27K
+                    </label>
+                    <input
+                      id="bib-range-27k"
+                      type="number"
+                      min={1}
+                      value={rangeStart27k}
+                      onChange={(e) => setRangeStart27k(e.target.value)}
+                      className="w-full rounded-lg bg-stone-950 border border-cyan-500/60 focus:border-cyan-400 focus:outline-none px-2 py-1 text-xs font-mono text-white"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label
+                      htmlFor="bib-range-scope"
+                      className="block text-[10px] font-medium text-stone-400 mb-1"
+                    >
+                      Alcance
+                    </label>
+                    <select
+                      id="bib-range-scope"
+                      value={rangeScope}
+                      onChange={(e) => setRangeScope(e.target.value)}
+                      className="w-full rounded-lg bg-stone-950 border border-stone-700 focus:border-orange-400 focus:outline-none px-2 py-1 text-[11px] text-white"
+                    >
+                      <option value="missing">Solo confirmados sin dorsal</option>
+                      <option value="all">Reasignar todos los confirmados</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-0.5">
+                  <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                    <label
+                      htmlFor="bib-range-order"
+                      className="text-[10px] text-stone-400 shrink-0"
+                    >
+                      Orden:
+                    </label>
+                    <select
+                      id="bib-range-order"
+                      value={rangeOrder}
+                      onChange={(e) => setRangeOrder(e.target.value)}
+                      className="min-w-0 flex-1 rounded-lg bg-stone-950 border border-stone-700 focus:border-orange-400 focus:outline-none px-2 py-1 text-[11px] text-white"
+                    >
+                      <option value="createdAt">Por fecha de inscripción (1° al último)</option>
+                      <option value="alphabetical">Alfabético (A → Z)</option>
+                    </select>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={batchSaving || (regStats.confirmed || 0) === 0}
+                    onClick={handlePreviewRangeAssignment}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-stone-950 hover:bg-white/5 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
+                  >
+                    <Wand2 className="w-3.5 h-3.5 shrink-0" />
+                    Previsualizar Rangos
+                  </button>
+                </div>
+              </div>
+
+              {/* Bloque 2: Importar Excel de Bahía Corre */}
+              <div className="rounded-xl bg-zinc-950 border border-stone-800 p-3 flex flex-col justify-between gap-2.5">
+                <div className="space-y-1">
+                  <h4 className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                    <Upload className="w-3.5 h-3.5 shrink-0" />
+                    Importar desde Excel de Bahía Corre
+                  </h4>
+                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                    Subí la planilla <span className="font-mono text-stone-300">.xlsx / .xls / .csv</span> que devuelve Bahía Corre con los dorsales/chips. Cruza automáticamente por <strong className="text-stone-200">Código RAF</strong> o <strong className="text-stone-200">DNI</strong> y solo actualiza los registros que cambian.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-[10px] text-stone-500">
+                    Columnas aceptadas: Dorsal / Bib / Chip + DNI o Código
+                  </span>
+                  <input
+                    ref={excelInputRef}
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                    onChange={handleImportExcelFile}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    disabled={batchSaving || registrationsCount === 0}
+                    onClick={() => excelInputRef.current?.click()}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-stone-950 hover:bg-white/5 border border-emerald-500/70 hover:border-emerald-400 text-emerald-400 text-[11px] font-semibold px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
+                  >
+                    <Upload className="w-3.5 h-3.5 shrink-0" />
+                    Subir Excel de Bahía Corre
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {bibToolsError && (
+              <div
+                role="alert"
+                className="rounded-xl bg-zinc-950 border border-rose-500/70 p-2.5 text-xs text-rose-300 flex items-start gap-2"
+              >
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+                <span>{bibToolsError}</span>
+              </div>
+            )}
+
+            {bibToolsNotice && (
+              <div
+                role="status"
+                className="rounded-xl bg-zinc-950 border border-emerald-500/60 p-2.5 text-xs text-emerald-300 flex items-start gap-2"
+              >
+                <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+                <span>{bibToolsNotice}</span>
+              </div>
+            )}
+
+            {/* Barra de vista previa y confirmación de lote */}
+            {batchPreview && (
+              <div className="rounded-xl bg-zinc-950 border border-orange-500/80 p-3 space-y-2.5">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-medium text-white">
+                      Listos para actualizar:{' '}
+                      <strong className="text-orange-400">{batchPreview.changes.length}</strong>{' '}
+                      {batchPreview.changes.length === 1 ? 'dorsal' : 'dorsales'} (
+                      <span className="text-red-400">{batchPreview.count13k} en 13K</span> ·{' '}
+                      <span className="text-cyan-400">{batchPreview.count27k} en 27K</span>).{' '}
+                      <span className="text-stone-400 font-normal">
+                        Solo se escribirán los documentos que cambiaron.
+                      </span>
+                    </p>
+                    <p className="text-[11px] text-stone-400">
+                      {batchPreview.source === 'excel'
+                        ? `Archivo: ${batchPreview.fileName}`
+                        : 'Asignación correlativa por rango'}
+                      {batchPreview.unchangedCount > 0 &&
+                        ` · ${batchPreview.unchangedCount} sin cambios (0 escrituras)`}
+                      {batchPreview.unmatchedCount > 0 &&
+                        ` · ${batchPreview.unmatchedCount} filas sin coincidencia`}
+                      {batchPreview.ambiguousCount > 0 &&
+                        ` · ${batchPreview.ambiguousCount} omitidas por DNI duplicado`}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      disabled={batchSaving}
+                      onClick={handleCancelBatchPreview}
+                      className="inline-flex items-center gap-1 rounded-lg bg-stone-950 hover:bg-white/5 border border-stone-700 text-stone-300 text-xs font-medium px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      disabled={batchSaving || !onBatchAssignBibs}
+                      onClick={handleConfirmBatchSave}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-xs font-bold px-3.5 py-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                      {batchSaving
+                        ? 'Guardando...'
+                        : `Confirmar y Guardar (${batchPreview.changes.length})`}
+                    </button>
+                  </div>
+                </div>
+
+                {batchPreview.duplicateWarnings?.length > 0 && (
+                  <div className="rounded-lg bg-rose-950/40 border border-rose-500/70 px-2.5 py-1.5 text-[11px] text-rose-300">
+                    <strong>⚠ Dorsales repetidos detectados:</strong> quedarán duplicados los números{' '}
+                    <span className="font-mono font-semibold">
+                      {batchPreview.duplicateWarnings.map((b) => `#${b}`).join(', ')}
+                    </span>
+                    . Revisalos antes o después desde el filtro &quot;Dorsales duplicados&quot;.
+                  </div>
+                )}
+
+                <div className="max-h-32 overflow-y-auto rounded-lg bg-stone-950 border border-stone-800/90 px-2.5 py-1.5 divide-y divide-stone-800/60 text-[11px]">
+                  {batchPreview.changes.slice(0, 8).map((item) => (
+                    <div
+                      key={item.id}
+                      className="py-1 flex items-center justify-between gap-2"
+                    >
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span
+                          className={`text-[10px] font-mono px-1.5 py-0.2 rounded border shrink-0 ${
+                            is13kDistance(item.distance)
+                              ? 'border-red-500/70 text-red-400'
+                              : 'border-cyan-500/70 text-cyan-400'
+                          }`}
+                        >
+                          {item.distance}
+                        </span>
+                        <span className="text-white truncate">{item.fullName}</span>
+                        <span className="font-mono text-[10px] text-stone-500 shrink-0">
+                          DNI {item.dni}
+                        </span>
+                      </div>
+                      <span className="font-mono font-semibold text-orange-400 shrink-0">
+                        {item.oldBib ? `#${item.oldBib} → ` : ''}#{item.newBib}
+                      </span>
+                    </div>
+                  ))}
+                  {batchPreview.changes.length > 8 && (
+                    <div className="py-1 text-center text-[10px] text-stone-400">
+                      + {batchPreview.changes.length - 8} corredores más
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Resumen en vivo de Talles (Confirmados / Activos) y Acreditación */}
         <div className="pt-2 border-t border-stone-800/80 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-[11px]">

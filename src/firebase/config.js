@@ -814,6 +814,106 @@ export async function updateRegistrationStatus(registrationId, updates, previous
 }
 
 /**
+ * Actualiza masivamente el dorsal (`assignedBib`) de múltiples corredores en lote (`writeBatch`),
+ * escribiendo únicamente los documentos que realmente cambiaron para minimizar escrituras en Blaze.
+ * No modifica `stats/summary` porque el número de dorsal no altera contadores agregados.
+ */
+export async function batchUpdateRegistrationBibs(bibUpdates = [], currentRegistrations = []) {
+  if (!Array.isArray(bibUpdates) || bibUpdates.length === 0) {
+    return { ok: true, updatedCount: 0, writesCount: 0, updatedMap: new Map() };
+  }
+
+  const dedupedInputs = new Map();
+  for (const item of bibUpdates) {
+    if (item?.id) {
+      dedupedInputs.set(item.id, String(item.assignedBib ?? '').trim().slice(0, 20));
+    }
+  }
+
+  const localList = readLocalRegistrations();
+  const baseList =
+    Array.isArray(currentRegistrations) && currentRegistrations.length > 0
+      ? currentRegistrations
+      : localList;
+  const regMap = new Map(baseList.map((item) => [item.id, item]));
+
+  const now = Date.now();
+  const changedRecords = [];
+  const updatedMap = new Map();
+
+  for (const [id, nextBib] of dedupedInputs.entries()) {
+    const existing = regMap.get(id);
+    if (!existing) continue;
+    const prevBib = String(existing.assignedBib ?? '').trim();
+    if (prevBib === nextBib) continue;
+
+    const updatedRecord = {
+      ...existing,
+      assignedBib: nextBib,
+      updatedAt: now,
+    };
+    changedRecords.push(updatedRecord);
+    updatedMap.set(existing.id, updatedRecord);
+  }
+
+  if (changedRecords.length === 0) {
+    return { ok: true, updatedCount: 0, writesCount: 0, updatedMap };
+  }
+
+  let writesCount = 0;
+
+  if (isFirebaseConfigured()) {
+    const remoteRecords = changedRecords.filter((rec) => !String(rec.id).startsWith('local-'));
+    if (remoteRecords.length > 0) {
+      const bundle = await getFirestoreDb();
+      if (bundle) {
+        const { db, firestore } = bundle;
+        const { doc, writeBatch } = firestore;
+        const ops = [];
+
+        for (const rec of remoteRecords) {
+          ops.push({
+            ref: doc(db, 'registrations', rec.id),
+            data: { assignedBib: rec.assignedBib, updatedAt: now },
+          });
+          const codeKey = normalizeCodeKey(rec.code);
+          if (codeKey) {
+            ops.push({
+              ref: doc(db, 'publicStatus', codeKey),
+              data: buildPublicStatusPayload(rec),
+            });
+          }
+        }
+
+        const CHUNK_SIZE = 400;
+        for (let i = 0; i < ops.length; i += CHUNK_SIZE) {
+          const batch = writeBatch(db);
+          ops.slice(i, i + CHUNK_SIZE).forEach((op) => {
+            batch.set(op.ref, op.data, { merge: true });
+          });
+          await batch.commit();
+        }
+        writesCount = ops.length;
+      }
+    }
+  }
+
+  const nextLocalList = (localList.length > 0 ? localList : baseList).map((item) =>
+    updatedMap.has(item.id)
+      ? { ...item, assignedBib: updatedMap.get(item.id).assignedBib, updatedAt: now }
+      : item
+  );
+  writeLocalRegistrations(nextLocalList);
+
+  return {
+    ok: true,
+    updatedCount: changedRecords.length,
+    writesCount,
+    updatedMap,
+  };
+}
+
+/**
  * Elimina un registro de inscripción desde el Panel Admin.
  */
 export async function deleteRegistrationRecord(registrationId, registrationRecord = null) {
