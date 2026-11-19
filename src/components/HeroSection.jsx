@@ -250,18 +250,18 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                   className="xl:absolute xl:left-full xl:ml-4 2xl:ml-6 xl:-top-6 rotate-2 xl:rotate-[5deg] hover:xl:rotate-[2deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/80 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] px-3.5 pt-2.5 pb-2.5 transition-all cursor-pointer flex flex-col items-center w-max"
                 >
                   <span className="inline-flex items-stretch justify-center gap-1 text-white font-poster-condensed drop-shadow-[0_3px_8px_rgba(0,0,0,0.65)] select-none px-1">
-                    <span className="text-[74px] sm:text-[86px] leading-[0.82] tracking-[-0.02em] scale-y-[1.06] origin-bottom">
+                    <span className="text-[78px] sm:text-[90px] leading-[0.82] tracking-[-0.02em] scale-y-[1.08] origin-bottom">
                       {residentDiscountPercent}
                     </span>
                     <span className="flex flex-col justify-between text-left leading-none py-[1px]">
-                      <span className="text-[38px] sm:text-[44px] leading-[0.82]">%</span>
-                      <span className="text-[31px] sm:text-[36px] leading-[0.82] tracking-[-0.01em]">
+                      <span className="text-[40px] sm:text-[46px] leading-[0.82]">%</span>
+                      <span className="text-[33px] sm:text-[38px] leading-[0.82] tracking-[-0.01em]">
                         OFF
                       </span>
                     </span>
                   </span>
-                  <span className="relative z-10 -mt-2 sm:-mt-2.5 block w-full rounded-[2px] theme-poster-ribbon text-slate-950 font-display font-bold text-[12px] sm:text-[13px] tracking-tight px-3 py-[3px] leading-tight whitespace-nowrap shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
-                    Residentes del distrito
+                  <span className="relative z-10 -mt-2.5 sm:-mt-3 block w-full rounded-[2px] theme-poster-ribbon text-[var(--theme-ribbon-text)] font-display font-extrabold uppercase text-[11.5px] sm:text-[12.5px] tracking-[0.03em] px-3 py-1 leading-tight whitespace-nowrap shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
+                    CORREDORES DEL DISTRITO
                   </span>
                 </button>
               )}
