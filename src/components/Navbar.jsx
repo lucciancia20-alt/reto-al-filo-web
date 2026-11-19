@@ -126,7 +126,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
                       alt={sp.name || `Sponsor ${idx + 1}`}
                       loading="lazy"
                       decoding="async"
-                      className={`h-6 sm:h-7 w-auto max-w-[90px] object-contain transition-all duration-200 ${
+                      className={`h-8 sm:h-9 w-auto max-w-[110px] object-contain transition-all duration-200 ${
                         sp.invertOnDark
                           ? 'brightness-0 invert opacity-80 group-hover:opacity-100'
                           : 'opacity-80 group-hover:opacity-100'
