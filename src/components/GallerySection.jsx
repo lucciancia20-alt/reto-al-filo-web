@@ -98,7 +98,7 @@ export default function GallerySection({ raceConfig = RACE_CONFIG }) {
             <span>Galería · 1ra Edición</span>
           </div>
 
-          <h2 className="mt-2 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight section-title-stroke">
+          <h2 className="mt-2 text-balance section-title-athletic text-3xl md:text-4xl text-white">
             VIVÍ EL RETO: POSTALES DE LA{' '}
             <span className="whitespace-nowrap">
               1<sup className="lowercase text-sm md:text-base font-extrabold align-super -top-2 relative">ra</sup> EDICIÓN

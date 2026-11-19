@@ -8,19 +8,28 @@ import {
   getRaceEdition,
 } from '../data/raceConfig';
 
-const ORDINAL_EDITION = /^(\d+)\s*(ra|da|ta|ma|na|va|er|do|to|vo|no|mo|°|º)\.?\s+(.*)$/i;
+const ORDINAL_WORDS = {
+  1: 'PRIMERA',
+  2: 'SEGUNDA',
+  3: 'TERCERA',
+  4: 'CUARTA',
+  5: 'QUINTA',
+  6: 'SEXTA',
+  7: 'SÉPTIMA',
+  8: 'OCTAVA',
+  9: 'NOVENA',
+  10: 'DÉCIMA',
+};
 
-/** Renderiza "2da Edición" como "2ᵈᵃ EDICIÓN" conservando el estilo original del Hero. */
-function EditionLabel({ edition }) {
-  const match = edition.match(ORDINAL_EDITION);
-  if (!match) return edition;
-  return (
-    <>
-      {match[1]}
-      <span className="lowercase text-2xl md:text-4xl font-black align-baseline">{match[2]}</span>{' '}
-      {match[3]}
-    </>
-  );
+function expandHeroEdition(rawEdition) {
+  const trimmed = String(rawEdition ?? '').trim();
+  if (!trimmed) return '';
+  return trimmed
+    .replace(
+      /\b(\d+)\s*(?:ra|da|ta|ma|na|va|er|do|to|vo|no|mo|ª|º|°)\.?(?=\s|$)/gi,
+      (full, num) => ORDINAL_WORDS[Number(num)] || full
+    )
+    .toUpperCase();
 }
 
 function calculateTimeLeft(targetIso) {
@@ -70,7 +79,20 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
   const targetDateParts = parseTargetDateParts(targetDateIso);
   const raceTitle = getRaceTitle(raceConfig);
-  const raceEdition = getRaceEdition(raceConfig);
+  const rawEdition = getRaceEdition(raceConfig);
+  const raceEdition = expandHeroEdition(rawEdition) || 'SEGUNDA EDICIÓN';
+  const titleWords = raceTitle.trim().split(/\s+/);
+  const firstTitleWord = titleWords[0] || '';
+  const restTitleWords = titleWords.slice(1).join(' ');
+  const editionChars = raceEdition ? Array.from(raceEdition) : [];
+  const topBadgeSubtitle =
+    raceConfig.subtitle &&
+    (!rawEdition ||
+      raceConfig.subtitle.trim().toLowerCase() !== rawEdition.trim().toLowerCase()) &&
+    (!raceEdition ||
+      raceConfig.subtitle.trim().toLowerCase() !== raceEdition.trim().toLowerCase())
+      ? raceConfig.subtitle
+      : '';
 
   return (
     <section
@@ -93,31 +115,38 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         <div className="inline-flex items-center gap-2 rounded-full bg-zinc-900/35 backdrop-blur-sm border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-orange-400 mb-3.5 shadow-[0_0_14px_rgba(249,115,22,0.3)]">
           <Calendar className="w-4 h-4 text-orange-500 shrink-0" />
           <span>
-            {[raceConfig.subtitle, targetDateParts.formattedDayMonth, targetDateParts.formattedTime]
+            {[topBadgeSubtitle, targetDateParts.formattedDayMonth, targetDateParts.formattedTime]
               .filter(Boolean)
               .join(' · ')}
           </span>
         </div>
 
         {/* Título central imponente */}
-        <div className="max-w-3xl mx-auto px-6 py-4 rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.28)]">
-          <h1 className="text-balance font-display text-3xl md:text-4xl font-black tracking-tight text-white uppercase leading-[1.08] section-title-stroke">
-            {raceTitle}
-            {raceEdition && (
-              <>
-                {' '}
-                <span className="whitespace-nowrap">
-                  <EditionLabel edition={raceEdition} />
-                </span>
-              </>
-            )}
-          </h1>
+        <div className="max-w-4xl mx-auto px-5 sm:px-8 py-4 sm:py-5 rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.28)]">
+          <div className="inline-flex flex-col items-stretch mx-auto max-w-full">
+            <h1 className="hero-title-athletic text-5xl sm:text-7xl md:text-8xl lg:text-[6.5rem] whitespace-nowrap">
+              <span className="hero-word-accent">{firstTitleWord}</span>
+              {restTitleWords && (
+                <>
+                  {' '}
+                  <span className="hero-word-white">{restTitleWords}</span>
+                </>
+              )}
+            </h1>
 
-          {raceConfig.subtitle && (
-            <p className="mt-2 text-lg sm:text-2xl font-bold uppercase tracking-[0.22em] text-orange-500">
-              {raceConfig.subtitle}
-            </p>
-          )}
+            {editionChars.length > 0 && (
+              <p
+                aria-label={raceEdition}
+                className="hero-subtitle-edition mt-2 sm:mt-2.5 w-full flex items-center justify-between text-sm sm:text-xl md:text-2xl leading-none select-none"
+              >
+                {editionChars.map((ch, idx) => (
+                  <span key={idx} aria-hidden="true">
+                    {ch === ' ' ? '\u00A0' : ch}
+                  </span>
+                ))}
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="mt-3 max-w-2xl mx-auto px-6 sm:px-8 py-3.5 rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500/80 shadow-[0_0_16px_rgba(249,115,22,0.28)]">
@@ -151,7 +180,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                 key={unit.label}
                 className="rounded-2xl bg-zinc-900/35 backdrop-blur-sm border border-orange-500 py-2.5 px-2 sm:py-3 shadow-[0_0_16px_rgba(249,115,22,0.35)]"
               >
-                <div className="font-display text-2xl sm:text-4xl font-black text-white tabular-nums tracking-tight">
+                <div className="section-title-athletic text-2xl sm:text-4xl text-white tabular-nums">
                   {unit.value}
                 </div>
                 <div className="mt-1 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-orange-400">

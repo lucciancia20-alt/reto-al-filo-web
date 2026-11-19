@@ -37,7 +37,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-16 py-2 flex items-center justify-between gap-3">
         <a
           href="#inicio"
-          className="flex items-center gap-2.5 min-w-0 text-stone-100 font-display font-extrabold tracking-tight text-lg"
+          className="flex items-center gap-2.5 min-w-0 text-stone-100 font-display-athletic text-lg"
         >
           <img
             src="/logo-raf.png"
@@ -45,9 +45,9 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
             className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-md shrink-0"
           />
           <span className="leading-none uppercase min-w-0">
-            <span className="block truncate max-w-[52vw] sm:max-w-xs">{raceTitle}</span>
+            <span className="block truncate max-w-[52vw] sm:max-w-xs font-display-athletic">{raceTitle}</span>
             {brandSubline && (
-              <span className="block text-[10px] font-sans font-semibold tracking-widest text-orange-400 uppercase mt-0.5">
+              <span className="block text-[10px] font-display-athletic tracking-widest text-orange-400 uppercase mt-0.5">
                 {brandSubline}
               </span>
             )}

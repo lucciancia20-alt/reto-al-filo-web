@@ -541,7 +541,7 @@ export default function CircuitSection({
             <span>Circuito GPX Oficial y Altimetría Real</span>
           </div>
 
-          <h2 className="mt-1.5 text-balance font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight section-title-stroke">
+          <h2 className="mt-1.5 text-balance section-title-athletic text-3xl md:text-4xl text-white">
             Dominá el Desnivel
           </h2>
           <p className="mt-1 max-w-2xl mx-auto text-balance text-xs sm:text-sm text-stone-300">
