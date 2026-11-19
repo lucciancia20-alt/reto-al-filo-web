@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, Flame, ChevronDown, Timer, Search, Tag } from 'lucide-react';
+import { Calendar, MapPin, Flame, ChevronDown, Timer, Search } from 'lucide-react';
 import {
   RACE_CONFIG,
   DEFAULT_RESIDENT_DISCOUNT_PERCENT,
@@ -204,17 +204,21 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
               type="button"
               onClick={() => onOpenModal()}
               aria-label={`Descuento para residentes del distrito: ${residentDiscountPercent}% OFF. Abrir inscripción.`}
-              className="mt-3 xl:mt-0 xl:absolute xl:left-full xl:ml-5 xl:top-1/2 xl:-translate-y-1/2 -rotate-2 xl:rotate-[4deg] hover:xl:rotate-[2deg] antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-slate-950/80 hover:bg-slate-950/90 backdrop-blur-md border-2 border-[var(--theme-sub-border)] hover:border-[var(--theme-primary)] px-4 py-2.5 shadow-[0_10px_25px_rgba(0,0,0,0.65)] hover:scale-105 transition-all cursor-pointer text-center w-max"
+              className="mt-3 xl:mt-0 xl:absolute xl:left-full xl:ml-5 xl:-top-6 -rotate-2 xl:rotate-[5deg] hover:xl:rotate-[2deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/80 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] px-4 pt-2.5 pb-3 transition-all cursor-pointer flex flex-col items-center w-max"
             >
-              <span className="inline-flex items-center justify-center gap-1.5 font-display font-bold text-[11px] sm:text-xs tracking-wider text-white uppercase whitespace-nowrap">
-                <Tag className="w-3.5 h-3.5 text-[var(--theme-primary)] shrink-0" />
-                ¿SOS RESIDENTE DEL DISTRITO?
+              <span className="inline-flex items-stretch justify-center gap-1 text-white font-display-athletic drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] select-none">
+                <span className="text-[54px] sm:text-[64px] font-black leading-[0.82] tracking-tight">
+                  {residentDiscountPercent}
+                </span>
+                <span className="flex flex-col justify-between text-left leading-none py-[1px]">
+                  <span className="text-[26px] sm:text-[31px] font-black leading-[0.85]">%</span>
+                  <span className="text-[22px] sm:text-[26px] font-black leading-[0.85] tracking-tight">
+                    OFF
+                  </span>
+                </span>
               </span>
-              <span className="block font-display font-extrabold tracking-wide text-2xl sm:text-3xl leading-none text-[var(--theme-primary)] whitespace-nowrap mt-1">
-                {residentDiscountPercent}% OFF
-              </span>
-              <span className="block font-display text-[11px] sm:text-xs font-medium tracking-wide text-white/90 uppercase mt-1 whitespace-nowrap">
-                EN TU INSCRIPCIÓN →
+              <span className="mt-1.5 block w-full rounded-md bg-[var(--theme-primary)] text-slate-950 font-display font-extrabold text-xs sm:text-[13px] tracking-wide px-3 py-1 leading-tight whitespace-nowrap shadow-sm">
+                Residentes del distrito
               </span>
             </button>
           )}
