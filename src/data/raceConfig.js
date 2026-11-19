@@ -964,19 +964,37 @@ export function parseResidentLocalities(input, fallback = DEFAULT_RESIDENT_LOCAL
   return cleaned.length > 0 ? cleaned : fallback;
 }
 
+const LOCALITY_ALIASES = {
+  'villa serrana la gruta': ['la gruta', 'villa la gruta'],
+};
+
 /** Verifica si el texto ingresado coincide con una localidad habilitada para el beneficio. */
 export function matchResidentLocality(cityInput, localities = DEFAULT_RESIDENT_LOCALITIES) {
   const normInput = normalizeLocalityText(cityInput);
   if (!normInput) return null;
 
-  const firstSegment = normalizeLocalityText(normInput.split(/[,/()-]/)[0]);
+  const firstSegment = normalizeLocalityText(normInput.split(/[,/()\-–—·]/)[0]);
+  const strippedSegment = firstSegment
+    .replace(
+      /\s+(?:(?:provincia|pcia\.?|prov\.?)\s+de\s+buenos\s+aires|buenos\s+aires|bs\.?\s*as\.?|partido\s+de\s+tornquist)$/i,
+      ''
+    )
+    .trim();
   const list = Array.isArray(localities) ? localities : DEFAULT_RESIDENT_LOCALITIES;
 
   for (const loc of list) {
     const label = String(loc ?? '').trim();
     const normLoc = normalizeLocalityText(label);
     if (!normLoc) continue;
-    if (normInput === normLoc || firstSegment === normLoc) {
+    const candidates = [normLoc, ...(LOCALITY_ALIASES[normLoc] || [])];
+    if (
+      candidates.some(
+        (candidate) =>
+          normInput === candidate ||
+          firstSegment === candidate ||
+          strippedSegment === candidate
+      )
+    ) {
       return label;
     }
   }
