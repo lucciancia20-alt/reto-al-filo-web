@@ -1,9 +1,10 @@
 import React from 'react';
-import { Flame, Settings } from 'lucide-react';
+import { Flame, Settings, Handshake } from 'lucide-react';
 import {
   RACE_CONFIG,
   getRaceTitle,
   getRaceEdition,
+  getRaceFullTitle,
   expandOrdinalEdition,
   parseTargetDateParts,
 } from '../data/raceConfig';
@@ -20,10 +21,41 @@ export default function Footer({
   const titleWords = raceTitle.trim().split(/\s+/);
   const firstTitleWord = titleWords[0] || '';
   const restTitleWords = titleWords.slice(1).join(' ');
+  const orgDigits = String(raceConfig?.whatsappNumber || '').replace(/\D/g, '');
+  const sponsorWaUrl = orgDigits
+    ? `https://wa.me/${orgDigits}?text=${encodeURIComponent(
+        `Hola! Me interesa recibir información para ser sponsor de ${getRaceFullTitle(raceConfig, ' · ')}${
+          raceConfig?.subtitle ? ` (${raceConfig.subtitle})` : ''
+        }.`
+      )}`
+    : '#';
 
   return (
     <footer className="bg-stone-950 border-t-2 border-orange-500/50 py-6 sm:py-8 text-stone-400">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-5">
+        <div className="pb-4 border-b border-stone-800/80 flex flex-wrap items-center justify-center sm:justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-2.5">
+            <span className="inline-flex items-center px-3 py-1 rounded bg-[var(--theme-sub-bg)] border border-[var(--theme-sub-border)] text-[var(--theme-sub)] font-display-athletic text-xs tracking-widest -skew-x-6 [text-shadow:none]">
+              <span className="skew-x-6">Nos acompañan:</span>
+            </span>
+            <span className="text-xs text-stone-400">
+              Espacio disponible para marcas y sponsors oficiales
+            </span>
+          </div>
+          {orgDigits && (
+            <a
+              href={sponsorWaUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 border border-[var(--theme-sub-border)] hover:border-[var(--theme-sub)] text-[var(--theme-sub)] text-xs font-semibold px-3 py-1.5 transition-colors whitespace-nowrap"
+            >
+              <Handshake className="w-3.5 h-3.5 shrink-0" />
+              Sumate como Sponsor
+            </a>
+          )}
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <img
             src={optimizeCloudinaryUrl('/logo-raf.png', 400)}
@@ -39,8 +71,9 @@ export default function Footer({
                 {restTitleWords && <span className="text-white"> {restTitleWords}</span>}
               </span>
               {expandedEdition && (
-                <span className="hero-subtitle-edition font-bold text-sm sm:text-base tracking-[0.12em] text-white">
-                  - {expandedEdition}
+                <span className="hero-subtitle-edition font-bold text-sm sm:text-base tracking-[0.12em] [text-shadow:none]">
+                  <span className="text-white">- </span>
+                  <span className="text-[var(--theme-edition-text)]">{expandedEdition}</span>
                 </span>
               )}
             </p>
@@ -69,6 +102,7 @@ export default function Footer({
             <Flame className="w-4 h-4 text-orange-400" />
             Quiero Inscribirme
           </button>
+        </div>
         </div>
       </div>
     </footer>

@@ -60,7 +60,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
             {editionChars.length > 0 && (
               <span
                 aria-label={editionText}
-                className="w-full flex items-center justify-between text-[9.5px] sm:text-[10px] leading-none text-orange-400 select-none"
+                className="w-full flex items-center justify-between text-[9.5px] sm:text-[10px] leading-none text-[var(--theme-sub)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)] select-none"
               >
                 {editionChars.map((ch, idx) => (
                   <span key={idx} aria-hidden="true">
@@ -72,7 +72,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
             {yearChars.length > 0 && (
               <span
                 aria-label={year}
-                className="w-full flex items-center justify-between text-[9.5px] sm:text-[10px] leading-none text-orange-400 select-none"
+                className="w-full flex items-center justify-between text-[9.5px] sm:text-[10px] leading-none text-[var(--theme-sub)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)] select-none"
               >
                 {yearChars.map((ch, idx) => (
                   <span key={idx} aria-hidden="true">
@@ -102,9 +102,9 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
               href={sponsorWaUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/80 hover:border-orange-400 text-orange-400 text-xs font-semibold px-3.5 py-2.5 transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 rounded-full bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-[var(--theme-sub-border)] hover:border-[var(--theme-sub)] text-[var(--theme-sub)] text-xs font-semibold px-3.5 py-2.5 transition-colors whitespace-nowrap"
             >
-              <Handshake className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+              <Handshake className="w-3.5 h-3.5 text-[var(--theme-sub)] shrink-0" />
               ¿Querés ser sponsor?
             </a>
           )}
@@ -149,9 +149,9 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-zinc-900/65 hover:bg-zinc-900/80 backdrop-blur-md border border-orange-500/80 hover:border-orange-400 text-orange-400 text-sm font-semibold py-3 transition-colors"
+              className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-zinc-900/65 hover:bg-zinc-900/80 backdrop-blur-md border border-[var(--theme-sub-border)] hover:border-[var(--theme-sub)] text-[var(--theme-sub)] text-sm font-semibold py-3 transition-colors"
             >
-              <Handshake className="w-4 h-4 text-orange-500 shrink-0" />
+              <Handshake className="w-4 h-4 text-[var(--theme-sub)] shrink-0" />
               ¿Querés ser sponsor?
             </a>
           )}

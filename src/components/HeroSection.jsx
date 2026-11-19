@@ -91,7 +91,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-2 pb-8 sm:pt-3 sm:pb-10 -mt-2 md:-mt-4 text-center flex flex-col items-center">
         {/* Etiqueta superior de aventura */}
         <div className="inline-flex items-center gap-2 rounded-full bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-orange-400 mb-3.5 shadow-[0_0_14px_var(--theme-glow)]">
-          <Calendar className="w-4 h-4 text-orange-500 shrink-0" />
+          <Calendar className="w-4 h-4 text-[var(--theme-sub)] shrink-0" />
           <span>
             {[topBadgeSubtitle, targetDateParts.formattedDayMonth, targetDateParts.formattedTime]
               .filter(Boolean)
@@ -201,8 +201,8 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         </div>
 
         {/* Ubicación rápida */}
-        <div className="mt-4 inline-flex items-center gap-2 text-xs sm:text-sm text-stone-300">
-          <MapPin className="w-5 h-5 text-orange-500 shrink-0" />
+        <div className="mt-4 inline-flex items-center gap-2 text-xs sm:text-sm text-stone-200 border-b border-[var(--theme-sub-border)] pb-1">
+          <MapPin className="w-5 h-5 text-[var(--theme-sub)] shrink-0" />
           <span>{raceConfig.locationName}</span>
         </div>
       </div>

@@ -263,7 +263,13 @@ export default function AdminGeneralTab({
                   aria-label={option.label}
                   title={option.label}
                   onClick={() => setDraft((prev) => ({ ...prev, themeColor: option.id }))}
-                  style={{ backgroundColor: option.hex }}
+                  style={
+                    option.secondaryHex
+                      ? {
+                          background: `linear-gradient(135deg, ${option.hex} 52%, ${option.secondaryHex} 52%)`,
+                        }
+                      : { backgroundColor: option.hex }
+                  }
                   className={`w-7 h-7 rounded-full transition-transform cursor-pointer focus:outline-none ${
                     isSelected
                       ? 'ring-2 ring-white ring-offset-2 ring-offset-zinc-950 scale-110'
