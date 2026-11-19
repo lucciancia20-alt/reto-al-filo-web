@@ -20,9 +20,6 @@ export default function Footer({
   const titleWords = raceTitle.trim().split(/\s+/);
   const firstTitleWord = titleWords[0] || '';
   const restTitleWords = titleWords.slice(1).join(' ');
-  const restWithEdition = [restTitleWords, expandedEdition ? `- ${expandedEdition}` : '']
-    .filter(Boolean)
-    .join(' ');
 
   return (
     <footer className="bg-stone-950 border-t-2 border-orange-500/50 py-6 sm:py-8 text-stone-400">
@@ -36,9 +33,16 @@ export default function Footer({
             className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-md shrink-0"
           />
           <div>
-            <p className="hero-title-athletic text-xs sm:text-[13px] leading-none uppercase">
-              <span className="text-[var(--theme-primary)]">{firstTitleWord}</span>
-              {restWithEdition && <span className="text-white"> {restWithEdition}</span>}
+            <p className="flex flex-wrap items-baseline gap-x-2 leading-tight uppercase">
+              <span className="hero-title-athletic text-base sm:text-lg tracking-[0.06em] [word-spacing:0.1em]">
+                <span className="text-[var(--theme-primary)]">{firstTitleWord}</span>
+                {restTitleWords && <span className="text-white"> {restTitleWords}</span>}
+              </span>
+              {expandedEdition && (
+                <span className="hero-subtitle-edition font-bold text-sm sm:text-base tracking-[0.12em] text-white">
+                  - {expandedEdition}
+                </span>
+              )}
             </p>
             <p className="mt-1 text-xs text-stone-400">
               {formattedFullDate} · {raceConfig.locationName}
