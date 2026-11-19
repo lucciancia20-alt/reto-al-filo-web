@@ -60,7 +60,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
             {editionChars.length > 0 && (
               <span
                 aria-label={editionText}
-                className="w-full flex items-center justify-between text-[9.5px] sm:text-[10px] leading-none text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)] select-none"
+                className="w-full flex items-center justify-between text-[9.5px] sm:text-[10px] leading-none text-[var(--theme-sub)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)] select-none"
               >
                 {editionChars.map((ch, idx) => (
                   <span key={idx} aria-hidden="true">
@@ -72,7 +72,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
             {yearChars.length > 0 && (
               <span
                 aria-label={year}
-                className="w-full flex items-center justify-between text-[9.5px] sm:text-[10px] leading-none text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)] select-none"
+                className="w-full flex items-center justify-between text-[9.5px] sm:text-[10px] leading-none text-[var(--theme-sub)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)] select-none"
               >
                 {yearChars.map((ch, idx) => (
                   <span key={idx} aria-hidden="true">
