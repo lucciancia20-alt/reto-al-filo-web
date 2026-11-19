@@ -10,6 +10,16 @@ import {
 } from '../data/raceConfig';
 import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
+function normalizeSponsorLink(rawLink) {
+  const trimmed = String(rawLink || '').trim();
+  if (!trimmed) return '';
+  if (trimmed.startsWith('@')) {
+    return `https://www.instagram.com/${trimmed.slice(1).replace(/^\/+|\/+$/g, '')}/`;
+  }
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
 export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -30,6 +40,10 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
         }.`
       )}`
     : '#';
+
+  const activeSponsors = (Array.isArray(raceConfig?.sponsors) ? raceConfig.sponsors : []).filter(
+    (s) => s && (String(s.name || '').trim() || String(s.logoUrl || '').trim())
+  );
 
   const navLinks = [
     { label: 'Circuito', href: '#circuito' },
@@ -97,6 +111,57 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
         </nav>
 
         <div className="hidden md:flex items-center gap-3 shrink-0">
+          {/* Sponsors strip — solo visible cuando hay sponsors cargados */}
+          {activeSponsors.length > 0 && (
+            <div className="flex items-center gap-2.5 border-r border-stone-700/50 pr-3 mr-1">
+              <span className="inline-flex items-center px-2.5 py-1 rounded bg-[var(--theme-sub-bg)] border border-[var(--theme-sub-border)] text-[var(--theme-sub)] font-display-athletic text-[10px] tracking-widest -skew-x-6 shrink-0">
+                <span className="skew-x-6">Nos acompañan:</span>
+              </span>
+              <div className="flex items-center gap-3">
+                {activeSponsors.map((sp, idx) => {
+                  const href = normalizeSponsorLink(sp.linkUrl);
+                  const content = sp.logoUrl ? (
+                    <img
+                      src={optimizeCloudinaryUrl(sp.logoUrl, 180)}
+                      alt={sp.name || `Sponsor ${idx + 1}`}
+                      loading="lazy"
+                      decoding="async"
+                      className={`h-6 sm:h-7 w-auto max-w-[90px] object-contain transition-all duration-200 ${
+                        sp.invertOnDark
+                          ? 'brightness-0 invert opacity-80 group-hover:opacity-100'
+                          : 'opacity-80 group-hover:opacity-100'
+                      }`}
+                    />
+                  ) : (
+                    <span className="font-display font-bold text-[10px] uppercase tracking-wider text-stone-200 group-hover:text-white transition-colors">
+                      {sp.name}
+                    </span>
+                  );
+                  return href ? (
+                    <a
+                      key={sp.id || `nav-sponsor-${idx}`}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={sp.name ? `Visitar ${sp.name}` : 'Visitar sponsor oficial'}
+                      aria-label={sp.name ? `Visitar ${sp.name}` : 'Visitar sponsor oficial'}
+                      className="group inline-flex items-center hover:scale-105 transition-transform"
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    <span
+                      key={sp.id || `nav-sponsor-${idx}`}
+                      title={sp.name || undefined}
+                      className="group inline-flex items-center"
+                    >
+                      {content}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           {orgDigits && (
             <a
               href={sponsorWaUrl}
@@ -143,6 +208,48 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
               {link.label}
             </a>
           ))}
+          {/* Sponsors en mobile */}
+          {activeSponsors.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 pt-1 pb-2 border-b border-stone-700/50">
+              <span className="inline-flex items-center px-2.5 py-1 rounded bg-[var(--theme-sub-bg)] border border-[var(--theme-sub-border)] text-[var(--theme-sub)] font-display-athletic text-[10px] tracking-widest -skew-x-6 shrink-0">
+                <span className="skew-x-6">Nos acompañan:</span>
+              </span>
+              {activeSponsors.map((sp, idx) => {
+                const href = normalizeSponsorLink(sp.linkUrl);
+                const content = sp.logoUrl ? (
+                  <img
+                    src={optimizeCloudinaryUrl(sp.logoUrl, 180)}
+                    alt={sp.name || `Sponsor ${idx + 1}`}
+                    loading="lazy"
+                    decoding="async"
+                    className={`h-6 w-auto max-w-[80px] object-contain ${
+                      sp.invertOnDark ? 'brightness-0 invert opacity-85' : 'opacity-85'
+                    }`}
+                  />
+                ) : (
+                  <span className="font-display font-bold text-[10px] uppercase tracking-wider text-stone-200">
+                    {sp.name}
+                  </span>
+                );
+                return href ? (
+                  <a
+                    key={sp.id || `mnav-sponsor-${idx}`}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="inline-flex items-center"
+                  >
+                    {content}
+                  </a>
+                ) : (
+                  <span key={sp.id || `mnav-sponsor-${idx}`} className="inline-flex items-center">
+                    {content}
+                  </span>
+                );
+              })}
+            </div>
+          )}
           {orgDigits && (
             <a
               href={sponsorWaUrl}
