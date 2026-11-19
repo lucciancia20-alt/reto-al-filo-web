@@ -16,6 +16,7 @@ import {
   MapPin,
   X,
   Users,
+  Mail,
 } from 'lucide-react';
 import { uploadImageToCloudinary } from '../../firebase/config';
 import {
@@ -823,6 +824,17 @@ export default function AdminGeneralTab({
                 placeholder={DEFAULT_TEAMS_BENEFIT_EMAIL}
                 className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
               />
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                <span className="text-[11px] text-stone-400">
+                  Vista previa en la cinta del Hero:
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-[2px] theme-poster-ribbon text-[var(--theme-ribbon-text)] font-display font-extrabold text-xs tracking-tight px-2.5 py-1 leading-tight">
+                  <Mail className="w-3.5 h-3.5 text-[var(--theme-ribbon-text)] shrink-0 stroke-[2.5]" />
+                  <span>
+                    {String(draft.teamsBenefitEmail || '').trim() || DEFAULT_TEAMS_BENEFIT_EMAIL}
+                  </span>
+                </span>
+              </div>
             </div>
           </div>
         );
