@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, Flame, ChevronDown, Timer, Search } from 'lucide-react';
+import { Calendar, MapPin, Flame, ChevronDown, Timer, Search, Tag } from 'lucide-react';
 import {
   RACE_CONFIG,
+  DEFAULT_RESIDENT_DISCOUNT_PERCENT,
   parseTargetDateParts,
   resolveTargetDateIso,
   getRaceTitle,
@@ -85,6 +86,17 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
     (s) => s && (String(s.name || '').trim() || String(s.logoUrl || '').trim())
   );
 
+  const residentDiscountEnabled = Boolean(
+    raceConfig?.residentDiscountEnabled ?? RACE_CONFIG.residentDiscountEnabled
+  );
+  const rawDiscountPercent = Number(
+    raceConfig?.residentDiscountPercent ?? RACE_CONFIG.residentDiscountPercent
+  );
+  const residentDiscountPercent =
+    Number.isFinite(rawDiscountPercent) && rawDiscountPercent >= 1
+      ? Math.min(100, Math.max(1, Math.round(rawDiscountPercent)))
+      : DEFAULT_RESIDENT_DISCOUNT_PERCENT;
+
   return (
     <section
       id="inicio"
@@ -101,20 +113,10 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/30 to-black/80" />
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-2 pb-8 sm:pt-3 sm:pb-10 -mt-2 md:-mt-4 text-center flex flex-col items-center">
-        {/* Etiqueta superior de aventura */}
-        <div className="inline-flex items-center gap-2 rounded-full bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-orange-400 mb-3.5 shadow-[0_0_14px_var(--theme-glow)]">
-          <Calendar className="w-4 h-4 text-[var(--theme-sub)] shrink-0" />
-          <span>
-            {[topBadgeSubtitle, targetDateParts.formattedDayMonth, targetDateParts.formattedTime]
-              .filter(Boolean)
-              .join(' · ')}
-          </span>
-        </div>
-
-        {/* Franja de sponsors — solo si hay sponsors cargados */}
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-8 sm:pb-10 text-center flex flex-col items-center">
+        {/* Franja de sponsors — arriba debajo del Navbar fijo */}
         {activeSponsors.length > 0 && (
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-4 px-2">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5 mb-3.5 px-2">
             <span className="inline-flex items-center px-3 py-1 rounded bg-[var(--theme-sub-bg)] border border-[var(--theme-sub-border)] text-[var(--theme-sub)] font-display-athletic text-[10px] sm:text-xs tracking-widest -skew-x-6 shrink-0">
               <span className="skew-x-6">Nos acompañan:</span>
             </span>
@@ -122,11 +124,11 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
               const href = normalizeSponsorLink(sp.linkUrl);
               const content = sp.logoUrl ? (
                 <img
-                  src={optimizeCloudinaryUrl(sp.logoUrl, 240)}
+                  src={optimizeCloudinaryUrl(sp.logoUrl, 320)}
                   alt={sp.name || `Sponsor ${idx + 1}`}
                   loading="lazy"
                   decoding="async"
-                  className={`h-8 sm:h-10 w-auto max-w-[120px] object-contain transition-all duration-200 ${
+                  className={`h-12 sm:h-14 w-auto max-w-[165px] object-contain transition-all duration-200 ${
                     sp.invertOnDark
                       ? 'brightness-0 invert opacity-85 hover:opacity-100'
                       : 'opacity-85 hover:opacity-100'
@@ -158,32 +160,64 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
           </div>
         )}
 
-        {/* Título central imponente */}
-        <div className="max-w-4xl mx-auto px-5 sm:px-8 py-4 sm:py-5 rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500/80 shadow-[0_0_16px_var(--theme-glow)]">
-          <div className="inline-flex flex-col items-stretch mx-auto max-w-full">
-            <h1 className="hero-title-athletic text-[clamp(1.25rem,5.6vw,3.85rem)] whitespace-nowrap">
-              <span className="hero-word-accent">{firstTitleWord}</span>
-              {restTitleWords && (
-                <>
-                  {' '}
-                  <span className="hero-word-white">{restTitleWords}</span>
-                </>
-              )}
-            </h1>
+        {/* Pastilla de fecha debajo de los sponsors */}
+        <div className="inline-flex items-center gap-2 rounded-full bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500 px-4 py-1.5 text-xs sm:text-sm font-semibold text-orange-400 mb-3.5 shadow-[0_0_14px_var(--theme-glow)]">
+          <Calendar className="w-4 h-4 text-[var(--theme-sub)] shrink-0" />
+          <span>
+            {[topBadgeSubtitle, targetDateParts.formattedDayMonth, targetDateParts.formattedTime]
+              .filter(Boolean)
+              .join(' · ')}
+          </span>
+        </div>
 
-            {editionChars.length > 0 && (
-              <p
-                aria-label={raceEdition}
-                className="hero-subtitle-edition mt-2 sm:mt-2.5 w-full flex items-center justify-between text-xs sm:text-base md:text-xl leading-none select-none"
-              >
-                {editionChars.map((ch, idx) => (
-                  <span key={idx} aria-hidden="true">
-                    {ch === ' ' ? '\u00A0' : ch}
-                  </span>
-                ))}
-              </p>
-            )}
+        {/* Título central imponente + sello inclinado de descuento para residentes */}
+        <div className="relative inline-flex flex-col items-center max-w-full">
+          <div className="max-w-4xl mx-auto px-5 sm:px-8 py-4 sm:py-5 rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500/80 shadow-[0_0_16px_var(--theme-glow)]">
+            <div className="inline-flex flex-col items-stretch mx-auto max-w-full">
+              <h1 className="hero-title-athletic text-[clamp(1.25rem,5.6vw,3.85rem)] whitespace-nowrap">
+                <span className="hero-word-accent">{firstTitleWord}</span>
+                {restTitleWords && (
+                  <>
+                    {' '}
+                    <span className="hero-word-white">{restTitleWords}</span>
+                  </>
+                )}
+              </h1>
+
+              {editionChars.length > 0 && (
+                <p
+                  aria-label={raceEdition}
+                  className="hero-subtitle-edition mt-2 sm:mt-2.5 w-full flex items-center justify-between text-xs sm:text-base md:text-xl leading-none select-none"
+                >
+                  {editionChars.map((ch, idx) => (
+                    <span key={idx} aria-hidden="true">
+                      {ch === ' ' ? '\u00A0' : ch}
+                    </span>
+                  ))}
+                </p>
+              )}
+            </div>
           </div>
+
+          {residentDiscountEnabled && (
+            <button
+              type="button"
+              onClick={() => onOpenModal()}
+              aria-label={`Descuento para residentes del distrito: ${residentDiscountPercent}% OFF. Abrir inscripción.`}
+              className="mt-3 xl:mt-0 xl:absolute xl:left-full xl:ml-5 xl:top-1/2 xl:-translate-y-1/2 -rotate-2 xl:rotate-[6deg] hover:xl:rotate-[3deg] rounded-2xl bg-zinc-900/25 hover:bg-zinc-900/45 backdrop-blur-md border-2 border-[var(--theme-sub-border)] hover:border-[var(--theme-primary)] px-4 py-2.5 shadow-[0_8px_20px_rgba(0,0,0,0.55)] hover:scale-105 transition-all cursor-pointer text-center w-max"
+            >
+              <span className="inline-flex items-center justify-center gap-1.5 font-display-athletic text-[11px] sm:text-xs tracking-[0.1em] text-white uppercase whitespace-nowrap">
+                <Tag className="w-3.5 h-3.5 text-[var(--theme-primary)] shrink-0" />
+                ¿SOS RESIDENTE DEL DISTRITO?
+              </span>
+              <span className="block hero-title-athletic text-lg sm:text-xl text-[var(--theme-primary)] leading-tight whitespace-nowrap mt-0.5">
+                {residentDiscountPercent}% OFF
+              </span>
+              <span className="block text-[10px] font-bold uppercase tracking-wider text-[var(--theme-sub)] mt-0.5 whitespace-nowrap">
+                EN TU INSCRIPCIÓN →
+              </span>
+            </button>
+          )}
         </div>
 
         <div className="mt-3 max-w-2xl mx-auto px-6 sm:px-8 py-3.5 rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500/80 shadow-[0_0_16px_var(--theme-glow)]">
