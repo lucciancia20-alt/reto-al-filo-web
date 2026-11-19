@@ -86,7 +86,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         fetchpriority="high"
         className="absolute inset-0 w-full h-full object-cover object-[center_28%]"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/80" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/30 to-black/80" />
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-2 pb-8 sm:pt-3 sm:pb-10 -mt-2 md:-mt-4 text-center flex flex-col items-center">
         {/* Etiqueta superior de aventura */}

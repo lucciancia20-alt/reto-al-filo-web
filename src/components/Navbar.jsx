@@ -39,7 +39,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
   ];
 
   return (
-    <header className="fixed top-0 inset-x-0 z-40 bg-zinc-900/65 backdrop-blur-md border-b border-orange-500/80">
+    <header className="fixed top-0 inset-x-0 z-40 bg-zinc-900/10 backdrop-blur-[2px] border-b border-orange-500/80">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-16 py-2 flex items-center justify-between gap-3">
         <a
           href="#inicio"
@@ -102,7 +102,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
               href={sponsorWaUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full bg-zinc-900/65 hover:bg-zinc-900/80 backdrop-blur-md border border-orange-500/80 hover:border-orange-400 text-orange-400 text-xs font-semibold px-3.5 py-2.5 transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 rounded-full bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/80 hover:border-orange-400 text-orange-400 text-xs font-semibold px-3.5 py-2.5 transition-colors whitespace-nowrap"
             >
               <Handshake className="w-3.5 h-3.5 text-orange-500 shrink-0" />
               ¿Querés ser sponsor?
@@ -111,7 +111,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
           <button
             type="button"
             onClick={() => onOpenModal()}
-            className="inline-flex items-center justify-center rounded-full bg-zinc-900/70 hover:bg-zinc-900/80 backdrop-blur-md border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-900 active:scale-[0.99] text-orange-400 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2.5 transition-all cursor-pointer whitespace-nowrap"
+            className="inline-flex items-center justify-center rounded-full bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-900 active:scale-[0.99] text-orange-400 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2.5 transition-all cursor-pointer whitespace-nowrap"
           >
             <span className="inline-flex items-center gap-1.5 animate-cta-pulse">
               <span>Quiero Inscribirme</span>
@@ -125,7 +125,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
           onClick={() => setMobileMenuOpen((prev) => !prev)}
           aria-expanded={mobileMenuOpen}
           aria-label="Abrir menú de navegación"
-          className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-lg bg-zinc-900/65 backdrop-blur-md border border-orange-500/60 text-orange-400 hover:bg-zinc-900/80 transition-colors"
+          className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-lg bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500/60 text-orange-400 hover:bg-zinc-900/25 transition-colors"
         >
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
