@@ -21,10 +21,11 @@ export const DEFAULT_WAIVER_CLAUSES = [
 export const DEFAULT_MEDICAL_BODY_TEXT =
   'ha sido evaluado/a clínicamente y mediante los estudios complementarios que consideré pertinentes en función de su edad y antecedentes, encontrándose actualmente APTO/A FÍSICAMENTE y sin contraindicaciones médicas aparentes para participar en competencias de Trail Running / Carrera de Montaña de esfuerzo físico intenso y competitivo (modalidad indicada en el campo de distancia, en ambiente serrano), correspondiente al evento {RACE_TITLE}.';
 
-export const VALID_THEME_COLORS = ['orange', 'red', 'blue', 'green', 'yellow', 'cyan'];
+export const VALID_THEME_COLORS = ['orange', 'naranja', 'red', 'blue', 'green', 'yellow', 'cyan'];
 
 export const THEME_COLOR_OPTIONS = [
-  { id: 'orange', label: 'Naranja Oficial RAF', hex: '#ff5e2b', secondaryHex: '#7a8f49' },
+  { id: 'orange', label: 'Naranja + Verde (Oficial RAF)', hex: '#ff5e2b', secondaryHex: '#7a8f49' },
+  { id: 'naranja', label: 'Naranja', hex: '#ff5e2b' },
   { id: 'red', label: 'Rojo', hex: '#fb2c36' },
   { id: 'blue', label: 'Azul', hex: '#3b82f6' },
   { id: 'green', label: 'Verde', hex: '#22c55e' },

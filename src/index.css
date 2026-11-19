@@ -14,6 +14,19 @@
   --theme-edition-text: #7a8f49;
 }
 
+[data-theme="naranja"] {
+  --theme-primary: #ff5e2b;
+  --theme-secondary: #ff9914;
+  --theme-accent: #ff2a6d;
+  --theme-stroke: #ff4d4d;
+  --theme-glow: rgba(255, 77, 46, 0.55);
+  --theme-sub: var(--theme-secondary);
+  --theme-sub-strong: var(--theme-primary);
+  --theme-sub-bg: color-mix(in srgb, var(--theme-primary) 16%, transparent);
+  --theme-sub-border: color-mix(in srgb, var(--theme-primary) 80%, transparent);
+  --theme-edition-text: #ffffff;
+}
+
 [data-theme="red"] {
   --theme-primary: var(--color-red-500, #fb2c36);
   --theme-secondary: var(--color-red-500, #fb2c36);
