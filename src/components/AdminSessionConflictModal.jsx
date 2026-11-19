@@ -26,6 +26,7 @@ export default function AdminSessionConflictModal({
       role="alertdialog"
       aria-modal="true"
       aria-label="Conflicto de sesión activa"
+      onClick={(e) => e.stopPropagation()}
     >
       <div className="w-full max-w-sm rounded-2xl bg-stone-900 border border-amber-500/70 shadow-2xl flex flex-col gap-0 overflow-hidden">
         {/* Header */}

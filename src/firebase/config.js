@@ -1413,20 +1413,22 @@ export async function checkAdminSession() {
 /**
  * Escribe 1 sola vez reclamando la sesión activa para este dispositivo.
  * @param {{ uid, email, displayName }} adminUser
- * @returns {Promise<{ sessionId: string }>}
+ * @returns {Promise<{ sessionId: string, deviceId: string }>}
  */
 export async function claimAdminSession(adminUser) {
-  const sessionId = getAdminClientSessionId();
-  if (!isFirebaseConfigured()) return { sessionId };
+  const sessionId = generateSessionId();
+  adoptAdminClientSessionId(sessionId);
+  const deviceId = getAdminDeviceId();
+  if (!isFirebaseConfigured()) return { sessionId, deviceId };
   const bundle = await getFirestoreDb();
-  if (!bundle) return { sessionId };
+  if (!bundle) return { sessionId, deviceId };
 
   const { db, firestore } = bundle;
   const { doc, setDoc } = firestore;
 
   await setDoc(doc(db, 'settings', 'adminSession'), {
     sessionId,
-    deviceId: getAdminDeviceId(),
+    deviceId,
     adminUid: String(adminUser?.uid || ''),
     deviceInfo: buildDeviceInfo(),
     adminEmail: String(adminUser?.email || '').trim().toLowerCase(),
@@ -1434,27 +1436,32 @@ export async function claimAdminSession(adminUser) {
     isActive: true,
   });
 
-  return { sessionId };
+  return { sessionId, deviceId };
 }
 
 /**
  * Escribe 1 sola vez marcando la sesión como inactiva.
- * Solo escribe si el sessionId sigue siendo el nuestro (evita pisar la sesión nueva).
+ * Solo escribe si el documento está activo y coincide tanto deviceId como sessionId
+ * (evita liberar o pisar una sesión activa de otro dispositivo).
  * @param {string} sessionId
+ * @param {string} [expectedDeviceId]
  */
-export async function releaseAdminSession(sessionId) {
-  if (!isFirebaseConfigured() || !sessionId) return;
+export async function releaseAdminSession(sessionId, expectedDeviceId = getAdminDeviceId()) {
+  if (!isFirebaseConfigured() || !sessionId || !expectedDeviceId) return;
   try {
     const bundle = await getFirestoreDb();
     if (!bundle) return;
     const { db, firestore } = bundle;
     const { doc, getDoc, setDoc } = firestore;
-    // Verificar que nadie tomó el control entre medio
+    // Verificar que nadie tomó el control entre medio y que seguimos siendo dueños
     const snap = await getDoc(doc(db, 'settings', 'adminSession'));
     if (!snap.exists()) return;
-    if (snap.data()?.sessionId !== sessionId) return; // ya fue reemplazada
+    const data = snap.data();
+    if (data?.isActive !== true) return;
+    if (data?.deviceId !== expectedDeviceId) return; // otro dispositivo tomó el control
+    if (data?.sessionId !== sessionId) return; // ya fue reemplazada
     await setDoc(doc(db, 'settings', 'adminSession'), {
-      ...snap.data(),
+      ...data,
       isActive: false,
       endedAt: Date.now(),
     });

@@ -214,10 +214,10 @@ export default function AdminModal({
   };
 
   useEffect(() => {
-    if (isOpen && unlocked && activeTab === 'registrations') {
+    if (isOpen && unlocked && sessionState === 'active' && activeTab === 'registrations') {
       loadRegistrations();
     }
-  }, [isOpen, unlocked, activeTab]);
+  }, [isOpen, unlocked, sessionState, activeTab]);
 
   // Al cerrar el modal, cerrar sesión o desmontar: cancelar lectura en vuelo e invalidar caché.
   useEffect(() => {
@@ -529,6 +529,10 @@ export default function AdminModal({
   );
 
   const handleSafeClose = useCallback(() => {
+    if (sessionState === 'conflict') {
+      cancelEntry();
+      return;
+    }
     if (
       hasUnsavedChanges &&
       !window.confirm(
@@ -538,7 +542,7 @@ export default function AdminModal({
       return;
     }
     onClose();
-  }, [hasUnsavedChanges, onClose]);
+  }, [sessionState, cancelEntry, hasUnsavedChanges, onClose]);
 
   useEffect(() => {
     if (!isOpen) return undefined;

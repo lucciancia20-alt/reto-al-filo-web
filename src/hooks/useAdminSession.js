@@ -40,21 +40,38 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
   const inactivityRef     = useRef(null);
   const lastActivityRef   = useRef(Date.now());
   const isReleasedRef     = useRef(false);
+  const hasConflictRef    = useRef(false);
+  const isOwnerRef        = useRef(false);
+  const remoteDeviceIdRef = useRef(null);
   const cleanupRef        = useRef(null);  // cleanup de listeners locales (actividad / pagehide)
   const transferringRef   = useRef(false); // true durante el traspaso de sesión
   const adminUserRef      = useRef(adminUser);
-  adminUserRef.current = adminUser;
+  adminUserRef.current    = adminUser;
+  const onForceCloseRef   = useRef(onForceClose);
+  onForceCloseRef.current = onForceClose;
 
   const stopLocalListeners = useCallback(() => {
     if (typeof cleanupRef.current === 'function') cleanupRef.current();
     cleanupRef.current = null;
   }, []);
 
-  // ─── Liberar sesión (1 escritura) ───────────────────────────────────────────
+  // ─── Liberar sesión (1 escritura, solo si somos el dueño activo) ────────────
   const release = useCallback(async () => {
-    if (isReleasedRef.current) return;
-    if (!sessionIdRef.current) return;
+    const localDeviceId = getAdminDeviceId();
+    if (
+      isReleasedRef.current ||
+      hasConflictRef.current ||
+      !isOwnerRef.current ||
+      !sessionIdRef.current ||
+      remoteDeviceIdRef.current !== localDeviceId
+    ) {
+      return;
+    }
+
+    const sessionToRelease = sessionIdRef.current;
     isReleasedRef.current = true;
+    isOwnerRef.current = false;
+    sessionIdRef.current = null;
 
     // Desuscribir el listener antes de escribir para evitar que reaccione a nuestra propia escritura
     if (typeof unsubscribeRef.current === 'function') {
@@ -64,35 +81,46 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
 
     clearTimeout(inactivityRef.current);
     stopLocalListeners();
-    await releaseAdminSession(sessionIdRef.current);
-    sessionIdRef.current = null;
     setSessionState('idle');
+    await releaseAdminSession(sessionToRelease, localDeviceId);
   }, [stopLocalListeners]);
 
   // ─── Montar el listener onSnapshot + timer de inactividad ───────────────────
   const startSession = useCallback(() => {
     isReleasedRef.current = false;
 
-    // ── 1) listener onSnapshot liviano: reacciona SOLO si el sessionId cambia ──
+    if (typeof unsubscribeRef.current === 'function') {
+      unsubscribeRef.current();
+      unsubscribeRef.current = null;
+    }
+
+    // ── 1) listener onSnapshot liviano: expulsa inmediatamente si otro equipo toma el control ──
     unsubscribeRef.current = subscribeToAdminSession((snap) => {
+      remoteDeviceIdRef.current = snap?.deviceId || null;
       if (!snap || transferringRef.current) return;
-      const remoteSessionId = snap.sessionId;
-      // Si el doc se actualizó con un sessionId distinto al nuestro → nos expulsaron
-      if (
-        remoteSessionId &&
-        sessionIdRef.current &&
-        remoteSessionId !== sessionIdRef.current
-      ) {
-        setSessionState('releasing');
-        // Limpiar todo localmente (no escribir: la otra sesión ya está activa)
+
+      const localDeviceId = getAdminDeviceId();
+      const deviceChanged = Boolean(snap.deviceId && snap.deviceId !== localDeviceId);
+      const sessionChanged = Boolean(
+        snap.sessionId && sessionIdRef.current && snap.sessionId !== sessionIdRef.current
+      );
+
+      // Si el doc sigue activo con otro deviceId o sessionId → otro dispositivo tomó el control
+      if (snap.isActive === true && (deviceChanged || sessionChanged)) {
+        isOwnerRef.current = false;
+        hasConflictRef.current = false;
+        isReleasedRef.current = true;
+        sessionIdRef.current = null;
+
+        // Limpiar todo localmente sin escribir en Firestore (la otra sesión ya está activa)
         if (typeof unsubscribeRef.current === 'function') {
           unsubscribeRef.current();
           unsubscribeRef.current = null;
         }
         clearTimeout(inactivityRef.current);
-        sessionIdRef.current = null;
         stopLocalListeners();
-        onForceClose?.();
+        setSessionState('idle');
+        onForceCloseRef.current?.();
       }
     });
 
@@ -102,7 +130,7 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
       inactivityRef.current = setTimeout(async () => {
         // 20 min de inactividad → 1 escritura y cierra
         await release();
-        onForceClose?.();
+        onForceCloseRef.current?.();
       }, INACTIVITY_MS);
     };
 
@@ -123,7 +151,7 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
 
     resetTimer();
 
-    // ── 3) Cierre por pagehide / beforeunload → 1 escritura ─────────────────
+    // ── 3) Cierre por pagehide / beforeunload → 1 escritura (solo si es dueño) ─
     const onPageHide = () => { release(); };
     window.addEventListener('pagehide', onPageHide);
     window.addEventListener('beforeunload', onPageHide);
@@ -141,33 +169,35 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
     };
     cleanupRef.current = cleanup;
     return cleanup;
-  }, [release, onForceClose, stopLocalListeners]);
+  }, [release, stopLocalListeners]);
 
   // ─── Tomar control en 1 paso (desde el modal de conflicto), sin cerrar el panel ──
   const takeover = useCallback(async () => {
     const user = adminUserRef.current;
     if (!user || transferringRef.current) return;
 
-    // 1) Ocultar el modal y fijar el sessionId local ANTES de escribir, para que
+    // 1) Ocultar el modal y fijar flags locales ANTES de escribir, para que
     //    el listener nunca interprete el traspaso como una expulsión.
     transferringRef.current = true;
     const previousConflict = conflictInfo;
     setConflictInfo(null);
-    sessionIdRef.current = getAdminClientSessionId();
+    hasConflictRef.current = false;
     setSessionState('active');
 
     try {
-      // 2) Única escritura: reclamar la sesión
-      const { sessionId } = await claimAdminSession(user);
+      // 2) Única escritura: reclamar la sesión con nuevo sessionId + deviceId local
+      const { sessionId, deviceId } = await claimAdminSession(user);
+      hasConflictRef.current = false;
+      isOwnerRef.current = true;
+      isReleasedRef.current = false;
+      remoteDeviceIdRef.current = deviceId || getAdminDeviceId();
       sessionIdRef.current = sessionId;
       // 3) Listener + timer locales (si ya existían se reemplazan sin duplicar)
-      if (typeof unsubscribeRef.current === 'function') {
-        unsubscribeRef.current();
-        unsubscribeRef.current = null;
-      }
       startSession();
     } catch {
-      // Falló la escritura: volver al modal de conflicto
+      // Falló la escritura: volver al modal de conflicto sin tocar Firestore
+      hasConflictRef.current = true;
+      isOwnerRef.current = false;
       sessionIdRef.current = null;
       setConflictInfo(previousConflict);
       setSessionState('conflict');
@@ -176,12 +206,15 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
     }
   }, [conflictInfo, startSession]);
 
-  // ─── Cancelar: no entrar al panel ───────────────────────────────────────────
+  // ─── Cancelar: no entrar al panel (nunca libera la sesión del otro equipo) ───
   const cancelEntry = useCallback(() => {
+    hasConflictRef.current = true;
+    isOwnerRef.current = false;
+    sessionIdRef.current = null;
     setConflictInfo(null);
     setSessionState('idle');
-    onForceClose?.();
-  }, [onForceClose]);
+    onForceCloseRef.current?.();
+  }, []);
 
   // ─── Efecto principal: se ejecuta cuando el panel pasa a enabled=true ────────
   useEffect(() => {
@@ -217,6 +250,10 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
         if (isSameClient) {
           // Reconexión transparente: 0 escrituras, sin modal
           adoptAdminClientSessionId(snap.sessionId);
+          hasConflictRef.current = false;
+          isOwnerRef.current = true;
+          isReleasedRef.current = false;
+          remoteDeviceIdRef.current = snap.deviceId || getAdminDeviceId();
           sessionIdRef.current = snap.sessionId;
           setSessionState('active');
           cleanupSession = startSession();
@@ -225,6 +262,10 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
 
         if (isLive) {
           // Hay otra sesión activa en otro dispositivo/navegador → modal de conflicto
+          hasConflictRef.current = true;
+          isOwnerRef.current = false;
+          remoteDeviceIdRef.current = snap.deviceId || null;
+          sessionIdRef.current = null;
           setConflictInfo({
             deviceInfo: snap.deviceInfo || 'otro dispositivo',
             startedAt: snap.startedAt,
@@ -234,9 +275,13 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
         }
 
         // Sin conflicto: reclamar directamente (1 escritura)
-        const { sessionId } = await claimAdminSession(adminUser);
+        const { sessionId, deviceId } = await claimAdminSession(adminUser);
         if (cancelled) return;
 
+        hasConflictRef.current = false;
+        isOwnerRef.current = true;
+        isReleasedRef.current = false;
+        remoteDeviceIdRef.current = deviceId || getAdminDeviceId();
         sessionIdRef.current = sessionId;
         setSessionState('active');
         cleanupSession = startSession();
@@ -248,8 +293,20 @@ export function useAdminSession({ enabled, adminUser, onForceClose }) {
     return () => {
       cancelled = true;
       if (typeof cleanupSession === 'function') cleanupSession();
+      if (typeof unsubscribeRef.current === 'function') {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
       stopLocalListeners();
-      // Liberar sesión al desmontar o al cerrar el panel
+      // Nunca liberar el candado si estamos en conflicto o no somos dueños activos
+      if (
+        hasConflictRef.current ||
+        !isOwnerRef.current ||
+        remoteDeviceIdRef.current !== getAdminDeviceId()
+      ) {
+        return;
+      }
+      // Liberar sesión al desmontar o al cerrar el panel (solo el dueño activo)
       release();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
