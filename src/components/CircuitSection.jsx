@@ -528,6 +528,12 @@ export default function CircuitSection({
     },
   ];
 
+  const is13KActive = activeDistance === '13K';
+  const headerBadgeTone = is13KActive
+    ? 'border-red-500/70 text-red-500'
+    : 'border-orange-500/70 text-orange-400';
+  const headerDownloadHoverTone = is13KActive ? 'hover:border-red-400' : 'hover:border-orange-400';
+
   return (
     <section
       id="circuito"
@@ -600,7 +606,9 @@ export default function CircuitSection({
                   <h3 className="font-display font-extrabold text-sm sm:text-base text-white uppercase">
                     Track GPX Real · {currentCircuit.tabLabel}
                   </h3>
-                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-950 border border-orange-500/70 text-orange-400">
+                  <span
+                    className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-950 border ${headerBadgeTone}`}
+                  >
                     {currentCircuit.summaryBadge}
                   </span>
                 </div>
@@ -628,23 +636,21 @@ export default function CircuitSection({
                 <a
                   href={track.gpxDownloadUrl}
                   download={`reto-al-filo-${activeDistance.toLowerCase()}.gpx`}
-                  className="inline-flex items-center gap-1.5 bg-zinc-950 hover:bg-stone-900 text-orange-400 border border-orange-500/70 hover:border-orange-400 px-3 py-1.5 rounded-xl transition-colors"
+                  className={`inline-flex items-center gap-1.5 bg-zinc-950 hover:bg-stone-900 border px-3 py-1.5 rounded-xl transition-colors ${headerBadgeTone} ${headerDownloadHoverTone}`}
                 >
-                  <Download className="w-3.5 h-3.5 text-orange-400" />
+                  <Download className="w-3.5 h-3.5" />
                   Descargar .GPX
                 </a>
               )}
               <span
-                className={`inline-flex items-center gap-1.5 bg-zinc-950 border px-2.5 py-1.5 rounded-xl ${
-                  activeDistance === '13K'
-                    ? 'border-red-500/60 text-red-500'
-                    : 'border-cyan-500/60 text-cyan-400'
-                }`}
+                className={`inline-flex items-center gap-1.5 bg-zinc-950 border px-2.5 py-1.5 rounded-xl ${headerBadgeTone}`}
               >
                 <Droplets className="w-3.5 h-3.5" />
                 {stations.length} Puestos PA
               </span>
-              <span className="inline-flex items-center gap-1.5 bg-zinc-950 border border-orange-500/60 text-orange-400 px-2.5 py-1.5 rounded-xl">
+              <span
+                className={`inline-flex items-center gap-1.5 bg-zinc-950 border px-2.5 py-1.5 rounded-xl ${headerBadgeTone}`}
+              >
                 <Navigation className="w-3.5 h-3.5" />
                 {currentCircuit.elevationGain} D+
               </span>
