@@ -15,7 +15,14 @@ export default function Footer({
   onOpenAdmin,
 }) {
   const { formattedFullDate } = parseTargetDateParts(raceConfig?.targetDateIso);
+  const raceTitle = getRaceTitle(raceConfig);
   const expandedEdition = expandOrdinalEdition(getRaceEdition(raceConfig), 'SEGUNDA EDICIÓN');
+  const titleWords = raceTitle.trim().split(/\s+/);
+  const firstTitleWord = titleWords[0] || '';
+  const restTitleWords = titleWords.slice(1).join(' ');
+  const restWithEdition = [restTitleWords, expandedEdition ? `- ${expandedEdition}` : '']
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <footer className="bg-stone-950 border-t-2 border-orange-500/50 py-6 sm:py-8 text-stone-400">
@@ -23,16 +30,17 @@ export default function Footer({
         <div className="flex items-center gap-3">
           <img
             src={optimizeCloudinaryUrl('/logo-raf.png', 400)}
-            alt={`Logo ${getRaceTitle(raceConfig)}`}
+            alt={`Logo ${raceTitle}`}
             loading="lazy"
             decoding="async"
             className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-md shrink-0"
           />
           <div>
-            <p className="font-display font-black text-white text-sm uppercase">
-              {`${getRaceTitle(raceConfig)}${expandedEdition ? ` - ${expandedEdition}` : ''}`}
+            <p className="hero-title-athletic text-xs sm:text-[13px] leading-none uppercase">
+              <span className="text-[var(--theme-primary)]">{firstTitleWord}</span>
+              {restWithEdition && <span className="text-white"> {restWithEdition}</span>}
             </p>
-            <p className="text-xs text-stone-400">
+            <p className="mt-1 text-xs text-stone-400">
               {formattedFullDate} · {raceConfig.locationName}
             </p>
           </div>

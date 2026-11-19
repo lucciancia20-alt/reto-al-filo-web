@@ -53,8 +53,8 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
             className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-md shrink-0"
           />
           <span className="inline-flex flex-col items-stretch leading-none gap-[3px] uppercase min-w-0 font-display-athletic">
-            <span className="block whitespace-nowrap text-[17px] sm:text-lg leading-none">
-              <span className="text-orange-500">{firstTitleWord}</span>
+            <span className="block whitespace-nowrap hero-title-athletic text-[12px] sm:text-[13.5px] leading-none">
+              <span className="text-[var(--theme-primary)]">{firstTitleWord}</span>
               {restTitleWords && <span className="text-white"> {restTitleWords}</span>}
             </span>
             {editionChars.length > 0 && (
