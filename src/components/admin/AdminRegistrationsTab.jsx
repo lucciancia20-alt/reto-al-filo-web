@@ -859,7 +859,7 @@ export default function AdminRegistrationsTab({
 
       {/* Controles de filtro y exportación */}
       <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3 space-y-2.5">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <select
             aria-label="Filtrar por distancia"
             value={regDistanceFilter}
@@ -930,27 +930,7 @@ export default function AdminRegistrationsTab({
             className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900/80 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
           >
             <Printer className="w-3.5 h-3.5 shrink-0" />
-            Imprimir Planilla Acreditación / SOS
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setShowBibTools((prev) => !prev);
-              setBibToolsError('');
-              setBibToolsNotice('');
-            }}
-            disabled={registrationsCount === 0}
-            aria-expanded={showBibTools}
-            title="Auto-asignar dorsales por rango o importar planilla de Bahía Corre"
-            className={`inline-flex items-center gap-1.5 rounded-xl border text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0 ${
-              showBibTools
-                ? 'bg-orange-500/15 border-orange-400 text-orange-300'
-                : 'bg-zinc-900/80 border-orange-500/70 hover:border-orange-400 text-orange-400'
-            }`}
-          >
-            <Hash className="w-3.5 h-3.5 shrink-0" />
-            <span>Dorsales / Bahía Corre</span>
+            Imprimir Planilla Acreditación
           </button>
 
           <a
@@ -964,6 +944,28 @@ export default function AdminRegistrationsTab({
             <span>Mercado Pago</span>
             <ExternalLink className="w-3 h-3 opacity-80 shrink-0" />
           </a>
+        </div>
+
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => {
+              setShowBibTools((prev) => !prev);
+              setBibToolsError('');
+              setBibToolsNotice('');
+            }}
+            disabled={registrationsCount === 0}
+            aria-expanded={showBibTools}
+            title="Auto-asignar dorsales por rango o importar planilla de Bahía Corre"
+            className={`inline-flex items-center gap-1.5 rounded-xl border text-[11px] xl:text-xs font-medium px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0 ${
+              showBibTools
+                ? 'bg-orange-500/15 border-orange-400 text-orange-300'
+                : 'bg-zinc-900/80 border-orange-500/70 hover:border-orange-400 text-orange-400'
+            }`}
+          >
+            <Hash className="w-3.5 h-3.5 shrink-0" />
+            <span>Dorsales / Bahía Corre</span>
+          </button>
         </div>
 
         {/* Panel desplegable de asignación masiva de dorsales (Rangos + Importar Excel Bahía Corre) */}
