@@ -531,8 +531,8 @@ export default function CircuitSection({
   const is13KActive = activeDistance === '13K';
   const headerBadgeTone = is13KActive
     ? 'border-red-500/70 text-red-500'
-    : 'border-orange-500/70 text-orange-400';
-  const headerDownloadHoverTone = is13KActive ? 'hover:border-red-400' : 'hover:border-orange-400';
+    : 'border-cyan-500/70 text-cyan-400';
+  const headerDownloadHoverTone = is13KActive ? 'hover:border-red-400' : 'hover:border-cyan-400';
 
   return (
     <section
