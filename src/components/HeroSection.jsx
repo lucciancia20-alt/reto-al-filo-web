@@ -8,6 +8,7 @@ import {
   getRaceEdition,
   expandOrdinalEdition,
 } from '../data/raceConfig';
+import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
 function calculateTimeLeft(targetIso) {
   const targetMs = Date.parse(resolveTargetDateIso(targetIso));
@@ -78,7 +79,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
     >
       {/* Imagen de fondo con srcSet responsivo y respaldo oscuro para lectura en exterior */}
       <img
-        src={raceConfig.heroImage || '/images/hero-trail-runners.jpg'}
+        src={optimizeCloudinaryUrl(raceConfig.heroImage || '/images/hero-trail-runners.jpg', 1920)}
         srcSet={heroSrcSet}
         sizes="100vw"
         alt="Corredor de trail running en el filo de la montaña"

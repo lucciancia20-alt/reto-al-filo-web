@@ -8,6 +8,7 @@ import {
   expandOrdinalEdition,
   parseTargetDateParts,
 } from '../data/raceConfig';
+import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
 export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -45,8 +46,10 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
           className="flex items-center gap-2.5 min-w-0 text-stone-100 font-display-athletic text-lg"
         >
           <img
-            src="/logo-raf.png"
+            src={optimizeCloudinaryUrl('/logo-raf.png', 400)}
             alt={`Logo ${raceTitle}`}
+            loading="lazy"
+            decoding="async"
             className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-md shrink-0"
           />
           <span className="inline-flex flex-col items-stretch leading-none gap-[3px] uppercase min-w-0 font-display-athletic">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Camera, Maximize2, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { RACE_CONFIG, getRaceTitle } from '../data/raceConfig';
+import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 import {
   fetchGalleryPhotos,
   filterDemoPhotos,
@@ -80,7 +81,7 @@ export default function GallerySection({ raceConfig = RACE_CONFIG }) {
       const url = photos[idx]?.cloudinaryUrl;
       if (url) {
         const img = new Image();
-        img.src = url;
+        img.src = optimizeCloudinaryUrl(url, 1600);
       }
     });
   }, [selectedIndex, photos]);
@@ -144,14 +145,17 @@ export default function GallerySection({ raceConfig = RACE_CONFIG }) {
               >
                 <div className={`w-full overflow-hidden bg-zinc-950 ${photo.aspectClass}`}>
                   <img
-                    src={photo.cloudinaryThumb}
+                    src={optimizeCloudinaryUrl(photo.cloudinaryThumb || photo.cloudinaryUrl, 800)}
                     alt={`Postal de ${raceTitle} — ${photo.sector}`}
                     loading="lazy"
                     decoding="async"
                     onError={(e) => {
                       if (!e.currentTarget.dataset.fallbackApplied) {
                         e.currentTarget.dataset.fallbackApplied = 'true';
-                        e.currentTarget.src = RACE_CONFIG.heroImage;
+                        e.currentTarget.src = optimizeCloudinaryUrl(
+                          raceConfig?.heroImage || RACE_CONFIG.heroImage,
+                          800
+                        );
                       }
                     }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -235,8 +239,9 @@ export default function GallerySection({ raceConfig = RACE_CONFIG }) {
             )}
 
             <img
-              src={selectedPhoto.cloudinaryUrl}
+              src={optimizeCloudinaryUrl(selectedPhoto.cloudinaryUrl, 1600)}
               alt={selectedPhoto.sector}
+              decoding="async"
               className="block max-w-[92vw] max-h-[85vh] w-auto h-auto"
             />
 

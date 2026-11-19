@@ -12,6 +12,7 @@ import {
   ChevronRight,
   GripVertical,
 } from 'lucide-react';
+import { optimizeCloudinaryUrl } from '../../utils/cloudinary';
 
 export default function AdminPhotosTab({
   raceTitle = 'Reto al Filo',
@@ -76,7 +77,7 @@ export default function AdminPhotosTab({
       const url = galleryItems[idx]?.cloudinaryUrl || galleryItems[idx]?.cloudinaryThumb;
       if (url) {
         const img = new Image();
-        img.src = url;
+        img.src = optimizeCloudinaryUrl(url, 1600);
       }
     });
   }, [previewIndex, galleryItems]);
@@ -319,8 +320,10 @@ export default function AdminPhotosTab({
                   } ${isDragged ? 'opacity-60' : ''}`}
                 >
                   <img
-                    src={item.cloudinaryThumb}
+                    src={optimizeCloudinaryUrl(item.cloudinaryThumb || item.cloudinaryUrl, 800)}
                     alt={item.sector}
+                    loading="lazy"
+                    decoding="async"
                     draggable={false}
                     className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
                   />
@@ -427,8 +430,12 @@ export default function AdminPhotosTab({
             )}
 
             <img
-              src={galleryItems[previewIndex].cloudinaryUrl || galleryItems[previewIndex].cloudinaryThumb}
+              src={optimizeCloudinaryUrl(
+                galleryItems[previewIndex].cloudinaryUrl || galleryItems[previewIndex].cloudinaryThumb,
+                1600
+              )}
               alt={galleryItems[previewIndex].sector}
+              decoding="async"
               className="block max-w-[92vw] max-h-[85vh] w-auto h-auto"
             />
 

@@ -1,4 +1,5 @@
 import { RACE_CONFIG, mergeRaceConfig, calculateRunnerAgeAtRace } from '../data/raceConfig';
+import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
 const LOCAL_CONFIG_STORAGE_KEY = 'reto_al_filo_config_v2';
 const LOCAL_REGISTRATIONS_STORAGE_KEY = 'reto_al_filo_registrations_v1';
@@ -69,40 +70,30 @@ export async function getFirestoreDb() {
 /**
  * Helper de escalabilidad para Cloudinary:
  * Transforma una URL de Cloudinary o un publicId insertando parámetros de
- * optimización automática (f_auto,q_auto,w_{width}) sin alterar URLs externas (Unsplash).
+ * optimización automática (f_auto,q_auto,c_limit,w_{width}) sin alterar URLs externas.
  */
 export function getCloudinaryUrl(urlOrPublicId, { width = 800 } = {}) {
   if (!urlOrPublicId) return '';
 
-  // Si es una URL completa que no pertenece a Cloudinary (ej. Unsplash), se devuelve intacta
+  // Si es una URL completa, delega en optimizeCloudinaryUrl (mantiene intactas las externas)
   if (urlOrPublicId.startsWith('http://') || urlOrPublicId.startsWith('https://')) {
-    if (urlOrPublicId.includes('res.cloudinary.com') && urlOrPublicId.includes('/image/upload/')) {
-      if (urlOrPublicId.includes('f_auto') || urlOrPublicId.includes('q_auto')) {
-        return urlOrPublicId;
-      }
-      return urlOrPublicId.replace(
-        '/image/upload/',
-        `/image/upload/f_auto,q_auto,w_${width}/`
-      );
-    }
-    return urlOrPublicId;
+    return optimizeCloudinaryUrl(urlOrPublicId, width);
   }
 
   // Si se recibe un publicId relativo de Cloudinary
   const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '';
   if (!cloudName) return '';
   const cleanId = urlOrPublicId.replace(/^\/+/, '');
-  return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto,w_${width}/${cleanId}`;
+  return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto,c_limit,w_${width}/${cleanId}`;
 }
 
 /**
- * Normaliza un documento de foto (local o de Firestore) al esquema canónico de la galería.
+ * Normaliza un documento de foto (local o de Firestore) al esquema canónico de la galería
+ * conservando las URLs originales intactas (la optimización se aplica al renderizar).
  */
 function normalizePhotoRecord(docId, data) {
-  const fullUrl = getCloudinaryUrl(data.cloudinaryUrl, { width: 1600 });
-  const thumbUrl = data.cloudinaryThumb
-    ? getCloudinaryUrl(data.cloudinaryThumb, { width: 800 })
-    : getCloudinaryUrl(data.cloudinaryUrl, { width: 800 });
+  const fullUrl = data.cloudinaryUrl || '';
+  const thumbUrl = data.cloudinaryThumb || data.cloudinaryUrl || '';
 
   return {
     id: docId,
@@ -258,12 +249,11 @@ export async function addPhotoToFirestore({ cloudinaryUrl, sector, edicion = 1 }
 
   const { db, firestore } = bundle;
   const { collection, addDoc } = firestore;
-  const thumbUrl = getCloudinaryUrl(cloudinaryUrl, { width: 800 });
-  const fullUrl = getCloudinaryUrl(cloudinaryUrl, { width: 1600 });
+  const cleanUrl = String(cloudinaryUrl).trim();
 
   const docRef = await addDoc(collection(db, 'photos'), {
-    cloudinaryUrl: fullUrl,
-    cloudinaryThumb: thumbUrl,
+    cloudinaryUrl: cleanUrl,
+    cloudinaryThumb: cleanUrl,
     sector: sector?.trim() || 'Postales · 1ra Edición',
     edicion: Number(edicion) || 1,
     timestamp: Date.now(),

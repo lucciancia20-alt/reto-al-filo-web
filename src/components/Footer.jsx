@@ -7,6 +7,7 @@ import {
   expandOrdinalEdition,
   parseTargetDateParts,
 } from '../data/raceConfig';
+import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
 export default function Footer({
   raceConfig = RACE_CONFIG,
@@ -21,8 +22,10 @@ export default function Footer({
       <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <img
-            src="/logo-raf.png"
+            src={optimizeCloudinaryUrl('/logo-raf.png', 400)}
             alt={`Logo ${getRaceTitle(raceConfig)}`}
+            loading="lazy"
+            decoding="async"
             className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-md shrink-0"
           />
           <div>
