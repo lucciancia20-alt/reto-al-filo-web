@@ -197,7 +197,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                 <a
                   href={`mailto:${teamsBenefitEmail}?subject=${encodeURIComponent(`Beneficios para Teams - ${raceTitle}`)}`}
                   aria-label={`Beneficios para Teams: Profesor/Entrenador FREE y 1 Corredor FREE cada 10 inscriptos. Coordinar al mail ${teamsBenefitEmail}`}
-                  className="z-20 min-[1360px]:absolute min-[1360px]:right-full min-[1360px]:mr-16 2xl:mr-24 min-[1360px]:-top-12 -rotate-2 min-[1360px]:-rotate-[5deg] hover:rotate-0 min-[1360px]:hover:-rotate-[1.5deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/15 hover:bg-zinc-900/25 backdrop-blur-[2px] border-[1.5px] border-orange-500/90 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] px-3.5 py-2.5 sm:px-3.5 sm:py-3 transition-all duration-200 cursor-pointer flex flex-col items-stretch w-[244px] sm:w-[258px] text-center no-underline"
+                  className="z-20 min-[1360px]:absolute min-[1360px]:right-full min-[1360px]:mr-16 2xl:mr-24 min-[1360px]:-top-12 -rotate-2 min-[1360px]:-rotate-[5deg] hover:rotate-0 min-[1360px]:hover:-rotate-[1.5deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/15 hover:bg-zinc-900/25 backdrop-blur-[2px] border-2 border-[var(--theme-primary)] hover:border-[var(--theme-secondary)] shadow-[0_0_16px_var(--theme-glow)] px-3.5 py-2.5 sm:px-3.5 sm:py-3 transition-all duration-200 cursor-pointer flex flex-col items-stretch w-[244px] sm:w-[258px] text-center no-underline"
                 >
                   <span className="block font-poster-condensed text-white uppercase leading-[0.86] tracking-[0.02em] drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] select-none">
                     <span className="block text-[32px] sm:text-[35px]">BENEFICIOS</span>
@@ -234,7 +234,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                   type="button"
                   onClick={() => onOpenModal()}
                   aria-label={`Descuento para residentes del distrito: ${residentDiscountPercent}% OFF. Abrir inscripción.`}
-                  className="z-20 min-[1360px]:absolute min-[1360px]:left-full min-[1360px]:ml-16 2xl:ml-24 min-[1360px]:-top-8 rotate-2 min-[1360px]:rotate-[5deg] hover:rotate-0 min-[1360px]:hover:rotate-[1.5deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/15 hover:bg-zinc-900/25 backdrop-blur-[2px] border-[1.5px] border-orange-500/90 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] px-3.5 sm:px-4 pt-6 sm:pt-7 pb-3.5 sm:pb-4 transition-all duration-200 cursor-pointer flex flex-col items-center w-max"
+                  className="z-20 min-[1360px]:absolute min-[1360px]:left-full min-[1360px]:ml-16 2xl:ml-24 min-[1360px]:-top-8 rotate-2 min-[1360px]:rotate-[5deg] hover:rotate-0 min-[1360px]:hover:rotate-[1.5deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/15 hover:bg-zinc-900/25 backdrop-blur-[2px] border-2 border-[var(--theme-primary)] hover:border-[var(--theme-secondary)] shadow-[0_0_16px_var(--theme-glow)] px-3.5 sm:px-4 pt-6 sm:pt-7 pb-3.5 sm:pb-4 transition-all duration-200 cursor-pointer flex flex-col items-center w-max"
                 >
                   {/* Bloque estirado verticalmente desde la base: el pt extra compensa el crecimiento hacia arriba */}
                   <span className="inline-flex items-stretch justify-center gap-[3px] text-white font-poster-impact drop-shadow-[0_3px_8px_rgba(0,0,0,0.65)] select-none px-0.5 scale-y-[1.18] scale-x-[0.94] origin-bottom antialiased transform-gpu">
@@ -256,7 +256,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
             </div>
           )}
 
-          <div className="max-w-4xl mx-auto px-5 sm:px-7 py-4 sm:py-5 rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500/80 shadow-[0_0_16px_var(--theme-glow)]">
+          <div className="max-w-4xl mx-auto px-5 sm:px-7 py-4 sm:py-5 rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500 shadow-[0_0_16px_var(--theme-glow)]">
             <div className="inline-flex flex-col items-stretch mx-auto max-w-full">
               <h1 className="hero-title-athletic text-[clamp(1.25rem,4.9vw,3.45rem)] whitespace-nowrap">
                 <span className="hero-word-accent">{firstTitleWord}</span>
@@ -284,7 +284,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
           </div>
         </div>
 
-        <div className="mt-3 max-w-2xl mx-auto px-6 sm:px-8 py-3.5 rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500/80 shadow-[0_0_16px_var(--theme-glow)]">
+        <div className="mt-3 max-w-2xl mx-auto px-6 sm:px-8 py-3.5 rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500 shadow-[0_0_16px_var(--theme-glow)]">
           <p className="w-full max-w-none text-center text-sm sm:text-base text-white leading-relaxed tracking-[0.075em] [word-spacing:0.28em]">
             Desafiá las crestas técnicas, el bosque de altura y los senderos serranos en dos
             distancias diseñadas para corredores de montaña:{' '}
