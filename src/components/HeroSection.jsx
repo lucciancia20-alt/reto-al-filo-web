@@ -101,12 +101,15 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
   const teamsBenefitEnabled = Boolean(
     raceConfig?.teamsBenefitEnabled ?? RACE_CONFIG.teamsBenefitEnabled
   );
+  const rawNotificationEmail = String(raceConfig?.notificationEmail ?? '').trim();
+  const rawTeamsBenefitEmail = String(raceConfig?.teamsBenefitEmail ?? '').trim();
+  const customTeamsBenefitEmail =
+    rawTeamsBenefitEmail &&
+    rawTeamsBenefitEmail.toLowerCase() !== DEFAULT_TEAMS_BENEFIT_EMAIL.toLowerCase()
+      ? rawTeamsBenefitEmail
+      : '';
   const teamsBenefitEmail =
-    String(
-      raceConfig?.teamsBenefitEmail ||
-        raceConfig?.notificationEmail ||
-        DEFAULT_TEAMS_BENEFIT_EMAIL
-    ).trim() || DEFAULT_TEAMS_BENEFIT_EMAIL;
+    rawNotificationEmail || customTeamsBenefitEmail || DEFAULT_TEAMS_BENEFIT_EMAIL;
 
   return (
     <section
@@ -182,7 +185,72 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         </div>
 
         {/* Título central imponente + sellos inclinados de Teams y Residentes */}
-        <div className="relative inline-flex flex-col items-center max-w-full">
+        <div className="relative z-20 inline-flex flex-col items-center max-w-full">
+          {(teamsBenefitEnabled || residentDiscountEnabled) && (
+            <div className="mb-3.5 flex flex-wrap items-center justify-center gap-3.5 sm:gap-5 min-[1360px]:mb-0 min-[1360px]:contents">
+              {teamsBenefitEnabled && (
+                <a
+                  href={`mailto:${teamsBenefitEmail}?subject=${encodeURIComponent(`Beneficios para Teams - ${raceTitle}`)}`}
+                  aria-label={`Beneficios para Teams: Profesor/Entrenador FREE y 1 Corredor FREE cada 10 inscriptos. Coordinar al mail ${teamsBenefitEmail}`}
+                  className="z-20 min-[1360px]:absolute min-[1360px]:right-full min-[1360px]:mr-16 2xl:mr-24 min-[1360px]:-top-12 -rotate-2 min-[1360px]:-rotate-[5deg] hover:rotate-0 min-[1360px]:hover:-rotate-[1.5deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/15 hover:bg-zinc-900/25 backdrop-blur-[2px] border-[1.5px] border-orange-500/90 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] px-3.5 py-2.5 sm:px-3.5 sm:py-3 transition-all duration-200 cursor-pointer flex flex-col items-stretch w-[244px] sm:w-[258px] text-center no-underline"
+                >
+                  <span className="block font-poster-condensed text-white uppercase leading-[0.86] tracking-[0.02em] drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] select-none">
+                    <span className="block text-[32px] sm:text-[35px]">BENEFICIOS</span>
+                    <span className="block text-[31px] sm:text-[34px] mt-0.5">PARA TEAMS</span>
+                  </span>
+                  <span className="mt-2 flex flex-col gap-1">
+                    <span className="block rounded-[3px] bg-[#f4f2e1] px-2.5 py-0.5 font-display text-[11.5px] sm:text-xs font-bold text-slate-950 leading-snug whitespace-nowrap shadow-sm">
+                      Profesor/Entrenador{' '}
+                      <strong className="font-black uppercase theme-word-accent-light">
+                        FREE
+                      </strong>
+                    </span>
+                    <span className="block rounded-[3px] bg-[#f4f2e1] px-2.5 py-0.5 font-display text-[11.5px] sm:text-xs font-bold text-slate-950 leading-snug whitespace-nowrap shadow-sm">
+                      <strong className="font-black text-[var(--theme-sub-strong)]">
+                        1 Corredor FREE
+                      </strong>{' '}
+                      cada 10 inscriptos
+                    </span>
+                  </span>
+                  <span className="mt-1.5 block font-display text-[10.5px] sm:text-[11px] font-semibold text-white/95 leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                    Se coordina con el profesor /
+                    <br />
+                    entrenador al mail:
+                  </span>
+                  <span className="mt-1.5 inline-flex items-center justify-center gap-1.5 w-full rounded-[2px] theme-poster-ribbon text-[var(--theme-ribbon-text)] font-display font-extrabold text-[11.5px] sm:text-[12.5px] tracking-tight px-3 py-1 leading-tight whitespace-nowrap shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
+                    <Mail className="w-3.5 h-3.5 text-[var(--theme-ribbon-text)] shrink-0 stroke-[2.5]" />
+                    <span className="truncate">{teamsBenefitEmail}</span>
+                  </span>
+                </a>
+              )}
+
+              {residentDiscountEnabled && (
+                <button
+                  type="button"
+                  onClick={() => onOpenModal()}
+                  aria-label={`Descuento para residentes del distrito: ${residentDiscountPercent}% OFF. Abrir inscripción.`}
+                  className="z-20 min-[1360px]:absolute min-[1360px]:left-full min-[1360px]:ml-16 2xl:ml-24 min-[1360px]:-top-8 rotate-2 min-[1360px]:rotate-[5deg] hover:rotate-0 min-[1360px]:hover:rotate-[1.5deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/15 hover:bg-zinc-900/25 backdrop-blur-[2px] border-[1.5px] border-orange-500/90 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] px-3.5 sm:px-4 pt-6 sm:pt-7 pb-3.5 sm:pb-4 transition-all duration-200 cursor-pointer flex flex-col items-center w-max"
+                >
+                  {/* Bloque estirado verticalmente desde la base: el pt extra compensa el crecimiento hacia arriba */}
+                  <span className="inline-flex items-stretch justify-center gap-[3px] text-white font-poster-impact drop-shadow-[0_3px_8px_rgba(0,0,0,0.65)] select-none px-0.5 scale-y-[1.18] scale-x-[0.94] origin-bottom antialiased transform-gpu">
+                    <span className="text-[80px] sm:text-[92px] leading-[0.8] tracking-[-0.04em]">
+                      {residentDiscountPercent}
+                    </span>
+                    <span className="flex flex-col justify-between text-left">
+                      <span className="text-[44px] sm:text-[50px] leading-[0.8]">%</span>
+                      <span className="text-[34px] sm:text-[39px] leading-[0.8] tracking-[-0.02em]">
+                        OFF
+                      </span>
+                    </span>
+                  </span>
+                  <span className="relative z-10 -mt-[3px] block w-full -rotate-[2.5deg] antialiased transform-gpu [backface-visibility:hidden] rounded-[2px] theme-poster-ribbon text-[var(--theme-ribbon-text)] font-display font-extrabold uppercase text-[11.5px] sm:text-[12.5px] tracking-[0.03em] px-3 py-1 leading-tight whitespace-nowrap shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
+                    CORREDORES DEL DISTRITO
+                  </span>
+                </button>
+              )}
+            </div>
+          )}
+
           <div className="max-w-4xl mx-auto px-5 sm:px-7 py-4 sm:py-5 rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500/80 shadow-[0_0_16px_var(--theme-glow)]">
             <div className="inline-flex flex-col items-stretch mx-auto max-w-full">
               <h1 className="hero-title-athletic text-[clamp(1.25rem,4.9vw,3.45rem)] whitespace-nowrap">
@@ -209,71 +277,6 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
               )}
             </div>
           </div>
-
-          {(teamsBenefitEnabled || residentDiscountEnabled) && (
-            <div className="mt-3 flex flex-wrap items-center justify-center gap-3.5 sm:gap-5 xl:mt-0 xl:contents">
-              {teamsBenefitEnabled && (
-                <a
-                  href={`mailto:${teamsBenefitEmail}?subject=${encodeURIComponent(`Beneficios para Teams - ${raceTitle}`)}`}
-                  aria-label={`Beneficios para Teams: Profesor/Entrenador FREE y 1 Corredor FREE cada 10 inscriptos. Coordinar al mail ${teamsBenefitEmail}`}
-                  className="xl:absolute xl:right-full xl:mr-4 2xl:mr-6 xl:-top-6 -rotate-2 xl:-rotate-[5deg] hover:rotate-0 xl:hover:-rotate-[1.5deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/15 hover:bg-zinc-900/25 backdrop-blur-[2px] border-[1.5px] border-orange-500/90 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] p-3.5 sm:p-4 transition-all duration-200 cursor-pointer flex flex-col items-stretch w-[244px] sm:w-[258px] text-center no-underline"
-                >
-                  <span className="block font-poster-condensed text-white uppercase leading-[0.86] tracking-[0.02em] drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] select-none">
-                    <span className="block text-[34px] sm:text-[38px]">BENEFICIOS</span>
-                    <span className="block text-[33px] sm:text-[37px] mt-0.5">PARA TEAMS</span>
-                  </span>
-                  <span className="mt-2.5 flex flex-col gap-1.5">
-                    <span className="block rounded-[3px] bg-[#f4f2e1] px-2.5 py-1 font-display text-[11.5px] sm:text-xs font-bold text-slate-950 leading-snug whitespace-nowrap shadow-sm">
-                      Profesor/Entrenador{' '}
-                      <strong className="font-black text-[var(--theme-accent)] uppercase">
-                        FREE
-                      </strong>
-                    </span>
-                    <span className="block rounded-[3px] bg-[#f4f2e1] px-2.5 py-1 font-display text-[11.5px] sm:text-xs font-bold text-slate-950 leading-snug whitespace-nowrap shadow-sm">
-                      <strong className="font-black text-[var(--theme-sub-strong)]">
-                        1 Corredor FREE
-                      </strong>{' '}
-                      cada 10 inscriptos
-                    </span>
-                  </span>
-                  <span className="mt-2 block font-display text-[10.5px] sm:text-[11px] font-semibold text-white/95 leading-snug drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
-                    Se coordina con el profesor /
-                    <br />
-                    entrenador al mail:
-                  </span>
-                  <span className="mt-1.5 inline-flex items-center justify-center gap-1.5 w-full rounded-[2px] theme-poster-ribbon text-[var(--theme-ribbon-text)] font-display font-extrabold text-[11.5px] sm:text-[12.5px] tracking-tight px-3 py-1 leading-tight whitespace-nowrap shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
-                    <Mail className="w-3.5 h-3.5 text-[var(--theme-ribbon-text)] shrink-0 stroke-[2.5]" />
-                    <span className="truncate">{teamsBenefitEmail}</span>
-                  </span>
-                </a>
-              )}
-
-              {residentDiscountEnabled && (
-                <button
-                  type="button"
-                  onClick={() => onOpenModal()}
-                  aria-label={`Descuento para residentes del distrito: ${residentDiscountPercent}% OFF. Abrir inscripción.`}
-                  className="xl:absolute xl:left-full xl:ml-4 2xl:ml-6 xl:-top-6 rotate-2 xl:rotate-[5deg] hover:rotate-0 xl:hover:rotate-[1.5deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/15 hover:bg-zinc-900/25 backdrop-blur-[2px] border-[1.5px] border-orange-500/90 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] px-3.5 sm:px-4 pt-6 sm:pt-7 pb-3.5 sm:pb-4 transition-all duration-200 cursor-pointer flex flex-col items-center w-max"
-                >
-                  {/* Bloque estirado verticalmente desde la base: el pt extra compensa el crecimiento hacia arriba */}
-                  <span className="inline-flex items-stretch justify-center gap-[3px] text-white font-poster-impact drop-shadow-[0_3px_8px_rgba(0,0,0,0.65)] select-none px-0.5 scale-y-[1.18] scale-x-[0.94] origin-bottom antialiased transform-gpu">
-                    <span className="text-[80px] sm:text-[92px] leading-[0.8] tracking-[-0.04em]">
-                      {residentDiscountPercent}
-                    </span>
-                    <span className="flex flex-col justify-between text-left">
-                      <span className="text-[44px] sm:text-[50px] leading-[0.8]">%</span>
-                      <span className="text-[34px] sm:text-[39px] leading-[0.8] tracking-[-0.02em]">
-                        OFF
-                      </span>
-                    </span>
-                  </span>
-                  <span className="relative z-10 -mt-[3px] block w-full -rotate-[2.5deg] antialiased transform-gpu [backface-visibility:hidden] rounded-[2px] theme-poster-ribbon text-[var(--theme-ribbon-text)] font-display font-extrabold uppercase text-[11.5px] sm:text-[12.5px] tracking-[0.03em] px-3 py-1 leading-tight whitespace-nowrap shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
-                    CORREDORES DEL DISTRITO
-                  </span>
-                </button>
-              )}
-            </div>
-          )}
         </div>
 
         <div className="mt-3 max-w-2xl mx-auto px-6 sm:px-8 py-3.5 rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500/80 shadow-[0_0_16px_var(--theme-glow)]">

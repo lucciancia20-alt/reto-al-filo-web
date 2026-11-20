@@ -331,7 +331,7 @@ export const RACE_CONFIG = {
 
   // Tarjeta promocional de Beneficios para Teams en el Hero
   teamsBenefitEnabled: DEFAULT_TEAMS_BENEFIT_ENABLED,
-  teamsBenefitEmail: DEFAULT_TEAMS_BENEFIT_EMAIL,
+  teamsBenefitEmail: '',
 };
 
 const ARGENTINA_TIMEZONE = 'America/Argentina/Buenos_Aires';
@@ -730,12 +730,21 @@ export function mergeRaceConfig(override) {
       ? RACE_CONFIG.residentLocalities
       : parseResidentLocalities(override.residentLocalities, RACE_CONFIG.residentLocalities);
 
+  const resolvedNotificationEmail =
+    String(override.notificationEmail || '').trim() || RACE_CONFIG.notificationEmail;
+
   const resolvedTeamsBenefitEnabled =
     typeof override.teamsBenefitEnabled === 'boolean'
       ? override.teamsBenefitEnabled
       : RACE_CONFIG.teamsBenefitEnabled;
+  const rawTeamsBenefitEmail = String(override.teamsBenefitEmail ?? '').trim();
+  const customTeamsBenefitEmail =
+    rawTeamsBenefitEmail &&
+    rawTeamsBenefitEmail.toLowerCase() !== DEFAULT_TEAMS_BENEFIT_EMAIL.toLowerCase()
+      ? rawTeamsBenefitEmail
+      : '';
   const resolvedTeamsBenefitEmail =
-    String(override.teamsBenefitEmail ?? '').trim() || RACE_CONFIG.teamsBenefitEmail;
+    resolvedNotificationEmail || customTeamsBenefitEmail || DEFAULT_TEAMS_BENEFIT_EMAIL;
 
   return {
     ...RACE_CONFIG,
@@ -745,8 +754,7 @@ export function mergeRaceConfig(override) {
     themeColor: resolvedThemeColor,
     whatsappNumber:
       String(override.whatsappNumber || '').trim() || RACE_CONFIG.whatsappNumber,
-    notificationEmail:
-      String(override.notificationEmail || '').trim() || RACE_CONFIG.notificationEmail,
+    notificationEmail: resolvedNotificationEmail,
     targetDateIso: resolvedTargetDateIso,
     heroImage: resolvedHeroImage,
     payment: {

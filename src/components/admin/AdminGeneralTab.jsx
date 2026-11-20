@@ -210,7 +210,12 @@ export default function AdminGeneralTab({
               placeholder="lciancia1972@gmail.com"
               value={draft.notificationEmail ?? ''}
               onChange={(e) => {
-                setDraft({ ...draft, notificationEmail: e.target.value });
+                const nextEmail = e.target.value;
+                setDraft((prev) => ({
+                  ...prev,
+                  notificationEmail: nextEmail,
+                  teamsBenefitEmail: nextEmail,
+                }));
                 if (emailTestStatus) setEmailTestStatus(null);
               }}
               className="flex-1 min-w-0 rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
@@ -744,6 +749,15 @@ export default function AdminGeneralTab({
             ? draft.teamsBenefitEnabled
             : RACE_CONFIG.teamsBenefitEnabled;
 
+        const orgEmailValue =
+          String(draft.notificationEmail ?? '') !== ''
+            ? draft.notificationEmail
+            : draft.teamsBenefitEmail ?? '';
+        const previewTeamsEmail =
+          String(draft.notificationEmail || '').trim() ||
+          String(draft.teamsBenefitEmail || '').trim() ||
+          DEFAULT_TEAMS_BENEFIT_EMAIL;
+
         return (
           <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5">
             <div className="flex flex-wrap items-center justify-between gap-2.5">
@@ -810,17 +824,26 @@ export default function AdminGeneralTab({
               <input
                 id="admin-teams-benefit-email"
                 type="email"
-                value={draft.teamsBenefitEmail ?? DEFAULT_TEAMS_BENEFIT_EMAIL}
-                onChange={(e) =>
-                  setDraft((prev) => ({ ...prev, teamsBenefitEmail: e.target.value }))
-                }
-                onBlur={() =>
+                value={orgEmailValue}
+                onChange={(e) => {
+                  const nextEmail = e.target.value;
                   setDraft((prev) => ({
                     ...prev,
-                    teamsBenefitEmail:
-                      String(prev.teamsBenefitEmail ?? '').trim() || DEFAULT_TEAMS_BENEFIT_EMAIL,
-                  }))
-                }
+                    notificationEmail: nextEmail,
+                    teamsBenefitEmail: nextEmail,
+                  }));
+                  if (emailTestStatus) setEmailTestStatus(null);
+                }}
+                onBlur={(e) => {
+                  const trimmed = e.target.value.trim();
+                  if (trimmed !== e.target.value) {
+                    setDraft((prev) => ({
+                      ...prev,
+                      notificationEmail: trimmed,
+                      teamsBenefitEmail: trimmed,
+                    }));
+                  }
+                }}
                 placeholder={DEFAULT_TEAMS_BENEFIT_EMAIL}
                 className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
               />
@@ -830,9 +853,7 @@ export default function AdminGeneralTab({
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-[2px] theme-poster-ribbon text-[var(--theme-ribbon-text)] font-display font-extrabold text-xs tracking-tight px-2.5 py-1 leading-tight">
                   <Mail className="w-3.5 h-3.5 text-[var(--theme-ribbon-text)] shrink-0 stroke-[2.5]" />
-                  <span>
-                    {String(draft.teamsBenefitEmail || '').trim() || DEFAULT_TEAMS_BENEFIT_EMAIL}
-                  </span>
+                  <span>{previewTeamsEmail}</span>
                 </span>
               </div>
             </div>
