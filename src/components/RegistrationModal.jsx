@@ -537,12 +537,12 @@ export default function RegistrationModal({
           <>
             {/* Pantalla de Confirmación */}
             <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-7 space-y-5">
-              <div className="rounded-2xl bg-zinc-950 border border-[#41712a] p-5 text-center">
-                <CheckCircle2 className="w-12 h-12 text-[#41712a] mx-auto" />
-                <p className="mt-2 text-xs font-bold uppercase tracking-widest text-[#41712a]">
+              <div className="rounded-2xl bg-zinc-950 border border-[#3E5C23] p-5 text-center">
+                <CheckCircle2 className="w-12 h-12 text-[#3E5C23] mx-auto" />
+                <p className="mt-2 text-xs font-bold uppercase tracking-widest text-[#3E5C23]">
                   Ficha y Comprobante Recibidos
                 </p>
-                <div className="mt-2 inline-block rounded-xl bg-zinc-950 border border-[#41712a] px-4 py-2">
+                <div className="mt-2 inline-block rounded-xl bg-zinc-950 border border-[#3E5C23] px-4 py-2">
                   <span className="block text-[10px] uppercase tracking-wider text-stone-400">
                     Tu Código de Inscripción
                   </span>
@@ -586,7 +586,7 @@ export default function RegistrationModal({
                     </span>
                     {confirmedReg.isLocalResident && (
                       <div className="mt-1 flex flex-col items-end gap-0.5">
-                        <span className="inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300">
+                        <span className="inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-zinc-950 border border-[#3E5C23] text-[#3E5C23]">
                           Residente (-{confirmedReg.discountPercentApplied || 0}%)
                         </span>
                         <span className="text-[10px] text-amber-300">
@@ -657,7 +657,7 @@ export default function RegistrationModal({
                 href={confirmationWhatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 min-h-[46px] inline-flex items-center justify-center gap-2 rounded-xl bg-[#41712a] hover:bg-[#4a7c30] text-amber-400 font-display font-black text-xs sm:text-sm uppercase tracking-wide px-4 py-3 transition-colors"
+                className="flex-1 min-h-[46px] inline-flex items-center justify-center gap-2 rounded-xl bg-[#2E441A] hover:bg-[#243614] text-amber-400 font-display font-black text-xs sm:text-sm uppercase tracking-wide px-4 py-3 transition-colors"
               >
                 <MessageCircle className="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" />
                 Avisar por WhatsApp a la Organización
