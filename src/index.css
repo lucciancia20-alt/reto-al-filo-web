@@ -191,6 +191,12 @@
     background: var(--theme-ribbon-gradient);
   }
 
+  .poster-title-stroke {
+    color: #ffffff;
+    -webkit-text-stroke: 2px var(--theme-stroke);
+    paint-order: stroke fill;
+  }
+
   .hero-title-athletic {
     font-family: 'Vipnagorgialla', 'Barlow Condensed', sans-serif;
     font-weight: 800;

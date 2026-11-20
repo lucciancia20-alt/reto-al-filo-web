@@ -297,7 +297,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                   aria-label={`Beneficios para Teams: Profesor/Entrenador FREE y 1 Corredor FREE cada 10 inscriptos. Coordinar al mail ${teamsBenefitEmail}`}
                   className="z-20 min-[1360px]:absolute min-[1360px]:right-full min-[1360px]:mr-16 2xl:mr-24 min-[1360px]:-top-12 -rotate-2 min-[1360px]:-rotate-[5deg] hover:rotate-0 min-[1360px]:hover:-rotate-[1.5deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/15 hover:bg-zinc-900/25 backdrop-blur-[2px] border-2 border-[var(--theme-primary)] hover:border-[var(--theme-secondary)] shadow-[0_0_16px_var(--theme-glow)] px-3.5 py-2.5 sm:px-3.5 sm:py-3 transition-all duration-200 cursor-pointer flex flex-col items-stretch w-[244px] sm:w-[258px] text-center no-underline"
                 >
-                  <span className="block font-poster-condensed text-white uppercase leading-[0.86] tracking-[0.02em] drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] select-none">
+                  <span className="block font-poster-condensed poster-title-stroke uppercase leading-[0.86] tracking-[0.02em] drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] select-none">
                     <span className="block text-[32px] sm:text-[35px]">BENEFICIOS</span>
                     <span className="block text-[31px] sm:text-[34px] mt-0.5">PARA TEAMS</span>
                   </span>
@@ -335,7 +335,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                   className="z-20 min-[1360px]:absolute min-[1360px]:left-full min-[1360px]:ml-16 2xl:ml-24 min-[1360px]:-top-8 rotate-2 min-[1360px]:rotate-[5deg] hover:rotate-0 min-[1360px]:hover:rotate-[1.5deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/15 hover:bg-zinc-900/25 backdrop-blur-[2px] border-2 border-[var(--theme-primary)] hover:border-[var(--theme-secondary)] shadow-[0_0_16px_var(--theme-glow)] px-3.5 sm:px-4 pt-6 sm:pt-7 pb-3.5 sm:pb-4 transition-all duration-200 cursor-pointer flex flex-col items-center w-max"
                 >
                   {/* Bloque estirado verticalmente desde la base: el pt extra compensa el crecimiento hacia arriba */}
-                  <span className="inline-flex items-stretch justify-center gap-[3px] text-white font-poster-impact drop-shadow-[0_3px_8px_rgba(0,0,0,0.65)] select-none px-0.5 scale-y-[1.18] scale-x-[0.94] origin-bottom antialiased transform-gpu">
+                  <span className="inline-flex items-stretch justify-center gap-[3px] poster-title-stroke font-poster-impact drop-shadow-[0_3px_8px_rgba(0,0,0,0.65)] select-none px-0.5 scale-y-[1.18] scale-x-[0.94] origin-bottom antialiased transform-gpu">
                     <span className="text-[80px] sm:text-[92px] leading-[0.8] tracking-[-0.04em]">
                       {residentDiscountPercent}
                     </span>
