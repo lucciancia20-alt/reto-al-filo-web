@@ -19,6 +19,7 @@
     #ea8c00 100%
   );
   --theme-ribbon-text: #264214;
+  --theme-strip-accent: #264214;
 }
 
 [data-theme="naranja"] {
@@ -115,6 +116,7 @@
     color-mix(in srgb, var(--theme-accent) 92%, #000000 8%) 100%
   );
   --theme-ribbon-text: #020617;
+  --theme-strip-accent: var(--theme-accent);
 }
 
 /* Blinda los colores semánticos operativos dentro de la pestaña Inscriptos */
@@ -207,21 +209,6 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 0 14px var(--theme-glow)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.75));
-  }
-
-  .theme-word-accent-light {
-    display: inline-block;
-    background: linear-gradient(
-      180deg,
-      var(--theme-secondary) 0%,
-      var(--theme-primary) 50%,
-      var(--theme-accent) 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45));
   }
 
   .hero-word-white {

@@ -206,12 +206,12 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                   <span className="mt-2 flex flex-col gap-1">
                     <span className="block rounded-[3px] bg-[#f4f2e1] px-2.5 py-0.5 font-display text-[11.5px] sm:text-xs font-bold text-slate-950 leading-snug whitespace-nowrap shadow-sm">
                       Profesor/Entrenador{' '}
-                      <strong className="font-black uppercase theme-word-accent-light">
+                      <strong className="font-black text-[var(--theme-strip-accent)] uppercase">
                         FREE
                       </strong>
                     </span>
                     <span className="block rounded-[3px] bg-[#f4f2e1] px-2.5 py-0.5 font-display text-[11.5px] sm:text-xs font-bold text-slate-950 leading-snug whitespace-nowrap shadow-sm">
-                      <strong className="font-black text-[var(--theme-sub-strong)]">
+                      <strong className="font-black text-[var(--theme-strip-accent)]">
                         1 Corredor FREE
                       </strong>{' '}
                       cada 10 inscriptos
