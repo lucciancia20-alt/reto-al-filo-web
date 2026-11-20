@@ -537,12 +537,12 @@ export default function RegistrationModal({
           <>
             {/* Pantalla de Confirmación */}
             <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-7 space-y-5">
-              <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/35 p-5 text-center">
-                <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
-                <p className="mt-2 text-xs font-bold uppercase tracking-widest text-emerald-300">
+              <div className="rounded-2xl bg-zinc-950 border border-[#41712a] p-5 text-center">
+                <CheckCircle2 className="w-12 h-12 text-[#41712a] mx-auto" />
+                <p className="mt-2 text-xs font-bold uppercase tracking-widest text-[#41712a]">
                   Ficha y Comprobante Recibidos
                 </p>
-                <div className="mt-2 inline-block rounded-xl bg-zinc-950 border border-emerald-500/40 px-4 py-2">
+                <div className="mt-2 inline-block rounded-xl bg-zinc-950 border border-[#41712a] px-4 py-2">
                   <span className="block text-[10px] uppercase tracking-wider text-stone-400">
                     Tu Código de Inscripción
                   </span>
@@ -621,7 +621,7 @@ export default function RegistrationModal({
               </div>
 
               {/* Descargas A4 pre-llenadas para Acreditación */}
-              <div className="rounded-2xl bg-amber-500/10 border border-orange-500/50 p-4 space-y-2.5">
+              <div className="rounded-2xl bg-zinc-950 border border-orange-500/50 p-4 space-y-2.5">
                 <div>
                   <span className="block text-[10px] font-bold uppercase tracking-widest text-amber-400">
                     Documentación para presentar al retirar tu kit
@@ -635,7 +635,7 @@ export default function RegistrationModal({
                   <button
                     type="button"
                     onClick={() => openPrintableWaiver({ raceConfig, runner: confirmedReg })}
-                    className="min-h-[42px] inline-flex items-center justify-center gap-2 rounded-xl bg-orange-600/85 hover:bg-orange-600 text-zinc-950 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
+                    className="min-h-[42px] inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-950 hover:bg-stone-800 text-amber-300 border border-orange-500/70 font-display font-bold text-xs uppercase tracking-wider px-3.5 py-2 transition-colors cursor-pointer"
                   >
                     <Printer className="w-4 h-4 shrink-0" />
                     <span>Deslinde Oficial (A4 / PDF)</span>
@@ -657,9 +657,9 @@ export default function RegistrationModal({
                 href={confirmationWhatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 min-h-[46px] inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wide px-4 py-3 shadow-lg shadow-emerald-500/20"
+                className="flex-1 min-h-[46px] inline-flex items-center justify-center gap-2 rounded-xl bg-[#41712a] hover:bg-[#4a7c30] text-amber-400 font-display font-black text-xs sm:text-sm uppercase tracking-wide px-4 py-3 transition-colors"
               >
-                <MessageCircle className="w-4 h-4 fill-stone-950 shrink-0" />
+                <MessageCircle className="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" />
                 Avisar por WhatsApp a la Organización
               </a>
               <button
