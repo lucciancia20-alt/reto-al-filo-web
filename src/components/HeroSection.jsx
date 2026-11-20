@@ -12,6 +12,105 @@ import {
 } from '../data/raceConfig';
 import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
+const SPONSOR_CIRCLE_SIZE_CLASS =
+  'w-14 h-14 sm:w-16 sm:h-16 md:w-[72px] md:h-[72px] lg:w-[76px] lg:h-[76px] aspect-square';
+
+const SPONSOR_PRESENTATIONS = [
+  {
+    matchUrl: 'aoiikojcbeiifxjcmbkz',
+    matchName: /\bena\b/i,
+    variant: 'circle-white',
+  },
+  {
+    matchUrl: 'lk1mw5odlaby0mwvhwkq',
+    matchName: /minuj[ií]n/i,
+    variant: 'circle',
+    src: '/sponsors/minujin.png',
+  },
+  {
+    matchUrl: 'g9snabgpin6vdhxxbzhq',
+    matchName: /vertientes|churrasquer/i,
+    variant: 'circle',
+    src: '/sponsors/vertientes.png',
+  },
+  {
+    matchUrl: 'lvpqtxqvv2wlf5ns2orx',
+    matchName: /\bhidra\b/i,
+    variant: 'circle',
+  },
+  {
+    matchUrl: 'yjcapd0duqt2iur2fu7p',
+    matchName: /resto\s*bar|229/i,
+    variant: 'badge',
+    src: '/sponsors/restobar-229.png',
+  },
+  {
+    matchUrl: 'tjuvxbiv7wpzg53twn9c',
+    matchName: /tornquist\s*municipio|municipio\s*(de\s*)?tornquist/i,
+    variant: 'horizontal',
+    src: '/sponsors/municipio-tornquist.png',
+  },
+  {
+    matchUrl: 'l23k5ifhxguhm1vntihl',
+    matchName: /mistega/i,
+    variant: 'circle-white',
+  },
+  {
+    matchUrl: 't2hgy400hjjfw3mclvwn',
+    matchName: /irineo/i,
+    variant: 'circle-white',
+    src: '/sponsors/irineo.png',
+  },
+];
+
+function resolveSponsorPresentation(sp) {
+  const url = String(sp?.logoUrl || '');
+  const name = String(sp?.name || '');
+  const matched = SPONSOR_PRESENTATIONS.find(
+    (entry) => (entry.matchUrl && url.includes(entry.matchUrl)) || entry.matchName.test(name)
+  );
+  const variant = matched?.variant || 'default';
+  const resolvedSrc = matched?.src || optimizeCloudinaryUrl(url, 320);
+
+  if (variant === 'circle' || variant === 'circle-white') {
+    return {
+      src: resolvedSrc,
+      wrapperClass: `${SPONSOR_CIRCLE_SIZE_CLASS} rounded-full overflow-hidden ${
+        variant === 'circle-white' ? 'bg-white' : ''
+      }`,
+      imgClass: 'w-full h-full object-cover rounded-full transition-transform duration-200',
+      allowInvert: false,
+    };
+  }
+
+  if (variant === 'badge') {
+    return {
+      src: resolvedSrc,
+      wrapperClass: SPONSOR_CIRCLE_SIZE_CLASS,
+      imgClass: 'w-full h-full object-contain transition-transform duration-200',
+      allowInvert: false,
+    };
+  }
+
+  if (variant === 'horizontal') {
+    return {
+      src: resolvedSrc,
+      wrapperClass: 'h-11 sm:h-12 md:h-[52px] lg:h-[56px] w-auto',
+      imgClass:
+        'h-full w-auto max-w-[155px] sm:max-w-[185px] md:max-w-[205px] object-contain drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)] transition-transform duration-200',
+      allowInvert: false,
+    };
+  }
+
+  return {
+    src: resolvedSrc,
+    wrapperClass: 'h-14 sm:h-16 md:h-[72px] lg:h-[76px]',
+    imgClass:
+      'h-full w-auto max-w-[140px] sm:max-w-[175px] md:max-w-[195px] object-contain transition-all duration-200',
+    allowInvert: true,
+  };
+}
+
 function normalizeSponsorLink(rawLink) {
   const trimmed = String(rawLink || '').trim();
   if (!trimmed) return '';
@@ -137,16 +236,15 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mx-auto max-w-[300px] sm:max-w-none">
               {activeSponsors.map((sp, idx) => {
                 const href = normalizeSponsorLink(sp.linkUrl);
+                const presentation = resolveSponsorPresentation(sp);
                 const content = sp.logoUrl ? (
                   <img
-                    src={optimizeCloudinaryUrl(sp.logoUrl, 320)}
+                    src={presentation.src}
                     alt={sp.name || `Sponsor ${idx + 1}`}
                     loading="lazy"
                     decoding="async"
-                    className={`h-full w-auto max-w-[140px] sm:max-w-[175px] md:max-w-[195px] object-contain transition-all duration-200 ${
-                      sp.invertOnDark
-                        ? 'brightness-0 invert opacity-85 hover:opacity-100'
-                        : 'opacity-85 hover:opacity-100'
+                    className={`${presentation.imgClass}${
+                      presentation.allowInvert && sp.invertOnDark ? ' brightness-0 invert' : ''
                     }`}
                   />
                 ) : (
@@ -162,14 +260,14 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                     rel="noopener noreferrer"
                     title={sp.name ? `Visitar ${sp.name}` : 'Visitar sponsor oficial'}
                     aria-label={sp.name ? `Visitar ${sp.name}` : 'Visitar sponsor oficial'}
-                    className="inline-flex items-center justify-center shrink-0 h-14 sm:h-16 md:h-[72px] lg:h-[76px] hover:scale-105 transition-transform"
+                    className={`inline-flex items-center justify-center shrink-0 ${presentation.wrapperClass} hover:scale-105 transition-transform`}
                   >
                     {content}
                   </a>
                 ) : (
                   <span
                     key={sp.id || `hero-sponsor-${idx}`}
-                    className="inline-flex items-center justify-center shrink-0 h-14 sm:h-16 md:h-[72px] lg:h-[76px]"
+                    className={`inline-flex items-center justify-center shrink-0 ${presentation.wrapperClass}`}
                   >
                     {content}
                   </span>
