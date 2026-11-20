@@ -315,10 +315,10 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                 key={unit.label}
                 className="rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500 py-2.5 px-2 sm:py-3 shadow-[0_0_16px_var(--theme-glow)]"
               >
-                <div className="countdown-number-athletic text-xl sm:text-[28px] text-white tabular-nums px-1">
+                <div className="font-mono font-bold text-2xl sm:text-4xl leading-none tracking-[0.06em] text-white tabular-nums drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]">
                   {unit.value}
                 </div>
-                <div className="mt-1.5 font-display font-extrabold italic text-[11px] sm:text-xs uppercase tracking-widest text-orange-400">
+                <div className="mt-1.5 font-mono text-[11px] sm:text-xs font-semibold uppercase tracking-widest text-orange-400">
                   {unit.label}
                 </div>
               </div>
