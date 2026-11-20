@@ -293,7 +293,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         </div>
 
         {/* Contador regresivo dinámico hacia la fecha y hora de largada */}
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md sm:max-w-lg">
           <p className="my-4 text-center text-xs sm:text-sm font-medium uppercase tracking-wider text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
             <Timer className="inline-block w-4 h-4 sm:w-[18px] sm:h-[18px] text-orange-400 mr-1.5 -mt-0.5 align-middle" />
             <span>
@@ -315,10 +315,10 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                 key={unit.label}
                 className="rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500 py-2.5 px-2 sm:py-3 shadow-[0_0_16px_var(--theme-glow)]"
               >
-                <div className="section-title-athletic text-2xl sm:text-4xl text-white tabular-nums">
+                <div className="countdown-number-athletic text-xl sm:text-[28px] text-white tabular-nums px-1">
                   {unit.value}
                 </div>
-                <div className="mt-1 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-orange-400">
+                <div className="mt-1.5 font-display font-extrabold italic text-[11px] sm:text-xs uppercase tracking-widest text-orange-400">
                   {unit.label}
                 </div>
               </div>
