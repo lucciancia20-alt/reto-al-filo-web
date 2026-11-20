@@ -47,7 +47,7 @@ const SPONSOR_PRESENTATIONS = [
   {
     matchUrl: 'tjuvxbiv7wpzg53twn9c',
     matchName: /tornquist\s*municipio|municipio\s*(de\s*)?tornquist/i,
-    variant: 'horizontal',
+    variant: 'circle-white',
     src: '/sponsors/municipio-tornquist.png',
   },
   {
