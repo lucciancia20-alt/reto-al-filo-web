@@ -127,50 +127,55 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/30 to-black/80" />
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-8 sm:pb-10 text-center flex flex-col items-center">
+      <div className="relative z-10 w-full max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-8 sm:pb-10 text-center flex flex-col items-center">
         {/* Franja de sponsors — arriba debajo del Navbar fijo */}
         {activeSponsors.length > 0 && (
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5 mb-3.5 px-2">
+          <div className="w-full max-w-6xl xl:max-w-7xl mx-auto mb-5 px-2 sm:px-4 flex flex-col md:flex-row items-center justify-center gap-2.5 md:gap-4">
             <span className="inline-flex items-center px-3 py-1 rounded bg-[var(--theme-sub-bg)] border border-[var(--theme-sub-border)] text-[var(--theme-sub)] font-display-athletic text-[10px] sm:text-xs tracking-widest -skew-x-6 shrink-0">
               <span className="skew-x-6">Nos acompañan:</span>
             </span>
-            {activeSponsors.map((sp, idx) => {
-              const href = normalizeSponsorLink(sp.linkUrl);
-              const content = sp.logoUrl ? (
-                <img
-                  src={optimizeCloudinaryUrl(sp.logoUrl, 320)}
-                  alt={sp.name || `Sponsor ${idx + 1}`}
-                  loading="lazy"
-                  decoding="async"
-                  className={`h-12 sm:h-14 w-auto max-w-[165px] object-contain transition-all duration-200 ${
-                    sp.invertOnDark
-                      ? 'brightness-0 invert opacity-85 hover:opacity-100'
-                      : 'opacity-85 hover:opacity-100'
-                  }`}
-                />
-              ) : (
-                <span className="font-display font-bold text-xs uppercase tracking-wider text-stone-200 hover:text-white transition-colors">
-                  {sp.name}
-                </span>
-              );
-              return href ? (
-                <a
-                  key={sp.id || `hero-sponsor-${idx}`}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={sp.name ? `Visitar ${sp.name}` : 'Visitar sponsor oficial'}
-                  aria-label={sp.name ? `Visitar ${sp.name}` : 'Visitar sponsor oficial'}
-                  className="inline-flex items-center hover:scale-105 transition-transform"
-                >
-                  {content}
-                </a>
-              ) : (
-                <span key={sp.id || `hero-sponsor-${idx}`} className="inline-flex items-center">
-                  {content}
-                </span>
-              );
-            })}
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 max-w-[300px] sm:max-w-none">
+              {activeSponsors.map((sp, idx) => {
+                const href = normalizeSponsorLink(sp.linkUrl);
+                const content = sp.logoUrl ? (
+                  <img
+                    src={optimizeCloudinaryUrl(sp.logoUrl, 320)}
+                    alt={sp.name || `Sponsor ${idx + 1}`}
+                    loading="lazy"
+                    decoding="async"
+                    className={`h-14 sm:h-16 md:h-[72px] lg:h-[76px] w-auto max-w-[140px] sm:max-w-[175px] md:max-w-[195px] object-contain transition-all duration-200 ${
+                      sp.invertOnDark
+                        ? 'brightness-0 invert opacity-85 hover:opacity-100'
+                        : 'opacity-85 hover:opacity-100'
+                    }`}
+                  />
+                ) : (
+                  <span className="font-display font-bold text-xs uppercase tracking-wider text-stone-200 hover:text-white transition-colors">
+                    {sp.name}
+                  </span>
+                );
+                return href ? (
+                  <a
+                    key={sp.id || `hero-sponsor-${idx}`}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={sp.name ? `Visitar ${sp.name}` : 'Visitar sponsor oficial'}
+                    aria-label={sp.name ? `Visitar ${sp.name}` : 'Visitar sponsor oficial'}
+                    className="inline-flex items-center shrink-0 hover:scale-105 transition-transform"
+                  >
+                    {content}
+                  </a>
+                ) : (
+                  <span
+                    key={sp.id || `hero-sponsor-${idx}`}
+                    className="inline-flex items-center shrink-0"
+                  >
+                    {content}
+                  </span>
+                );
+              })}
+            </div>
           </div>
         )}
 
