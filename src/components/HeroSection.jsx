@@ -335,7 +335,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
               className="w-full min-h-[54px] h-full flex items-center justify-center rounded-2xl bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-950 active:scale-[0.99] text-orange-400 font-display font-semibold text-base sm:text-lg uppercase tracking-wider px-6 py-3 transition-all cursor-pointer"
             >
               <span className="inline-flex items-center gap-2.5 animate-cta-pulse">
-                <Flame className="w-5 h-5 text-orange-400" />
+                <Flame className="w-5 h-5 text-[var(--theme-sub)] shrink-0" />
                 <span>Quiero Inscribirme</span>
               </span>
             </button>
@@ -352,7 +352,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
             href="#consultar-dorsal"
             className="w-full flex items-center justify-center gap-2 rounded-full bg-zinc-900/10 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-orange-500/70 px-4 py-2 text-xs font-semibold text-orange-400 hover:scale-[1.01] transition-all"
           >
-            <Search className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+            <Search className="w-3.5 h-3.5 text-[var(--theme-sub)] shrink-0" />
             <span>¿Ya te inscribiste? Consultar mi estado y dorsal →</span>
           </a>
         </div>
