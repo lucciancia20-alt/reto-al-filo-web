@@ -253,20 +253,21 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                   type="button"
                   onClick={() => onOpenModal()}
                   aria-label={`Descuento para residentes del distrito: ${residentDiscountPercent}% OFF. Abrir inscripción.`}
-                  className="xl:absolute xl:left-full xl:ml-4 2xl:ml-6 xl:-top-6 rotate-2 xl:rotate-[5deg] hover:rotate-0 xl:hover:rotate-[1.5deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/15 hover:bg-zinc-900/25 backdrop-blur-[2px] border-[1.5px] border-orange-500/90 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] p-3.5 sm:p-4 transition-all duration-200 cursor-pointer flex flex-col items-center w-max"
+                  className="xl:absolute xl:left-full xl:ml-4 2xl:ml-6 xl:-top-6 rotate-2 xl:rotate-[5deg] hover:rotate-0 xl:hover:rotate-[1.5deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/15 hover:bg-zinc-900/25 backdrop-blur-[2px] border-[1.5px] border-orange-500/90 hover:border-orange-400 shadow-[0_0_16px_var(--theme-glow)] px-3.5 sm:px-4 pt-6 sm:pt-7 pb-3.5 sm:pb-4 transition-all duration-200 cursor-pointer flex flex-col items-center w-max"
                 >
-                  <span className="inline-flex items-stretch justify-center gap-1 text-white font-poster-condensed drop-shadow-[0_3px_8px_rgba(0,0,0,0.65)] select-none px-1">
-                    <span className="text-[78px] sm:text-[90px] leading-[0.82] tracking-[-0.02em] scale-y-[1.08] origin-bottom">
+                  {/* Bloque estirado verticalmente desde la base: el pt extra compensa el crecimiento hacia arriba */}
+                  <span className="inline-flex items-stretch justify-center gap-[3px] text-white font-poster-impact drop-shadow-[0_3px_8px_rgba(0,0,0,0.65)] select-none px-0.5 scale-y-[1.18] scale-x-[0.94] origin-bottom antialiased transform-gpu">
+                    <span className="text-[80px] sm:text-[92px] leading-[0.8] tracking-[-0.04em]">
                       {residentDiscountPercent}
                     </span>
-                    <span className="flex flex-col justify-between text-left leading-none py-[1px]">
-                      <span className="text-[40px] sm:text-[46px] leading-[0.82]">%</span>
-                      <span className="text-[33px] sm:text-[38px] leading-[0.82] tracking-[-0.01em]">
+                    <span className="flex flex-col justify-between text-left">
+                      <span className="text-[44px] sm:text-[50px] leading-[0.8]">%</span>
+                      <span className="text-[34px] sm:text-[39px] leading-[0.8] tracking-[-0.02em]">
                         OFF
                       </span>
                     </span>
                   </span>
-                  <span className="relative z-10 -mt-2.5 sm:-mt-3 block w-full rounded-[2px] theme-poster-ribbon text-[var(--theme-ribbon-text)] font-display font-extrabold uppercase text-[11.5px] sm:text-[12.5px] tracking-[0.03em] px-3 py-1 leading-tight whitespace-nowrap shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
+                  <span className="relative z-10 -mt-[3px] block w-full -rotate-[2.5deg] antialiased transform-gpu [backface-visibility:hidden] rounded-[2px] theme-poster-ribbon text-[var(--theme-ribbon-text)] font-display font-extrabold uppercase text-[11.5px] sm:text-[12.5px] tracking-[0.03em] px-3 py-1 leading-tight whitespace-nowrap shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
                     CORREDORES DEL DISTRITO
                   </span>
                 </button>

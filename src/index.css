@@ -177,6 +177,14 @@
     letter-spacing: 0.01em;
   }
 
+  /* Display ultra-condensada de huecos cerrados (Impact nativa, Anton como respaldo web) */
+  .font-poster-impact {
+    font-family: 'Impact', 'Anton', 'Haettenschweiler', 'Arial Narrow Bold', sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+  }
+
   .theme-poster-ribbon {
     background: var(--theme-ribbon-gradient);
   }
