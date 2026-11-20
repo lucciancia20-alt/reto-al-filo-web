@@ -131,8 +131,8 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         {/* Franja de sponsors — arriba debajo del Navbar fijo */}
         {activeSponsors.length > 0 && (
           <div className="w-full max-w-6xl xl:max-w-7xl mx-auto mb-3.5 px-2 sm:px-4 flex flex-col items-center justify-center gap-2">
-            <span className="inline-flex items-center px-3 py-1 rounded bg-slate-950/55 backdrop-blur-sm border border-[var(--theme-sub-border)] text-[var(--theme-sub)] font-display-athletic text-[10px] sm:text-xs tracking-widest -skew-x-6 shrink-0 shadow-sm">
-              <span className="skew-x-6">Nos acompañan:</span>
+            <span className="inline-flex items-center px-4 py-1 rounded-md bg-zinc-900/10 backdrop-blur-[2px] border border-[var(--theme-sub-border)] shadow-[0_0_12px_var(--theme-glow)] text-[var(--theme-sub)] font-display-athletic font-extrabold text-sm sm:text-base tracking-widest -skew-x-6 shrink-0">
+              <span className="skew-x-6 drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]">Nos acompañan:</span>
             </span>
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mx-auto max-w-[300px] sm:max-w-none">
               {activeSponsors.map((sp, idx) => {
