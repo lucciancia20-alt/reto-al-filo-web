@@ -35,13 +35,13 @@ export default function Footer({
             className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-md shrink-0"
           />
           <div>
-            <p className="flex flex-wrap items-center gap-x-2 leading-tight uppercase">
-              <span className="hero-title-athletic text-base sm:text-lg tracking-[0.06em] [word-spacing:0.1em]">
+            <p className="flex flex-wrap items-baseline gap-x-2 leading-none uppercase">
+              <span className="hero-title-athletic text-base sm:text-lg leading-none tracking-[0.06em] [word-spacing:0.1em]">
                 <span className="text-[var(--theme-primary)]">{firstTitleWord}</span>
                 {restTitleWords && <span className="text-white"> {restTitleWords}</span>}
               </span>
               {expandedEdition && (
-                <span className="hero-subtitle-edition font-bold text-[16px] sm:text-[18.5px] leading-none translate-y-[1.5px] tracking-[0.12em] [text-shadow:none]">
+                <span className="hero-subtitle-edition font-bold text-[18.5px] sm:text-[21px] leading-none -translate-y-[0.5px] tracking-[0.1em] [text-shadow:none]">
                   <span className="text-white">- </span>
                   <span className="text-[var(--theme-edition-text)]">{expandedEdition}</span>
                 </span>
