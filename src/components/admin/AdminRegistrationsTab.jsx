@@ -1380,9 +1380,9 @@ export default function AdminRegistrationsTab({
               count: regStats.total || 0,
               distance: 'all',
               gender: 'all',
-              activeClass: 'bg-zinc-950 border-white text-white font-semibold',
+              activeClass: 'border-2 px-[7px] py-[3px] bg-zinc-950 border-white text-white font-bold',
               inactiveClass:
-                'bg-zinc-950 border-stone-700 text-stone-300 hover:border-white/70 hover:text-white',
+                'border px-2 py-1 bg-zinc-950 border-white/35 text-white/60 font-medium hover:border-white/70 hover:text-white',
             },
             {
               id: '27K-Masculino',
@@ -1390,9 +1390,10 @@ export default function AdminRegistrationsTab({
               count: genderCounts['27K_Masculino'] || 0,
               distance: '27K',
               gender: 'Masculino',
-              activeClass: 'bg-zinc-950 border-cyan-400 text-cyan-400 font-bold',
+              activeClass:
+                'border-2 px-[7px] py-[3px] bg-zinc-950 border-cyan-400 text-cyan-400 font-bold',
               inactiveClass:
-                'bg-zinc-950 border-cyan-500/60 text-cyan-400 font-semibold hover:border-cyan-400',
+                'border px-2 py-1 bg-zinc-950 border-cyan-400/35 text-cyan-400/65 font-medium hover:border-cyan-400/75 hover:text-cyan-400',
             },
             {
               id: '27K-Femenino',
@@ -1400,9 +1401,10 @@ export default function AdminRegistrationsTab({
               count: genderCounts['27K_Femenino'] || 0,
               distance: '27K',
               gender: 'Femenino',
-              activeClass: 'bg-zinc-950 border-cyan-400 text-cyan-400 font-bold',
+              activeClass:
+                'border-2 px-[7px] py-[3px] bg-zinc-950 border-cyan-400 text-cyan-400 font-bold',
               inactiveClass:
-                'bg-zinc-950 border-cyan-500/60 text-cyan-400 font-semibold hover:border-cyan-400',
+                'border px-2 py-1 bg-zinc-950 border-cyan-400/35 text-cyan-400/65 font-medium hover:border-cyan-400/75 hover:text-cyan-400',
             },
             {
               id: '13K-Masculino',
@@ -1410,9 +1412,10 @@ export default function AdminRegistrationsTab({
               count: genderCounts['13K_Masculino'] || 0,
               distance: '13K',
               gender: 'Masculino',
-              activeClass: 'bg-zinc-950 border-[#ff3333] text-[#ff3333] font-bold',
+              activeClass:
+                'border-2 px-[7px] py-[3px] bg-zinc-950 border-[#ff3333] text-[#ff3333] font-bold',
               inactiveClass:
-                'bg-zinc-950 border-red-500/75 text-[#ff3333] font-semibold hover:border-[#ff3333]',
+                'border px-2 py-1 bg-zinc-950 border-[#ff3333]/35 text-[#ff3333]/65 font-medium hover:border-[#ff3333]/75 hover:text-[#ff3333]',
             },
             {
               id: '13K-Femenino',
@@ -1420,9 +1423,10 @@ export default function AdminRegistrationsTab({
               count: genderCounts['13K_Femenino'] || 0,
               distance: '13K',
               gender: 'Femenino',
-              activeClass: 'bg-zinc-950 border-[#ff3333] text-[#ff3333] font-bold',
+              activeClass:
+                'border-2 px-[7px] py-[3px] bg-zinc-950 border-[#ff3333] text-[#ff3333] font-bold',
               inactiveClass:
-                'bg-zinc-950 border-red-500/75 text-[#ff3333] font-semibold hover:border-[#ff3333]',
+                'border px-2 py-1 bg-zinc-950 border-[#ff3333]/35 text-[#ff3333]/65 font-medium hover:border-[#ff3333]/75 hover:text-[#ff3333]',
             },
           ].map((item) => {
             const isSelected =
@@ -1444,7 +1448,7 @@ export default function AdminRegistrationsTab({
                     setRegGenderFilter?.(item.gender);
                   }
                 }}
-                className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[11px] transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`inline-flex items-center gap-1 rounded-lg shadow-none text-[11px] transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                   isSelected ? item.activeClass : item.inactiveClass
                 }`}
               >
