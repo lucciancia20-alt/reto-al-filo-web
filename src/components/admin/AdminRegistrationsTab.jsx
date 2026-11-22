@@ -29,6 +29,7 @@ import {
   formatArsPrice,
   normalizeRunnerGender,
 } from '../../data/raceConfig';
+import { getOptimizedReceiptUrl } from '../../utils/cloudinary';
 
 const REVENUE_VISIBILITY_STORAGE_KEY = 'reto_al_filo_admin_show_revenue_v1';
 
@@ -1836,7 +1837,9 @@ export default function AdminRegistrationsTab({
 
                     {reg.receiptUrl && (
                       <a
-                        href={reg.receiptUrl}
+                        href={getOptimizedReceiptUrl(reg.receiptUrl, {
+                          format: reg.receiptFormat,
+                        })}
                         target="_blank"
                         rel="noopener noreferrer"
                         title="Ver comprobante adjunto"

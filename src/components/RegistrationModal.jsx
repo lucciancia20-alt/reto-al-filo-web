@@ -42,6 +42,7 @@ import {
 } from '../firebase/config';
 import { sendRegistrationNotificationEmail } from '../utils/emailNotification';
 import { openPrintableWaiver, openPrintableMedicalCert } from '../utils/printableDocs';
+import { compressReceiptImage, getOptimizedReceiptUrl } from '../utils/cloudinary';
 
 const SHIRT_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 const SHIRT_SIZE_GUIDE = [
@@ -427,8 +428,12 @@ export default function RegistrationModal({
 
     setSubmitting(true);
     try {
-      setSubmitStep('Subiendo comprobante de pago de forma segura...');
-      const uploaded = await uploadImageToCloudinary(receiptFile, {
+      setSubmitStep('Optimizando y subiendo comprobante de pago de forma segura...');
+      const fileToUpload = await compressReceiptImage(receiptFile, {
+        maxDimension: 1200,
+        quality: 0.78,
+      });
+      const uploaded = await uploadImageToCloudinary(fileToUpload, {
         folder: 'reto-al-filo/comprobantes',
         resourceType: 'auto',
       });
@@ -620,7 +625,9 @@ export default function RegistrationModal({
                 <div className="flex justify-between items-center gap-3 pt-1">
                   <span className="text-stone-400">Comprobante adjunto</span>
                   <a
-                    href={confirmedReg.receiptUrl}
+                    href={getOptimizedReceiptUrl(confirmedReg.receiptUrl, {
+                      format: confirmedReg.receiptFormat,
+                    })}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-xs font-bold text-sky-400 hover:text-sky-300 underline"
