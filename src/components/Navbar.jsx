@@ -40,7 +40,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
   return (
     <header className="fixed top-0 inset-x-0 z-40 bg-slate-950/60 backdrop-blur-md border-b border-orange-500/80">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-[72px] sm:min-h-20 py-2.5 sm:py-3 flex items-center justify-between gap-3">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-[72px] sm:min-h-20 py-1.5 sm:py-2 flex items-center justify-between gap-3">
         {/* Logo + título RAF */}
         <a
           href="#inicio"
@@ -49,9 +49,8 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
           <img
             src={optimizeCloudinaryUrl('/logo-raf.png', 400)}
             alt={`Logo ${raceTitle}`}
-            loading="lazy"
             decoding="async"
-            className="w-14 h-14 sm:w-[58px] sm:h-[58px] object-contain drop-shadow-md shrink-0"
+            className="w-16 h-16 sm:w-[68px] sm:h-[68px] object-contain drop-shadow-md shrink-0"
           />
           <span className="inline-flex flex-col items-stretch leading-none gap-[3px] uppercase min-w-0 font-display-athletic">
             <span className="block whitespace-nowrap hero-title-athletic text-[12px] sm:text-[13.5px] leading-none">

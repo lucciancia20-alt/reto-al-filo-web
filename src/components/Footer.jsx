@@ -32,7 +32,7 @@ export default function Footer({
             alt={`Logo ${raceTitle}`}
             loading="lazy"
             decoding="async"
-            className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-md shrink-0"
+            className="w-14 h-14 sm:w-16 sm:h-16 object-contain drop-shadow-md shrink-0"
           />
           <div>
             <p className="flex flex-wrap items-baseline gap-x-2 leading-none uppercase">
