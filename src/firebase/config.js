@@ -1,4 +1,9 @@
-import { RACE_CONFIG, mergeRaceConfig, calculateRunnerAgeAtRace } from '../data/raceConfig';
+import {
+  RACE_CONFIG,
+  mergeRaceConfig,
+  calculateRunnerAgeAtRace,
+  normalizeRunnerGender,
+} from '../data/raceConfig';
 import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
 const LOCAL_CONFIG_STORAGE_KEY = 'reto_al_filo_config_v2';
@@ -641,6 +646,7 @@ export async function submitRunnerRegistration(payload) {
     ['fullName', 'Nombre y Apellido'],
     ['dni', 'DNI'],
     ['birthDate', 'Fecha de Nacimiento'],
+    ['gender', 'Género'],
     ['phone', 'Celular / WhatsApp'],
     ['email', 'Email'],
     ['city', 'Localidad / Provincia'],
@@ -653,6 +659,11 @@ export async function submitRunnerRegistration(payload) {
     if (!String(payload?.[key] || '').trim()) {
       throw new Error(`Completá el campo obligatorio: ${label}.`);
     }
+  }
+
+  const normalizedGender = normalizeRunnerGender(payload.gender);
+  if (!normalizedGender) {
+    throw new Error('Seleccioná un género válido (Masculino o Femenino).');
   }
 
   const runnerAge = calculateRunnerAgeAtRace(
@@ -680,7 +691,7 @@ export async function submitRunnerRegistration(payload) {
     fullName: String(payload.fullName).trim(),
     dni: String(payload.dni).trim(),
     birthDate: String(payload.birthDate).trim(),
-    gender: String(payload.gender || 'No especificado').trim(),
+    gender: normalizedGender,
     phone: String(payload.phone).trim(),
     email: String(payload.email).trim().toLowerCase(),
     city: String(payload.city).trim(),

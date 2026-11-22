@@ -19,11 +19,18 @@ import {
   Wand2,
   Check,
   X,
+  Eye,
+  EyeOff,
+  Banknote,
 } from 'lucide-react';
 import {
   resolveRunnerCategory,
   resolveFrozenRegistrationPricing,
+  formatArsPrice,
+  normalizeRunnerGender,
 } from '../../data/raceConfig';
+
+const REVENUE_VISIBILITY_STORAGE_KEY = 'reto_al_filo_admin_show_revenue_v1';
 
 const DNI_HEADER_KEYS = new Set([
   'dni',
@@ -365,6 +372,8 @@ export default function AdminRegistrationsTab({
   setRegSearch,
   regDistanceFilter,
   setRegDistanceFilter,
+  regGenderFilter = 'all',
+  setRegGenderFilter,
   regStatusFilter,
   setRegStatusFilter,
   regDuplicateFilter = 'none',
@@ -382,6 +391,7 @@ export default function AdminRegistrationsTab({
   onConfirmRegistration,
   onChangeRegStatus,
   onToggleCheckIn,
+  onToggleFree,
   onDeleteRegistration,
   buildRunnerWhatsappUrl,
   duplicateBibCount = 0,
@@ -389,6 +399,26 @@ export default function AdminRegistrationsTab({
   duplicateLiveBibs,
 }) {
   const [expandedId, setExpandedId] = useState(null);
+  const [showRevenue, setShowRevenue] = useState(() => {
+    try {
+      const saved = window.localStorage.getItem(REVENUE_VISIBILITY_STORAGE_KEY);
+      return saved === null ? true : saved === 'true';
+    } catch {
+      return true;
+    }
+  });
+
+  const handleToggleRevenue = () => {
+    setShowRevenue((prev) => {
+      const next = !prev;
+      try {
+        window.localStorage.setItem(REVENUE_VISIBILITY_STORAGE_KEY, String(next));
+      } catch {
+        // Ignorar errores de almacenamiento local
+      }
+      return next;
+    });
+  };
   const [editingBibIds, setEditingBibIds] = useState({});
   const [sortConfig, setSortConfig] = useState({ field: null, direction: 'asc' });
   const [pendingStatusAction, setPendingStatusAction] = useState({});
@@ -534,6 +564,7 @@ export default function AdminRegistrationsTab({
       setRegDuplicateFilter?.('none');
     } else {
       setRegDistanceFilter('all');
+      setRegGenderFilter?.('all');
       setRegStatusFilter('all');
       setRegDuplicateFilter?.(filterValue);
     }
@@ -551,7 +582,7 @@ export default function AdminRegistrationsTab({
         aria-pressed={isActive}
         className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] transition-colors cursor-pointer ${
           isActive
-            ? 'bg-stone-950 border-red-500 ring-1 ring-red-500/50 text-white font-medium'
+            ? 'bg-stone-950 border-red-500 text-white font-medium'
             : 'bg-stone-950 border-orange-500/60 text-zinc-200 hover:border-orange-400 hover:text-white font-medium'
         }`}
       >
@@ -734,13 +765,108 @@ export default function AdminRegistrationsTab({
 
   const hasSpecificFilter =
     regDistanceFilter !== 'all' ||
+    regGenderFilter !== 'all' ||
     regStatusFilter !== 'all' ||
     regDuplicateFilter !== 'none' ||
     regShirtFilter !== 'all' ||
     regCheckInFilter !== 'all';
 
+  const genderCounts = regStats.genderDistanceCounts || {
+    '27K_Masculino': 0,
+    '27K_Femenino': 0,
+    '13K_Masculino': 0,
+    '13K_Femenino': 0,
+  };
+
   return (
     <div className="space-y-3">
+      {/* Contador compacto de Ingresos Confirmados con toggle persistente */}
+      <div className="rounded-2xl bg-stone-950 border border-stone-800 px-3 py-2.5 space-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2 min-w-0">
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-stone-200">
+              <Banknote className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span>Ingresos Confirmados</span>
+            </span>
+            <span className="text-[10px] font-mono text-stone-400">
+              ({regStats.confirmed || 0} aprobados
+              {regStats.freeConfirmedCount > 0 ? ` · ${regStats.freeConfirmedCount} FREE` : ''})
+            </span>
+            {!showRevenue && (
+              <span className="text-[11px] font-mono tracking-widest text-stone-500">
+                $ ••••••
+              </span>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleToggleRevenue}
+            aria-pressed={showRevenue}
+            title={showRevenue ? 'Ocultar montos de ingresos' : 'Mostrar montos de ingresos'}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 hover:bg-white/5 border border-orange-500/80 hover:border-orange-400 text-stone-200 hover:text-white text-[11px] font-medium px-2.5 py-1 transition-colors cursor-pointer shrink-0"
+          >
+            {showRevenue ? (
+              <>
+                <EyeOff className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                <span>Ocultar ingresos</span>
+              </>
+            ) : (
+              <>
+                <Eye className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                <span>Mostrar ingresos</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {showRevenue && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div className="rounded-xl bg-zinc-950 border border-cyan-500/70 hover:border-cyan-300 transition-colors px-3 py-2 flex items-center justify-between gap-2">
+              <div>
+                <span className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
+                  Ingresos 27K
+                </span>
+                <span className="block text-[10px] text-white">
+                  {regStats.confirmed27k || 0} confirmados
+                </span>
+              </div>
+              <span className="font-mono text-sm sm:text-base font-bold text-cyan-400">
+                {formatArsPrice(regStats.revenue27k || 0)}
+              </span>
+            </div>
+
+            <div className="rounded-xl bg-zinc-950 border border-red-500/75 hover:border-red-500 hover:brightness-125 transition-all px-3 py-2 flex items-center justify-between gap-2">
+              <div>
+                <span className="block text-xs font-bold uppercase tracking-wider text-red-500">
+                  Ingresos 13K
+                </span>
+                <span className="block text-[10px] text-white">
+                  {regStats.confirmed13k || 0} confirmados
+                </span>
+              </div>
+              <span className="font-mono text-sm sm:text-base font-bold text-red-500">
+                {formatArsPrice(regStats.revenue13k || 0)}
+              </span>
+            </div>
+
+            <div className="rounded-xl bg-zinc-950 border border-emerald-500/70 hover:border-emerald-300 transition-colors px-3 py-2 flex items-center justify-between gap-2">
+              <div>
+                <span className="block text-xs font-bold uppercase tracking-wider text-emerald-400">
+                  Total General
+                </span>
+                <span className="block text-[10px] text-white">
+                  27K + 13K confirmados
+                </span>
+              </div>
+              <span className="font-mono text-sm sm:text-base font-extrabold text-emerald-400">
+                {formatArsPrice(regStats.revenueTotal || 0)}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Resumen de contadores (filtros rápidos sincronizados) */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
         {[
@@ -748,7 +874,7 @@ export default function AdminRegistrationsTab({
             label: 'Total',
             value: regStats.total,
             tone: 'text-stone-100',
-            inactiveClass: 'bg-zinc-950 border-white',
+            inactiveClass: 'bg-zinc-950 border-white/75 hover:border-white hover:brightness-125',
             activeClass: 'bg-zinc-950 border-white ring-2 ring-white/85 ring-offset-2 ring-offset-zinc-950',
             labelClass: 'text-white',
             dotClass: 'bg-white',
@@ -756,6 +882,7 @@ export default function AdminRegistrationsTab({
             onClick: () => {
               setRegDuplicateFilter?.('none');
               setRegDistanceFilter('all');
+              setRegGenderFilter?.('all');
               setRegStatusFilter('all');
               setRegShirtFilter?.('all');
               setRegCheckInFilter?.('all');
@@ -765,7 +892,7 @@ export default function AdminRegistrationsTab({
             label: 'Confirmados',
             value: regStats.confirmed,
             tone: 'text-emerald-400',
-            inactiveClass: 'bg-zinc-950 border-emerald-400 hover:border-emerald-300',
+            inactiveClass: 'bg-zinc-950 border-emerald-400/75 hover:border-emerald-400 hover:brightness-125',
             activeClass: 'bg-zinc-950 border-emerald-400 ring-2 ring-emerald-400/85 ring-offset-2 ring-offset-zinc-950',
             labelClass: 'text-emerald-400',
             dotClass: 'bg-emerald-400',
@@ -784,7 +911,7 @@ export default function AdminRegistrationsTab({
             label: 'Pendientes',
             value: regStats.pending,
             tone: 'text-amber-400',
-            inactiveClass: 'bg-zinc-950 border-amber-400 hover:border-amber-300',
+            inactiveClass: 'bg-zinc-950 border-amber-400/75 hover:border-amber-400 hover:brightness-125',
             activeClass: 'bg-zinc-950 border-amber-400 ring-2 ring-amber-400/85 ring-offset-2 ring-offset-zinc-950',
             labelClass: 'text-amber-400',
             dotClass: 'bg-amber-400',
@@ -803,18 +930,23 @@ export default function AdminRegistrationsTab({
             label: '27K',
             value: regStats.count27k,
             tone: 'text-cyan-400',
-            inactiveClass: 'bg-zinc-950 border-cyan-400 hover:border-cyan-300',
+            inactiveClass: 'bg-zinc-950 border-cyan-400/75 hover:border-cyan-400 hover:brightness-125',
             activeClass: 'bg-zinc-950 border-cyan-400 ring-2 ring-cyan-400/85 ring-offset-2 ring-offset-zinc-950',
             labelClass: 'text-cyan-400',
             dotClass: 'bg-cyan-300',
-            isActive: regDistanceFilter === '27K' && regDuplicateFilter === 'none',
+            isActive:
+              regDistanceFilter === '27K' &&
+              regGenderFilter === 'all' &&
+              regDuplicateFilter === 'none',
             onClick: () => {
               const isAlreadyActive =
                 regDistanceFilter === '27K' &&
+                regGenderFilter === 'all' &&
                 regStatusFilter === 'all' &&
                 regDuplicateFilter === 'none';
               setRegDuplicateFilter?.('none');
               setRegStatusFilter('all');
+              setRegGenderFilter?.('all');
               setRegDistanceFilter(isAlreadyActive ? 'all' : '27K');
             },
           },
@@ -822,18 +954,23 @@ export default function AdminRegistrationsTab({
             label: '13K',
             value: regStats.count13k,
             tone: 'text-red-500',
-            inactiveClass: 'bg-zinc-950 border-red-500 hover:border-red-400',
+            inactiveClass: 'bg-zinc-950 border-red-500/75 hover:border-red-500 hover:brightness-125',
             activeClass: 'bg-zinc-950 border-red-500 ring-2 ring-red-500/85 ring-offset-2 ring-offset-zinc-950',
             labelClass: 'text-red-500',
-            dotClass: 'bg-red-400',
-            isActive: regDistanceFilter === '13K' && regDuplicateFilter === 'none',
+            dotClass: 'bg-red-500',
+            isActive:
+              regDistanceFilter === '13K' &&
+              regGenderFilter === 'all' &&
+              regDuplicateFilter === 'none',
             onClick: () => {
               const isAlreadyActive =
                 regDistanceFilter === '13K' &&
+                regGenderFilter === 'all' &&
                 regStatusFilter === 'all' &&
                 regDuplicateFilter === 'none';
               setRegDuplicateFilter?.('none');
               setRegStatusFilter('all');
+              setRegGenderFilter?.('all');
               setRegDistanceFilter(isAlreadyActive ? 'all' : '13K');
             },
           },
@@ -918,11 +1055,18 @@ export default function AdminRegistrationsTab({
           <button
             type="button"
             onClick={onExportExcel}
-            disabled={registrationsCount === 0}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
+            disabled={filteredRegistrations.length === 0}
+            title={
+              filteredRegistrations.length !== registrationsCount
+                ? `Exportar los ${filteredRegistrations.length} inscriptos del filtro activo`
+                : 'Exportar todos los inscriptos a Excel (.XLSX)'
+            }
+            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-emerald-500/70 hover:border-emerald-400 text-emerald-400 shadow-none text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
           >
             <Download className="w-3.5 h-3.5 shrink-0" />
-            Exportar Excel (.XLSX)
+            {filteredRegistrations.length !== registrationsCount
+              ? `Exportar Excel (${filteredRegistrations.length})`
+              : 'Exportar Excel (.XLSX)'}
           </button>
 
           <button
@@ -930,7 +1074,7 @@ export default function AdminRegistrationsTab({
             onClick={onPrintAccreditationSheet}
             disabled={(regStats.confirmed || 0) === 0}
             title="Imprimir planilla A4 de acreditación y seguridad SOS ordenada por dorsal"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900/80 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500/70 hover:border-orange-400 text-orange-400 shadow-none text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
           >
             <Printer className="w-3.5 h-3.5 shrink-0" />
             Imprimir Planilla Acreditación
@@ -941,7 +1085,7 @@ export default function AdminRegistrationsTab({
             target="_blank"
             rel="noopener noreferrer"
             title="Abrir actividad y transferencias recibidas en Mercado Pago"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-950 hover:bg-white/5 text-sky-400 border border-sky-500/60 text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-sky-500/70 hover:border-sky-400 text-sky-400 shadow-none text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors whitespace-nowrap shrink-0"
           >
             <Wallet className="w-3.5 h-3.5 shrink-0" />
             <span>Mercado Pago</span>
@@ -960,10 +1104,10 @@ export default function AdminRegistrationsTab({
             disabled={registrationsCount === 0}
             aria-expanded={showBibTools}
             title="Auto-asignar dorsales por rango o importar planilla de Bahía Corre"
-            className={`inline-flex items-center gap-1.5 rounded-xl border text-[11px] xl:text-xs font-medium px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0 ${
+            className={`inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border shadow-none text-[11px] xl:text-xs font-medium px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0 ${
               showBibTools
-                ? 'bg-orange-500/15 border-orange-400 text-orange-300'
-                : 'bg-zinc-900/80 border-orange-500/70 hover:border-orange-400 text-orange-400'
+                ? 'border-orange-400 text-orange-300'
+                : 'border-orange-500/70 hover:border-orange-400 text-orange-400'
             }`}
           >
             <Hash className="w-3.5 h-3.5 shrink-0" />
@@ -1107,9 +1251,9 @@ export default function AdminRegistrationsTab({
             {bibToolsError && (
               <div
                 role="alert"
-                className="rounded-xl bg-zinc-950 border border-rose-500/70 p-2.5 text-xs text-rose-300 flex items-start gap-2"
+                className="rounded-xl bg-zinc-950 border border-red-500/70 p-2.5 text-xs text-red-500 flex items-start gap-2"
               >
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
                 <span>{bibToolsError}</span>
               </div>
             )}
@@ -1177,7 +1321,7 @@ export default function AdminRegistrationsTab({
                 </div>
 
                 {batchPreview.duplicateWarnings?.length > 0 && (
-                  <div className="rounded-lg bg-rose-950/40 border border-rose-500/70 px-2.5 py-1.5 text-[11px] text-rose-300">
+                  <div className="rounded-lg bg-zinc-950 border border-red-500/70 px-2.5 py-1.5 text-[11px] text-red-500">
                     <strong>⚠ Dorsales repetidos detectados:</strong> quedarán duplicados los números{' '}
                     <span className="font-mono font-semibold">
                       {batchPreview.duplicateWarnings.map((b) => `#${b}`).join(', ')}
@@ -1223,6 +1367,93 @@ export default function AdminRegistrationsTab({
           </div>
         )}
 
+        {/* Filtros combinados por Distancia y Género */}
+        <div className="pt-2 border-t border-stone-800/80 flex flex-wrap items-center gap-1.5">
+          <span className="text-[10px] font-medium uppercase tracking-wider text-stone-400 mr-0.5 shrink-0">
+            Categoría:
+          </span>
+          {[
+            {
+              id: 'all',
+              label: 'Todos',
+              count: regStats.total || 0,
+              distance: 'all',
+              gender: 'all',
+              activeClass: 'bg-zinc-950 border-white text-white font-semibold',
+              inactiveClass:
+                'bg-zinc-950 border-stone-700 text-stone-300 hover:border-white/70 hover:text-white',
+            },
+            {
+              id: '27K-Masculino',
+              label: '27K Masculino',
+              count: genderCounts['27K_Masculino'] || 0,
+              distance: '27K',
+              gender: 'Masculino',
+              activeClass: 'bg-zinc-950 border-cyan-400 text-cyan-400 font-bold',
+              inactiveClass:
+                'bg-zinc-950 border-cyan-500/60 text-cyan-400 font-semibold hover:border-cyan-400',
+            },
+            {
+              id: '27K-Femenino',
+              label: '27K Femenino',
+              count: genderCounts['27K_Femenino'] || 0,
+              distance: '27K',
+              gender: 'Femenino',
+              activeClass: 'bg-zinc-950 border-cyan-400 text-cyan-400 font-bold',
+              inactiveClass:
+                'bg-zinc-950 border-cyan-500/60 text-cyan-400 font-semibold hover:border-cyan-400',
+            },
+            {
+              id: '13K-Masculino',
+              label: '13K Masculino',
+              count: genderCounts['13K_Masculino'] || 0,
+              distance: '13K',
+              gender: 'Masculino',
+              activeClass: 'bg-zinc-950 border-[#ff3333] text-[#ff3333] font-bold',
+              inactiveClass:
+                'bg-zinc-950 border-red-500/75 text-[#ff3333] font-semibold hover:border-[#ff3333]',
+            },
+            {
+              id: '13K-Femenino',
+              label: '13K Femenino',
+              count: genderCounts['13K_Femenino'] || 0,
+              distance: '13K',
+              gender: 'Femenino',
+              activeClass: 'bg-zinc-950 border-[#ff3333] text-[#ff3333] font-bold',
+              inactiveClass:
+                'bg-zinc-950 border-red-500/75 text-[#ff3333] font-semibold hover:border-[#ff3333]',
+            },
+          ].map((item) => {
+            const isSelected =
+              regDuplicateFilter === 'none' &&
+              regDistanceFilter === item.distance &&
+              regGenderFilter === item.gender;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => {
+                  setRegDuplicateFilter?.('none');
+                  if (item.id === 'all' || isSelected) {
+                    setRegDistanceFilter('all');
+                    setRegGenderFilter?.('all');
+                  } else {
+                    setRegDistanceFilter(item.distance);
+                    setRegGenderFilter?.(item.gender);
+                  }
+                }}
+                className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[11px] transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                  isSelected ? item.activeClass : item.inactiveClass
+                }`}
+              >
+                <span>{item.label}</span>
+                <span className="font-mono text-[11px]">({item.count})</span>
+              </button>
+            );
+          })}
+        </div>
+
         {/* Resumen en vivo de Talles (Confirmados / Activos) y Acreditación */}
         <div className="pt-2 border-t border-stone-800/80 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-[11px]">
           <div className="flex flex-wrap items-center gap-1">
@@ -1240,8 +1471,8 @@ export default function AdminRegistrationsTab({
                   title={`Filtrar por talle ${item.size}: ${item.confirmed} confirmados de ${item.total} inscriptos no rechazados`}
                   className={`inline-flex items-center gap-0.5 rounded-lg border px-1.5 py-0.5 text-[10px] sm:text-[11px] font-mono whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
                     isSelected
-                      ? 'bg-orange-500/20 border-orange-400 ring-1 ring-orange-400/70 shadow-sm text-white font-medium'
-                      : 'bg-zinc-900/80 border-orange-500/60 text-white hover:border-orange-400'
+                      ? 'bg-zinc-950 border-orange-500 text-orange-400 font-medium'
+                      : 'bg-zinc-950 border-orange-500/50 text-white hover:border-orange-400'
                   }`}
                 >
                   <span className="text-white font-semibold">{item.size}:</span>
@@ -1274,8 +1505,8 @@ export default function AdminRegistrationsTab({
               }
               className={`rounded-lg border px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                 regCheckInFilter === 'checked'
-                  ? 'bg-zinc-950 border-orange-500 ring-1 ring-orange-500/70 text-white font-medium'
-                  : 'bg-zinc-950 border-orange-500/60 text-white hover:border-orange-400'
+                  ? 'bg-zinc-950 border-orange-500 text-orange-400 font-medium'
+                  : 'bg-zinc-950 border-orange-500/50 text-white hover:border-orange-400'
               }`}
             >
               Kits entregados ({regStats.checkedInCount || 0})
@@ -1289,8 +1520,8 @@ export default function AdminRegistrationsTab({
               }
               className={`rounded-lg border px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                 regCheckInFilter === 'pending_checkin'
-                  ? 'bg-zinc-950 border-orange-500 ring-1 ring-orange-500/70 text-white font-medium'
-                  : 'bg-zinc-950 border-orange-500/60 text-white hover:border-orange-400'
+                  ? 'bg-zinc-950 border-orange-500 text-orange-400 font-medium'
+                  : 'bg-zinc-950 border-orange-500/50 text-white hover:border-orange-400'
               }`}
             >
               Pendientes de retirar ({regStats.pendingCheckInCount || 0})
@@ -1308,8 +1539,8 @@ export default function AdminRegistrationsTab({
       </div>
 
       {regsError && (
-        <div className="rounded-xl bg-stone-950 border border-rose-500/60 p-3 text-xs text-rose-300 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+        <div className="rounded-xl bg-stone-950 border border-red-500/70 p-3 text-xs text-red-500 flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
           <span>{regsError}</span>
         </div>
       )}
@@ -1383,10 +1614,10 @@ export default function AdminRegistrationsTab({
             const armedKitAction = pendingKitAction[reg.id];
             const statusBadgeClass =
               reg.status === 'confirmado'
-                ? 'bg-zinc-950 text-emerald-400 border-emerald-500/60'
+                ? 'bg-transparent text-emerald-400 border-emerald-500/60'
                 : reg.status === 'rechazado'
-                  ? 'bg-zinc-950 text-rose-400 border-rose-500/60'
-                  : 'bg-zinc-950 text-amber-400 border-amber-500/60';
+                  ? 'bg-transparent text-red-500 border-red-500/70'
+                  : 'bg-transparent text-amber-400 border-amber-500/60';
 
             return (
               <div
@@ -1398,14 +1629,14 @@ export default function AdminRegistrationsTab({
                   {/* Identificación rápida del corredor (estructura fija en 2 líneas) */}
                   <div className="w-full md:w-auto md:flex-1 min-w-0 space-y-1.5">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="font-mono text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded-md bg-stone-950 border border-amber-500/60 text-white shrink-0">
+                      <span className="font-mono text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded-md bg-transparent border border-amber-500/60 text-white shrink-0">
                         {reg.code}
                       </span>
                       <span
-                        className={`text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded-md border shrink-0 ${
+                        className={`text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded-md border bg-transparent shrink-0 ${
                           reg.distance === '13K'
-                            ? 'bg-stone-950 border-red-500 text-red-500'
-                            : 'bg-stone-950 border-cyan-500 text-cyan-400'
+                            ? 'border-red-500 text-red-500'
+                            : 'border-cyan-500 text-cyan-400'
                         }`}
                       >
                         {reg.distance}
@@ -1421,39 +1652,46 @@ export default function AdminRegistrationsTab({
                       <span className="font-mono text-[11px] text-white font-medium shrink-0">
                         DNI {reg.dni}
                       </span>
+                      {(() => {
+                        const normGender = normalizeRunnerGender(reg.gender);
+                        const label = normGender || String(reg.gender || '').trim() || 'Sin género';
+                        const genderBadgeClass =
+                          normGender === 'Masculino'
+                            ? 'border-cyan-500/70 text-cyan-400 bg-transparent'
+                            : normGender === 'Femenino'
+                              ? 'border-red-500/70 text-red-500 bg-transparent'
+                              : 'border-stone-700 text-stone-400 bg-transparent';
+                        return (
+                          <span
+                            className={`text-[10px] font-medium px-2 py-0.5 rounded-full border shrink-0 ${genderBadgeClass}`}
+                          >
+                            {label}
+                          </span>
+                        );
+                      })()}
                       <span
                         className={`text-[10px] font-medium uppercase px-2 py-0.5 rounded-full border shrink-0 ${statusBadgeClass}`}
                       >
                         {reg.status}
                       </span>
-                      {pricing.finalAmount && (
-                        <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-stone-200 shrink-0">
-                          {pricing.isLocalResident &&
-                            pricing.originalPrice &&
-                            pricing.originalPrice !== pricing.finalAmount && (
-                              <span className="text-[10px] text-stone-500 line-through font-normal">
-                                {pricing.originalPrice}
-                              </span>
-                            )}
-                          <span
-                            className={
-                              pricing.isLocalResident ? 'text-emerald-300' : 'text-stone-200'
-                            }
-                          >
-                            {pricing.finalAmount}
-                          </span>
-                        </span>
-                      )}
                       {pricing.isLocalResident && (
                         <span
                           title="Verificar domicilio del Partido de Tornquist en el DNI"
-                          className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-emerald-500/60 bg-emerald-500/15 text-emerald-300 shrink-0"
+                          className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-emerald-500/70 bg-transparent text-emerald-400 shrink-0"
                         >
                           {pricing.badgeText}
                         </span>
                       )}
+                      {reg.isFree === true && (
+                        <span
+                          title="Corredor FREE / Bonificado: computa $0 en Ingresos Confirmados"
+                          className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-yellow-400/70 bg-transparent text-yellow-300 shrink-0"
+                        >
+                          FREE
+                        </span>
+                      )}
                       {reg.checkedIn && (
-                        <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-full border border-emerald-500/60 bg-zinc-950 text-emerald-400 shrink-0">
+                        <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-full border border-emerald-500/60 bg-transparent text-emerald-400 shrink-0">
                           Kit ✓
                         </span>
                       )}
@@ -1507,7 +1745,7 @@ export default function AdminRegistrationsTab({
                           onClick={() => startEditingBib(reg.id)}
                           aria-label={`Editar dorsal de ${reg.fullName}`}
                           title="Editar dorsal"
-                          className="p-1 rounded-lg bg-stone-950 hover:bg-white/5 border border-orange-500/40 hover:border-orange-500/70 text-stone-400 hover:text-orange-400 transition-colors cursor-pointer disabled:opacity-40"
+                          className="p-1 rounded-lg bg-transparent border border-orange-500/50 hover:border-orange-400 text-stone-400 hover:text-orange-400 shadow-none transition-colors cursor-pointer disabled:opacity-40"
                         >
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
@@ -1529,20 +1767,20 @@ export default function AdminRegistrationsTab({
                                 ? 'Guardar nuevo número de dorsal'
                                 : 'Guardar número de dorsal y confirmar inscripción'
                       }
-                      className={`inline-flex items-center gap-1 rounded-lg font-display font-medium text-[10px] sm:text-[11px] uppercase px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
+                      className={`inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none font-display font-medium text-[10px] sm:text-[11px] uppercase px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
                         armedStatusAction === 'unconfirm'
-                          ? 'bg-zinc-950 text-red-400 border border-red-500'
+                          ? 'text-red-500 border border-red-500/80 hover:border-red-500'
                           : armedStatusAction === 'confirm'
-                            ? 'bg-zinc-950 text-orange-400 border border-orange-500'
+                            ? 'text-orange-400 border border-orange-500/80 hover:border-orange-400'
                             : isAlreadySaved
-                              ? 'bg-zinc-950 text-zinc-300 border border-zinc-700 hover:border-zinc-500'
-                              : 'bg-zinc-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/70'
+                              ? 'text-zinc-300 border border-zinc-700 hover:border-zinc-400'
+                              : 'text-emerald-400 border border-emerald-500/70 hover:border-emerald-400'
                       }`}
                     >
                       <CheckCircle2
                         className={`w-3.5 h-3.5 shrink-0 ${
                           armedStatusAction === 'unconfirm'
-                            ? 'text-red-400'
+                            ? 'text-red-500'
                             : armedStatusAction === 'confirm'
                               ? 'text-orange-400'
                               : 'text-emerald-400'
@@ -1573,14 +1811,14 @@ export default function AdminRegistrationsTab({
                                 ? 'Kit acreditado y entregado (clic para desmarcar)'
                                 : 'Marcar kit entregado / corredor acreditado en mesa'
                         }
-                        className={`inline-flex items-center justify-center gap-1 md:w-[116px] whitespace-nowrap rounded-lg border text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
+                        className={`inline-flex items-center justify-center gap-1 md:w-[116px] whitespace-nowrap rounded-lg bg-transparent shadow-none border text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
                           armedKitAction === 'revoke'
-                            ? 'bg-zinc-950 border-red-500 text-red-400'
+                            ? 'border-red-500/80 hover:border-red-500 text-red-500'
                             : armedKitAction === 'deliver'
-                              ? 'bg-zinc-950 border-orange-500 text-orange-300'
+                              ? 'border-orange-500/80 hover:border-orange-400 text-orange-400'
                               : reg.checkedIn
-                                ? 'bg-zinc-950 border-emerald-500/70 text-emerald-400 hover:border-emerald-400'
-                                : 'bg-zinc-950 border-orange-500/70 text-orange-400 hover:border-orange-400'
+                                ? 'border-emerald-500/70 hover:border-emerald-400 text-emerald-400'
+                                : 'border-orange-500/70 hover:border-orange-400 text-orange-400'
                         }`}
                       >
                         <PackageCheck className="w-3.5 h-3.5 shrink-0" />
@@ -1602,7 +1840,7 @@ export default function AdminRegistrationsTab({
                         target="_blank"
                         rel="noopener noreferrer"
                         title="Ver comprobante adjunto"
-                        className="inline-flex items-center gap-1 rounded-lg bg-zinc-950 hover:bg-white/5 text-sky-400 border border-sky-500/60 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
+                        className="inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none text-sky-400 border border-sky-500/60 hover:border-sky-400 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">Comprobante</span>
@@ -1616,7 +1854,7 @@ export default function AdminRegistrationsTab({
                         rel="noopener noreferrer"
                         title="Enviar confirmación por WhatsApp"
                         aria-label={`Enviar WhatsApp a ${reg.fullName}`}
-                        className="inline-flex items-center gap-1 rounded-lg bg-zinc-950 hover:bg-white/5 text-emerald-400 border border-emerald-500/60 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
+                        className="inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none text-emerald-400 border border-emerald-500/60 hover:border-emerald-400 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
                       >
                         <MessageCircle className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">WhatsApp</span>
@@ -1629,10 +1867,10 @@ export default function AdminRegistrationsTab({
                       aria-expanded={isExpanded}
                       aria-label={`${isExpanded ? 'Ocultar' : 'Ver'} detalles de ${reg.fullName}`}
                       title="Ver detalles completos"
-                      className={`inline-flex items-center gap-1 rounded-lg border px-1.5 py-1 text-[10px] sm:text-[11px] font-semibold transition-colors cursor-pointer ${
+                      className={`inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none border px-1.5 py-1 text-[10px] sm:text-[11px] font-semibold transition-colors cursor-pointer ${
                         isExpanded
-                          ? 'bg-stone-950 border-orange-500 text-orange-400'
-                          : 'bg-stone-950 border-stone-700 text-stone-300 hover:bg-white/5 hover:border-orange-500/60 hover:text-white'
+                          ? 'border-orange-500 text-orange-400'
+                          : 'border-stone-700 text-stone-300 hover:border-orange-400 hover:text-white'
                       }`}
                     >
                       <span className="hidden md:inline">Detalles</span>
@@ -1649,7 +1887,7 @@ export default function AdminRegistrationsTab({
                       onClick={() => onDeleteRegistration(reg)}
                       aria-label={`Eliminar inscripción de ${reg.fullName}`}
                       title="Eliminar inscripción"
-                      className="p-1 rounded-lg bg-stone-950 text-stone-400 hover:text-rose-400 hover:bg-white/5 cursor-pointer disabled:opacity-40"
+                      className="p-1 rounded-lg bg-transparent border border-transparent hover:border-red-500/70 text-stone-400 hover:text-red-500 shadow-none transition-colors cursor-pointer disabled:opacity-40"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -1662,40 +1900,73 @@ export default function AdminRegistrationsTab({
                   return (
                     <div className="border-t border-stone-800/90 bg-stone-950 px-3.5 py-2.5 space-y-2 text-xs text-stone-300">
                       <div className="flex flex-wrap items-center gap-2 pb-2 border-b border-stone-800/70">
-                        <span className="inline-flex items-center gap-1 rounded-lg bg-zinc-900/80 border border-amber-500/60 px-2.5 py-1 text-[11px] text-zinc-200">
+                        <span className="inline-flex items-center gap-1 rounded-lg bg-transparent border border-amber-500/60 px-2.5 py-1 text-[11px] text-zinc-200">
                           Categoría Oficial: <span className="text-white font-medium">{cat.fullCategory}</span>
                         </span>
-                        <span className="inline-flex items-center gap-1 rounded-lg bg-zinc-900/80 border border-amber-500/60 px-2.5 py-1 text-[11px] text-zinc-200">
+                        <span className="inline-flex items-center gap-1 rounded-lg bg-transparent border border-amber-500/60 px-2.5 py-1 text-[11px] text-zinc-200">
                           Edad al día de carrera:{' '}
                           <span className="text-white font-medium">
                             {cat.age !== null ? `${cat.age} años` : 'Sin fecha'}
                           </span>
                         </span>
-                        <span className="inline-flex items-center gap-1 rounded-lg bg-zinc-900/80 border border-amber-500/60 px-2.5 py-1 text-[11px] text-zinc-200">
+                        <span className="inline-flex items-center gap-1 rounded-lg bg-transparent border border-amber-500/60 px-2.5 py-1 text-[11px] text-zinc-200">
                           Mesa Kit:{' '}
                           <span className="text-white font-medium">
                             {reg.checkedIn ? 'Kit entregado ✓' : 'Pendiente de retiro'}
                           </span>
                         </span>
                         {pricing.finalAmount && (
-                          <span className="inline-flex flex-wrap items-center gap-1.5 rounded-lg bg-zinc-900/80 border border-emerald-500/50 px-2.5 py-1 text-[11px] text-zinc-200">
+                          <span className="inline-flex flex-wrap items-center gap-1.5 rounded-lg bg-transparent border border-emerald-500/50 px-2.5 py-1 text-[11px] text-zinc-200">
                             Monto:{' '}
-                            {pricing.isLocalResident &&
-                              pricing.originalPrice &&
-                              pricing.originalPrice !== pricing.finalAmount && (
+                            {reg.isFree === true ? (
+                              <>
                                 <span className="text-stone-500 line-through font-mono">
-                                  {pricing.originalPrice}
+                                  {pricing.finalAmount}
                                 </span>
-                              )}
-                            <span className="text-emerald-300 font-mono font-semibold">
-                              {pricing.finalAmount}
-                            </span>
+                                <span className="text-yellow-300 font-mono font-semibold">
+                                  $0 · FREE
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                {pricing.isLocalResident &&
+                                  pricing.originalPrice &&
+                                  pricing.originalPrice !== pricing.finalAmount && (
+                                    <span className="text-stone-500 line-through font-mono">
+                                      {pricing.originalPrice}
+                                    </span>
+                                  )}
+                                <span className="text-emerald-400 font-mono font-semibold">
+                                  {pricing.finalAmount}
+                                </span>
+                              </>
+                            )}
                             {pricing.isLocalResident && (
-                              <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                              <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-transparent text-emerald-400 border border-emerald-500/60">
                                 {pricing.badgeText} · Verificar domicilio en DNI
                               </span>
                             )}
                           </span>
+                        )}
+                        {onToggleFree && (
+                          <button
+                            type="button"
+                            onClick={() => onToggleFree(reg)}
+                            disabled={isBusy}
+                            aria-pressed={reg.isFree === true}
+                            title={
+                              reg.isFree === true
+                                ? 'Quitar bonificación: vuelve a computar el monto abonado'
+                                : 'Marcar como FREE / Bonificado: computa $0 en Ingresos Confirmados'
+                            }
+                            className={`inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none border px-2.5 py-1 text-[11px] font-medium transition-colors cursor-pointer disabled:opacity-50 ${
+                              reg.isFree === true
+                                ? 'border-yellow-400/80 text-yellow-300 hover:border-yellow-300'
+                                : 'border-stone-700 text-stone-300 hover:border-yellow-400/70 hover:text-yellow-300'
+                            }`}
+                          >
+                            {reg.isFree === true ? 'Quitar FREE' : 'Marcar FREE / Bonificado'}
+                          </button>
                         )}
                       </div>
 

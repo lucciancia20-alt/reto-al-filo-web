@@ -52,14 +52,14 @@ const SHIRT_SIZE_GUIDE = [
   { size: 'XL', width: '58 cm', length: '75 cm' },
   { size: 'XXL', width: '61 cm', length: '78 cm' },
 ];
-const GENDERS = ['Femenino', 'Masculino', 'Otro'];
+const GENDERS = ['Masculino', 'Femenino'];
 const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-', 'No sabe'];
 
 const INITIAL_FORM = {
   fullName: '',
   dni: '',
   birthDate: '',
-  gender: 'Femenino',
+  gender: '',
   phone: '',
   email: '',
   city: '',
@@ -406,6 +406,11 @@ export default function RegistrationModal({
     }
     setBirthDateError('');
 
+    if (!form.gender) {
+      setSubmitError('Seleccioná tu género (Masculino o Femenino) para completar tu inscripción.');
+      return;
+    }
+
     if (!receiptFile) {
       setSubmitError(
         'Adjuntá la foto, captura o PDF del comprobante de transferencia para completar tu inscripción.'
@@ -568,6 +573,12 @@ export default function RegistrationModal({
                   <span className="text-stone-400">DNI</span>
                   <span className="font-mono text-stone-100">{confirmedReg.dni}</span>
                 </div>
+                {confirmedReg.gender && (
+                  <div className="flex justify-between gap-3 py-1 border-b border-stone-800/80">
+                    <span className="text-stone-400">Género</span>
+                    <span className="font-bold text-stone-100">{confirmedReg.gender}</span>
+                  </div>
+                )}
                 <div className="flex justify-between gap-3 py-1 border-b border-stone-800/80">
                   <span className="text-stone-400">Distancia y Monto</span>
                   <div className="text-right">
@@ -699,12 +710,15 @@ export default function RegistrationModal({
                     );
                     const cardClass = active
                       ? is13K
-                        ? 'bg-zinc-950 border-red-500 shadow-lg shadow-red-500/20'
-                        : 'bg-zinc-950 border-cyan-500 shadow-lg shadow-cyan-500/20'
+                        ? 'bg-zinc-950 border-red-500 shadow-none'
+                        : 'bg-zinc-950 border-cyan-400 shadow-none'
                       : is13K
-                        ? 'bg-zinc-950/80 border-red-500/70 hover:border-red-500'
-                        : 'bg-zinc-950/80 border-cyan-500/70 hover:border-cyan-500';
+                        ? 'bg-zinc-950 border-red-500/50 hover:border-red-500 shadow-none'
+                        : 'bg-zinc-950 border-cyan-500/50 hover:border-cyan-400 shadow-none';
                     const titleClass = is13K ? 'text-red-500' : 'text-cyan-400';
+                    const priceBadgeClass = is13K
+                      ? 'bg-zinc-950 text-red-500 border border-red-500/70'
+                      : 'bg-zinc-950 text-cyan-400 border border-cyan-500/70';
                     const iconClass = active
                       ? is13K
                         ? 'text-red-500'
@@ -716,7 +730,7 @@ export default function RegistrationModal({
                         key={item.id}
                         type="button"
                         onClick={() => setSelectedDistance(item.id)}
-                        className={`w-full text-left rounded-2xl p-3.5 border transition-all cursor-pointer flex items-center justify-between gap-2 ${cardClass}`}
+                        className={`w-full text-left rounded-2xl p-3.5 border transition-colors cursor-pointer flex items-center justify-between gap-2 ${cardClass}`}
                       >
                         <div className="min-w-0">
                           <div className="flex items-center flex-wrap gap-2">
@@ -726,14 +740,18 @@ export default function RegistrationModal({
                               {item.title}
                             </span>
                             {itemPricing.isLocalResident ? (
-                              <span className="inline-flex items-center gap-1.5 text-xs font-extrabold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                              <span
+                                className={`inline-flex items-center gap-1.5 text-xs font-extrabold px-2 py-0.5 rounded-md ${priceBadgeClass}`}
+                              >
                                 <span className="line-through text-stone-400 font-normal text-[11px]">
                                   {itemPricing.originalPrice}
                                 </span>
                                 <span>{itemPricing.finalAmount}</span>
                               </span>
                             ) : (
-                              <span className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                              <span
+                                className={`text-xs font-extrabold px-2 py-0.5 rounded-md ${priceBadgeClass}`}
+                              >
                                 {item.price}
                               </span>
                             )}
@@ -965,26 +983,39 @@ export default function RegistrationModal({
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="reg-gender"
-                      className="block text-xs font-semibold text-stone-300 mb-1"
-                    >
+                    <span className="block text-xs font-semibold text-stone-300 mb-1">
                       Categoría / Género <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      id="reg-gender"
-                      name="gender"
-                      autoComplete="sex"
-                      value={form.gender}
-                      onChange={(e) => handleFieldChange('gender', e.target.value)}
-                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                    </span>
+                    <div
+                      className="grid grid-cols-2 gap-2"
+                      role="radiogroup"
+                      aria-label="Categoría / Género"
                     >
-                      {GENDERS.map((g) => (
-                        <option key={g} value={g}>
-                          {g}
-                        </option>
-                      ))}
-                    </select>
+                      {GENDERS.map((g) => {
+                        const active = form.gender === g;
+                        return (
+                          <button
+                            key={g}
+                            type="button"
+                            role="radio"
+                            aria-checked={active}
+                            onClick={() => {
+                              handleFieldChange('gender', g);
+                              if (submitError.includes('género')) {
+                                setSubmitError('');
+                              }
+                            }}
+                            className={`min-h-[42px] rounded-xl font-display font-bold text-xs sm:text-sm border transition-colors cursor-pointer ${
+                              active
+                                ? 'bg-zinc-950 border-orange-500 text-orange-400 font-bold'
+                                : 'bg-zinc-950 text-white border-orange-500/40 hover:border-orange-500'
+                            }`}
+                          >
+                            {g}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   <div>

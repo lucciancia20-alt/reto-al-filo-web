@@ -1110,3 +1110,88 @@ export function resolveFrozenRegistrationPricing(reg) {
     badgeText,
   };
 }
+
+/** Normaliza el género del corredor a 'Masculino', 'Femenino' o '' si no coincide. */
+export function normalizeRunnerGender(rawGender) {
+  const lower = String(rawGender ?? '').trim().toLowerCase();
+  if (!lower) return '';
+  if (
+    lower === 'm' ||
+    lower.includes('masc') ||
+    lower.includes('hombre') ||
+    lower.includes('varon') ||
+    lower.includes('varón') ||
+    lower.includes('caballero')
+  ) {
+    return 'Masculino';
+  }
+  if (
+    lower === 'f' ||
+    lower.includes('fem') ||
+    lower.includes('mujer') ||
+    lower.includes('dama')
+  ) {
+    return 'Femenino';
+  }
+  return '';
+}
+
+const FREE_ENTRY_TEXT_RE = /\b(free|gratis|bonificad[oa]|sin\s*cargo|cortes[ií]a)\b/i;
+
+/**
+ * Resuelve el monto real abonado (en ARS entero) por un corredor:
+ * - Devuelve 0 si es corredor/entrenador FREE (flag, texto FREE/Gratis, $0 o 100% descuento).
+ * - Prioriza el monto congelado en la inscripción (`finalAmount` / `priceSnapshot`).
+ * - Si el documento legacy no tiene monto guardado, usa el precio configurado en el panel
+ *   aplicando el descuento de residente si corresponde.
+ */
+export function resolveRegistrationPaidAmount(reg, raceConfig = RACE_CONFIG) {
+  if (!reg || typeof reg !== 'object') return 0;
+
+  if (
+    reg.isFree === true ||
+    reg.freeEntry === true ||
+    reg.isTeamFree === true ||
+    Number(reg.discountPercentApplied) >= 100 ||
+    FREE_ENTRY_TEXT_RE.test(String(reg.benefitType || reg.teamBenefit || ''))
+  ) {
+    return 0;
+  }
+
+  const storedCandidates = [reg.finalAmount, reg.priceSnapshot];
+  for (const candidate of storedCandidates) {
+    if (typeof candidate === 'number' && Number.isFinite(candidate)) {
+      return Math.max(0, Math.round(candidate));
+    }
+    if (typeof candidate === 'string') {
+      const trimmed = candidate.trim();
+      if (!trimmed) continue;
+      if (FREE_ENTRY_TEXT_RE.test(trimmed)) return 0;
+      const intPart = trimmed.split(',')[0];
+      const digits = intPart.replace(/[^\d]/g, '');
+      if (digits !== '') {
+        const parsed = Number.parseInt(digits, 10);
+        if (Number.isFinite(parsed)) {
+          return Math.max(0, parsed);
+        }
+      }
+    }
+  }
+
+  const rawDist = String(reg.distance || '').trim().toUpperCase();
+  const distKey = rawDist === '13K' || rawDist === '10K' ? '13K' : '27K';
+  const configuredPrice =
+    raceConfig?.circuits?.[distKey]?.price || RACE_CONFIG.circuits[distKey].price;
+  const baseNumber = parseArsPriceNumber(configuredPrice);
+
+  if (reg.isLocalResident) {
+    const savedPct = Number(reg.discountPercentApplied);
+    const pct =
+      Number.isFinite(savedPct) && savedPct > 0
+        ? Math.min(100, Math.round(savedPct))
+        : Number(raceConfig?.residentDiscountPercent ?? DEFAULT_RESIDENT_DISCOUNT_PERCENT);
+    return Math.max(0, Math.round(baseNumber * (1 - Math.min(100, Math.max(0, pct)) / 100)));
+  }
+
+  return Math.max(0, baseNumber);
+}

@@ -52,6 +52,7 @@ service cloud.firestore {
         && hasNonEmptyString(data, 'fullName')
         && hasNonEmptyString(data, 'dni')
         && hasNonEmptyString(data, 'birthDate')
+        && hasNonEmptyString(data, 'gender') && data.gender in ['Masculino', 'Femenino']
         && hasNonEmptyString(data, 'phone')
         && hasNonEmptyString(data, 'email')
         && hasNonEmptyString(data, 'city')
@@ -81,7 +82,10 @@ service cloud.firestore {
 
     match /registrations/{registrationId} {
       allow create: if isValidRegistrationCreate(request.resource.data);
-      allow read, update, delete: if isAdmin();
+      allow read, delete: if isAdmin();
+      // Solo admins actualizan (estado, dorsal, kit, FREE/Bonificado); isFree debe ser booleano.
+      allow update: if isAdmin()
+        && (!('isFree' in request.resource.data) || request.resource.data.isFree is bool);
     }
 
     // Proyección pública: la crea/actualiza la Cloud Function (Admin SDK, ignora reglas)

@@ -21,6 +21,9 @@ import {
   syncScheduleWithTargetDate,
   resolveRunnerCategory,
   resolveFrozenRegistrationPricing,
+  resolveRegistrationPaidAmount,
+  parseArsPriceNumber,
+  normalizeRunnerGender,
   getRaceTitle,
   getRaceFullTitle,
 } from '../data/raceConfig';
@@ -60,6 +63,7 @@ const DEFAULT_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || '
 const REGS_CACHE_TTL_MS = 5 * 60 * 1000;
 
 const sanitizeExcelCell = (value) => {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
   const str = String(value ?? '');
   return /^\s*[=+\-@]/.test(str) ? `'${str}` : str;
 };
@@ -142,6 +146,7 @@ export default function AdminModal({
   const [regsSource, setRegsSource] = useState('firestore');
   const [regSearch, setRegSearch] = useState('');
   const [regDistanceFilter, setRegDistanceFilter] = useState('all');
+  const [regGenderFilter, setRegGenderFilter] = useState('all');
   const [regStatusFilter, setRegStatusFilter] = useState('all');
   const [regDuplicateFilter, setRegDuplicateFilter] = useState('none');
   const [regShirtFilter, setRegShirtFilter] = useState('all');
@@ -239,6 +244,12 @@ export default function AdminModal({
   );
 
   const regStats = useMemo(() => {
+    const emptyGenderDistance = {
+      '27K_Masculino': 0,
+      '27K_Femenino': 0,
+      '13K_Masculino': 0,
+      '13K_Femenino': 0,
+    };
     if (registrations.length === 0 && remoteStats) {
       return {
         total: remoteStats.total,
@@ -249,6 +260,13 @@ export default function AdminModal({
         checkedInCount: remoteStats.checkedIn,
         pendingCheckInCount: Math.max(0, remoteStats.confirmed - remoteStats.checkedIn),
         shirtSizes: [],
+        revenue27k: 0,
+        revenue13k: 0,
+        revenueTotal: 0,
+        confirmed27k: 0,
+        confirmed13k: 0,
+        freeConfirmedCount: 0,
+        genderDistanceCounts: emptyGenderDistance,
       };
     }
     let confirmed = 0;
@@ -257,6 +275,12 @@ export default function AdminModal({
     let count13k = 0;
     let checkedInCount = 0;
     let pendingCheckInCount = 0;
+    let revenue27k = 0;
+    let revenue13k = 0;
+    let confirmed27k = 0;
+    let confirmed13k = 0;
+    let freeConfirmedCount = 0;
+    const genderDistanceCounts = { ...emptyGenderDistance };
     const SHIRT_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
     const shirtMap = new Map(SHIRT_ORDER.map((sz) => [sz, { size: sz, confirmed: 0, total: 0 }]));
 
@@ -265,17 +289,35 @@ export default function AdminModal({
       const isConfirmed = st === 'confirmado' || st === 'confirmed';
       const isPending = st === 'pendiente' || st === 'pending';
       const isRejected = st === 'rechazado' || st === 'rejected';
+      const is27 = r.distance === '27K' || r.distance === '21K';
+      const is13 = r.distance === '13K' || r.distance === '10K';
 
       if (isConfirmed) {
         confirmed += 1;
         if (r.checkedIn) checkedInCount += 1;
         else pendingCheckInCount += 1;
+
+        const paid = resolveRegistrationPaidAmount(r, draft);
+        if (paid === 0) freeConfirmedCount += 1;
+        if (is27) {
+          confirmed27k += 1;
+          revenue27k += paid;
+        } else if (is13) {
+          confirmed13k += 1;
+          revenue13k += paid;
+        }
       } else if (isPending) {
         pending += 1;
       }
 
-      if (r.distance === '27K' || r.distance === '21K') count27k += 1;
-      else if (r.distance === '13K' || r.distance === '10K') count13k += 1;
+      if (is27) count27k += 1;
+      else if (is13) count13k += 1;
+
+      const normGender = normalizeRunnerGender(r.gender);
+      if (normGender) {
+        if (is27) genderDistanceCounts[`27K_${normGender}`] += 1;
+        else if (is13) genderDistanceCounts[`13K_${normGender}`] += 1;
+      }
 
       const sz = String(r.shirtSize || '').trim().toUpperCase();
       if (sz && !isRejected) {
@@ -296,8 +338,15 @@ export default function AdminModal({
       checkedInCount,
       pendingCheckInCount,
       shirtSizes: Array.from(shirtMap.values()),
+      revenue27k,
+      revenue13k,
+      revenueTotal: revenue27k + revenue13k,
+      confirmed27k,
+      confirmed13k,
+      freeConfirmedCount,
+      genderDistanceCounts,
     };
-  }, [registrations, remoteStats]);
+  }, [registrations, remoteStats, draft]);
 
   const duplicateInfo = useMemo(() => {
     const savedBibCounts = new Map();
@@ -366,8 +415,17 @@ export default function AdminModal({
   const filteredRegistrations = useMemo(() => {
     const q = regSearch.trim().toLowerCase();
     const list = registrations.filter((reg) => {
-      if (regDistanceFilter !== 'all' && reg.distance !== regDistanceFilter) {
+      if (regDistanceFilter === '27K') {
+        if (reg.distance !== '27K' && reg.distance !== '21K') return false;
+      } else if (regDistanceFilter === '13K') {
+        if (reg.distance !== '13K' && reg.distance !== '10K') return false;
+      } else if (regDistanceFilter !== 'all' && reg.distance !== regDistanceFilter) {
         return false;
+      }
+      if (regGenderFilter !== 'all') {
+        if (normalizeRunnerGender(reg.gender) !== regGenderFilter) {
+          return false;
+        }
       }
       if (regStatusFilter !== 'all' && reg.status !== regStatusFilter) {
         return false;
@@ -444,6 +502,7 @@ export default function AdminModal({
     registrations,
     regSearch,
     regDistanceFilter,
+    regGenderFilter,
     regStatusFilter,
     regDuplicateFilter,
     regShirtFilter,
@@ -857,6 +916,25 @@ export default function AdminModal({
     }
   };
 
+  // Marca/desmarca FREE (bonificado). No altera stats/summary: 1 sola escritura en Firestore.
+  const handleToggleFree = async (reg) => {
+    setRegBusyId(reg.id);
+    setRegsError('');
+    try {
+      const nextIsFree = reg.isFree !== true;
+      await updateRegistrationStatus(reg.id, { isFree: nextIsFree });
+      setRegistrations((prev) =>
+        prev.map((item) =>
+          item.id === reg.id ? { ...item, isFree: nextIsFree, updatedAt: Date.now() } : item
+        )
+      );
+    } catch (err) {
+      setRegsError(err?.message || 'No se pudo actualizar la bonificación FREE.');
+    } finally {
+      setRegBusyId('');
+    }
+  };
+
   const handlePrintAccreditationSheet = () => {
     openPrintableAccreditationSheet({
       raceConfig: draft,
@@ -936,25 +1014,33 @@ export default function AdminModal({
         'Fecha Inscripción',
       ];
 
-      const rows = registrations.map((r) => {
+      const exportList = filteredRegistrations;
+      const rows = exportList.map((r) => {
         const cat = resolveRunnerCategory(r, draft);
         const pricing = resolveFrozenRegistrationPricing(r);
-        const valorDisplay = pricing.isLocalResident
-          ? `${pricing.finalAmount} (${pricing.badgeText})`
-          : pricing.finalAmount;
+        const finalAmountNum = resolveRegistrationPaidAmount(r, draft);
+        const distKey = r.distance === '13K' || r.distance === '10K' ? '13K' : '27K';
+        const basePriceNum =
+          parseArsPriceNumber(pricing.originalPrice) ||
+          parseArsPriceNumber(draft?.circuits?.[distKey]?.price) ||
+          finalAmountNum;
         return [
           r.code || '',
           (r.status || '').toUpperCase(),
           bibDrafts[r.id] ?? r.assignedBib ?? '',
           r.distance || '',
-          valorDisplay,
-          pricing.originalPrice,
-          pricing.finalAmount,
-          pricing.isLocalResident ? `${pricing.badgeText} - Verificar DNI` : 'No',
+          finalAmountNum,
+          basePriceNum,
+          finalAmountNum,
+          r.isFree === true
+            ? 'FREE / Bonificado'
+            : pricing.isLocalResident
+              ? `${pricing.badgeText} - Verificar DNI`
+              : 'No',
           r.fullName || '',
           r.dni || '',
           r.birthDate || '',
-          r.gender || '',
+          normalizeRunnerGender(r.gender) || r.gender || '',
           cat.age !== null ? cat.age : '',
           cat.fullCategory,
           r.phone || '',
@@ -972,15 +1058,47 @@ export default function AdminModal({
         ].map(sanitizeExcelCell);
       });
 
+      const activeFilterParts = [];
+      if (regDistanceFilter !== 'all') activeFilterParts.push(regDistanceFilter);
+      if (regGenderFilter !== 'all') activeFilterParts.push(regGenderFilter);
+      if (regStatusFilter !== 'all') activeFilterParts.push(regStatusFilter);
+      if (regShirtFilter !== 'all') activeFilterParts.push(`Talle ${regShirtFilter}`);
+      if (regCheckInFilter === 'checked') activeFilterParts.push('Kits entregados');
+      if (regCheckInFilter === 'pending_checkin') activeFilterParts.push('Kits pendientes');
+      if (regSearch.trim()) activeFilterParts.push(`Búsqueda: "${regSearch.trim()}"`);
+
+      const filterSuffix =
+        activeFilterParts.length > 0 ? ` · Filtro: ${activeFilterParts.join(' / ')}` : '';
+      const fileSlug =
+        [
+          regDistanceFilter !== 'all' ? regDistanceFilter : '',
+          regGenderFilter !== 'all' ? regGenderFilter.toLowerCase() : '',
+          regStatusFilter !== 'all' ? regStatusFilter : '',
+        ]
+          .filter(Boolean)
+          .join('-') || 'todos';
+
       const titleRow = [
         `${getRaceFullTitle(draft || raceConfig).toUpperCase()} · PLANILLA DE CORREDORES INSCRIPTOS`,
       ];
       const subtitleRow = [
-        `Exportado el ${new Date().toLocaleString('es-AR')} · Total: ${registrations.length} inscriptos`,
+        `Exportado el ${new Date().toLocaleString('es-AR')} · Total: ${exportList.length} inscriptos${filterSuffix}`,
       ];
 
       const sheetData = [titleRow, subtitleRow, headers, ...rows];
       const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+      // Formato numérico entero con separador de miles (#,##0) para Valor, Precio Base y Monto Final
+      const numericAmountCols = [4, 5, 6];
+      for (let rIdx = 3; rIdx < 3 + rows.length; rIdx += 1) {
+        for (const cIdx of numericAmountCols) {
+          const cellRef = XLSX.utils.encode_cell({ r: rIdx, c: cIdx });
+          if (ws[cellRef] && typeof ws[cellRef].v === 'number') {
+            ws[cellRef].t = 'n';
+            ws[cellRef].z = '#,##0';
+          }
+        }
+      }
 
       const lastColIdx = headers.length - 1;
       const lastColLetter = XLSX.utils.encode_col(lastColIdx);
@@ -1012,7 +1130,7 @@ export default function AdminModal({
       XLSX.utils.book_append_sheet(wb, ws, 'Inscriptos');
       XLSX.writeFile(
         wb,
-        `reto-al-filo-inscriptos-${new Date().toISOString().slice(0, 10)}.xlsx`
+        `reto-al-filo-inscriptos-${fileSlug}-${new Date().toISOString().slice(0, 10)}.xlsx`
       );
     } catch (err) {
       setRegsError(err?.message || 'No se pudo generar la planilla Excel.');
@@ -1566,6 +1684,8 @@ export default function AdminModal({
                   setRegSearch={setRegSearch}
                   regDistanceFilter={regDistanceFilter}
                   setRegDistanceFilter={setRegDistanceFilter}
+                  regGenderFilter={regGenderFilter}
+                  setRegGenderFilter={setRegGenderFilter}
                   regStatusFilter={regStatusFilter}
                   setRegStatusFilter={setRegStatusFilter}
                   regDuplicateFilter={regDuplicateFilter}
@@ -1583,6 +1703,7 @@ export default function AdminModal({
                   onConfirmRegistration={handleConfirmRegistration}
                   onChangeRegStatus={handleChangeRegStatus}
                   onToggleCheckIn={handleToggleCheckIn}
+                  onToggleFree={handleToggleFree}
                   onDeleteRegistration={handleDeleteRegistration}
                   buildRunnerWhatsappUrl={buildRunnerWhatsappUrl}
                   duplicateBibCount={duplicateInfo.duplicateBibCount}
