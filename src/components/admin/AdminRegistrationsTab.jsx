@@ -1413,9 +1413,9 @@ export default function AdminRegistrationsTab({
               distance: '13K',
               gender: 'Masculino',
               activeClass:
-                'border-2 px-[7px] py-[3px] bg-zinc-950 border-[#ff3333] text-[#ff3333] font-bold',
+                'border-2 px-[7px] py-[3px] bg-zinc-950 border-red-500 text-red-400 font-bold',
               inactiveClass:
-                'border px-2 py-1 bg-zinc-950 border-[#ff3333]/35 text-[#ff3333]/65 font-medium hover:border-[#ff3333]/75 hover:text-[#ff3333]',
+                'border px-2 py-1 bg-zinc-950 border-red-500/70 text-red-500 font-medium hover:border-red-500 hover:text-red-400',
             },
             {
               id: '13K-Femenino',
@@ -1424,9 +1424,9 @@ export default function AdminRegistrationsTab({
               distance: '13K',
               gender: 'Femenino',
               activeClass:
-                'border-2 px-[7px] py-[3px] bg-zinc-950 border-[#ff3333] text-[#ff3333] font-bold',
+                'border-2 px-[7px] py-[3px] bg-zinc-950 border-red-500 text-red-400 font-bold',
               inactiveClass:
-                'border px-2 py-1 bg-zinc-950 border-[#ff3333]/35 text-[#ff3333]/65 font-medium hover:border-[#ff3333]/75 hover:text-[#ff3333]',
+                'border px-2 py-1 bg-zinc-950 border-red-500/70 text-red-500 font-medium hover:border-red-500 hover:text-red-400',
             },
           ].map((item) => {
             const isSelected =
