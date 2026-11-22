@@ -1576,8 +1576,11 @@ export default function AdminModal({
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center justify-center gap-1.5 px-2.5 py-2.5 rounded-xl bg-zinc-950 border border-orange-500/80 text-[11px] sm:text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer ${
-                      active ? 'text-orange-400' : 'text-zinc-300 hover:text-orange-400'
+                    aria-pressed={active}
+                    className={`flex items-center justify-center gap-1.5 rounded-xl bg-zinc-950 shadow-none text-[11px] sm:text-xs uppercase tracking-wide transition-colors cursor-pointer ${
+                      active
+                        ? 'border-2 px-[9px] py-[9px] border-amber-400 text-amber-400 font-bold'
+                        : 'border px-2.5 py-2.5 border-orange-500/45 text-zinc-300 font-semibold hover:border-amber-400 hover:text-amber-300'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5 shrink-0" />
