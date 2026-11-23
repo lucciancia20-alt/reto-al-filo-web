@@ -728,10 +728,10 @@ export default function RegistrationModal({
                 setModalTab('register');
                 setInstError('');
               }}
-              className={`min-h-[38px] rounded-xl font-display font-bold text-xs uppercase tracking-wider px-3 py-2 border transition-colors cursor-pointer ${
+              className={`min-h-[38px] rounded-xl font-display font-bold text-xs uppercase tracking-wider px-3 py-2 border shadow-none transition-colors cursor-pointer ${
                 modalTab === 'register'
-                  ? 'bg-zinc-950 border-orange-500 text-orange-400 shadow-[0_0_12px_var(--theme-glow)]'
-                  : 'bg-zinc-950 border-stone-800 text-stone-400 hover:text-white hover:border-stone-600'
+                  ? 'bg-zinc-950 border-orange-500 text-orange-400'
+                  : 'bg-zinc-950 border-orange-500/40 text-stone-300 hover:text-white hover:border-orange-500'
               }`}
             >
               Nueva Inscripción
@@ -742,10 +742,10 @@ export default function RegistrationModal({
                 setModalTab('installment');
                 setSubmitError('');
               }}
-              className={`min-h-[38px] rounded-xl font-display font-bold text-xs uppercase tracking-wider px-3 py-2 border transition-colors cursor-pointer ${
+              className={`min-h-[38px] rounded-xl font-display font-bold text-xs uppercase tracking-wider px-3 py-2 border shadow-none transition-colors cursor-pointer ${
                 modalTab === 'installment'
-                  ? 'bg-zinc-950 border-violet-400 text-violet-300 shadow-[0_0_12px_rgba(167,139,250,0.22)]'
-                  : 'bg-zinc-950 border-violet-500/40 text-violet-300/85 hover:text-violet-200 hover:border-violet-400'
+                  ? 'bg-zinc-950 border-orange-500 text-orange-400'
+                  : 'bg-zinc-950 border-orange-500/40 text-stone-300 hover:text-white hover:border-orange-500'
               }`}
             >
               Ya me inscribí · Subir Cuota 2 o 3
@@ -756,9 +756,9 @@ export default function RegistrationModal({
         {confirmedInstallment ? (
           <>
             <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-7 space-y-5">
-              <div className="rounded-2xl bg-zinc-950 border border-violet-500/70 p-5 text-center">
-                <CheckCircle2 className="w-12 h-12 text-violet-400 mx-auto" />
-                <p className="mt-2 text-xs font-bold uppercase tracking-widest text-violet-300">
+              <div className="rounded-2xl bg-zinc-950 border border-[#3E5C23] p-5 text-center">
+                <CheckCircle2 className="w-12 h-12 text-[#3E5C23] mx-auto" />
+                <p className="mt-2 text-xs font-bold uppercase tracking-widest text-[#3E5C23]">
                   Comprobante de Cuota {confirmedInstallment.installmentNumber} de 3 Recibido
                 </p>
                 <p className="mt-2 text-xs sm:text-sm text-stone-200 max-w-md mx-auto">
@@ -790,7 +790,7 @@ export default function RegistrationModal({
                 )}
                 <div className="flex justify-between gap-3 py-1 border-b border-stone-800/80">
                   <span className="text-stone-400">Cuota informada</span>
-                  <span className="font-bold text-violet-300">
+                  <span className="font-bold text-amber-300">
                     Cuota {confirmedInstallment.installmentNumber} de 3
                   </span>
                 </div>
@@ -902,7 +902,7 @@ export default function RegistrationModal({
                     )}
                     {confirmedReg.paymentPlan === 'cuotas' && (
                       <div className="mt-1 flex flex-col items-end gap-0.5">
-                        <span className="inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-zinc-950 border border-violet-500/70 text-violet-300">
+                        <span className="inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-zinc-950 border border-orange-500/70 text-amber-300">
                           3 Cuotas · Cuota 1/3 ({confirmedReg.installmentAmount})
                         </span>
                         <span className="text-[10px] text-stone-300">
@@ -1002,7 +1002,7 @@ export default function RegistrationModal({
             <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-5">
               {/* 1. Qué cuota estás abonando */}
               <section className="space-y-2">
-                <span className="block text-[11px] font-bold uppercase tracking-widest text-violet-300">
+                <span className="block text-[11px] font-bold uppercase tracking-widest text-amber-400">
                   1 · Seleccioná la Cuota a Informar
                 </span>
                 <div className="grid grid-cols-2 gap-3">
@@ -1015,23 +1015,27 @@ export default function RegistrationModal({
                         onClick={() =>
                           setInstForm((prev) => ({ ...prev, installmentNumber: num }))
                         }
-                        className={`rounded-2xl p-3.5 border text-left transition-colors cursor-pointer flex items-center justify-between gap-2 ${
+                        className={`rounded-2xl p-3.5 border shadow-none text-left transition-colors cursor-pointer flex items-center justify-between gap-2 ${
                           active
-                            ? 'bg-zinc-950 border-violet-400 ring-1 ring-violet-400/60'
-                            : 'bg-zinc-950 border-violet-500/35 hover:border-violet-400'
+                            ? 'bg-zinc-950 border-orange-500'
+                            : 'bg-zinc-950 border-orange-500/40 hover:border-orange-500'
                         }`}
                       >
                         <div>
-                          <span className="block font-display text-sm sm:text-base font-black text-violet-300 uppercase">
+                          <span
+                            className={`block font-display text-sm sm:text-base font-black uppercase ${
+                              active ? 'text-orange-400' : 'text-white'
+                            }`}
+                          >
                             Cuota {num} de 3
                           </span>
-                          <span className="block text-[11px] text-stone-400 mt-0.5">
+                          <span className="block text-[11px] text-stone-300 mt-0.5">
                             {num === 2 ? 'Segunda cuota parcial' : 'Tercera y última cuota'}
                           </span>
                         </div>
                         <CheckCircle2
                           className={`w-5 h-5 shrink-0 ${
-                            active ? 'text-violet-400' : 'text-stone-700'
+                            active ? 'text-orange-400' : 'text-stone-700'
                           }`}
                         />
                       </button>
@@ -1041,9 +1045,9 @@ export default function RegistrationModal({
               </section>
 
               {/* 2. Datos bancarios rápidos + valores de referencia */}
-              <section className="rounded-2xl bg-zinc-950 border border-violet-500/40 p-4 space-y-3">
+              <section className="rounded-2xl bg-zinc-950 border border-orange-500/40 p-4 space-y-3">
                 <div className="flex items-center gap-2">
-                  <Landmark className="w-4 h-4 text-violet-300 shrink-0" />
+                  <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
                   <span className="text-xs font-bold uppercase tracking-wider text-white">
                     2 · Datos Bancarios para Transferir tu Cuota
                   </span>
@@ -1057,7 +1061,7 @@ export default function RegistrationModal({
                     return (
                       <div
                         key={`inst-ref-${item.id}`}
-                        className="rounded-xl bg-zinc-950 border border-stone-800 p-2.5 space-y-1"
+                        className="rounded-xl bg-zinc-950 border border-orange-500/40 p-2.5 space-y-1 shadow-none"
                       >
                         <span
                           className={`font-display font-bold text-xs ${
@@ -1141,7 +1145,7 @@ export default function RegistrationModal({
               {/* 3. Identificación del corredor ya inscripto */}
               <section className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <User className="w-4 h-4 text-violet-300 shrink-0" />
+                  <User className="w-4 h-4 text-amber-400 shrink-0" />
                   <span className="text-xs font-bold uppercase tracking-wider text-white">
                     3 · Datos con los que te Inscribiste
                   </span>
@@ -1165,7 +1169,7 @@ export default function RegistrationModal({
                         setInstForm((prev) => ({ ...prev, dni: e.target.value }))
                       }
                       placeholder="Ej. 34567890"
-                      className="w-full rounded-xl bg-zinc-950 border border-violet-500/50 focus:border-violet-400 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
                     />
                   </div>
 
@@ -1184,7 +1188,7 @@ export default function RegistrationModal({
                         setInstForm((prev) => ({ ...prev, code: e.target.value }))
                       }
                       placeholder="Ej. RAF-12345"
-                      className="w-full rounded-xl bg-zinc-950 border border-violet-500/40 focus:border-violet-400 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
                     />
                   </div>
 
@@ -1204,7 +1208,7 @@ export default function RegistrationModal({
                         setInstForm((prev) => ({ ...prev, fullName: e.target.value }))
                       }
                       placeholder="Ej. María Gómez"
-                      className="w-full rounded-xl bg-zinc-950 border border-violet-500/50 focus:border-violet-400 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
                     />
                   </div>
                 </div>
@@ -1216,15 +1220,15 @@ export default function RegistrationModal({
                   4 · Adjuntar Comprobante de Cuota {instForm.installmentNumber} de 3{' '}
                   <span className="text-red-500">*</span>
                 </span>
-                <div className="rounded-2xl border border-dashed border-violet-500/50 hover:border-violet-400 transition-colors bg-zinc-950/70 p-4 flex flex-col sm:flex-row items-center gap-4">
+                <div className="rounded-2xl border border-dashed border-orange-500/40 hover:border-orange-500 transition-colors bg-zinc-950/70 p-4 flex flex-col sm:flex-row items-center gap-4">
                   {instPreview ? (
                     <img
                       src={instPreview}
                       alt="Vista previa del comprobante de cuota"
-                      className="w-20 h-20 rounded-xl object-cover border border-violet-500/40 shrink-0"
+                      className="w-20 h-20 rounded-xl object-cover border border-orange-500/40 shrink-0"
                     />
                   ) : (
-                    <div className="w-20 h-20 rounded-xl bg-zinc-950 border border-violet-500/40 flex items-center justify-center text-stone-500 shrink-0">
+                    <div className="w-20 h-20 rounded-xl bg-zinc-950 border border-orange-500/40 flex items-center justify-center text-stone-500 shrink-0">
                       <FileText className="w-8 h-8" />
                     </div>
                   )}
@@ -1239,7 +1243,7 @@ export default function RegistrationModal({
                       Formatos aceptados: JPG, PNG, WEBP o PDF (máx. 8 MB).
                     </p>
                     <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                      <label className="inline-flex items-center gap-2 rounded-xl bg-violet-500 hover:bg-violet-400 text-zinc-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 cursor-pointer transition-colors">
+                      <label className="inline-flex items-center gap-2 rounded-xl bg-orange-600/85 hover:bg-orange-600 text-zinc-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 cursor-pointer transition-colors">
                         <Upload className="w-4 h-4" />
                         {instFile ? 'Cambiar Comprobante' : 'Adjuntar Comprobante'}
                         <input
@@ -1264,8 +1268,8 @@ export default function RegistrationModal({
               </section>
 
               {instStep && (
-                <div className="rounded-xl bg-violet-500/15 border border-violet-500/35 p-3 text-xs text-violet-200 flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin shrink-0 text-violet-400" />
+                <div className="rounded-xl bg-amber-500/15 border border-amber-500/35 p-3 text-xs text-amber-200 flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin shrink-0 text-amber-400" />
                   <span>{instStep}</span>
                 </div>
               )}
@@ -1294,7 +1298,7 @@ export default function RegistrationModal({
               <button
                 type="submit"
                 disabled={instSubmitting}
-                className="min-h-[48px] inline-flex items-center justify-center gap-2 rounded-2xl bg-violet-500 hover:bg-violet-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider py-3 px-6 shadow-lg shadow-violet-500/20 transition-all cursor-pointer disabled:opacity-50"
+                className="min-h-[48px] inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider py-3 px-6 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer disabled:opacity-50"
               >
                 {instSubmitting ? (
                   <>
@@ -1437,14 +1441,18 @@ export default function RegistrationModal({
                   <button
                     type="button"
                     onClick={() => setPaymentPlan('total')}
-                    className={`text-left rounded-xl p-3 border transition-colors cursor-pointer flex items-center justify-between gap-2 ${
+                    className={`text-left rounded-xl p-3 border shadow-none transition-colors cursor-pointer flex items-center justify-between gap-2 ${
                       paymentPlan === 'total'
-                        ? 'bg-zinc-950 border-orange-500 ring-1 ring-orange-500/60'
-                        : 'bg-zinc-950 border-stone-800 hover:border-orange-500/50'
+                        ? 'bg-zinc-950 border-orange-500'
+                        : 'bg-zinc-950 border-orange-500/40 hover:border-orange-500'
                     }`}
                   >
                     <div>
-                      <span className="block font-display text-xs sm:text-sm font-bold text-white uppercase">
+                      <span
+                        className={`block font-display text-xs sm:text-sm font-bold uppercase ${
+                          paymentPlan === 'total' ? 'text-orange-400' : 'text-white'
+                        }`}
+                      >
                         Pago Total (1 pago)
                       </span>
                       <span className="block text-[11px] text-stone-300 mt-0.5">
@@ -1462,19 +1470,23 @@ export default function RegistrationModal({
                   <button
                     type="button"
                     onClick={() => setPaymentPlan('cuotas')}
-                    className={`text-left rounded-xl p-3 border transition-colors cursor-pointer flex items-center justify-between gap-2 ${
+                    className={`text-left rounded-xl p-3 border shadow-none transition-colors cursor-pointer flex items-center justify-between gap-2 ${
                       paymentPlan === 'cuotas'
-                        ? 'bg-zinc-950 border-violet-400 ring-1 ring-violet-400/60'
-                        : 'bg-zinc-950 border-violet-500/40 hover:border-violet-400'
+                        ? 'bg-zinc-950 border-orange-500'
+                        : 'bg-zinc-950 border-orange-500/40 hover:border-orange-500'
                     }`}
                   >
                     <div>
-                      <span className="flex items-center gap-1.5 font-display text-xs sm:text-sm font-bold text-violet-300 uppercase">
+                      <span
+                        className={`flex items-center gap-1.5 font-display text-xs sm:text-sm font-bold uppercase ${
+                          paymentPlan === 'cuotas' ? 'text-orange-400' : 'text-white'
+                        }`}
+                      >
                         <span>Pago en 3 Cuotas</span>
                       </span>
                       <span className="block text-[11px] text-stone-300 mt-0.5">
                         3 cuotas de{' '}
-                        <strong className="text-violet-300 font-mono">
+                        <strong className="text-amber-300 font-mono">
                           {pricing.installmentAmount}
                         </strong>{' '}
                         (Total {pricing.finalAmount})
@@ -1482,26 +1494,26 @@ export default function RegistrationModal({
                     </div>
                     <CheckCircle2
                       className={`w-4 h-4 shrink-0 ${
-                        paymentPlan === 'cuotas' ? 'text-violet-400' : 'text-stone-700'
+                        paymentPlan === 'cuotas' ? 'text-orange-400' : 'text-stone-700'
                       }`}
                     />
                   </button>
                 </div>
 
                 {paymentPlan === 'cuotas' && (
-                  <div className="rounded-xl bg-zinc-950 border border-violet-500/50 p-3 text-xs text-stone-200 space-y-1">
+                  <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-3 text-xs text-stone-200 space-y-1 shadow-none">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-violet-300 uppercase text-[11px]">
+                      <span className="font-semibold text-amber-400 uppercase text-[11px]">
                         Monto a transferir hoy (Cuota 1 de 3)
                       </span>
-                      <span className="font-display text-base sm:text-lg font-black text-violet-300 font-mono">
+                      <span className="font-display text-base sm:text-lg font-black text-amber-300 font-mono">
                         {pricing.installmentAmount}
                       </span>
                     </div>
                     <p className="text-[11px] text-stone-400 leading-snug">
                       Subí hoy el comprobante de la <strong className="text-white">Cuota 1/3</strong>.
                       Tiempo después podrás cargar las <strong className="text-white">Cuotas 2 y 3</strong> desde la pestaña{' '}
-                      <strong className="text-violet-300">&ldquo;Ya me inscribí · Subir Cuota 2 o 3&rdquo;</strong>.
+                      <strong className="text-amber-300">&ldquo;Ya me inscribí · Subir Cuota 2 o 3&rdquo;</strong>.
                     </p>
                   </div>
                 )}
