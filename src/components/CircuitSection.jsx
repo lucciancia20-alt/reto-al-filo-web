@@ -533,6 +533,10 @@ export default function CircuitSection({
     ? 'border-red-500/70 text-red-500'
     : 'border-cyan-500/70 text-cyan-400';
   const headerDownloadHoverTone = is13KActive ? 'hover:border-red-400' : 'hover:border-cyan-400';
+  const bottomCtaTone = is13KActive
+    ? 'border-red-500/90 ring-1 ring-red-500/70 ring-offset-2 ring-offset-zinc-950 text-red-500'
+    : 'border-cyan-400/90 ring-1 ring-cyan-400/70 ring-offset-2 ring-offset-zinc-950 text-cyan-400';
+  const bottomCtaIconTone = is13KActive ? 'text-red-500' : 'text-cyan-400';
 
   return (
     <section
@@ -1045,9 +1049,9 @@ export default function CircuitSection({
                 <button
                   type="button"
                   onClick={() => onOpenModalWithDistance(activeDistance)}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-950 border border-orange-500/90 ring-1 ring-orange-500/70 ring-offset-2 ring-offset-zinc-950 active:scale-[0.99] text-orange-400 font-display font-semibold text-xs uppercase tracking-wider px-4 py-2 transition-all cursor-pointer shrink-0 whitespace-nowrap"
+                  className={`inline-flex items-center justify-center gap-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-950 border ${bottomCtaTone} active:scale-[0.99] font-display font-semibold text-xs uppercase tracking-wider px-4 py-2 transition-all cursor-pointer shrink-0 whitespace-nowrap`}
                 >
-                  <Flame className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                  <Flame className={`w-3.5 h-3.5 ${bottomCtaIconTone} shrink-0`} />
                   <span className="inline-grid place-items-center">
                     {Object.values(circuits).map((c) => {
                       const isActive = c.id === activeDistance;
