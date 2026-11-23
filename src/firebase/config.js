@@ -568,16 +568,18 @@ if (typeof window !== 'undefined') readLocalRegistrations();
 // ---------------------------------------------------------------------------
 // stats/summary: contadores agregados (1 lectura en vez de N) mantenidos con increment()
 // ---------------------------------------------------------------------------
-const STATS_FIELDS = ['total', 'pending', 'confirmed', 'rejected', 'd27k', 'd13k', 'checkedIn'];
+const STATS_FIELDS = ['total', 'pending', 'partial', 'confirmed', 'rejected', 'd27k', 'd13k', 'checkedIn'];
 
 function statsContribution(record) {
   const out = Object.fromEntries(STATS_FIELDS.map((f) => [f, 0]));
   if (!record) return out;
   const st = String(record.status || '').trim().toLowerCase();
   const confirmed = st === 'confirmado' || st === 'confirmed';
+  const partial = st === 'parcial' || st === 'partial';
   const rejected = st === 'rechazado' || st === 'rejected';
   out.total = 1;
   if (confirmed) out.confirmed = 1;
+  else if (partial) out.partial = 1;
   else if (rejected) out.rejected = 1;
   else out.pending = 1;
   const dist = String(record.distance || '').toUpperCase();
@@ -678,6 +680,8 @@ export async function submitRunnerRegistration(payload) {
 
   const now = Date.now();
   const isLocalResident = Boolean(payload.isLocalResident);
+  const paymentPlan = payload.paymentPlan === 'cuotas' ? 'cuotas' : 'total';
+  const installmentsTotal = paymentPlan === 'cuotas' ? 3 : 1;
   const record = {
     code: generateRegistrationCode(),
     distance: payload.distance === '13K' ? '13K' : '27K',
@@ -688,6 +692,9 @@ export async function submitRunnerRegistration(payload) {
       : 0,
     originalPrice: String(payload.originalPrice || payload.priceSnapshot || '').trim(),
     finalAmount: String(payload.finalAmount || payload.priceSnapshot || '').trim(),
+    paymentPlan,
+    installmentsTotal,
+    installmentAmount: String(payload.installmentAmount || payload.finalAmount || payload.priceSnapshot || '').trim(),
     fullName: String(payload.fullName).trim(),
     dni: String(payload.dni).trim(),
     birthDate: String(payload.birthDate).trim(),
@@ -745,12 +752,184 @@ export async function submitRunnerRegistration(payload) {
   };
 }
 
+const LOCAL_INSTALLMENTS_STORAGE_KEY = 'reto_al_filo_local_installments_v1';
+
+function readLocalInstallmentSubmissions() {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(LOCAL_INSTALLMENTS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalInstallmentSubmissions(list) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(
+      LOCAL_INSTALLMENTS_STORAGE_KEY,
+      JSON.stringify(Array.isArray(list) ? list.slice(0, 100) : [])
+    );
+  } catch {
+    // Ignorar errores de almacenamiento local
+  }
+}
+
+function normalizeInstallmentDni(value) {
+  return String(value ?? '').replace(/[.\s-]+/g, '').trim().toUpperCase();
+}
+
+function normalizeInstallmentCode(value) {
+  const upper = String(value ?? '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
+  if (!upper) return '';
+  if (/^RAF-\d{4,}$/.test(upper) || /^RAF-[A-Z0-9]{8}$/.test(upper)) return upper;
+  if (/^RAF\d{4,}$/.test(upper)) return `RAF-${upper.slice(3)}`;
+  if (/^\d{5}$/.test(upper)) return `RAF-${upper}`;
+  return upper;
+}
+
+function attachInstallmentsToRegistrations(registrations = [], submissions = []) {
+  const byCode = new Map();
+  const byDni = new Map();
+
+  const sortedSubs = [...submissions].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+  for (const sub of sortedSubs) {
+    const num = Number(sub?.installmentNumber);
+    if (num !== 2 && num !== 3) continue;
+    const url = String(sub?.receiptUrl || '').trim();
+    if (!url) continue;
+
+    const entry = {
+      id: sub.id || '',
+      number: num,
+      url,
+      format: String(sub?.receiptFormat || '').trim(),
+      createdAt: sub.createdAt || 0,
+    };
+
+    const codeKey = normalizeInstallmentCode(sub.code);
+    if (codeKey) {
+      if (!byCode.has(codeKey)) byCode.set(codeKey, new Map());
+      byCode.get(codeKey).set(num, entry);
+    }
+
+    const dniKey = normalizeInstallmentDni(sub.dni);
+    if (dniKey) {
+      if (!byDni.has(dniKey)) byDni.set(dniKey, new Map());
+      byDni.get(dniKey).set(num, entry);
+    }
+  }
+
+  return registrations.map((reg) => {
+    const receiptMap = new Map();
+    if (reg.receiptUrl) {
+      receiptMap.set(1, {
+        number: 1,
+        url: reg.receiptUrl,
+        format: String(reg.receiptFormat || '').trim(),
+        createdAt: reg.createdAt || 0,
+      });
+    }
+
+    const dniKey = normalizeInstallmentDni(reg.dni);
+    if (dniKey && byDni.has(dniKey)) {
+      for (const [num, entry] of byDni.get(dniKey).entries()) {
+        receiptMap.set(num, entry);
+      }
+    }
+
+    const codeKey = normalizeInstallmentCode(reg.code);
+    if (codeKey && byCode.has(codeKey)) {
+      for (const [num, entry] of byCode.get(codeKey).entries()) {
+        receiptMap.set(num, entry);
+      }
+    }
+
+    const installmentReceipts = Array.from(receiptMap.values()).sort((a, b) => a.number - b.number);
+    return {
+      ...reg,
+      installmentReceipts,
+    };
+  });
+}
+
+/**
+ * Registra el comprobante de la Cuota 2 o Cuota 3 de un corredor ya inscripto.
+ */
+export async function submitInstallmentReceipt(payload) {
+  const dni = String(payload?.dni || '').trim();
+  const fullName = String(payload?.fullName || '').trim();
+  const receiptUrl = String(payload?.receiptUrl || '').trim();
+  const installmentNumber = Number(payload?.installmentNumber);
+
+  if (!dni) {
+    throw new Error('Ingresá el DNI con el que te inscribiste.');
+  }
+  if (!fullName) {
+    throw new Error('Ingresá tu Nombre y Apellido.');
+  }
+  if (installmentNumber !== 2 && installmentNumber !== 3) {
+    throw new Error('Seleccioná si corresponde a la Cuota 2 o a la Cuota 3.');
+  }
+  if (!receiptUrl) {
+    throw new Error('Adjuntá el comprobante de transferencia de la cuota.');
+  }
+
+  const cleanCode = normalizeInstallmentCode(payload?.code);
+  const now = Date.now();
+  const record = {
+    ...(cleanCode ? { code: cleanCode } : {}),
+    dni,
+    fullName,
+    installmentNumber,
+    receiptUrl,
+    receiptPublicId: String(payload?.receiptPublicId || '').trim(),
+    receiptFormat: String(payload?.receiptFormat || '').trim(),
+    createdAt: now,
+  };
+
+  let persistedId = `local-inst-${now}`;
+  let persistedTo = 'local-only';
+  let errorCode = '';
+
+  if (isFirebaseConfigured()) {
+    try {
+      const bundle = await getFirestoreDb();
+      if (bundle) {
+        const { db, firestore } = bundle;
+        const { collection, addDoc } = firestore;
+        const docRef = await addDoc(collection(db, 'installmentSubmissions'), record);
+        persistedId = docRef.id;
+        persistedTo = 'firestore';
+      }
+    } catch (error) {
+      errorCode = error?.code || 'unknown';
+      console.warn('[Reto al Filo] Error guardando comprobante de cuota en Firestore:', errorCode);
+    }
+  }
+
+  const savedRecord = { id: persistedId, ...record };
+  const localSubs = readLocalInstallmentSubmissions();
+  writeLocalInstallmentSubmissions([savedRecord, ...localSubs]);
+
+  return {
+    ...savedRecord,
+    persistedTo,
+    errorCode,
+  };
+}
+
 /**
  * Obtiene las inscripciones registradas desde Firestore ordenadas de la más reciente a la más antigua.
  */
 export async function fetchRegistrations({ signal } = {}) {
-  const localList = readLocalRegistrations().sort(
-    (a, b) => (b.createdAt || 0) - (a.createdAt || 0)
+  const localSubs = readLocalInstallmentSubmissions();
+  const localList = attachInstallmentsToRegistrations(
+    readLocalRegistrations().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)),
+    localSubs
   );
 
   if (!isFirebaseConfigured()) {
@@ -767,18 +946,29 @@ export async function fetchRegistrations({ signal } = {}) {
     if (signal?.aborted) return { registrations: localList, source: 'local', aborted: true };
 
     const { collection, getDocs } = firestore;
-    const snapshot = await getDocs(collection(db, 'registrations'));
+    const [snapshot, installmentsSnap] = await Promise.all([
+      getDocs(collection(db, 'registrations')),
+      getDocs(collection(db, 'installmentSubmissions')).catch(() => null),
+    ]);
 
     if (signal?.aborted) return { registrations: localList, source: 'local', aborted: true };
 
-    const remoteList = snapshot.docs
+    const remoteInstallments = installmentsSnap
+      ? installmentsSnap.docs.map((docSnap) => ({
+          id: docSnap.id,
+          ...docSnap.data(),
+        }))
+      : localSubs;
+
+    const remoteRawList = snapshot.docs
       .map((docSnap) => ({
         id: docSnap.id,
         ...docSnap.data(),
       }))
       .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-    writeLocalRegistrations(remoteList);
+    writeLocalRegistrations(remoteRawList);
+    const remoteList = attachInstallmentsToRegistrations(remoteRawList, remoteInstallments);
     return { registrations: remoteList, source: 'firestore' };
   } catch (error) {
     console.warn(
@@ -1003,6 +1193,7 @@ function getRunnerInitials(fullName) {
 function mapStatusToPublic(rawStatus) {
   const normalized = String(rawStatus || '').trim().toLowerCase();
   if (normalized === 'confirmed' || normalized === 'confirmado') return 'confirmed';
+  if (normalized === 'partial' || normalized === 'parcial') return 'partial';
   if (normalized === 'rejected' || normalized === 'rechazado') return 'rejected';
   return 'pending';
 }
@@ -1014,6 +1205,7 @@ export function buildPublicStatusPayload(record) {
     initials: getRunnerInitials(record?.fullName),
     distance: rawDist.includes('13') ? '13K' : '27K',
     status: mapStatusToPublic(record?.status),
+    paymentPlan: record?.paymentPlan === 'cuotas' ? 'cuotas' : 'total',
     assignedBib: String(record?.assignedBib || '').trim().slice(0, 20),
     shirtSize: String(record?.shirtSize || '').trim().slice(0, 10),
     checkedIn: Boolean(record?.checkedIn),

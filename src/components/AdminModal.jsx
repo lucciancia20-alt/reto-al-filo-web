@@ -254,6 +254,7 @@ export default function AdminModal({
       return {
         total: remoteStats.total,
         confirmed: remoteStats.confirmed,
+        partial: remoteStats.partial || 0,
         pending: remoteStats.pending,
         count27k: remoteStats.d27k,
         count13k: remoteStats.d13k,
@@ -270,6 +271,7 @@ export default function AdminModal({
       };
     }
     let confirmed = 0;
+    let partial = 0;
     let pending = 0;
     let count27k = 0;
     let count13k = 0;
@@ -287,6 +289,7 @@ export default function AdminModal({
     for (const r of registrations) {
       const st = String(r.status || '').toLowerCase();
       const isConfirmed = st === 'confirmado' || st === 'confirmed';
+      const isPartial = st === 'parcial' || st === 'partial';
       const isPending = st === 'pendiente' || st === 'pending';
       const isRejected = st === 'rechazado' || st === 'rejected';
       const is27 = r.distance === '27K' || r.distance === '21K';
@@ -306,6 +309,8 @@ export default function AdminModal({
           confirmed13k += 1;
           revenue13k += paid;
         }
+      } else if (isPartial) {
+        partial += 1;
       } else if (isPending) {
         pending += 1;
       }
@@ -332,6 +337,7 @@ export default function AdminModal({
     return {
       total: registrations.length,
       confirmed,
+      partial,
       pending,
       count27k,
       count13k,
@@ -977,7 +983,14 @@ export default function AdminModal({
       digits.length === 10 && !digits.startsWith('54') ? `549${digits}` : digits;
     const bib = String(bibDrafts[reg.id] ?? reg.assignedBib ?? '').trim();
     const bibText = bib ? ` Tu dorsal asignado es el #${bib}.` : '';
-    const msg = `¡Hola ${reg.fullName}! Te confirmamos desde ${getRaceFullTitle(draft || raceConfig)} que tu inscripción (${reg.code}) en ${reg.distance} está CONFIRMADA.${bibText} ¡Nos vemos en Tornquist!`;
+    const isPartial = String(reg.status || '').toLowerCase() === 'parcial';
+    const receiptsCount =
+      Array.isArray(reg.installmentReceipts) && reg.installmentReceipts.length > 0
+        ? reg.installmentReceipts.length
+        : 1;
+    const msg = isPartial
+      ? `¡Hola ${reg.fullName}! Te escribimos desde ${getRaceFullTitle(draft || raceConfig)} para confirmarte que registramos tu PAGO PARCIAL (${receiptsCount}/3 cuotas) de la inscripción (${reg.code}) en ${reg.distance}.${bibText} Recordá que podés subir los comprobantes de las cuotas siguientes desde la web en "Quiero Inscribirme -> Ya me inscribí · Subir Cuota 2 o 3".`
+      : `¡Hola ${reg.fullName}! Te confirmamos desde ${getRaceFullTitle(draft || raceConfig)} que tu inscripción (${reg.code}) en ${reg.distance} está CONFIRMADA.${bibText} ¡Nos vemos en Tornquist!`;
     return `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`;
   };
 

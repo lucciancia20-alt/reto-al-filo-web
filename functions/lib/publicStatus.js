@@ -8,7 +8,7 @@
 // Código legado (RAF-12345) y formato futuro de mayor entropía (RAF-A1B2C3D4).
 const CODE_PATTERN = /^RAF-(\d{5}|[A-Z0-9]{8})$/;
 
-const STATS_FIELDS = ['total', 'pending', 'confirmed', 'rejected', 'd27k', 'd13k', 'checkedIn'];
+const STATS_FIELDS = ['total', 'pending', 'partial', 'confirmed', 'rejected', 'd27k', 'd13k', 'checkedIn'];
 
 function normalizeCode(rawCode) {
   return String(rawCode || '')
@@ -41,6 +41,7 @@ function getRunnerInitials(fullName) {
 function mapStatusToPublic(rawStatus) {
   const normalized = String(rawStatus || '').trim().toLowerCase();
   if (normalized === 'confirmed' || normalized === 'confirmado') return 'confirmed';
+  if (normalized === 'partial' || normalized === 'parcial') return 'partial';
   if (normalized === 'rejected' || normalized === 'rechazado') return 'rejected';
   return 'pending';
 }

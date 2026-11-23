@@ -30,9 +30,13 @@ export async function sendRegistrationNotificationEmail({
   const runnerEmail = String(registration?.email || '').trim();
   const pricing = resolveFrozenRegistrationPricing(registration);
   const baseDistance = registration?.distance || '-';
+  const planSuffix =
+    pricing.paymentPlan === 'cuotas'
+      ? ` · 3 CUOTAS (Cuota 1/3: ${pricing.installmentAmount} de ${pricing.finalAmount})`
+      : '';
   const distanceSummary = pricing.isLocalResident
-    ? `${baseDistance} · ${pricing.finalAmount} (${pricing.badgeText} - Verificar DNI)`
-    : baseDistance;
+    ? `${baseDistance} · ${pricing.finalAmount} (${pricing.badgeText} - Verificar DNI)${planSuffix}`
+    : `${baseDistance}${planSuffix}`;
 
   const templateParams = {
     to_email: toEmail,
@@ -62,6 +66,52 @@ export async function sendRegistrationNotificationEmail({
     );
   } catch (err) {
     console.error('[Reto al Filo] Error en envío EmailJS:', {
+      status: err?.status,
+      text: err?.text,
+      err,
+    });
+    throw err;
+  }
+}
+
+/**
+ * Envía aviso por EmailJS a la organización cuando un corredor sube la Cuota 2/3 o Cuota 3/3.
+ */
+export async function sendInstallmentNotificationEmail({
+  notificationEmail,
+  submission,
+  uploadedUrl = '',
+  raceTitle = '',
+}) {
+  const toEmail = resolveNotificationEmail(notificationEmail);
+  const instNum = Number(submission?.installmentNumber) || 2;
+
+  const templateParams = {
+    to_email: toEmail,
+    email: toEmail,
+    reply_to: toEmail,
+    carrera: String(raceTitle || '').trim() || 'RETO AL FILO',
+    codigo: submission?.code || 'Por DNI',
+    nombre: submission?.fullName || '-',
+    distancia: `CUOTA ${instNum} DE 3`,
+    dni: submission?.dni || '-',
+    categoria: '-',
+    celular: '-',
+    localidad: '-',
+    team: `Pago de Cuota ${instNum}/3`,
+    remera: '-',
+    comprobante_url: submission?.receiptUrl || uploadedUrl || 'Pendiente de adjuntar',
+  };
+
+  try {
+    return await emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      templateParams,
+      { publicKey: EMAILJS_PUBLIC_KEY }
+    );
+  } catch (err) {
+    console.error('[Reto al Filo] Error en envío EmailJS de cuota:', {
       status: err?.status,
       text: err?.text,
       err,

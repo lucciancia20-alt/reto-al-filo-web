@@ -36,7 +36,8 @@ service cloud.firestore {
         ])
         && data.keys().hasOnly([
           'code', 'distance', 'priceSnapshot', 'isLocalResident', 'discountPercentApplied',
-          'originalPrice', 'finalAmount', 'fullName', 'dni', 'birthDate', 'gender',
+          'originalPrice', 'finalAmount', 'paymentPlan', 'installmentsTotal', 'installmentAmount',
+          'fullName', 'dni', 'birthDate', 'gender',
           'phone', 'email', 'city', 'team', 'shirtSize', 'bloodType',
           'emergencyContactName', 'emergencyContactPhone', 'medicalNotes', 'acceptedTerms',
           'receiptUrl', 'receiptPublicId', 'receiptFormat', 'status', 'assignedBib',
@@ -49,6 +50,9 @@ service cloud.firestore {
         && (!('discountPercentApplied' in data) || (data.discountPercentApplied is int && data.discountPercentApplied >= 0 && data.discountPercentApplied <= 100))
         && (!('originalPrice' in data) || data.originalPrice is string)
         && (!('finalAmount' in data) || data.finalAmount is string)
+        && (!('paymentPlan' in data) || data.paymentPlan in ['total', 'cuotas'])
+        && (!('installmentsTotal' in data) || data.installmentsTotal in [1, 3])
+        && (!('installmentAmount' in data) || data.installmentAmount is string)
         && hasNonEmptyString(data, 'fullName')
         && hasNonEmptyString(data, 'dni')
         && hasNonEmptyString(data, 'birthDate')
@@ -86,6 +90,24 @@ service cloud.firestore {
       // Solo admins actualizan (estado, dorsal, kit, FREE/Bonificado); isFree debe ser booleano.
       allow update: if isAdmin()
         && (!('isFree' in request.resource.data) || request.resource.data.isFree is bool);
+    }
+
+    // Carga posterior de comprobantes de Cuota 2 y Cuota 3 (solo alta pública validada; lectura exclusiva Admin)
+    match /installmentSubmissions/{submissionId} {
+      allow create: if request.resource.data.keys().hasAll([
+          'dni', 'fullName', 'installmentNumber', 'receiptUrl', 'createdAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'code', 'dni', 'fullName', 'installmentNumber',
+          'receiptUrl', 'receiptPublicId', 'receiptFormat', 'createdAt'
+        ])
+        && (!('code' in request.resource.data) || request.resource.data.code is string)
+        && hasNonEmptyString(request.resource.data, 'dni')
+        && hasNonEmptyString(request.resource.data, 'fullName')
+        && request.resource.data.installmentNumber in [2, 3]
+        && hasNonEmptyString(request.resource.data, 'receiptUrl')
+        && request.resource.data.createdAt is int;
+      allow read, update, delete: if isAdmin();
     }
 
     // Proyección pública: la crea/actualiza la Cloud Function (Admin SDK, ignora reglas)

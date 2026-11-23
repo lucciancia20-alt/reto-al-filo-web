@@ -39,8 +39,13 @@ import {
   validateUploadFile,
   uploadImageToCloudinary,
   submitRunnerRegistration,
+  submitInstallmentReceipt,
+  fetchPublicRunnerStatus,
 } from '../firebase/config';
-import { sendRegistrationNotificationEmail } from '../utils/emailNotification';
+import {
+  sendRegistrationNotificationEmail,
+  sendInstallmentNotificationEmail,
+} from '../utils/emailNotification';
 import { openPrintableWaiver, openPrintableMedicalCert } from '../utils/printableDocs';
 import { compressReceiptImage, getOptimizedReceiptUrl } from '../utils/cloudinary';
 
@@ -92,13 +97,23 @@ function getBirthDateValidationError(birthDateStr, raceDateIso, maxBirthDateIso)
   return '';
 }
 
+const INITIAL_INSTALLMENT_FORM = {
+  installmentNumber: 2,
+  code: '',
+  dni: '',
+  fullName: '',
+};
+
 export default function RegistrationModal({
   isOpen,
   onClose,
   initialDistance = '27K',
+  initialTab = 'register',
   raceConfig = RACE_CONFIG,
 }) {
+  const [modalTab, setModalTab] = useState(initialTab);
   const [selectedDistance, setSelectedDistance] = useState(initialDistance);
+  const [paymentPlan, setPaymentPlan] = useState('total');
   const [form, setForm] = useState(INITIAL_FORM);
   const [receiptFile, setReceiptFile] = useState(null);
   const [receiptPreview, setReceiptPreview] = useState('');
@@ -114,24 +129,38 @@ export default function RegistrationModal({
   const [birthDateError, setBirthDateError] = useState('');
   const [confirmedReg, setConfirmedReg] = useState(null);
 
+  const [instForm, setInstForm] = useState(INITIAL_INSTALLMENT_FORM);
+  const [instFile, setInstFile] = useState(null);
+  const [instPreview, setInstPreview] = useState('');
+  const [instSubmitting, setInstSubmitting] = useState(false);
+  const [instStep, setInstStep] = useState('');
+  const [instError, setInstError] = useState('');
+  const [confirmedInstallment, setConfirmedInstallment] = useState(null);
+
   useEffect(() => {
     if (isOpen) {
+      setModalTab(initialTab === 'installment' ? 'installment' : 'register');
       setSelectedDistance(initialDistance);
       setSubmitError('');
       setBirthDateError('');
       setSubmitStep('');
+      setInstError('');
+      setInstStep('');
       setShowTermsModal(false);
       setShowSizeGuide(false);
     }
-  }, [initialDistance, isOpen]);
+  }, [initialDistance, initialTab, isOpen]);
 
   useEffect(() => {
     return () => {
       if (receiptPreview) {
         URL.revokeObjectURL(receiptPreview);
       }
+      if (instPreview) {
+        URL.revokeObjectURL(instPreview);
+      }
     };
-  }, [receiptPreview]);
+  }, [receiptPreview, instPreview]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -139,7 +168,7 @@ export default function RegistrationModal({
     document.body.style.overflow = 'hidden';
 
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape' && !submitting) {
+      if (event.key === 'Escape' && !submitting && !instSubmitting) {
         onClose();
       }
     };
@@ -148,7 +177,7 @@ export default function RegistrationModal({
       document.body.style.overflow = prevOverflow;
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, onClose, submitting]);
+  }, [isOpen, onClose, submitting, instSubmitting]);
 
   if (!isOpen) return null;
 
@@ -378,17 +407,142 @@ export default function RegistrationModal({
     setReceiptPreview('');
   };
 
+  const handleSelectInstReceipt = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      validateUploadFile(file);
+    } catch (err) {
+      e.target.value = '';
+      if (instPreview) {
+        URL.revokeObjectURL(instPreview);
+      }
+      setInstFile(null);
+      setInstPreview('');
+      setInstError(err.message || 'Archivo de comprobante no válido.');
+      return;
+    }
+
+    if (instPreview) {
+      URL.revokeObjectURL(instPreview);
+    }
+
+    setInstFile(file);
+    if (file.type.startsWith('image/')) {
+      setInstPreview(URL.createObjectURL(file));
+    } else {
+      setInstPreview('');
+    }
+    setInstError('');
+  };
+
+  const handleClearInstReceipt = () => {
+    if (instPreview) {
+      URL.revokeObjectURL(instPreview);
+    }
+    setInstFile(null);
+    setInstPreview('');
+  };
+
   const handleResetAll = () => {
     handleClearReceipt();
+    handleClearInstReceipt();
     setForm(INITIAL_FORM);
+    setPaymentPlan('total');
+    setInstForm(INITIAL_INSTALLMENT_FORM);
     setResidentCheckboxManual(false);
     setConfirmedReg(null);
+    setConfirmedInstallment(null);
     setSubmitError('');
     setBirthDateError('');
     setSubmitStep('');
+    setInstError('');
+    setInstStep('');
     setAcceptedTerms(false);
     setShowTermsModal(false);
     setShowSizeGuide(false);
+  };
+
+  const handleInstSubmit = async (e) => {
+    e.preventDefault();
+    setInstError('');
+
+    const cleanDni = String(instForm.dni || '').trim();
+    const cleanName = String(instForm.fullName || '').trim();
+    const cleanCode = String(instForm.code || '').trim();
+    const instNum = Number(instForm.installmentNumber) === 3 ? 3 : 2;
+
+    if (!cleanDni) {
+      setInstError('Ingresá el DNI con el que te inscribiste.');
+      return;
+    }
+    if (!cleanName) {
+      setInstError('Ingresá tu Nombre y Apellido.');
+      return;
+    }
+    if (!instFile) {
+      setInstError(
+        `Adjuntá la foto, captura o PDF del comprobante de la Cuota ${instNum} de 3.`
+      );
+      return;
+    }
+
+    setInstSubmitting(true);
+    try {
+      if (cleanCode) {
+        setInstStep('Verificando código de inscripción...');
+        const lookup = await fetchPublicRunnerStatus(cleanCode);
+        if (lookup?.invalidQuery) {
+          throw new Error(
+            'El código RAF ingresado no tiene un formato válido (ejemplo: RAF-12345). Si no lo recordás, dejalo vacío.'
+          );
+        }
+      }
+
+      setInstStep(`Optimizando y subiendo comprobante de Cuota ${instNum}/3...`);
+      const fileToUpload = await compressReceiptImage(instFile, {
+        maxDimension: 1200,
+        quality: 0.78,
+      });
+      const uploaded = await uploadImageToCloudinary(fileToUpload, {
+        folder: 'reto-al-filo/comprobantes',
+        resourceType: 'auto',
+      });
+
+      setInstStep('Asociando comprobante a tu inscripción...');
+      const saved = await submitInstallmentReceipt({
+        code: cleanCode,
+        dni: cleanDni,
+        fullName: cleanName,
+        installmentNumber: instNum,
+        receiptUrl: uploaded.secureUrl,
+        receiptPublicId: uploaded.publicId,
+        receiptFormat: uploaded.format || '',
+      });
+
+      void (async () => {
+        try {
+          await sendInstallmentNotificationEmail({
+            notificationEmail: raceConfig?.notificationEmail,
+            raceTitle: getRaceFullTitle(raceConfig),
+            submission: saved,
+            uploadedUrl: uploaded.secureUrl,
+          });
+        } catch (err) {
+          console.error('[Cuotas] Error enviando notificación EmailJS en segundo plano:', err);
+        }
+      })();
+
+      setConfirmedInstallment(saved);
+    } catch (err) {
+      setInstError(
+        err?.message || 'No se pudo cargar el comprobante de la cuota. Intentá nuevamente.'
+      );
+    } finally {
+      setInstSubmitting(false);
+      setInstStep('');
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -450,6 +604,10 @@ export default function RegistrationModal({
         discountPercentApplied: pricing.discountPercentApplied,
         originalPrice: pricing.originalPrice,
         finalAmount: pricing.finalAmount,
+        paymentPlan,
+        installmentsTotal: paymentPlan === 'cuotas' ? 3 : 1,
+        installmentAmount:
+          paymentPlan === 'cuotas' ? pricing.installmentAmount : pricing.finalAmount,
         receiptUrl: uploaded.secureUrl,
         receiptPublicId: uploaded.publicId,
         receiptFormat: uploaded.format || '',
@@ -488,7 +646,19 @@ export default function RegistrationModal({
 
   const confirmationWhatsappHref = confirmedReg
     ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-        `¡Hola! Acabo de inscribirme a ${getRaceFullTitle(raceConfig)}. Mi código es *${confirmedReg.code}* - *${confirmedReg.fullName}* (*${confirmedReg.distance}*). Ya adjunté el comprobante en la web.`
+        `¡Hola! Acabo de inscribirme a ${getRaceFullTitle(raceConfig)}. Mi código es *${confirmedReg.code}* - *${confirmedReg.fullName}* (*${confirmedReg.distance}*${
+          confirmedReg.paymentPlan === 'cuotas'
+            ? ` · Pago en 3 Cuotas - Cuota 1/3: ${confirmedReg.installmentAmount}`
+            : ''
+        }). Ya adjunté el comprobante en la web.`
+      )}`
+    : buildWhatsAppUrl(selectedDistance, raceConfig.whatsappNumber, raceConfig);
+
+  const installmentWhatsappHref = confirmedInstallment
+    ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
+        `¡Hola! Acabo de subir en la web el comprobante de la *Cuota ${confirmedInstallment.installmentNumber}/3* para mi inscripción en ${getRaceFullTitle(raceConfig)} (${
+          confirmedInstallment.code ? `Código *${confirmedInstallment.code}* · ` : ''
+        }DNI *${confirmedInstallment.dni}* - *${confirmedInstallment.fullName}*).`
       )}`
     : buildWhatsAppUrl(selectedDistance, raceConfig.whatsappNumber, raceConfig);
 
@@ -527,7 +697,13 @@ export default function RegistrationModal({
                 id="modal-inscripcion-title"
                 className="font-display text-lg sm:text-xl font-black text-white truncate"
               >
-                {confirmedReg ? '¡Inscripción Recibida!' : 'Formulario de Inscripción'}
+                {confirmedReg
+                  ? '¡Inscripción Recibida!'
+                  : confirmedInstallment
+                    ? `¡Cuota ${confirmedInstallment.installmentNumber}/3 Recibida!`
+                    : modalTab === 'installment'
+                      ? 'Cargar Comprobante de Cuota 2 o 3'
+                      : 'Formulario de Inscripción'}
               </h3>
             </div>
           </div>
@@ -535,7 +711,7 @@ export default function RegistrationModal({
           <button
             type="button"
             onClick={onClose}
-            disabled={submitting}
+            disabled={submitting || instSubmitting}
             aria-label="Cerrar ventana de inscripción"
             className="p-2 rounded-xl text-stone-400 hover:text-white hover:bg-stone-800 transition-colors cursor-pointer shrink-0 disabled:opacity-40"
           >
@@ -543,7 +719,121 @@ export default function RegistrationModal({
           </button>
         </div>
 
-        {confirmedReg ? (
+        {/* Pestañas de navegación: Nueva Inscripción vs Ya me inscribí (Subir Cuota 2 o 3) */}
+        {!confirmedReg && !confirmedInstallment && (
+          <div className="px-4 sm:px-6 py-2.5 bg-stone-950 border-b border-stone-800 grid grid-cols-2 gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                setModalTab('register');
+                setInstError('');
+              }}
+              className={`min-h-[38px] rounded-xl font-display font-bold text-xs uppercase tracking-wider px-3 py-2 border transition-colors cursor-pointer ${
+                modalTab === 'register'
+                  ? 'bg-zinc-950 border-orange-500 text-orange-400 shadow-[0_0_12px_var(--theme-glow)]'
+                  : 'bg-zinc-950 border-stone-800 text-stone-400 hover:text-white hover:border-stone-600'
+              }`}
+            >
+              Nueva Inscripción
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setModalTab('installment');
+                setSubmitError('');
+              }}
+              className={`min-h-[38px] rounded-xl font-display font-bold text-xs uppercase tracking-wider px-3 py-2 border transition-colors cursor-pointer ${
+                modalTab === 'installment'
+                  ? 'bg-zinc-950 border-violet-400 text-violet-300 shadow-[0_0_12px_rgba(167,139,250,0.22)]'
+                  : 'bg-zinc-950 border-violet-500/40 text-violet-300/85 hover:text-violet-200 hover:border-violet-400'
+              }`}
+            >
+              Ya me inscribí · Subir Cuota 2 o 3
+            </button>
+          </div>
+        )}
+
+        {confirmedInstallment ? (
+          <>
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-7 space-y-5">
+              <div className="rounded-2xl bg-zinc-950 border border-violet-500/70 p-5 text-center">
+                <CheckCircle2 className="w-12 h-12 text-violet-400 mx-auto" />
+                <p className="mt-2 text-xs font-bold uppercase tracking-widest text-violet-300">
+                  Comprobante de Cuota {confirmedInstallment.installmentNumber} de 3 Recibido
+                </p>
+                <p className="mt-2 text-xs sm:text-sm text-stone-200 max-w-md mx-auto">
+                  Tu comprobante quedó vinculado a tu inscripción (
+                  <strong className="text-white font-mono">DNI {confirmedInstallment.dni}</strong>
+                  {confirmedInstallment.code ? ` · ${confirmedInstallment.code}` : ''}). La
+                  organización lo verificará desde el panel.
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-zinc-950 border border-stone-800 p-4 space-y-2 text-xs sm:text-sm">
+                <div className="flex justify-between gap-3 py-1 border-b border-stone-800/80">
+                  <span className="text-stone-400">Corredor/a</span>
+                  <span className="font-bold text-white text-right">
+                    {confirmedInstallment.fullName}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-3 py-1 border-b border-stone-800/80">
+                  <span className="text-stone-400">DNI</span>
+                  <span className="font-mono text-stone-100">{confirmedInstallment.dni}</span>
+                </div>
+                {confirmedInstallment.code && (
+                  <div className="flex justify-between gap-3 py-1 border-b border-stone-800/80">
+                    <span className="text-stone-400">Código RAF</span>
+                    <span className="font-mono font-bold text-amber-400">
+                      {confirmedInstallment.code}
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between gap-3 py-1 border-b border-stone-800/80">
+                  <span className="text-stone-400">Cuota informada</span>
+                  <span className="font-bold text-violet-300">
+                    Cuota {confirmedInstallment.installmentNumber} de 3
+                  </span>
+                </div>
+                <div className="flex justify-between items-center gap-3 pt-1">
+                  <span className="text-stone-400">Comprobante adjunto</span>
+                  <a
+                    href={getOptimizedReceiptUrl(confirmedInstallment.receiptUrl, {
+                      format: confirmedInstallment.receiptFormat,
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-sky-400 hover:text-sky-300 underline"
+                  >
+                    Ver comprobante subido
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-4 sm:px-6 py-4 bg-zinc-950 border-t border-stone-800 flex flex-col sm:flex-row gap-2.5 shrink-0">
+              <a
+                href={installmentWhatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 min-h-[46px] inline-flex items-center justify-center gap-2 rounded-xl bg-[#2E441A] hover:bg-[#243614] text-amber-400 font-display font-black text-xs sm:text-sm uppercase tracking-wide px-4 py-3 transition-colors"
+              >
+                <MessageCircle className="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" />
+                Avisar por WhatsApp a la Organización
+              </a>
+              <button
+                type="button"
+                onClick={() => {
+                  handleResetAll();
+                  onClose();
+                }}
+                className="min-h-[46px] rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 font-semibold text-xs sm:text-sm px-5 py-3 cursor-pointer"
+              >
+                Listo, cerrar
+              </button>
+            </div>
+          </>
+        ) : confirmedReg ? (
           <>
             {/* Pantalla de Confirmación */}
             <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-7 space-y-5">
@@ -607,6 +897,16 @@ export default function RegistrationModal({
                         </span>
                         <span className="text-[10px] text-amber-300">
                           Presentá tu DNI para verificar domicilio al retirar el kit.
+                        </span>
+                      </div>
+                    )}
+                    {confirmedReg.paymentPlan === 'cuotas' && (
+                      <div className="mt-1 flex flex-col items-end gap-0.5">
+                        <span className="inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-zinc-950 border border-violet-500/70 text-violet-300">
+                          3 Cuotas · Cuota 1/3 ({confirmedReg.installmentAmount})
+                        </span>
+                        <span className="text-[10px] text-stone-300">
+                          Podrás cargar las Cuotas 2 y 3 desde la pestaña &ldquo;Ya me inscribí&rdquo;.
                         </span>
                       </div>
                     )}
@@ -692,6 +992,324 @@ export default function RegistrationModal({
               </button>
             </div>
           </>
+        ) : modalTab === 'installment' ? (
+          <form
+            id="runner-installment-form"
+            autoComplete="on"
+            onSubmit={handleInstSubmit}
+            className="flex-1 min-h-0 flex flex-col overflow-hidden"
+          >
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-5">
+              {/* 1. Qué cuota estás abonando */}
+              <section className="space-y-2">
+                <span className="block text-[11px] font-bold uppercase tracking-widest text-violet-300">
+                  1 · Seleccioná la Cuota a Informar
+                </span>
+                <div className="grid grid-cols-2 gap-3">
+                  {[2, 3].map((num) => {
+                    const active = Number(instForm.installmentNumber) === num;
+                    return (
+                      <button
+                        key={num}
+                        type="button"
+                        onClick={() =>
+                          setInstForm((prev) => ({ ...prev, installmentNumber: num }))
+                        }
+                        className={`rounded-2xl p-3.5 border text-left transition-colors cursor-pointer flex items-center justify-between gap-2 ${
+                          active
+                            ? 'bg-zinc-950 border-violet-400 ring-1 ring-violet-400/60'
+                            : 'bg-zinc-950 border-violet-500/35 hover:border-violet-400'
+                        }`}
+                      >
+                        <div>
+                          <span className="block font-display text-sm sm:text-base font-black text-violet-300 uppercase">
+                            Cuota {num} de 3
+                          </span>
+                          <span className="block text-[11px] text-stone-400 mt-0.5">
+                            {num === 2 ? 'Segunda cuota parcial' : 'Tercera y última cuota'}
+                          </span>
+                        </div>
+                        <CheckCircle2
+                          className={`w-5 h-5 shrink-0 ${
+                            active ? 'text-violet-400' : 'text-stone-700'
+                          }`}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+
+              {/* 2. Datos bancarios rápidos + valores de referencia */}
+              <section className="rounded-2xl bg-zinc-950 border border-violet-500/40 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Landmark className="w-4 h-4 text-violet-300 shrink-0" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-white">
+                    2 · Datos Bancarios para Transferir tu Cuota
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                  {distances.map((item) => {
+                    const generalP = computeRegistrationPricing(item.price, raceConfig, false);
+                    const residentP = computeRegistrationPricing(item.price, raceConfig, true);
+                    const is13K = item.id === '13K';
+                    return (
+                      <div
+                        key={`inst-ref-${item.id}`}
+                        className="rounded-xl bg-zinc-950 border border-stone-800 p-2.5 space-y-1"
+                      >
+                        <span
+                          className={`font-display font-bold text-xs ${
+                            is13K ? 'text-red-500' : 'text-cyan-400'
+                          }`}
+                        >
+                          {item.title}
+                        </span>
+                        <div className="flex items-center justify-between text-stone-300">
+                          <span>Valor cuota general (1/3):</span>
+                          <strong className="font-mono text-white">
+                            {generalP.installmentAmount}
+                          </strong>
+                        </div>
+                        {residentDiscountEnabled && (
+                          <div className="flex items-center justify-between text-emerald-400">
+                            <span>Cuota residente (-{residentDiscountPercent}%):</span>
+                            <strong className="font-mono">{residentP.installmentAmount}</strong>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                  <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-2.5 flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <span className="block text-[10px] uppercase text-stone-400">Alias</span>
+                      <span className="font-mono font-bold text-amber-300 truncate block">
+                        {payment.bankAlias}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyText('alias', payment.bankAlias)}
+                      className="inline-flex items-center gap-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 px-2.5 py-1.5 text-[11px] font-semibold cursor-pointer shrink-0"
+                    >
+                      {copiedField === 'alias' ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>¡Copiado!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Copiar Alias</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-2.5 flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <span className="block text-[10px] uppercase text-stone-400">CBU / CVU</span>
+                      <span className="font-mono font-bold text-stone-100 truncate block">
+                        {payment.bankCbu}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyText('cbu', payment.bankCbu)}
+                      className="inline-flex items-center gap-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 px-2.5 py-1.5 text-[11px] font-semibold cursor-pointer shrink-0"
+                    >
+                      {copiedField === 'cbu' ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>¡Copiado!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Copiar CBU</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </section>
+
+              {/* 3. Identificación del corredor ya inscripto */}
+              <section className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <User className="w-4 h-4 text-violet-300 shrink-0" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-white">
+                    3 · Datos con los que te Inscribiste
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label
+                      htmlFor="inst-dni"
+                      className="block text-xs font-semibold text-stone-300 mb-1"
+                    >
+                      DNI del Corredor/a <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="inst-dni"
+                      type="text"
+                      inputMode="numeric"
+                      required
+                      value={instForm.dni}
+                      onChange={(e) =>
+                        setInstForm((prev) => ({ ...prev, dni: e.target.value }))
+                      }
+                      placeholder="Ej. 34567890"
+                      className="w-full rounded-xl bg-zinc-950 border border-violet-500/50 focus:border-violet-400 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="inst-code"
+                      className="block text-xs font-semibold text-stone-300 mb-1"
+                    >
+                      Código RAF <span className="text-stone-400 font-normal">(opcional)</span>
+                    </label>
+                    <input
+                      id="inst-code"
+                      type="text"
+                      value={instForm.code}
+                      onChange={(e) =>
+                        setInstForm((prev) => ({ ...prev, code: e.target.value }))
+                      }
+                      placeholder="Ej. RAF-12345"
+                      className="w-full rounded-xl bg-zinc-950 border border-violet-500/40 focus:border-violet-400 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="inst-fullname"
+                      className="block text-xs font-semibold text-stone-300 mb-1"
+                    >
+                      Nombre y Apellido <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="inst-fullname"
+                      type="text"
+                      required
+                      value={instForm.fullName}
+                      onChange={(e) =>
+                        setInstForm((prev) => ({ ...prev, fullName: e.target.value }))
+                      }
+                      placeholder="Ej. María Gómez"
+                      className="w-full rounded-xl bg-zinc-950 border border-violet-500/50 focus:border-violet-400 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* 4. Adjuntar comprobante de la cuota */}
+              <section className="space-y-2.5">
+                <span className="block text-xs font-bold uppercase tracking-wider text-white">
+                  4 · Adjuntar Comprobante de Cuota {instForm.installmentNumber} de 3{' '}
+                  <span className="text-red-500">*</span>
+                </span>
+                <div className="rounded-2xl border border-dashed border-violet-500/50 hover:border-violet-400 transition-colors bg-zinc-950/70 p-4 flex flex-col sm:flex-row items-center gap-4">
+                  {instPreview ? (
+                    <img
+                      src={instPreview}
+                      alt="Vista previa del comprobante de cuota"
+                      className="w-20 h-20 rounded-xl object-cover border border-violet-500/40 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl bg-zinc-950 border border-violet-500/40 flex items-center justify-center text-stone-500 shrink-0">
+                      <FileText className="w-8 h-8" />
+                    </div>
+                  )}
+
+                  <div className="flex-1 text-center sm:text-left min-w-0">
+                    <p className="text-xs font-semibold text-stone-200 truncate">
+                      {instFile
+                        ? `Comprobante listo: ${instFile.name}`
+                        : `Subí la captura, foto o PDF de la Cuota ${instForm.installmentNumber}/3`}
+                    </p>
+                    <p className="text-[11px] text-stone-400 mt-0.5">
+                      Formatos aceptados: JPG, PNG, WEBP o PDF (máx. 8 MB).
+                    </p>
+                    <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                      <label className="inline-flex items-center gap-2 rounded-xl bg-violet-500 hover:bg-violet-400 text-zinc-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 cursor-pointer transition-colors">
+                        <Upload className="w-4 h-4" />
+                        {instFile ? 'Cambiar Comprobante' : 'Adjuntar Comprobante'}
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,application/pdf"
+                          onChange={handleSelectInstReceipt}
+                          className="hidden"
+                        />
+                      </label>
+                      {instFile && (
+                        <button
+                          type="button"
+                          onClick={handleClearInstReceipt}
+                          className="text-xs text-stone-400 hover:text-stone-200 px-2 py-1.5 cursor-pointer"
+                        >
+                          Quitar
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {instStep && (
+                <div className="rounded-xl bg-violet-500/15 border border-violet-500/35 p-3 text-xs text-violet-200 flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin shrink-0 text-violet-400" />
+                  <span>{instStep}</span>
+                </div>
+              )}
+
+              {instError && (
+                <div
+                  role="alert"
+                  className="rounded-xl bg-zinc-950 border border-red-500 p-3 text-xs text-white flex items-start gap-2"
+                >
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
+                  <span>{instError}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="px-4 sm:px-6 py-3.5 bg-zinc-950 border-t border-stone-800 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shrink-0">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={instSubmitting}
+                className="min-h-[44px] rounded-xl bg-zinc-950 border border-orange-500/80 text-red-500 hover:text-red-500 text-xs font-semibold px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="submit"
+                disabled={instSubmitting}
+                className="min-h-[48px] inline-flex items-center justify-center gap-2 rounded-2xl bg-violet-500 hover:bg-violet-400 text-stone-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider py-3 px-6 shadow-lg shadow-violet-500/20 transition-all cursor-pointer disabled:opacity-50"
+              >
+                {instSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Subiendo Comprobante...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    Enviar Comprobante de Cuota {instForm.installmentNumber}/3
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
         ) : (
           <form
             id="runner-registration-form"
@@ -798,8 +1416,13 @@ export default function RegistrationModal({
                   <div className="flex items-center gap-2">
                     <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
                     <span className="text-xs font-bold uppercase tracking-wider text-white">
-                      2 · Transferencia Bancaria / Mercado Pago (
-                      {pricing.isLocalResident ? pricing.finalAmount : activeDistanceInfo.price})
+                      2 · Modalidad de Pago y Transferencia (
+                      {paymentPlan === 'cuotas'
+                        ? `Cuota 1/3: ${pricing.installmentAmount}`
+                        : pricing.isLocalResident
+                          ? pricing.finalAmount
+                          : activeDistanceInfo.price}
+                      )
                     </span>
                   </div>
                   {pricing.isLocalResident && (
@@ -808,6 +1431,80 @@ export default function RegistrationModal({
                     </span>
                   )}
                 </div>
+
+                {/* Selector: Pago Total vs 3 Cuotas */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentPlan('total')}
+                    className={`text-left rounded-xl p-3 border transition-colors cursor-pointer flex items-center justify-between gap-2 ${
+                      paymentPlan === 'total'
+                        ? 'bg-zinc-950 border-orange-500 ring-1 ring-orange-500/60'
+                        : 'bg-zinc-950 border-stone-800 hover:border-orange-500/50'
+                    }`}
+                  >
+                    <div>
+                      <span className="block font-display text-xs sm:text-sm font-bold text-white uppercase">
+                        Pago Total (1 pago)
+                      </span>
+                      <span className="block text-[11px] text-stone-300 mt-0.5">
+                        Transferís hoy:{' '}
+                        <strong className="text-amber-300 font-mono">{pricing.finalAmount}</strong>
+                      </span>
+                    </div>
+                    <CheckCircle2
+                      className={`w-4 h-4 shrink-0 ${
+                        paymentPlan === 'total' ? 'text-orange-400' : 'text-stone-700'
+                      }`}
+                    />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentPlan('cuotas')}
+                    className={`text-left rounded-xl p-3 border transition-colors cursor-pointer flex items-center justify-between gap-2 ${
+                      paymentPlan === 'cuotas'
+                        ? 'bg-zinc-950 border-violet-400 ring-1 ring-violet-400/60'
+                        : 'bg-zinc-950 border-violet-500/40 hover:border-violet-400'
+                    }`}
+                  >
+                    <div>
+                      <span className="flex items-center gap-1.5 font-display text-xs sm:text-sm font-bold text-violet-300 uppercase">
+                        <span>Pago en 3 Cuotas</span>
+                      </span>
+                      <span className="block text-[11px] text-stone-300 mt-0.5">
+                        3 cuotas de{' '}
+                        <strong className="text-violet-300 font-mono">
+                          {pricing.installmentAmount}
+                        </strong>{' '}
+                        (Total {pricing.finalAmount})
+                      </span>
+                    </div>
+                    <CheckCircle2
+                      className={`w-4 h-4 shrink-0 ${
+                        paymentPlan === 'cuotas' ? 'text-violet-400' : 'text-stone-700'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {paymentPlan === 'cuotas' && (
+                  <div className="rounded-xl bg-zinc-950 border border-violet-500/50 p-3 text-xs text-stone-200 space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-semibold text-violet-300 uppercase text-[11px]">
+                        Monto a transferir hoy (Cuota 1 de 3)
+                      </span>
+                      <span className="font-display text-base sm:text-lg font-black text-violet-300 font-mono">
+                        {pricing.installmentAmount}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-stone-400 leading-snug">
+                      Subí hoy el comprobante de la <strong className="text-white">Cuota 1/3</strong>.
+                      Tiempo después podrás cargar las <strong className="text-white">Cuotas 2 y 3</strong> desde la pestaña{' '}
+                      <strong className="text-violet-300">&ldquo;Ya me inscribí · Subir Cuota 2 o 3&rdquo;</strong>.
+                    </p>
+                  </div>
+                )}
 
                 {renderResidentDiscountSummary(false)}
 
@@ -1348,7 +2045,11 @@ export default function RegistrationModal({
               {/* 4. Adjuntar Comprobante */}
               <section className="space-y-2.5">
                 <span className="block text-xs font-bold uppercase tracking-wider text-white">
-                  4 · Adjuntar Comprobante de Pago <span className="text-red-500">*</span>
+                  4 · Adjuntar Comprobante de Pago{' '}
+                  {paymentPlan === 'cuotas'
+                    ? `(Cuota 1/3 · ${pricing.installmentAmount})`
+                    : `(${pricing.finalAmount})`}{' '}
+                  <span className="text-red-500">*</span>
                 </span>
                 <div className="rounded-2xl border border-dashed border-orange-500/40 hover:border-orange-500 transition-colors bg-zinc-950/70 p-4 flex flex-col sm:flex-row items-center gap-4">
                   {receiptPreview ? (

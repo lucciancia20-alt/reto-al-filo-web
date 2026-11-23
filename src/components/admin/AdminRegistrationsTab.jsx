@@ -655,6 +655,17 @@ export default function AdminRegistrationsTab({
     armPendingAction(statusTimersRef, setPendingStatusAction, reg.id, targetAction);
   };
 
+  const handlePartialButtonClick = async (reg, { isPartial }) => {
+    const targetAction = isPartial ? 'unpartial' : 'partial';
+    if (pendingStatusAction[reg.id] === targetAction) {
+      clearPendingAction(statusTimersRef, setPendingStatusAction, reg.id);
+      await onChangeRegStatus(reg, isPartial ? 'pendiente' : 'parcial');
+      return;
+    }
+
+    armPendingAction(statusTimersRef, setPendingStatusAction, reg.id, targetAction);
+  };
+
   const handleKitButtonClick = async (reg) => {
     const targetAction = reg.checkedIn ? 'revoke' : 'deliver';
     if (pendingKitAction[reg.id] === targetAction) {
@@ -869,7 +880,7 @@ export default function AdminRegistrationsTab({
       </div>
 
       {/* Resumen de contadores (filtros rápidos sincronizados) */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
         {[
           {
             label: 'Total',
@@ -906,6 +917,25 @@ export default function AdminRegistrationsTab({
               setRegDuplicateFilter?.('none');
               setRegDistanceFilter('all');
               setRegStatusFilter(isAlreadyActive ? 'all' : 'confirmado');
+            },
+          },
+          {
+            label: 'Parciales',
+            value: regStats.partial || 0,
+            tone: 'text-violet-400',
+            inactiveClass: 'bg-zinc-950 border-violet-400/75 hover:border-violet-400 hover:brightness-125',
+            activeClass: 'bg-zinc-950 border-violet-400 ring-2 ring-violet-400/85 ring-offset-2 ring-offset-zinc-950',
+            labelClass: 'text-violet-400',
+            dotClass: 'bg-violet-400',
+            isActive: regStatusFilter === 'parcial' && regDuplicateFilter === 'none',
+            onClick: () => {
+              const isAlreadyActive =
+                regStatusFilter === 'parcial' &&
+                regDistanceFilter === 'all' &&
+                regDuplicateFilter === 'none';
+              setRegDuplicateFilter?.('none');
+              setRegDistanceFilter('all');
+              setRegStatusFilter(isAlreadyActive ? 'all' : 'parcial');
             },
           },
           {
@@ -1034,9 +1064,11 @@ export default function AdminRegistrationsTab({
             className={`w-fit rounded-xl bg-zinc-950 border focus:outline-none pl-2 pr-1.5 py-1.5 text-[11px] xl:text-xs transition-colors shrink-0 ${
               regStatusFilter === 'pendiente'
                 ? 'text-amber-400 border-amber-500/60 focus:border-amber-400 font-medium'
-                : regStatusFilter === 'confirmado'
-                  ? 'text-emerald-400 border-emerald-500/60 focus:border-emerald-400 font-medium'
-                  : 'text-white font-semibold border-white/15 focus:border-orange-400'
+                : regStatusFilter === 'parcial'
+                  ? 'text-violet-400 border-violet-500/60 focus:border-violet-400 font-medium'
+                  : regStatusFilter === 'confirmado'
+                    ? 'text-emerald-400 border-emerald-500/60 focus:border-emerald-400 font-medium'
+                    : 'text-white font-semibold border-white/15 focus:border-orange-400'
             }`}
           >
             <option value="all" className="bg-stone-950 text-white font-normal">
@@ -1044,6 +1076,9 @@ export default function AdminRegistrationsTab({
             </option>
             <option value="pendiente" className="bg-stone-950 text-amber-400 font-medium">
               Pendientes
+            </option>
+            <option value="parcial" className="bg-stone-950 text-violet-400 font-medium">
+              Parciales (3 cuotas)
             </option>
             <option value="confirmado" className="bg-stone-950 text-emerald-400 font-medium">
               Confirmados
@@ -1605,6 +1640,7 @@ export default function AdminRegistrationsTab({
             const pricing = resolveFrozenRegistrationPricing(reg);
             const bibValue = bibDrafts[reg.id] ?? reg.assignedBib ?? '';
             const isConfirmed = reg.status === 'confirmado';
+            const isPartial = reg.status === 'parcial';
             const isEditingBib = Boolean(editingBibIds[reg.id]);
             const isBibLocked = isConfirmed && !isEditingBib;
             const savedBib = String(reg.assignedBib ?? '').trim();
@@ -1617,12 +1653,21 @@ export default function AdminRegistrationsTab({
             const isAlreadySaved = isConfirmed && !isEditingBib && currentBib === savedBib;
             const armedStatusAction = pendingStatusAction[reg.id];
             const armedKitAction = pendingKitAction[reg.id];
+            const installmentReceipts = Array.isArray(reg.installmentReceipts)
+              ? reg.installmentReceipts
+              : reg.receiptUrl
+                ? [{ number: 1, url: reg.receiptUrl, format: reg.receiptFormat }]
+                : [];
+            const isInstallmentPlan =
+              pricing.paymentPlan === 'cuotas' || isPartial || installmentReceipts.length > 1;
             const statusBadgeClass =
               reg.status === 'confirmado'
                 ? 'bg-transparent text-emerald-400 border-emerald-500/60'
-                : reg.status === 'rechazado'
-                  ? 'bg-transparent text-red-500 border-red-500/70'
-                  : 'bg-transparent text-amber-400 border-amber-500/60';
+                : isPartial
+                  ? 'bg-transparent text-violet-300 border-violet-400/75'
+                  : reg.status === 'rechazado'
+                    ? 'bg-transparent text-red-500 border-red-500/70'
+                    : 'bg-transparent text-amber-400 border-amber-500/60';
 
             return (
               <div
@@ -1679,6 +1724,16 @@ export default function AdminRegistrationsTab({
                       >
                         {reg.status}
                       </span>
+                      {isInstallmentPlan && (
+                        <span
+                          title={`Modalidad 3 cuotas${
+                            pricing.installmentAmount ? ` (${pricing.installmentAmount} c/u)` : ''
+                          }`}
+                          className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-violet-400/75 bg-transparent text-violet-300 shrink-0"
+                        >
+                          3 Cuotas ({Math.min(3, Math.max(1, installmentReceipts.length))}/3)
+                        </span>
+                      )}
                       {pricing.isLocalResident && (
                         <span
                           title="Verificar domicilio del Partido de Tornquist en el DNI"
@@ -1802,6 +1857,36 @@ export default function AdminRegistrationsTab({
                               : 'Confirmar'}
                     </button>
 
+                    <button
+                      type="button"
+                      disabled={isBusy}
+                      onClick={() => handlePartialButtonClick(reg, { isPartial })}
+                      title={
+                        armedStatusAction === 'unpartial'
+                          ? 'Hacé clic de nuevo para pasar a Pendiente'
+                          : armedStatusAction === 'partial'
+                            ? 'Hacé clic de nuevo para marcar como Parcial (3 cuotas)'
+                            : isPartial
+                              ? 'Pago parcial en cuotas activo (clic para pasar a Pendiente)'
+                              : 'Marcar como Parcial (paga en 3 cuotas)'
+                      }
+                      className={`inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none font-display font-medium text-[10px] sm:text-[11px] uppercase px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
+                        armedStatusAction === 'unpartial'
+                          ? 'text-red-500 border border-red-500/80 hover:border-red-500'
+                          : armedStatusAction === 'partial'
+                            ? 'text-orange-400 border border-orange-500/80 hover:border-orange-400'
+                            : isPartial
+                              ? 'text-violet-300 border border-violet-400 hover:border-violet-300'
+                              : 'text-violet-400 border border-violet-500/65 hover:border-violet-400'
+                      }`}
+                    >
+                      {armedStatusAction === 'unpartial'
+                        ? '¿A Pendiente?'
+                        : armedStatusAction === 'partial'
+                          ? '¿Parcial?'
+                          : 'Parcial'}
+                    </button>
+
                     {(isConfirmed || reg.checkedIn) && (
                       <button
                         type="button"
@@ -1839,19 +1924,37 @@ export default function AdminRegistrationsTab({
                       </button>
                     )}
 
-                    {reg.receiptUrl && (
-                      <a
-                        href={getOptimizedReceiptUrl(reg.receiptUrl, {
-                          format: reg.receiptFormat,
-                        })}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title="Ver comprobante adjunto"
-                        className="inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none text-sky-400 border border-sky-500/60 hover:border-sky-400 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">Comprobante</span>
-                      </a>
+                    {isInstallmentPlan && installmentReceipts.length > 0 ? (
+                      installmentReceipts.map((item) => (
+                        <a
+                          key={`rcpt-${reg.id}-${item.number}`}
+                          href={getOptimizedReceiptUrl(item.url, {
+                            format: item.format,
+                          })}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={`Ver comprobante de Cuota ${item.number} de 3`}
+                          className="inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none text-sky-400 border border-sky-500/60 hover:border-sky-400 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>Cuota {item.number}/3</span>
+                        </a>
+                      ))
+                    ) : (
+                      reg.receiptUrl && (
+                        <a
+                          href={getOptimizedReceiptUrl(reg.receiptUrl, {
+                            format: reg.receiptFormat,
+                          })}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Ver comprobante adjunto"
+                          className="inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none text-sky-400 border border-sky-500/60 hover:border-sky-400 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">Comprobante</span>
+                        </a>
+                      )
                     )}
 
                     {reg.phone && (

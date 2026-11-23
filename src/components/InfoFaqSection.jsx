@@ -543,6 +543,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   (() => {
                     const st = lookupResult.data;
                     const isConfirmed = st.status === 'confirmed';
+                    const isPartial = st.status === 'partial';
                     const isRejected = st.status === 'rejected';
                     const badgeConfig = isConfirmed
                       ? {
@@ -550,17 +551,23 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                           pill: 'bg-zinc-950 border-emerald-500/80 text-emerald-400',
                           label: 'Inscripción Confirmada',
                         }
-                      : isRejected
+                      : isPartial
                         ? {
-                            wrapper: 'border-red-500/80 bg-zinc-950',
-                            pill: 'bg-zinc-950 border-red-500/80 text-red-400',
-                            label: 'Observada / Rechazada',
+                            wrapper: 'border-violet-500/80 bg-zinc-950',
+                            pill: 'bg-zinc-950 border-violet-400/80 text-violet-300',
+                            label: 'Pago Parcial Registrado (3 Cuotas)',
                           }
-                        : {
-                            wrapper: 'border-orange-500/80 bg-zinc-950',
-                            pill: 'bg-zinc-950 border-orange-500/80 text-orange-400',
-                            label: 'Pendiente de Verificación',
-                          };
+                        : isRejected
+                          ? {
+                              wrapper: 'border-red-500/80 bg-zinc-950',
+                              pill: 'bg-zinc-950 border-red-500/80 text-red-400',
+                              label: 'Observada / Rechazada',
+                            }
+                          : {
+                              wrapper: 'border-orange-500/80 bg-zinc-950',
+                              pill: 'bg-zinc-950 border-orange-500/80 text-orange-400',
+                              label: 'Pendiente de Verificación',
+                            };
 
                     return (
                       <div className={`rounded-2xl border p-4 space-y-3 ${badgeConfig.wrapper}`}>

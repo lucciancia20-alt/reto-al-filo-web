@@ -1066,6 +1066,10 @@ export function computeRegistrationPricing(
     ? Math.round(baseNumber * (1 - discountPercentApplied / 100))
     : baseNumber;
   const finalAmount = baseNumber > 0 ? formatArsPrice(finalAmountNumber) : originalPrice;
+  const installmentAmountNumber =
+    finalAmountNumber > 0 ? Math.round(finalAmountNumber / 3) : 0;
+  const installmentAmount =
+    installmentAmountNumber > 0 ? formatArsPrice(installmentAmountNumber) : finalAmount;
 
   return {
     isLocalResident,
@@ -1076,6 +1080,8 @@ export function computeRegistrationPricing(
     finalAmountNumber,
     originalPrice,
     finalAmount,
+    installmentAmountNumber,
+    installmentAmount,
   };
 }
 
@@ -1101,6 +1107,14 @@ export function resolveFrozenRegistrationPricing(reg) {
       ? `Residente (-${discountPercentApplied}%)`
       : 'Residente'
     : '';
+  const paymentPlan = reg?.paymentPlan === 'cuotas' ? 'cuotas' : 'total';
+  const installmentsTotal = paymentPlan === 'cuotas' ? 3 : 1;
+  const finalNum = parseArsPriceNumber(finalAmount);
+  const storedInstallment = formatStoredPrice(reg?.installmentAmount);
+  const installmentAmount =
+    paymentPlan === 'cuotas'
+      ? storedInstallment || (finalNum > 0 ? formatArsPrice(Math.round(finalNum / 3)) : '')
+      : finalAmount;
 
   return {
     isLocalResident,
@@ -1108,6 +1122,9 @@ export function resolveFrozenRegistrationPricing(reg) {
     originalPrice,
     finalAmount,
     badgeText,
+    paymentPlan,
+    installmentsTotal,
+    installmentAmount,
   };
 }
 
