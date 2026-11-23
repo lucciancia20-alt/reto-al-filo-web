@@ -733,10 +733,7 @@ export function mergeRaceConfig(override) {
   const resolvedNotificationEmail =
     String(override.notificationEmail || '').trim() || RACE_CONFIG.notificationEmail;
 
-  const resolvedTeamsBenefitEnabled =
-    typeof override.teamsBenefitEnabled === 'boolean'
-      ? override.teamsBenefitEnabled
-      : RACE_CONFIG.teamsBenefitEnabled;
+  const resolvedTeamsBenefitEnabled = true;
   const rawTeamsBenefitEmail = String(override.teamsBenefitEmail ?? '').trim();
   const customTeamsBenefitEmail =
     rawTeamsBenefitEmail &&
