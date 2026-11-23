@@ -380,11 +380,17 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
           </div>
         </div>
 
-        <div className="mt-3 max-w-2xl mx-auto px-6 sm:px-8 py-3.5 rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500 shadow-[0_0_16px_var(--theme-glow)]">
-          <p className="w-full max-w-none text-center text-sm sm:text-base text-white leading-relaxed tracking-[0.075em] [word-spacing:0.28em]">
-            Desafiá las crestas técnicas, el bosque de altura y los senderos serranos en dos
-            distancias diseñadas para corredores de montaña:{' '}
-            <span className="inline-block"><strong className="text-cyan-400 font-bold whitespace-nowrap">27K Competitivo</strong>{' '}y{' '}<strong className="text-red-500 font-bold whitespace-nowrap">13K Competitivo.</strong></span>
+        <div className="mt-3 w-full max-w-[780px] mx-auto px-5 sm:px-7 py-3.5 rounded-2xl bg-zinc-900/10 backdrop-blur-[2px] border border-orange-500 shadow-none">
+          <p className="w-full max-w-none text-center text-xs sm:text-[13.5px] md:text-[14.5px] text-white leading-relaxed tracking-[0.035em] [word-spacing:0.12em] text-balance space-y-0.5">
+            <span className="block md:whitespace-nowrap">
+              <span aria-hidden="true" className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-orange-500 mr-2 align-middle -translate-y-[1px]" />¿Buscas un desafío real? Bienvenido al trail más duro de la provincia de Bs. As.
+            </span>
+            <span className="block md:whitespace-nowrap">
+              <span aria-hidden="true" className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-orange-500 mr-2 align-middle -translate-y-[1px]" />Mucho desnivel, ascensos largos y terrenos técnicos.
+            </span>
+            <span className="block md:whitespace-nowrap">
+              <span aria-hidden="true" className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-orange-500 mr-2 align-middle -translate-y-[1px]" />Preparate para una carrera donde llegar ya es una hazaña.
+            </span>
           </p>
         </div>
 
