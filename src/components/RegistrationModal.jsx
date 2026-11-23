@@ -239,6 +239,8 @@ export default function RegistrationModal({
     isResidentActive
   );
   const residentDiscountPercent = pricing.configuredPercent;
+  const maxInstallments = pricing.maxInstallments;
+  const effectivePaymentPlan = maxInstallments > 1 ? paymentPlan : 'total';
 
   const renderResidentDiscountSummary = (compact = false) => {
     if (!pricing.isLocalResident) return null;
@@ -604,10 +606,10 @@ export default function RegistrationModal({
         discountPercentApplied: pricing.discountPercentApplied,
         originalPrice: pricing.originalPrice,
         finalAmount: pricing.finalAmount,
-        paymentPlan,
-        installmentsTotal: paymentPlan === 'cuotas' ? 3 : 1,
+        paymentPlan: effectivePaymentPlan,
+        installmentsTotal: effectivePaymentPlan === 'cuotas' ? maxInstallments : 1,
         installmentAmount:
-          paymentPlan === 'cuotas' ? pricing.installmentAmount : pricing.finalAmount,
+          effectivePaymentPlan === 'cuotas' ? pricing.installmentAmount : pricing.finalAmount,
         receiptUrl: uploaded.secureUrl,
         receiptPublicId: uploaded.publicId,
         receiptFormat: uploaded.format || '',
@@ -648,7 +650,7 @@ export default function RegistrationModal({
     ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
         `¡Hola! Acabo de inscribirme a ${getRaceFullTitle(raceConfig)}. Mi código es *${confirmedReg.code}* - *${confirmedReg.fullName}* (*${confirmedReg.distance}*${
           confirmedReg.paymentPlan === 'cuotas'
-            ? ` · Pago en 3 Cuotas - Cuota 1/3: ${confirmedReg.installmentAmount}`
+            ? ` · Pago en ${confirmedReg.installmentsTotal || 3} Cuotas - Cuota 1/${confirmedReg.installmentsTotal || 3}: ${confirmedReg.installmentAmount}`
             : ''
         }). Ya adjunté el comprobante en la web.`
       )}`
@@ -656,7 +658,7 @@ export default function RegistrationModal({
 
   const installmentWhatsappHref = confirmedInstallment
     ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-        `¡Hola! Acabo de subir en la web el comprobante de la *Cuota ${confirmedInstallment.installmentNumber}/3* para mi inscripción en ${getRaceFullTitle(raceConfig)} (${
+        `¡Hola! Acabo de subir en la web el comprobante de la *Cuota ${confirmedInstallment.installmentNumber}* para mi inscripción en ${getRaceFullTitle(raceConfig)} (${
           confirmedInstallment.code ? `Código *${confirmedInstallment.code}* · ` : ''
         }DNI *${confirmedInstallment.dni}* - *${confirmedInstallment.fullName}*).`
       )}`
@@ -903,10 +905,10 @@ export default function RegistrationModal({
                     {confirmedReg.paymentPlan === 'cuotas' && (
                       <div className="mt-1 flex flex-col items-end gap-0.5">
                         <span className="inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-zinc-950 border border-orange-500/70 text-amber-300">
-                          3 Cuotas · Cuota 1/3 ({confirmedReg.installmentAmount})
+                          {confirmedReg.installmentsTotal || 3} Cuotas · Cuota 1/{confirmedReg.installmentsTotal || 3} ({confirmedReg.installmentAmount})
                         </span>
                         <span className="text-[10px] text-stone-300">
-                          Podrás cargar las Cuotas 2 y 3 desde la pestaña &ldquo;Ya me inscribí&rdquo;.
+                          Podrás cargar {confirmedReg.installmentsTotal === 2 ? 'la Cuota 2' : 'las Cuotas 2 y 3'} desde la pestaña &ldquo;Ya me inscribí&rdquo;.
                         </span>
                       </div>
                     )}
@@ -1027,10 +1029,12 @@ export default function RegistrationModal({
                               active ? 'text-orange-400' : 'text-white'
                             }`}
                           >
-                            Cuota {num} de 3
+                            Cuota {num}
                           </span>
                           <span className="block text-[11px] text-stone-300 mt-0.5">
-                            {num === 2 ? 'Segunda cuota parcial' : 'Tercera y última cuota'}
+                            {num === 2
+                              ? 'Segunda cuota (plan de 2 o 3 cuotas)'
+                              : 'Tercera cuota (inscriptos hasta 31/01)'}
                           </span>
                         </div>
                         <CheckCircle2
@@ -1071,17 +1075,23 @@ export default function RegistrationModal({
                           {item.title}
                         </span>
                         <div className="flex items-center justify-between text-stone-300">
-                          <span>Valor cuota general (1/3):</span>
+                          <span>Plan 3 cuotas (1/3):</span>
                           <strong className="font-mono text-white">
-                            {generalP.installmentAmount}
+                            {generalP.installment3Amount}
+                            {residentDiscountEnabled
+                              ? ` · Res: ${residentP.installment3Amount}`
+                              : ''}
                           </strong>
                         </div>
-                        {residentDiscountEnabled && (
-                          <div className="flex items-center justify-between text-emerald-400">
-                            <span>Cuota residente (-{residentDiscountPercent}%):</span>
-                            <strong className="font-mono">{residentP.installmentAmount}</strong>
-                          </div>
-                        )}
+                        <div className="flex items-center justify-between text-stone-300">
+                          <span>Plan 2 cuotas (1/2):</span>
+                          <strong className="font-mono text-white">
+                            {generalP.installment2Amount}
+                            {residentDiscountEnabled
+                              ? ` · Res: ${residentP.installment2Amount}`
+                              : ''}
+                          </strong>
+                        </div>
                       </div>
                     );
                   })}
@@ -1421,8 +1431,8 @@ export default function RegistrationModal({
                     <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
                     <span className="text-xs font-bold uppercase tracking-wider text-white">
                       2 · Modalidad de Pago y Transferencia (
-                      {paymentPlan === 'cuotas'
-                        ? `Cuota 1/3: ${pricing.installmentAmount}`
+                      {effectivePaymentPlan === 'cuotas'
+                        ? `Cuota 1/${maxInstallments}: ${pricing.installmentAmount}`
                         : pricing.isLocalResident
                           ? pricing.finalAmount
                           : activeDistanceInfo.price}
@@ -1436,85 +1446,135 @@ export default function RegistrationModal({
                   )}
                 </div>
 
-                {/* Selector: Pago Total vs 3 Cuotas */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentPlan('total')}
-                    className={`text-left rounded-xl p-3 border shadow-none transition-colors cursor-pointer flex items-center justify-between gap-2 ${
-                      paymentPlan === 'total'
-                        ? 'bg-zinc-950 border-orange-500'
-                        : 'bg-zinc-950 border-orange-500/40 hover:border-orange-500'
-                    }`}
-                  >
-                    <div>
-                      <span
-                        className={`block font-display text-xs sm:text-sm font-bold uppercase ${
-                          paymentPlan === 'total' ? 'text-orange-400' : 'text-white'
+                {/* Aviso de fechas límite para pagar en cuotas */}
+                <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-3 text-[11px] text-stone-300 space-y-1 shadow-none">
+                  <span className="block font-display font-bold uppercase tracking-wider text-amber-400">
+                    Condiciones de Financiación por Fecha
+                  </span>
+                  <ul className="space-y-0.5 text-stone-200 leading-snug">
+                    <li>
+                      • <strong className="text-white">Hasta el 31 de enero:</strong> se puede
+                      abonar hasta en <strong className="text-amber-300">3 cuotas</strong>.
+                    </li>
+                    <li>
+                      • <strong className="text-white">Del 1 al 27 de febrero:</strong> se puede
+                      abonar hasta en <strong className="text-amber-300">2 cuotas</strong>.
+                    </li>
+                    <li>
+                      • <strong className="text-white">Después del 27 de febrero:</strong>{' '}
+                      únicamente en <strong className="text-amber-300">1 solo pago</strong>.
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Selector: Pago Total vs Cuotas habilitadas según fecha */}
+                {maxInstallments > 1 ? (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => setPaymentPlan('total')}
+                        className={`text-left rounded-xl p-3 border shadow-none transition-colors cursor-pointer flex items-center justify-between gap-2 ${
+                          effectivePaymentPlan === 'total'
+                            ? 'bg-zinc-950 border-orange-500'
+                            : 'bg-zinc-950 border-orange-500/40 hover:border-orange-500'
                         }`}
                       >
-                        Pago Total (1 pago)
+                        <div>
+                          <span
+                            className={`block font-display text-xs sm:text-sm font-bold uppercase ${
+                              effectivePaymentPlan === 'total' ? 'text-orange-400' : 'text-white'
+                            }`}
+                          >
+                            Pago Total (1 pago)
+                          </span>
+                          <span className="block text-[11px] text-stone-300 mt-0.5">
+                            Transferís hoy:{' '}
+                            <strong className="text-amber-300 font-mono">
+                              {pricing.finalAmount}
+                            </strong>
+                          </span>
+                        </div>
+                        <CheckCircle2
+                          className={`w-4 h-4 shrink-0 ${
+                            effectivePaymentPlan === 'total' ? 'text-orange-400' : 'text-stone-700'
+                          }`}
+                        />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setPaymentPlan('cuotas')}
+                        className={`text-left rounded-xl p-3 border shadow-none transition-colors cursor-pointer flex items-center justify-between gap-2 ${
+                          effectivePaymentPlan === 'cuotas'
+                            ? 'bg-zinc-950 border-orange-500'
+                            : 'bg-zinc-950 border-orange-500/40 hover:border-orange-500'
+                        }`}
+                      >
+                        <div>
+                          <span
+                            className={`flex items-center gap-1.5 font-display text-xs sm:text-sm font-bold uppercase ${
+                              effectivePaymentPlan === 'cuotas' ? 'text-orange-400' : 'text-white'
+                            }`}
+                          >
+                            <span>Pago en {maxInstallments} Cuotas</span>
+                          </span>
+                          <span className="block text-[11px] text-stone-300 mt-0.5">
+                            {maxInstallments} cuotas de{' '}
+                            <strong className="text-amber-300 font-mono">
+                              {pricing.installmentAmount}
+                            </strong>{' '}
+                            (Total {pricing.finalAmount})
+                          </span>
+                        </div>
+                        <CheckCircle2
+                          className={`w-4 h-4 shrink-0 ${
+                            effectivePaymentPlan === 'cuotas'
+                              ? 'text-orange-400'
+                              : 'text-stone-700'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {effectivePaymentPlan === 'cuotas' && (
+                      <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-3 text-xs text-stone-200 space-y-1 shadow-none">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-semibold text-amber-400 uppercase text-[11px]">
+                            Monto a transferir hoy (Cuota 1 de {maxInstallments})
+                          </span>
+                          <span className="font-display text-base sm:text-lg font-black text-amber-300 font-mono">
+                            {pricing.installmentAmount}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-stone-400 leading-snug">
+                          Subí hoy el comprobante de la{' '}
+                          <strong className="text-white">Cuota 1/{maxInstallments}</strong>. Tiempo
+                          después podrás cargar{' '}
+                          <strong className="text-white">
+                            {maxInstallments === 3 ? 'las Cuotas 2 y 3' : 'la Cuota 2/2'}
+                          </strong>{' '}
+                          desde la pestaña{' '}
+                          <strong className="text-amber-300">
+                            &ldquo;Ya me inscribí · Subir Cuota 2 o 3&rdquo;
+                          </strong>
+                          .
+                        </p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="rounded-xl bg-zinc-950 border border-orange-500 p-3 flex items-center justify-between gap-2 shadow-none">
+                    <div>
+                      <span className="block font-display text-xs sm:text-sm font-bold text-orange-400 uppercase">
+                        Pago Total (1 único pago)
                       </span>
                       <span className="block text-[11px] text-stone-300 mt-0.5">
-                        Transferís hoy:{' '}
+                        Monto total a transferir:{' '}
                         <strong className="text-amber-300 font-mono">{pricing.finalAmount}</strong>
                       </span>
                     </div>
-                    <CheckCircle2
-                      className={`w-4 h-4 shrink-0 ${
-                        paymentPlan === 'total' ? 'text-orange-400' : 'text-stone-700'
-                      }`}
-                    />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setPaymentPlan('cuotas')}
-                    className={`text-left rounded-xl p-3 border shadow-none transition-colors cursor-pointer flex items-center justify-between gap-2 ${
-                      paymentPlan === 'cuotas'
-                        ? 'bg-zinc-950 border-orange-500'
-                        : 'bg-zinc-950 border-orange-500/40 hover:border-orange-500'
-                    }`}
-                  >
-                    <div>
-                      <span
-                        className={`flex items-center gap-1.5 font-display text-xs sm:text-sm font-bold uppercase ${
-                          paymentPlan === 'cuotas' ? 'text-orange-400' : 'text-white'
-                        }`}
-                      >
-                        <span>Pago en 3 Cuotas</span>
-                      </span>
-                      <span className="block text-[11px] text-stone-300 mt-0.5">
-                        3 cuotas de{' '}
-                        <strong className="text-amber-300 font-mono">
-                          {pricing.installmentAmount}
-                        </strong>{' '}
-                        (Total {pricing.finalAmount})
-                      </span>
-                    </div>
-                    <CheckCircle2
-                      className={`w-4 h-4 shrink-0 ${
-                        paymentPlan === 'cuotas' ? 'text-orange-400' : 'text-stone-700'
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {paymentPlan === 'cuotas' && (
-                  <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-3 text-xs text-stone-200 space-y-1 shadow-none">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-amber-400 uppercase text-[11px]">
-                        Monto a transferir hoy (Cuota 1 de 3)
-                      </span>
-                      <span className="font-display text-base sm:text-lg font-black text-amber-300 font-mono">
-                        {pricing.installmentAmount}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-stone-400 leading-snug">
-                      Subí hoy el comprobante de la <strong className="text-white">Cuota 1/3</strong>.
-                      Tiempo después podrás cargar las <strong className="text-white">Cuotas 2 y 3</strong> desde la pestaña{' '}
-                      <strong className="text-amber-300">&ldquo;Ya me inscribí · Subir Cuota 2 o 3&rdquo;</strong>.
-                    </p>
+                    <CheckCircle2 className="w-4 h-4 text-orange-400 shrink-0" />
                   </div>
                 )}
 
@@ -2058,8 +2118,8 @@ export default function RegistrationModal({
               <section className="space-y-2.5">
                 <span className="block text-xs font-bold uppercase tracking-wider text-white">
                   4 · Adjuntar Comprobante de Pago{' '}
-                  {paymentPlan === 'cuotas'
-                    ? `(Cuota 1/3 · ${pricing.installmentAmount})`
+                  {effectivePaymentPlan === 'cuotas'
+                    ? `(Cuota 1/${maxInstallments} · ${pricing.installmentAmount})`
                     : `(${pricing.finalAmount})`}{' '}
                   <span className="text-red-500">*</span>
                 </span>

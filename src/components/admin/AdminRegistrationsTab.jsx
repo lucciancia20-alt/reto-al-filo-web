@@ -1078,7 +1078,7 @@ export default function AdminRegistrationsTab({
               Pendientes
             </option>
             <option value="parcial" className="bg-stone-950 text-violet-400 font-medium">
-              Parciales (3 cuotas)
+              Parciales (en cuotas)
             </option>
             <option value="confirmado" className="bg-stone-950 text-emerald-400 font-medium">
               Confirmados
@@ -1660,6 +1660,7 @@ export default function AdminRegistrationsTab({
                 : [];
             const isInstallmentPlan =
               pricing.paymentPlan === 'cuotas' || isPartial || installmentReceipts.length > 1;
+            const totalInstallments = pricing.installmentsTotal === 2 ? 2 : 3;
             const statusBadgeClass =
               reg.status === 'confirmado'
                 ? 'bg-transparent text-emerald-400 border-emerald-500/60'
@@ -1726,12 +1727,14 @@ export default function AdminRegistrationsTab({
                       </span>
                       {isInstallmentPlan && (
                         <span
-                          title={`Modalidad 3 cuotas${
+                          title={`Modalidad ${totalInstallments} cuotas${
                             pricing.installmentAmount ? ` (${pricing.installmentAmount} c/u)` : ''
                           }`}
                           className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-violet-400/75 bg-transparent text-violet-300 shrink-0"
                         >
-                          3 Cuotas ({Math.min(3, Math.max(1, installmentReceipts.length))}/3)
+                          {totalInstallments} Cuotas (
+                          {Math.min(totalInstallments, Math.max(1, installmentReceipts.length))}/
+                          {totalInstallments})
                         </span>
                       )}
                       {pricing.isLocalResident && (
@@ -1933,11 +1936,13 @@ export default function AdminRegistrationsTab({
                           })}
                           target="_blank"
                           rel="noopener noreferrer"
-                          title={`Ver comprobante de Cuota ${item.number} de 3`}
+                          title={`Ver comprobante de Cuota ${item.number} de ${totalInstallments}`}
                           className="inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none text-sky-400 border border-sky-500/60 hover:border-sky-400 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
-                          <span>Cuota {item.number}/3</span>
+                          <span>
+                            Cuota {item.number}/{totalInstallments}
+                          </span>
                         </a>
                       ))
                     ) : (

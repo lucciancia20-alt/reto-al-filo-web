@@ -32,7 +32,7 @@ export async function sendRegistrationNotificationEmail({
   const baseDistance = registration?.distance || '-';
   const planSuffix =
     pricing.paymentPlan === 'cuotas'
-      ? ` · 3 CUOTAS (Cuota 1/3: ${pricing.installmentAmount} de ${pricing.finalAmount})`
+      ? ` · ${pricing.installmentsTotal} CUOTAS (Cuota 1/${pricing.installmentsTotal}: ${pricing.installmentAmount} de ${pricing.finalAmount})`
       : '';
   const distanceSummary = pricing.isLocalResident
     ? `${baseDistance} · ${pricing.finalAmount} (${pricing.badgeText} - Verificar DNI)${planSuffix}`

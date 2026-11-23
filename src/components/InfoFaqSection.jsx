@@ -555,7 +555,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                         ? {
                             wrapper: 'border-violet-500/80 bg-zinc-950',
                             pill: 'bg-zinc-950 border-violet-400/80 text-violet-300',
-                            label: 'Pago Parcial Registrado (3 Cuotas)',
+                            label: 'Pago Parcial Registrado (En Cuotas)',
                           }
                         : isRejected
                           ? {

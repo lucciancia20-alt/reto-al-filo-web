@@ -681,7 +681,9 @@ export async function submitRunnerRegistration(payload) {
   const now = Date.now();
   const isLocalResident = Boolean(payload.isLocalResident);
   const paymentPlan = payload.paymentPlan === 'cuotas' ? 'cuotas' : 'total';
-  const installmentsTotal = paymentPlan === 'cuotas' ? 3 : 1;
+  const rawInstTotal = Number(payload.installmentsTotal);
+  const installmentsTotal =
+    paymentPlan === 'cuotas' ? (rawInstTotal === 2 ? 2 : 3) : 1;
   const record = {
     code: generateRegistrationCode(),
     distance: payload.distance === '13K' ? '13K' : '27K',

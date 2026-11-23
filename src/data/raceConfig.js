@@ -1040,11 +1040,67 @@ export function formatArsPrice(amount) {
   return `$${String(num).replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
 }
 
-/** Calcula precios base y final aplicando el descuento configurable de residentes. */
+export const THREE_INSTALLMENTS_DEADLINE_ISO = '2027-01-31';
+export const TWO_INSTALLMENTS_DEADLINE_ISO = '2027-02-27';
+
+/**
+ * Determina automáticamente la cantidad máxima de cuotas habilitadas según la fecha actual
+ * en horario de Argentina (America/Argentina/Buenos_Aires):
+ * - Hasta el 31/01/2027 (inclusive): hasta 3 cuotas.
+ * - Del 01/02/2027 al 27/02/2027 (inclusive): hasta 2 cuotas.
+ * - Desde el 28/02/2027 en adelante: solo 1 pago (Pago Total).
+ */
+export function resolveInstallmentSchedule(nowMs = Date.now()) {
+  let todayIso = '2026-11-23';
+  try {
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: ARGENTINA_TIMEZONE,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    const parts = Object.fromEntries(
+      formatter
+        .formatToParts(new Date(nowMs))
+        .filter((p) => p.type !== 'literal')
+        .map((p) => [p.type, p.value])
+    );
+    if (parts.year && parts.month && parts.day) {
+      todayIso = `${parts.year}-${parts.month}-${parts.day}`;
+    }
+  } catch {
+    todayIso = new Date(nowMs).toISOString().slice(0, 10);
+  }
+
+  if (todayIso <= THREE_INSTALLMENTS_DEADLINE_ISO) {
+    return {
+      todayIso,
+      maxInstallments: 3,
+      phase: '3_cuotas',
+    };
+  }
+
+  if (todayIso <= TWO_INSTALLMENTS_DEADLINE_ISO) {
+    return {
+      todayIso,
+      maxInstallments: 2,
+      phase: '2_cuotas',
+    };
+  }
+
+  return {
+    todayIso,
+    maxInstallments: 1,
+    phase: 'solo_total',
+  };
+}
+
+/** Calcula precios base y final aplicando el descuento configurable de residentes y el plan de cuotas vigente. */
 export function computeRegistrationPricing(
   rawBasePrice,
   raceConfig = RACE_CONFIG,
-  isResident = false
+  isResident = false,
+  customInstallmentsCount = null
 ) {
   const discountEnabled = Boolean(
     raceConfig?.residentDiscountEnabled ?? RACE_CONFIG.residentDiscountEnabled
@@ -1066,10 +1122,30 @@ export function computeRegistrationPricing(
     ? Math.round(baseNumber * (1 - discountPercentApplied / 100))
     : baseNumber;
   const finalAmount = baseNumber > 0 ? formatArsPrice(finalAmountNumber) : originalPrice;
+
+  const schedule = resolveInstallmentSchedule();
+  const maxInstallments = schedule.maxInstallments;
+  const installmentsCount =
+    customInstallmentsCount === 2 || customInstallmentsCount === 3
+      ? customInstallmentsCount
+      : maxInstallments;
+
   const installmentAmountNumber =
-    finalAmountNumber > 0 ? Math.round(finalAmountNumber / 3) : 0;
+    finalAmountNumber > 0 && installmentsCount > 1
+      ? Math.round(finalAmountNumber / installmentsCount)
+      : finalAmountNumber;
   const installmentAmount =
     installmentAmountNumber > 0 ? formatArsPrice(installmentAmountNumber) : finalAmount;
+
+  const installment3AmountNumber =
+    finalAmountNumber > 0 ? Math.round(finalAmountNumber / 3) : 0;
+  const installment3Amount =
+    installment3AmountNumber > 0 ? formatArsPrice(installment3AmountNumber) : finalAmount;
+
+  const installment2AmountNumber =
+    finalAmountNumber > 0 ? Math.round(finalAmountNumber / 2) : 0;
+  const installment2Amount =
+    installment2AmountNumber > 0 ? formatArsPrice(installment2AmountNumber) : finalAmount;
 
   return {
     isLocalResident,
@@ -1080,8 +1156,13 @@ export function computeRegistrationPricing(
     finalAmountNumber,
     originalPrice,
     finalAmount,
+    maxInstallments,
+    installmentPhase: schedule.phase,
+    installmentsCount,
     installmentAmountNumber,
     installmentAmount,
+    installment3Amount,
+    installment2Amount,
   };
 }
 
@@ -1108,12 +1189,14 @@ export function resolveFrozenRegistrationPricing(reg) {
       : 'Residente'
     : '';
   const paymentPlan = reg?.paymentPlan === 'cuotas' ? 'cuotas' : 'total';
-  const installmentsTotal = paymentPlan === 'cuotas' ? 3 : 1;
+  const storedTotal = Number(reg?.installmentsTotal);
+  const installmentsTotal = paymentPlan === 'cuotas' ? (storedTotal === 2 ? 2 : 3) : 1;
   const finalNum = parseArsPriceNumber(finalAmount);
   const storedInstallment = formatStoredPrice(reg?.installmentAmount);
   const installmentAmount =
     paymentPlan === 'cuotas'
-      ? storedInstallment || (finalNum > 0 ? formatArsPrice(Math.round(finalNum / 3)) : '')
+      ? storedInstallment ||
+        (finalNum > 0 ? formatArsPrice(Math.round(finalNum / installmentsTotal)) : '')
       : finalAmount;
 
   return {

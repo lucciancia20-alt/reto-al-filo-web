@@ -984,12 +984,13 @@ export default function AdminModal({
     const bib = String(bibDrafts[reg.id] ?? reg.assignedBib ?? '').trim();
     const bibText = bib ? ` Tu dorsal asignado es el #${bib}.` : '';
     const isPartial = String(reg.status || '').toLowerCase() === 'parcial';
+    const totalInst = Number(reg.installmentsTotal) === 2 ? 2 : 3;
     const receiptsCount =
       Array.isArray(reg.installmentReceipts) && reg.installmentReceipts.length > 0
-        ? reg.installmentReceipts.length
+        ? Math.min(totalInst, reg.installmentReceipts.length)
         : 1;
     const msg = isPartial
-      ? `¡Hola ${reg.fullName}! Te escribimos desde ${getRaceFullTitle(draft || raceConfig)} para confirmarte que registramos tu PAGO PARCIAL (${receiptsCount}/3 cuotas) de la inscripción (${reg.code}) en ${reg.distance}.${bibText} Recordá que podés subir los comprobantes de las cuotas siguientes desde la web en "Quiero Inscribirme -> Ya me inscribí · Subir Cuota 2 o 3".`
+      ? `¡Hola ${reg.fullName}! Te escribimos desde ${getRaceFullTitle(draft || raceConfig)} para confirmarte que registramos tu PAGO PARCIAL (${receiptsCount}/${totalInst} cuotas) de la inscripción (${reg.code}) en ${reg.distance}.${bibText} Recordá que podés subir los comprobantes de las cuotas siguientes desde la web en "Quiero Inscribirme -> Ya me inscribí · Subir Cuota 2 o 3".`
       : `¡Hola ${reg.fullName}! Te confirmamos desde ${getRaceFullTitle(draft || raceConfig)} que tu inscripción (${reg.code}) en ${reg.distance} está CONFIRMADA.${bibText} ¡Nos vemos en Tornquist!`;
     return `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`;
   };

@@ -51,7 +51,7 @@ service cloud.firestore {
         && (!('originalPrice' in data) || data.originalPrice is string)
         && (!('finalAmount' in data) || data.finalAmount is string)
         && (!('paymentPlan' in data) || data.paymentPlan in ['total', 'cuotas'])
-        && (!('installmentsTotal' in data) || data.installmentsTotal in [1, 3])
+        && (!('installmentsTotal' in data) || data.installmentsTotal in [1, 2, 3])
         && (!('installmentAmount' in data) || data.installmentAmount is string)
         && hasNonEmptyString(data, 'fullName')
         && hasNonEmptyString(data, 'dni')
