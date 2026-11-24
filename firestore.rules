@@ -36,6 +36,7 @@ service cloud.firestore {
         ])
         && data.keys().hasOnly([
           'code', 'distance', 'priceSnapshot', 'isLocalResident', 'discountPercentApplied',
+          'discountSource', 'couponCode', 'couponDiscountPercent', 'couponLabel',
           'originalPrice', 'finalAmount', 'paymentPlan', 'installmentsTotal', 'installmentAmount',
           'fullName', 'dni', 'birthDate', 'gender',
           'phone', 'email', 'city', 'team', 'shirtSize', 'bloodType',
@@ -48,6 +49,10 @@ service cloud.firestore {
         && data.distance in ['27K', '13K']
         && (!('isLocalResident' in data) || data.isLocalResident is bool)
         && (!('discountPercentApplied' in data) || (data.discountPercentApplied is int && data.discountPercentApplied >= 0 && data.discountPercentApplied <= 100))
+        && (!('discountSource' in data) || data.discountSource in ['none', 'resident', 'coupon'])
+        && (!('couponCode' in data) || data.couponCode is string)
+        && (!('couponDiscountPercent' in data) || (data.couponDiscountPercent is int && data.couponDiscountPercent >= 0 && data.couponDiscountPercent <= 100))
+        && (!('couponLabel' in data) || data.couponLabel is string)
         && (!('originalPrice' in data) || data.originalPrice is string)
         && (!('finalAmount' in data) || data.finalAmount is string)
         && (!('paymentPlan' in data) || data.paymentPlan in ['total', 'cuotas'])
@@ -62,7 +67,19 @@ service cloud.firestore {
         && hasNonEmptyString(data, 'city')
         && hasNonEmptyString(data, 'emergencyContactName')
         && hasNonEmptyString(data, 'emergencyContactPhone')
-        && hasNonEmptyString(data, 'receiptUrl')
+        && (
+          hasNonEmptyString(data, 'receiptUrl')
+          || (
+            data.receiptUrl == ''
+            && data.discountSource == 'coupon'
+            && data.discountPercentApplied == 100
+            && hasNonEmptyString(data, 'couponCode')
+            && exists(/databases/$(database)/documents/coupons/$(data.couponCode))
+            && get(/databases/$(database)/documents/coupons/$(data.couponCode)).data.usosActuales < get(/databases/$(database)/documents/coupons/$(data.couponCode)).data.maxUsos
+            && get(/databases/$(database)/documents/coupons/$(data.couponCode)).data.descuento == 100
+            && getAfter(/databases/$(database)/documents/coupons/$(data.couponCode)).data.usosActuales == get(/databases/$(database)/documents/coupons/$(data.couponCode)).data.usosActuales + 1
+          )
+        )
         && data.status == 'pendiente'
         && (!('assignedBib' in data) || data.assignedBib == '')
         && data.createdAt is int
@@ -82,6 +99,29 @@ service cloud.firestore {
     match /photos/{photoId} {
       allow read: if true;
       allow write: if isAdmin();
+    }
+
+    match /coupons/{couponCode} {
+      // El público solo puede validar un cupón puntual por código exacto (nunca listar todos)
+      allow get: if true;
+      allow list, create, delete: if isAdmin();
+      allow update: if isAdmin()
+        || (
+          resource.data.usosActuales is int
+          && resource.data.maxUsos is int
+          && resource.data.usosActuales < resource.data.maxUsos
+          && request.resource.data.usosActuales == resource.data.usosActuales + 1
+          && request.resource.data.status == (request.resource.data.usosActuales >= resource.data.maxUsos ? 'agotado' : 'disponible')
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'usosActuales', 'status', 'usadosPor', 'lastUsedAt'
+          ])
+          && request.resource.data.usadosPor is list
+          && (
+            (!('usadosPor' in resource.data) && request.resource.data.usadosPor.size() == 1)
+            || (resource.data.usadosPor is list && request.resource.data.usadosPor.size() == resource.data.usadosPor.size() + 1)
+          )
+          && request.resource.data.lastUsedAt is int
+        );
     }
 
     match /registrations/{registrationId} {

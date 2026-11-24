@@ -15,6 +15,7 @@ export const DEFAULT_RESIDENT_LOCALITIES = [
 ];
 export const DEFAULT_TEAMS_BENEFIT_ENABLED = true;
 export const DEFAULT_TEAMS_BENEFIT_EMAIL = 'retoalfilo@gmail.com';
+export const DEFAULT_TEAMS_FREE_EVERY = 10;
 
 /**
  * Texto por defecto de las cláusulas del Deslinde de Responsabilidad A4.
@@ -332,6 +333,7 @@ export const RACE_CONFIG = {
   // Tarjeta promocional de Beneficios para Teams en el Hero
   teamsBenefitEnabled: DEFAULT_TEAMS_BENEFIT_ENABLED,
   teamsBenefitEmail: '',
+  teamsFreeEvery: DEFAULT_TEAMS_FREE_EVERY,
 };
 
 const ARGENTINA_TIMEZONE = 'America/Argentina/Buenos_Aires';
@@ -743,6 +745,17 @@ export function mergeRaceConfig(override) {
   const resolvedTeamsBenefitEmail =
     resolvedNotificationEmail || customTeamsBenefitEmail || DEFAULT_TEAMS_BENEFIT_EMAIL;
 
+  const rawTeamsFreeEvery = override.teamsFreeEvery;
+  const parsedTeamsFreeEvery =
+    rawTeamsFreeEvery !== undefined &&
+    rawTeamsFreeEvery !== null &&
+    String(rawTeamsFreeEvery).trim() !== ''
+      ? Number(rawTeamsFreeEvery)
+      : NaN;
+  const resolvedTeamsFreeEvery = Number.isFinite(parsedTeamsFreeEvery) && parsedTeamsFreeEvery >= 1
+    ? Math.min(100, Math.max(1, Math.round(parsedTeamsFreeEvery)))
+    : RACE_CONFIG.teamsFreeEvery;
+
   return {
     ...RACE_CONFIG,
     ...override,
@@ -775,6 +788,7 @@ export function mergeRaceConfig(override) {
     residentLocalities: resolvedResidentLocalities,
     teamsBenefitEnabled: resolvedTeamsBenefitEnabled,
     teamsBenefitEmail: resolvedTeamsBenefitEmail,
+    teamsFreeEvery: resolvedTeamsFreeEvery,
   };
 }
 
@@ -1092,12 +1106,13 @@ export function resolveInstallmentSchedule(nowMs = Date.now()) {
   };
 }
 
-/** Calcula precios base y final aplicando el descuento configurable de residentes y el plan de cuotas vigente. */
+/** Calcula precios base y final aplicando el descuento configurable de residentes o cupón (no acumulables; prevalece el mayor) y el plan de cuotas vigente. */
 export function computeRegistrationPricing(
   rawBasePrice,
   raceConfig = RACE_CONFIG,
   isResident = false,
-  customInstallmentsCount = null
+  customInstallmentsCount = null,
+  couponDiscountPercent = 0
 ) {
   const discountEnabled = Boolean(
     raceConfig?.residentDiscountEnabled ?? RACE_CONFIG.residentDiscountEnabled
@@ -1114,11 +1129,37 @@ export function computeRegistrationPricing(
   const originalPrice =
     baseNumber > 0 ? formatArsPrice(baseNumber) : String(rawBasePrice || '').trim();
   const isLocalResident = Boolean(discountEnabled && isResident && baseNumber > 0);
-  const discountPercentApplied = isLocalResident ? configuredPercent : 0;
-  const finalAmountNumber = isLocalResident
-    ? Math.round(baseNumber * (1 - discountPercentApplied / 100))
-    : baseNumber;
-  const finalAmount = baseNumber > 0 ? formatArsPrice(finalAmountNumber) : originalPrice;
+  const residentPercent = isLocalResident ? configuredPercent : 0;
+
+  const rawCouponPercent = Number(couponDiscountPercent);
+  const couponPercent =
+    baseNumber > 0 && Number.isFinite(rawCouponPercent) && rawCouponPercent > 0
+      ? Math.min(100, Math.max(0, Math.round(rawCouponPercent)))
+      : 0;
+
+  let discountSource = 'none';
+  let discountPercentApplied = 0;
+  if (couponPercent > residentPercent) {
+    discountSource = 'coupon';
+    discountPercentApplied = couponPercent;
+  } else if (residentPercent > 0) {
+    discountSource = 'resident';
+    discountPercentApplied = residentPercent;
+  }
+
+  const finalAmountNumber =
+    discountPercentApplied >= 100
+      ? 0
+      : discountPercentApplied > 0
+        ? Math.round(baseNumber * (1 - discountPercentApplied / 100))
+        : baseNumber;
+  const finalAmount =
+    baseNumber > 0
+      ? finalAmountNumber === 0
+        ? '$0'
+        : formatArsPrice(finalAmountNumber)
+      : originalPrice;
+  const isFreeByDiscount = baseNumber > 0 && finalAmountNumber === 0;
 
   const schedule = resolveInstallmentSchedule();
   const maxInstallments = schedule.maxInstallments;
@@ -1128,27 +1169,46 @@ export function computeRegistrationPricing(
       : maxInstallments;
 
   const installmentAmountNumber =
-    finalAmountNumber > 0 && installmentsCount > 1
-      ? Math.round(finalAmountNumber / installmentsCount)
-      : finalAmountNumber;
+    finalAmountNumber === 0
+      ? 0
+      : finalAmountNumber > 0 && installmentsCount > 1
+        ? Math.round(finalAmountNumber / installmentsCount)
+        : finalAmountNumber;
   const installmentAmount =
-    installmentAmountNumber > 0 ? formatArsPrice(installmentAmountNumber) : finalAmount;
+    finalAmountNumber === 0
+      ? '$0'
+      : installmentAmountNumber > 0
+        ? formatArsPrice(installmentAmountNumber)
+        : finalAmount;
 
   const installment3AmountNumber =
     finalAmountNumber > 0 ? Math.round(finalAmountNumber / 3) : 0;
   const installment3Amount =
-    installment3AmountNumber > 0 ? formatArsPrice(installment3AmountNumber) : finalAmount;
+    finalAmountNumber === 0
+      ? '$0'
+      : installment3AmountNumber > 0
+        ? formatArsPrice(installment3AmountNumber)
+        : finalAmount;
 
   const installment2AmountNumber =
     finalAmountNumber > 0 ? Math.round(finalAmountNumber / 2) : 0;
   const installment2Amount =
-    installment2AmountNumber > 0 ? formatArsPrice(installment2AmountNumber) : finalAmount;
+    finalAmountNumber === 0
+      ? '$0'
+      : installment2AmountNumber > 0
+        ? formatArsPrice(installment2AmountNumber)
+        : finalAmount;
 
   return {
     isLocalResident,
     discountEnabled,
     configuredPercent,
     discountPercentApplied,
+    discountSource,
+    couponPercentApplied: discountSource === 'coupon' ? discountPercentApplied : 0,
+    residentPercentApplied: discountSource === 'resident' ? discountPercentApplied : 0,
+    isFreeByDiscount,
+    hasDiscount: discountPercentApplied > 0,
     baseNumber,
     finalAmountNumber,
     originalPrice,
@@ -1173,18 +1233,33 @@ function formatStoredPrice(val) {
 /** Lee los importes congelados en el documento del corredor sin recalcular con la config actual. */
 export function resolveFrozenRegistrationPricing(reg) {
   const isLocalResident = Boolean(reg?.isLocalResident);
-  const discountPercentApplied = isLocalResident
-    ? Math.max(0, Math.round(Number(reg?.discountPercentApplied) || 0))
-    : 0;
+  const couponCode = String(reg?.couponCode || '').trim().toUpperCase();
+  const couponDiscountPercent = Math.max(
+    0,
+    Math.round(Number(reg?.couponDiscountPercent) || 0)
+  );
+  const couponLabel = String(reg?.couponLabel || '').trim();
+  const discountSource =
+    reg?.discountSource || (couponCode ? 'coupon' : isLocalResident ? 'resident' : 'none');
+  const discountPercentApplied = Math.max(
+    0,
+    Math.round(
+      Number(reg?.discountPercentApplied) ||
+        (discountSource === 'coupon' ? couponDiscountPercent : 0)
+    )
+  );
   const originalPrice =
     formatStoredPrice(reg?.originalPrice) || formatStoredPrice(reg?.priceSnapshot);
   const finalAmount =
     formatStoredPrice(reg?.finalAmount) || formatStoredPrice(reg?.priceSnapshot) || originalPrice;
-  const badgeText = isLocalResident
-    ? discountPercentApplied > 0
-      ? `Residente (-${discountPercentApplied}%)`
-      : 'Residente'
-    : '';
+  const badgeText =
+    discountSource === 'coupon' && couponCode
+      ? `Cupón ${couponCode} (-${discountPercentApplied}%)`
+      : isLocalResident
+        ? discountPercentApplied > 0
+          ? `Residente (-${discountPercentApplied}%)`
+          : 'Residente'
+        : '';
   const paymentPlan = reg?.paymentPlan === 'cuotas' ? 'cuotas' : 'total';
   const storedTotal = Number(reg?.installmentsTotal);
   const installmentsTotal = paymentPlan === 'cuotas' ? (storedTotal === 2 ? 2 : 3) : 1;
@@ -1198,6 +1273,10 @@ export function resolveFrozenRegistrationPricing(reg) {
 
   return {
     isLocalResident,
+    discountSource,
+    couponCode,
+    couponDiscountPercent,
+    couponLabel,
     discountPercentApplied,
     originalPrice,
     finalAmount,

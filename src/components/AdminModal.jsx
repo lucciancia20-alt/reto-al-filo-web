@@ -15,6 +15,7 @@ import {
   Users,
   RefreshCw,
   ChevronDown,
+  Ticket,
 } from 'lucide-react';
 import { GPX_TRACKS, parseGpxXml } from '../data/gpxTracks';
 import {
@@ -47,6 +48,10 @@ import {
   deleteRegistrationRecord,
   syncPublicRunnerStatus,
   syncAllPublicRunnerStatuses,
+  fetchCoupons,
+  generateCouponBatch,
+  createGroupCoupon,
+  deleteCouponFromFirestore,
 } from '../firebase/config';
 import AdminLoginView from './admin/AdminLoginView';
 import AdminGeneralTab from './admin/AdminGeneralTab';
@@ -54,6 +59,7 @@ import AdminCircuitsTab from './admin/AdminCircuitsTab';
 import AdminScheduleFaqTab from './admin/AdminScheduleFaqTab';
 import AdminPhotosTab from './admin/AdminPhotosTab';
 import AdminRegistrationsTab from './admin/AdminRegistrationsTab';
+import AdminCouponsTab from './admin/AdminCouponsTab';
 import AdminSessionConflictModal from './AdminSessionConflictModal';
 import { useAdminSession } from '../hooks/useAdminSession';
 
@@ -160,6 +166,13 @@ export default function AdminModal({
   const [syncingPublic, setSyncingPublic] = useState(false);
   const [syncMessage, setSyncMessage] = useState(null);
 
+  // Estado para gestión de cupones de descuento / pases libres
+  const [coupons, setCoupons] = useState([]);
+  const [couponsLoading, setCouponsLoading] = useState(false);
+  const [couponsError, setCouponsError] = useState('');
+  const [couponsGenerating, setCouponsGenerating] = useState(false);
+  const [couponBusyCode, setCouponBusyCode] = useState('');
+
   // Carga con caché (TTL), deduplicación de llamadas en vuelo y cancelación al cerrar/desmontar.
   const loadRegistrations = async ({ force = false } = {}) => {
     if (regsAbortRef.current) return;
@@ -225,6 +238,79 @@ export default function AdminModal({
       loadRegistrations();
     }
   }, [isOpen, unlocked, sessionState, activeTab]);
+
+  const loadCoupons = async () => {
+    setCouponsLoading(true);
+    setCouponsError('');
+    try {
+      const res = await fetchCoupons();
+      setCoupons(res.coupons || []);
+    } catch (err) {
+      setCouponsError(err?.message || 'No se pudieron cargar los cupones.');
+    } finally {
+      setCouponsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && unlocked && sessionState === 'active' && activeTab === 'coupons') {
+      loadCoupons();
+    }
+  }, [isOpen, unlocked, sessionState, activeTab]);
+
+  const handleGenerateCouponBatch = async ({ quantity, descuento = 100, label }) => {
+    setCouponsGenerating(true);
+    setCouponsError('');
+    try {
+      const res = await generateCouponBatch({
+        quantity,
+        descuento,
+        label,
+        createdBy: adminUser?.email || '',
+        existingCodes: coupons.map((c) => c.code),
+      });
+      if (Array.isArray(res?.coupons) && res.coupons.length > 0) {
+        setCoupons((prev) => [...res.coupons, ...prev]);
+      }
+      return res;
+    } finally {
+      setCouponsGenerating(false);
+    }
+  };
+
+  const handleCreateGroupCoupon = async ({ code, descuento = 10, maxUsos = 15, label }) => {
+    setCouponsGenerating(true);
+    setCouponsError('');
+    try {
+      const res = await createGroupCoupon({
+        code,
+        descuento,
+        maxUsos,
+        label,
+        createdBy: adminUser?.email || '',
+      });
+      if (res?.coupon) {
+        setCoupons((prev) => [res.coupon, ...prev]);
+      }
+      return res;
+    } finally {
+      setCouponsGenerating(false);
+    }
+  };
+
+  const handleDeleteCoupon = async (coupon) => {
+    if (!coupon?.code) return;
+    setCouponBusyCode(coupon.code);
+    setCouponsError('');
+    try {
+      await deleteCouponFromFirestore(coupon.code);
+      setCoupons((prev) => prev.filter((item) => item.code !== coupon.code));
+    } catch (err) {
+      setCouponsError(err?.message || 'No se pudo eliminar el cupón.');
+    } finally {
+      setCouponBusyCode('');
+    }
+  };
 
   // Al cerrar el modal, cerrar sesión o desmontar: cancelar lectura en vuelo e invalidar caché.
   useEffect(() => {
@@ -708,8 +794,10 @@ export default function AdminModal({
     draft,
     galleryItems.length,
     filteredRegistrations.length,
+    coupons.length,
     regsLoading,
     galleryLoading,
+    couponsLoading,
     checkScrollMore,
   ]);
 
@@ -1575,13 +1663,14 @@ export default function AdminModal({
         ) : (
           <>
             {/* Navegación por pestañas del Admin */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 p-3 bg-stone-950 border-b border-stone-800 shrink-0">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 p-3 bg-stone-950 border-b border-stone-800 shrink-0">
               {[
                 { id: 'general', label: 'General & Pagos', icon: MapPin },
                 { id: 'circuits', label: 'Circuitos & GPX', icon: Droplets },
                 { id: 'schedule_faq', label: 'Horarios & FAQ', icon: Clock },
                 { id: 'photos', label: 'Galería 1ra Edición', icon: Camera },
                 { id: 'registrations', label: 'Inscriptos', icon: Users },
+                { id: 'coupons', label: 'Cupones', icon: Ticket },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const active = activeTab === tab.id;
@@ -1729,7 +1818,23 @@ export default function AdminModal({
                 />
               )}
 
-              {saveFeedback && activeTab !== 'photos' && activeTab !== 'registrations' && (
+              {activeTab === 'coupons' && (
+                <AdminCouponsTab
+                  coupons={coupons}
+                  couponsLoading={couponsLoading}
+                  couponsError={couponsError}
+                  couponsGenerating={couponsGenerating}
+                  couponBusyCode={couponBusyCode}
+                  onGenerateBatch={handleGenerateCouponBatch}
+                  onCreateGroupCoupon={handleCreateGroupCoupon}
+                  onDeleteCoupon={handleDeleteCoupon}
+                />
+              )}
+
+              {saveFeedback &&
+                activeTab !== 'photos' &&
+                activeTab !== 'registrations' &&
+                activeTab !== 'coupons' && (
                 <div
                   className={`p-3.5 rounded-xl text-xs flex items-start gap-2.5 ${
                     saveFeedback.type === 'success'
@@ -1751,7 +1856,7 @@ export default function AdminModal({
             {/* Footer fijo con altura constante en todas las pestañas */}
             <div className="relative px-4 sm:px-5 py-3.5 bg-stone-950 border-t border-stone-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
               <div className="flex flex-wrap items-center gap-3">
-                {activeTab === 'photos' || activeTab === 'registrations' ? (
+                {activeTab === 'photos' || activeTab === 'registrations' || activeTab === 'coupons' ? (
                   <button
                     type="button"
                     onClick={handleSafeClose}
@@ -1849,6 +1954,16 @@ export default function AdminModal({
                     {regsLoading ? 'Actualizando...' : 'Actualizar Inscriptos'}
                   </button>
                 </div>
+              ) : activeTab === 'coupons' ? (
+                <button
+                  type="button"
+                  onClick={loadCoupons}
+                  disabled={couponsLoading}
+                  className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-4 h-4 text-orange-500 ${couponsLoading ? 'animate-spin' : ''}`} />
+                  {couponsLoading ? 'Actualizando...' : 'Actualizar Cupones'}
+                </button>
               ) : (
                 <button
                   type="button"

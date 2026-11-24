@@ -640,10 +640,48 @@ function generateRegistrationCode() {
   return `RAF-${randomDigits}`;
 }
 
+export const COUPON_CODE_REGEX = /^[A-Z0-9][A-Z0-9-]{2,29}$/;
+const COUPON_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
+export function normalizeCouponCode(raw) {
+  return String(raw ?? '').trim().toUpperCase().replace(/\s+/g, '');
+}
+
+function generateRandomCouponCode(prefix = 'RAF-FREE') {
+  let suffix = '';
+  const length = 6;
+  if (typeof globalThis !== 'undefined' && globalThis.crypto?.getRandomValues) {
+    const bytes = new Uint8Array(length);
+    globalThis.crypto.getRandomValues(bytes);
+    for (let i = 0; i < length; i += 1) {
+      suffix += COUPON_ALPHABET[bytes[i] % COUPON_ALPHABET.length];
+    }
+  } else {
+    for (let i = 0; i < length; i += 1) {
+      suffix += COUPON_ALPHABET[Math.floor(Math.random() * COUPON_ALPHABET.length)];
+    }
+  }
+  return `${prefix}-${suffix}`;
+}
+
 /**
- * Registra la inscripción de un corredor junto con el link del comprobante subido.
+ * Registra la inscripción de un corredor junto con el link del comprobante subido
+ * (o consume atómicamente un cupón de un solo uso mediante transacción de Firestore).
  */
 export async function submitRunnerRegistration(payload) {
+  const discountSource = ['coupon', 'resident', 'none'].includes(payload?.discountSource)
+    ? payload.discountSource
+    : payload?.isLocalResident
+      ? 'resident'
+      : 'none';
+  const couponCode = normalizeCouponCode(payload?.couponCode);
+  const usesCoupon = Boolean(couponCode && discountSource === 'coupon');
+  const rawAppliedPercent = Number(payload?.discountPercentApplied);
+  const appliedPercent = Number.isFinite(rawAppliedPercent)
+    ? Math.max(0, Math.min(100, Math.round(rawAppliedPercent)))
+    : 0;
+  const isFreeByCoupon = usesCoupon && appliedPercent >= 100;
+
   const requiredFields = [
     ['fullName', 'Nombre y Apellido'],
     ['dni', 'DNI'],
@@ -654,8 +692,10 @@ export async function submitRunnerRegistration(payload) {
     ['city', 'Localidad / Provincia'],
     ['emergencyContactName', 'Nombre del contacto de emergencia'],
     ['emergencyContactPhone', 'Teléfono del contacto de emergencia'],
-    ['receiptUrl', 'Comprobante de transferencia'],
   ];
+  if (!isFreeByCoupon) {
+    requiredFields.push(['receiptUrl', 'Comprobante de transferencia']);
+  }
 
   for (const [key, label] of requiredFields) {
     if (!String(payload?.[key] || '').trim()) {
@@ -679,24 +719,39 @@ export async function submitRunnerRegistration(payload) {
   }
 
   const now = Date.now();
-  const isLocalResident = Boolean(payload.isLocalResident);
-  const paymentPlan = payload.paymentPlan === 'cuotas' ? 'cuotas' : 'total';
+  const isLocalResident = Boolean(payload.isLocalResident && discountSource === 'resident');
+  const paymentPlan = !isFreeByCoupon && payload.paymentPlan === 'cuotas' ? 'cuotas' : 'total';
   const rawInstTotal = Number(payload.installmentsTotal);
   const installmentsTotal =
     paymentPlan === 'cuotas' ? (rawInstTotal === 2 ? 2 : 3) : 1;
   const record = {
     code: generateRegistrationCode(),
     distance: payload.distance === '13K' ? '13K' : '27K',
-    priceSnapshot: String(payload.priceSnapshot || '').trim(),
+    priceSnapshot: isFreeByCoupon
+      ? '$0'
+      : String(payload.priceSnapshot || '').trim(),
     isLocalResident,
-    discountPercentApplied: isLocalResident
-      ? Math.max(0, Math.min(100, Math.round(Number(payload.discountPercentApplied) || 0)))
-      : 0,
+    discountPercentApplied:
+      discountSource === 'none' ? 0 : appliedPercent,
+    discountSource,
+    ...(usesCoupon
+      ? {
+          couponCode,
+          couponDiscountPercent: appliedPercent,
+          couponLabel: String(payload.couponLabel || '').trim(),
+        }
+      : {}),
     originalPrice: String(payload.originalPrice || payload.priceSnapshot || '').trim(),
-    finalAmount: String(payload.finalAmount || payload.priceSnapshot || '').trim(),
+    finalAmount: isFreeByCoupon
+      ? '$0'
+      : String(payload.finalAmount || payload.priceSnapshot || '').trim(),
     paymentPlan,
     installmentsTotal,
-    installmentAmount: String(payload.installmentAmount || payload.finalAmount || payload.priceSnapshot || '').trim(),
+    installmentAmount: isFreeByCoupon
+      ? '$0'
+      : String(
+          payload.installmentAmount || payload.finalAmount || payload.priceSnapshot || ''
+        ).trim(),
     fullName: String(payload.fullName).trim(),
     dni: String(payload.dni).trim(),
     birthDate: String(payload.birthDate).trim(),
@@ -711,9 +766,9 @@ export async function submitRunnerRegistration(payload) {
     emergencyContactPhone: String(payload.emergencyContactPhone).trim(),
     medicalNotes: String(payload.medicalNotes || '').trim(),
     acceptedTerms: Boolean(payload.acceptedTerms),
-    receiptUrl: String(payload.receiptUrl).trim(),
-    receiptPublicId: String(payload.receiptPublicId || '').trim(),
-    receiptFormat: String(payload.receiptFormat || '').trim(),
+    receiptUrl: isFreeByCoupon ? '' : String(payload.receiptUrl || '').trim(),
+    receiptPublicId: isFreeByCoupon ? '' : String(payload.receiptPublicId || '').trim(),
+    receiptFormat: isFreeByCoupon ? '' : String(payload.receiptFormat || '').trim(),
     status: 'pendiente',
     assignedBib: '',
     createdAt: now,
@@ -724,7 +779,72 @@ export async function submitRunnerRegistration(payload) {
   let persistedTo = 'local-only';
   let errorCode = '';
 
-  if (isFirebaseConfigured()) {
+  if (usesCoupon) {
+    if (!isFirebaseConfigured()) {
+      throw new Error('Firebase no está configurado para validar y consumir cupones.');
+    }
+    const bundle = await getFirestoreDb();
+    if (!bundle) {
+      throw new Error('No se pudo conectar con Firestore para validar el cupón.');
+    }
+    const { db, firestore } = bundle;
+    const { collection, doc, runTransaction } = firestore;
+
+    persistedId = await runTransaction(db, async (tx) => {
+      const couponRef = doc(db, 'coupons', couponCode);
+      const couponSnap = await tx.get(couponRef);
+      if (!couponSnap.exists()) {
+        throw new Error(
+          'El cupón ingresado no existe o fue eliminado. Quitá el cupón o ingresá otro.'
+        );
+      }
+      const couponData = couponSnap.data() || {};
+      const maxUses = Math.max(1, Math.round(Number(couponData.maxUsos ?? 1) || 1));
+      const legacyUsed = String(couponData.status || '').toLowerCase() === 'usado';
+      const rawCurrentUses = Number(couponData.usosActuales ?? (legacyUsed ? maxUses : 0));
+      const currentUses =
+        Number.isFinite(rawCurrentUses) && rawCurrentUses >= 0 ? Math.round(rawCurrentUses) : 0;
+
+      if (currentUses >= maxUses) {
+        throw new Error(
+          'Este cupón ya alcanzó el límite de usos disponibles (Agotado). Quitá el cupón o ingresá otro.'
+        );
+      }
+      const remotePercent = Math.round(
+        Number(couponData.descuento ?? couponData.discountPercent ?? 0)
+      );
+      if (remotePercent !== appliedPercent) {
+        throw new Error(
+          'El porcentaje del cupón cambió. Volvé a aplicarlo antes de confirmar.'
+        );
+      }
+
+      const regRef = doc(collection(db, 'registrations'));
+      const nextUses = currentUses + 1;
+      const nextStatus = nextUses >= maxUses ? 'agotado' : 'disponible';
+      const prevUsadosPor = Array.isArray(couponData.usadosPor) ? couponData.usadosPor : [];
+      const nextUsadosPor = [
+        ...prevUsadosPor,
+        {
+          nombre: record.fullName,
+          dni: record.dni,
+          registrationCode: record.code,
+          registrationId: regRef.id,
+          fecha: now,
+        },
+      ];
+
+      tx.set(regRef, record);
+      tx.update(couponRef, {
+        usosActuales: nextUses,
+        status: nextStatus,
+        usadosPor: nextUsadosPor,
+        lastUsedAt: now,
+      });
+      return regRef.id;
+    });
+    persistedTo = 'firestore';
+  } else if (isFirebaseConfigured()) {
     try {
       const bundle = await getFirestoreDb();
       if (bundle) {
@@ -1828,4 +1948,328 @@ export async function signOutAdmin() {
   } catch (error) {
     console.warn('[Reto al Filo] Error cerrando sesión:', error?.code || error?.message);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Cupones con tope de usos (`coupons/{CODE}`)
+// Modalidades: Pases libres 100% (`RAF-FREE-XXXXXX`, maxUsos: 1) y Grupales Teams (ej. `TEAMHALCONES10`, maxUsos editable)
+// ---------------------------------------------------------------------------
+
+function normalizeCouponDoc(docId, data = {}) {
+  const code = normalizeCouponCode(data.code || docId);
+  const rawPct = Number(data.descuento ?? data.discountPercent);
+  const descuento = Number.isFinite(rawPct)
+    ? Math.min(100, Math.max(1, Math.round(rawPct)))
+    : 100;
+  const rawMaxUses = Number(data.maxUsos ?? 1);
+  const maxUsos = Number.isFinite(rawMaxUses) && rawMaxUses >= 1 ? Math.round(rawMaxUses) : 1;
+  const legacyUsed = String(data.status || '').toLowerCase() === 'usado';
+  const rawUses = Number(data.usosActuales ?? (legacyUsed ? maxUsos : 0));
+  const usosActuales = Number.isFinite(rawUses) && rawUses >= 0 ? Math.round(rawUses) : 0;
+
+  let usadosPor = [];
+  if (Array.isArray(data.usadosPor)) {
+    usadosPor = data.usadosPor
+      .filter((entry) => entry && typeof entry === 'object')
+      .map((entry) => ({
+        nombre: String(entry.nombre || entry.usedByName || '').trim(),
+        dni: String(entry.dni || entry.usedByDni || '').trim(),
+        registrationCode: String(entry.registrationCode || '').trim(),
+        registrationId: String(entry.registrationId || '').trim(),
+        fecha: entry.fecha ? Number(entry.fecha) : null,
+      }));
+  } else if (data.usedByName || data.usedByDni) {
+    usadosPor = [
+      {
+        nombre: String(data.usedByName || '').trim(),
+        dni: String(data.usedByDni || '').trim(),
+        registrationCode: String(data.usedByRegistrationCode || '').trim(),
+        registrationId: String(data.usedByRegistrationId || '').trim(),
+        fecha: data.usedAt ? Number(data.usedAt) : null,
+      },
+    ];
+  }
+
+  const tipo = data.tipo === 'grupal' || maxUsos > 1 ? 'grupal' : 'pase_libre';
+  const status = usosActuales >= maxUsos ? 'agotado' : 'disponible';
+
+  return {
+    id: code,
+    code,
+    descuento,
+    discountPercent: descuento,
+    usosActuales,
+    maxUsos,
+    tipo,
+    label: String(data.label ?? data.etiqueta ?? '').trim(),
+    status,
+    usadosPor,
+    batchId: String(data.batchId || '').trim(),
+    createdAt: Number(data.createdAt) || 0,
+    createdBy: String(data.createdBy || '').trim(),
+    lastUsedAt: data.lastUsedAt
+      ? Number(data.lastUsedAt)
+      : data.usedAt
+        ? Number(data.usedAt)
+        : null,
+  };
+}
+
+/**
+ * Obtiene todos los cupones desde Firestore (`coupons`), ordenados por fecha de creación descendente.
+ */
+export async function fetchCoupons() {
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase no está configurado en las variables de entorno.');
+  }
+  const bundle = await getFirestoreDb();
+  if (!bundle) {
+    throw new Error('No se pudo inicializar Firestore.');
+  }
+  const { db, firestore } = bundle;
+  const { collection, getDocs } = firestore;
+  const snapshot = await getDocs(collection(db, 'coupons'));
+  const coupons = snapshot.docs
+    .map((docSnap) => normalizeCouponDoc(docSnap.id, docSnap.data()))
+    .sort((a, b) => {
+      if ((b.createdAt || 0) !== (a.createdAt || 0)) {
+        return (b.createdAt || 0) - (a.createdAt || 0);
+      }
+      return a.code.localeCompare(b.code);
+    });
+  return { coupons, source: 'firestore' };
+}
+
+/**
+ * Genera y guarda en Firestore un lote de pases libres de 1 uso con formato `RAF-FREE-XXXXXX`.
+ */
+export async function generateCouponBatch({
+  quantity,
+  descuento,
+  discountPercent,
+  label = '',
+  createdBy = '',
+  existingCodes = [],
+}) {
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase no está configurado en las variables de entorno.');
+  }
+  const qty = Math.round(Number(quantity));
+  if (!Number.isFinite(qty) || qty < 1 || qty > 500) {
+    throw new Error('La cantidad de cupones por lote debe estar entre 1 y 500.');
+  }
+  const pct = Math.round(Number(descuento ?? discountPercent ?? 100));
+  if (!Number.isFinite(pct) || pct < 1 || pct > 100) {
+    throw new Error('El porcentaje de descuento debe estar entre 1% y 100%.');
+  }
+
+  const bundle = await getFirestoreDb();
+  if (!bundle) {
+    throw new Error('No se pudo inicializar Firestore.');
+  }
+
+  const { db, firestore } = bundle;
+  const { doc, writeBatch } = firestore;
+  const cleanLabel = String(label || '').trim().slice(0, 60);
+  const cleanCreatedBy = String(createdBy || '').trim().toLowerCase();
+  const now = Date.now();
+  const batchId = `BATCH-${now}`;
+
+  const usedSet = new Set(
+    (Array.isArray(existingCodes) ? existingCodes : []).map(normalizeCouponCode).filter(Boolean)
+  );
+  const generated = [];
+  let attempts = 0;
+  const maxAttempts = qty * 20;
+
+  while (generated.length < qty && attempts < maxAttempts) {
+    attempts += 1;
+    const code = generateRandomCouponCode('RAF-FREE');
+    if (usedSet.has(code)) continue;
+    usedSet.add(code);
+    generated.push({
+      code,
+      descuento: pct,
+      usosActuales: 0,
+      maxUsos: 1,
+      tipo: 'pase_libre',
+      label: cleanLabel,
+      status: 'disponible',
+      usadosPor: [],
+      batchId,
+      createdAt: now,
+      createdBy: cleanCreatedBy,
+      lastUsedAt: null,
+    });
+  }
+
+  if (generated.length < qty) {
+    throw new Error('No se pudieron generar códigos únicos suficientes. Intentá nuevamente.');
+  }
+
+  const CHUNK_SIZE = 400;
+  for (let i = 0; i < generated.length; i += CHUNK_SIZE) {
+    const chunk = generated.slice(i, i + CHUNK_SIZE);
+    const batch = writeBatch(db);
+    for (const coupon of chunk) {
+      batch.set(doc(db, 'coupons', coupon.code), coupon);
+    }
+    await batch.commit();
+  }
+
+  return {
+    ok: true,
+    batchId,
+    coupons: generated.map((item) => normalizeCouponDoc(item.code, item)),
+  };
+}
+
+/**
+ * Crea un cupón grupal personalizado para Teams (ej. `TEAMHALCONES10`) con tope de usos editable.
+ */
+export async function createGroupCoupon({
+  code,
+  descuento = 10,
+  maxUsos = 15,
+  label = '',
+  createdBy = '',
+}) {
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase no está configurado en las variables de entorno.');
+  }
+  const normalizedCode = normalizeCouponCode(code);
+  if (!normalizedCode || !COUPON_CODE_REGEX.test(normalizedCode)) {
+    throw new Error(
+      'Ingresá un código válido de 3 a 30 caracteres (solo letras A-Z, números y guiones, ej. TEAMHALCONES10).'
+    );
+  }
+  const pct = Math.round(Number(descuento));
+  if (!Number.isFinite(pct) || pct < 1 || pct > 100) {
+    throw new Error('El porcentaje de descuento debe estar entre 1% y 100%.');
+  }
+  const maxUses = Math.round(Number(maxUsos));
+  if (!Number.isFinite(maxUses) || maxUses < 1 || maxUses > 500) {
+    throw new Error('El límite de usos debe estar entre 1 y 500.');
+  }
+
+  const bundle = await getFirestoreDb();
+  if (!bundle) {
+    throw new Error('No se pudo inicializar Firestore.');
+  }
+
+  const { db, firestore } = bundle;
+  const { doc, getDoc, setDoc } = firestore;
+  const couponRef = doc(db, 'coupons', normalizedCode);
+  const existing = await getDoc(couponRef);
+  if (existing.exists()) {
+    throw new Error(`Ya existe un cupón con el código "${normalizedCode}".`);
+  }
+
+  const now = Date.now();
+  const payload = {
+    code: normalizedCode,
+    descuento: pct,
+    usosActuales: 0,
+    maxUsos: maxUses,
+    tipo: 'grupal',
+    label: String(label || '').trim().slice(0, 60),
+    status: 'disponible',
+    usadosPor: [],
+    batchId: '',
+    createdAt: now,
+    createdBy: String(createdBy || '').trim().toLowerCase(),
+    lastUsedAt: null,
+  };
+
+  await setDoc(couponRef, payload);
+
+  return {
+    ok: true,
+    coupon: normalizeCouponDoc(normalizedCode, payload),
+  };
+}
+
+/**
+ * Elimina un cupón puntual en Firestore (`coupons/{code}`).
+ */
+export async function deleteCouponFromFirestore(code) {
+  const normalized = normalizeCouponCode(code);
+  if (!normalized) {
+    throw new Error('Código de cupón inválido.');
+  }
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase no está configurado en las variables de entorno.');
+  }
+  const bundle = await getFirestoreDb();
+  if (!bundle) {
+    throw new Error('No se pudo inicializar Firestore.');
+  }
+  const { db, firestore } = bundle;
+  const { doc, deleteDoc } = firestore;
+  await deleteDoc(doc(db, 'coupons', normalized));
+  return { ok: true, code: normalized };
+}
+
+/**
+ * Valida un código de cupón en Firestore por lectura puntual (`getDoc`) verificando `usosActuales < maxUsos`.
+ */
+export async function validateCouponCode(rawCode) {
+  const code = normalizeCouponCode(rawCode);
+  if (!code || !COUPON_CODE_REGEX.test(code)) {
+    return {
+      valid: false,
+      reason: 'invalid_format',
+      message: 'Ingresá un código de cupón válido (ej. TEAMHALCONES10 o RAF-FREE-ABC123).',
+    };
+  }
+  if (!isFirebaseConfigured()) {
+    return {
+      valid: false,
+      reason: 'not_configured',
+      message: 'Firebase no está configurado para validar cupones.',
+    };
+  }
+  const bundle = await getFirestoreDb();
+  if (!bundle) {
+    return {
+      valid: false,
+      reason: 'unavailable',
+      message: 'No se pudo conectar con Firestore.',
+    };
+  }
+
+  const { db, firestore } = bundle;
+  const { doc, getDoc } = firestore;
+  const snap = await getDoc(doc(db, 'coupons', code));
+  if (!snap.exists()) {
+    return {
+      valid: false,
+      reason: 'not_found',
+      message: 'El cupón ingresado no existe.',
+    };
+  }
+
+  const normalized = normalizeCouponDoc(code, snap.data());
+  if (normalized.usosActuales >= normalized.maxUsos) {
+    return {
+      valid: false,
+      reason: 'exhausted',
+      message: 'Este cupón ya alcanzó el límite máximo de usos (Agotado).',
+    };
+  }
+
+  return {
+    valid: true,
+    coupon: {
+      code: normalized.code,
+      descuento: normalized.descuento,
+      discountPercent: normalized.descuento,
+      usosActuales: normalized.usosActuales,
+      maxUsos: normalized.maxUsos,
+      remainingUses: normalized.maxUsos - normalized.usosActuales,
+      label: normalized.label,
+      tipo: normalized.tipo,
+      status: 'disponible',
+    },
+  };
 }

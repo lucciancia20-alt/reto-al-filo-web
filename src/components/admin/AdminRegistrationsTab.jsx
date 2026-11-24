@@ -581,7 +581,7 @@ export default function AdminRegistrationsTab({
         type="button"
         onClick={() => handleToggleDuplicateFilter(filterValue)}
         aria-pressed={isActive}
-        className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] transition-colors cursor-pointer ${
+        className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
           isActive
             ? 'bg-stone-950 border-red-500 text-white font-medium'
             : 'bg-stone-950 border-orange-500/60 text-zinc-200 hover:border-orange-400 hover:text-white font-medium'
@@ -1592,8 +1592,8 @@ export default function AdminRegistrationsTab({
       ) : (
         <div className="space-y-2">
           {/* Barra compacta de encabezados ordenables, buscador y accesos directos a duplicados */}
-          <div className="px-2.5 py-2 rounded-xl bg-stone-950 border border-stone-800 flex flex-wrap items-center gap-2 text-[11px]">
-            <div className="flex items-center gap-2 flex-wrap">
+          <div className="px-2.5 py-2 rounded-xl bg-stone-950 border border-stone-800 flex flex-wrap lg:flex-nowrap items-center gap-2 text-[11px]">
+            <div className="flex items-center gap-1.5 flex-wrap lg:flex-nowrap shrink-0">
               <span className="text-[10px] uppercase tracking-wider text-stone-500 font-semibold mr-0.5 hidden sm:inline">
                 Ordenar:
               </span>
@@ -1603,7 +1603,7 @@ export default function AdminRegistrationsTab({
               {renderSortButton('bib', 'Dorsal #')}
             </div>
 
-            <div className="relative w-full md:w-auto md:flex-1 md:min-w-[200px] md:max-w-md md:mx-auto">
+            <div className="relative w-full md:w-auto md:flex-1 md:min-w-[120px] lg:min-w-0">
               <Search className="w-3.5 h-3.5 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
@@ -1615,7 +1615,7 @@ export default function AdminRegistrationsTab({
               />
             </div>
 
-            <div className="ml-auto md:ml-0 flex items-center gap-2 flex-wrap shrink-0">
+            <div className="ml-auto md:ml-0 flex items-center gap-1.5 flex-wrap lg:flex-nowrap shrink-0">
               {renderDuplicateFilterButton('dorsal', 'Dorsales duplicados', duplicateBibCount)}
               {renderDuplicateFilterButton('dni', 'DNI duplicados', duplicateDniCount)}
             </div>
@@ -1741,6 +1741,18 @@ export default function AdminRegistrationsTab({
                         <span
                           title="Verificar domicilio del Partido de Tornquist en el DNI"
                           className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-emerald-500/70 bg-transparent text-emerald-400 shrink-0"
+                        >
+                          {pricing.badgeText}
+                        </span>
+                      )}
+                      {pricing.discountSource === 'coupon' && pricing.badgeText && (
+                        <span
+                          title={
+                            pricing.couponLabel
+                              ? `Cupón (${pricing.couponLabel})`
+                              : 'Cupón de descuento aplicado'
+                          }
+                          className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-amber-400/70 bg-transparent text-amber-300 shrink-0"
                         >
                           {pricing.badgeText}
                         </span>
@@ -1945,20 +1957,25 @@ export default function AdminRegistrationsTab({
                           </span>
                         </a>
                       ))
+                    ) : reg.receiptUrl ? (
+                      <a
+                        href={getOptimizedReceiptUrl(reg.receiptUrl, {
+                          format: reg.receiptFormat,
+                        })}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Ver comprobante adjunto"
+                        className="inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none text-sky-400 border border-sky-500/60 hover:border-sky-400 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Comprobante</span>
+                      </a>
                     ) : (
-                      reg.receiptUrl && (
-                        <a
-                          href={getOptimizedReceiptUrl(reg.receiptUrl, {
-                            format: reg.receiptFormat,
-                          })}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title="Ver comprobante adjunto"
-                          className="inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none text-sky-400 border border-sky-500/60 hover:border-sky-400 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">Comprobante</span>
-                        </a>
+                      pricing.discountSource === 'coupon' &&
+                      pricing.discountPercentApplied >= 100 && (
+                        <span className="inline-flex items-center rounded-lg bg-transparent text-amber-300 border border-amber-500/50 text-[10px] font-medium px-2 py-1">
+                          Sin comprobante (100%)
+                        </span>
                       )
                     )}
 
@@ -2044,7 +2061,7 @@ export default function AdminRegistrationsTab({
                               </>
                             ) : (
                               <>
-                                {pricing.isLocalResident &&
+                                {(pricing.isLocalResident || pricing.discountSource === 'coupon') &&
                                   pricing.originalPrice &&
                                   pricing.originalPrice !== pricing.finalAmount && (
                                     <span className="text-stone-500 line-through font-mono">
@@ -2059,6 +2076,12 @@ export default function AdminRegistrationsTab({
                             {pricing.isLocalResident && (
                               <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-transparent text-emerald-400 border border-emerald-500/60">
                                 {pricing.badgeText} · Verificar domicilio en DNI
+                              </span>
+                            )}
+                            {pricing.discountSource === 'coupon' && pricing.badgeText && (
+                              <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-transparent text-amber-300 border border-amber-400/60">
+                                {pricing.badgeText}
+                                {pricing.couponLabel ? ` · ${pricing.couponLabel}` : ''}
                               </span>
                             )}
                           </span>

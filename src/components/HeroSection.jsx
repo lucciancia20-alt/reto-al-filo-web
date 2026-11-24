@@ -4,6 +4,7 @@ import {
   RACE_CONFIG,
   DEFAULT_RESIDENT_DISCOUNT_PERCENT,
   DEFAULT_TEAMS_BENEFIT_EMAIL,
+  DEFAULT_TEAMS_FREE_EVERY,
   parseTargetDateParts,
   resolveTargetDateIso,
   getRaceTitle,
@@ -208,6 +209,15 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
   const teamsBenefitEmail =
     rawNotificationEmail || customTeamsBenefitEmail || DEFAULT_TEAMS_BENEFIT_EMAIL;
 
+  const rawTeamsFreeEvery = Number(
+    raceConfig?.teamsFreeEvery ?? RACE_CONFIG.teamsFreeEvery
+  );
+  const teamsFreeEvery =
+    Number.isFinite(rawTeamsFreeEvery) && rawTeamsFreeEvery >= 1
+      ? Math.min(100, Math.max(1, Math.round(rawTeamsFreeEvery)))
+      : DEFAULT_TEAMS_FREE_EVERY;
+  const teamsFreeEveryUnit = teamsFreeEvery === 1 ? 'inscripto' : 'inscriptos';
+
   return (
     <section
       id="inicio"
@@ -292,7 +302,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
               {teamsBenefitEnabled && (
                 <a
                   href={`mailto:${teamsBenefitEmail}?subject=${encodeURIComponent(`Beneficios para Teams - ${raceTitle}`)}`}
-                  aria-label={`Beneficios para Teams: Profesor/Entrenador FREE y 1 Corredor FREE cada 10 inscriptos. Coordinar al mail ${teamsBenefitEmail}`}
+                  aria-label={`Beneficios para Teams: Profesor/Entrenador FREE y 1 Corredor FREE cada ${teamsFreeEvery} ${teamsFreeEveryUnit}. Coordinar al mail ${teamsBenefitEmail}`}
                   className="z-20 min-[1360px]:absolute min-[1360px]:right-full min-[1360px]:mr-16 2xl:mr-24 min-[1360px]:-top-12 -rotate-2 min-[1360px]:-rotate-[5deg] hover:rotate-0 min-[1360px]:hover:-rotate-[1.5deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/15 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-[var(--theme-primary)] hover:border-[var(--theme-secondary)] shadow-none px-3.5 py-2.5 sm:px-3.5 sm:py-3 transition-all duration-200 cursor-pointer flex flex-col items-stretch w-[244px] sm:w-[258px] text-center no-underline"
                 >
                   <span className="block font-poster-condensed poster-title-stroke uppercase leading-[0.86] tracking-[0.02em] drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] select-none">
@@ -310,7 +320,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                       <strong className="font-black text-[var(--theme-strip-accent)]">
                         1 Corredor FREE
                       </strong>{' '}
-                      cada 10 inscriptos
+                      cada {teamsFreeEvery} {teamsFreeEveryUnit}
                     </span>
                   </span>
                   <span className="mt-1.5 block font-display text-[10.5px] sm:text-[11px] font-semibold text-white/95 leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">

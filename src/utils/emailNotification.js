@@ -34,9 +34,14 @@ export async function sendRegistrationNotificationEmail({
     pricing.paymentPlan === 'cuotas'
       ? ` · ${pricing.installmentsTotal} CUOTAS (Cuota 1/${pricing.installmentsTotal}: ${pricing.installmentAmount} de ${pricing.finalAmount})`
       : '';
-  const distanceSummary = pricing.isLocalResident
-    ? `${baseDistance} · ${pricing.finalAmount} (${pricing.badgeText} - Verificar DNI)${planSuffix}`
-    : `${baseDistance}${planSuffix}`;
+  const discountLabel =
+    pricing.discountSource === 'coupon'
+      ? ` · ${pricing.finalAmount} (${pricing.badgeText})`
+      : pricing.isLocalResident
+        ? ` · ${pricing.finalAmount} (${pricing.badgeText} - Verificar DNI)`
+        : '';
+  const distanceSummary = `${baseDistance}${discountLabel}${planSuffix}`;
+  const isFreeCoupon = pricing.discountSource === 'coupon' && pricing.discountPercentApplied >= 100;
 
   const templateParams = {
     to_email: toEmail,
@@ -52,7 +57,10 @@ export async function sendRegistrationNotificationEmail({
     localidad: registration?.city || '-',
     team: String(registration?.team || '').trim() || 'Sin agrupación',
     remera: registration?.shirtSize || '-',
-    comprobante_url: registration?.receiptUrl || uploadedUrl || 'Pendiente de adjuntar',
+    comprobante_url:
+      registration?.receiptUrl ||
+      uploadedUrl ||
+      (isFreeCoupon ? 'Bonificado 100% (Sin comprobante)' : 'Pendiente de adjuntar'),
   };
 
   console.log('Enviando email EmailJS...', templateParams);

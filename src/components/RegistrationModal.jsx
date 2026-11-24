@@ -22,6 +22,8 @@ import {
   ChevronDown,
   MapPin,
   Tag,
+  Ticket,
+  Sparkles,
 } from 'lucide-react';
 import {
   RACE_CONFIG,
@@ -41,6 +43,8 @@ import {
   submitRunnerRegistration,
   submitInstallmentReceipt,
   fetchPublicRunnerStatus,
+  validateCouponCode,
+  normalizeCouponCode,
 } from '../firebase/config';
 import {
   sendRegistrationNotificationEmail,
@@ -122,6 +126,10 @@ export default function RegistrationModal({
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [residentCheckboxManual, setResidentCheckboxManual] = useState(false);
+  const [couponInput, setCouponInput] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [submitStep, setSubmitStep] = useState('');
@@ -146,6 +154,7 @@ export default function RegistrationModal({
       setSubmitStep('');
       setInstError('');
       setInstStep('');
+      setCouponError('');
       setShowTermsModal(false);
       setShowSizeGuide(false);
     }
@@ -233,17 +242,68 @@ export default function RegistrationModal({
   const isResidentActive = Boolean(
     residentDiscountEnabled && (residentCheckboxManual || matchedLocality)
   );
+  const couponPercentValue = appliedCoupon?.discountPercent || 0;
   const pricing = computeRegistrationPricing(
     activeDistanceInfo.price,
     raceConfig,
-    isResidentActive
+    isResidentActive,
+    null,
+    couponPercentValue
   );
   const residentDiscountPercent = pricing.configuredPercent;
   const maxInstallments = pricing.maxInstallments;
-  const effectivePaymentPlan = maxInstallments > 1 ? paymentPlan : 'total';
+  const effectivePaymentPlan =
+    !pricing.isFreeByDiscount && maxInstallments > 1 ? paymentPlan : 'total';
 
   const renderResidentDiscountSummary = (compact = false) => {
-    if (!pricing.isLocalResident) return null;
+    if (pricing.discountSource === 'coupon' && appliedCoupon) {
+      if (compact && isResidentActive) {
+        return (
+          <div className="rounded-xl bg-zinc-950 border border-amber-500/40 p-2.5 text-[11px] text-amber-200 leading-snug">
+            Los descuentos no son acumulables: prevalece tu cupón{' '}
+            <strong className="font-mono text-amber-300">{appliedCoupon.code}</strong> (-
+            {pricing.couponPercentApplied}%) por sobre el descuento de residente (-
+            {pricing.configuredPercent}%).
+          </div>
+        );
+      }
+      return (
+        <div
+          className={`rounded-xl bg-zinc-950 border border-amber-500/45 ${
+            compact ? 'p-2.5' : 'p-3'
+          } space-y-1.5`}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs text-stone-400 line-through font-mono">
+                {pricing.originalPrice}
+              </span>
+              <span className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-zinc-950 text-amber-300 border border-amber-500/50">
+                <Ticket className="w-3 h-3 shrink-0" />
+                -{pricing.couponPercentApplied}% Cupón {appliedCoupon.code}
+              </span>
+            </div>
+            <div className="text-right">
+              <span className="block text-[10px] uppercase tracking-wider text-emerald-300 font-semibold">
+                {pricing.isFreeByDiscount ? 'Total bonificado' : 'Saldo restante a transferir'}
+              </span>
+              <span className="font-display text-lg sm:text-xl font-black text-emerald-300 font-mono">
+                {pricing.finalAmount}
+              </span>
+            </div>
+          </div>
+          {isResidentActive && (
+            <p className="text-[11px] text-amber-200 leading-snug border-t border-amber-500/25 pt-1.5">
+              Los descuentos no son acumulables: se aplica automáticamente el mayor (-
+              {pricing.couponPercentApplied}% del cupón sobre -{pricing.configuredPercent}% de
+              residente).
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    if (pricing.discountSource !== 'resident') return null;
     return (
       <div
         className={`rounded-xl bg-zinc-950 border border-emerald-500/45 ${
@@ -454,6 +514,10 @@ export default function RegistrationModal({
     setPaymentPlan('total');
     setInstForm(INITIAL_INSTALLMENT_FORM);
     setResidentCheckboxManual(false);
+    setCouponInput('');
+    setCouponLoading(false);
+    setCouponError('');
+    setAppliedCoupon(null);
     setConfirmedReg(null);
     setConfirmedInstallment(null);
     setSubmitError('');
@@ -547,6 +611,44 @@ export default function RegistrationModal({
     }
   };
 
+  const handleApplyCoupon = async () => {
+    const cleanCode = normalizeCouponCode(couponInput);
+    setCouponInput(cleanCode);
+    setCouponError('');
+
+    if (!cleanCode) {
+      setCouponError('Ingresá el código del cupón (ej. TEAMHALCONES10 o RAF-FREE-ABC123).');
+      return;
+    }
+
+    setCouponLoading(true);
+    try {
+      const res = await validateCouponCode(cleanCode);
+      if (!res?.valid || !res?.coupon) {
+        setAppliedCoupon(null);
+        setCouponError(res?.message || 'No se pudo validar el cupón.');
+        return;
+      }
+      setAppliedCoupon(res.coupon);
+      setCouponInput(res.coupon.code);
+      setCouponError('');
+      if (submitError.includes('comprobante')) {
+        setSubmitError('');
+      }
+    } catch (err) {
+      setAppliedCoupon(null);
+      setCouponError(err?.message || 'Error al validar el cupón en Firestore.');
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput('');
+    setCouponError('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError('');
@@ -568,7 +670,7 @@ export default function RegistrationModal({
       return;
     }
 
-    if (!receiptFile) {
+    if (!pricing.isFreeByDiscount && !receiptFile) {
       setSubmitError(
         'Adjuntá la foto, captura o PDF del comprobante de transferencia para completar tu inscripción.'
       );
@@ -584,17 +686,27 @@ export default function RegistrationModal({
 
     setSubmitting(true);
     try {
-      setSubmitStep('Optimizando y subiendo comprobante de pago de forma segura...');
-      const fileToUpload = await compressReceiptImage(receiptFile, {
-        maxDimension: 1200,
-        quality: 0.78,
-      });
-      const uploaded = await uploadImageToCloudinary(fileToUpload, {
-        folder: 'reto-al-filo/comprobantes',
-        resourceType: 'auto',
-      });
+      let uploaded = { secureUrl: '', publicId: '', format: '' };
+      if (!pricing.isFreeByDiscount) {
+        setSubmitStep('Optimizando y subiendo comprobante de pago de forma segura...');
+        const fileToUpload = await compressReceiptImage(receiptFile, {
+          maxDimension: 1200,
+          quality: 0.78,
+        });
+        uploaded = await uploadImageToCloudinary(fileToUpload, {
+          folder: 'reto-al-filo/comprobantes',
+          resourceType: 'auto',
+        });
+      }
 
-      setSubmitStep('Registrando tu ficha de corredor...');
+      const usesCoupon = pricing.discountSource === 'coupon' && Boolean(appliedCoupon?.code);
+      const isFreeByCoupon = pricing.isFreeByDiscount;
+
+      setSubmitStep(
+        usesCoupon
+          ? 'Validando cupón y registrando tu ficha de corredor...'
+          : 'Registrando tu ficha de corredor...'
+      );
       const created = await submitRunnerRegistration({
         ...form,
         birthDate: formatBirthDateDmy(form.birthDate),
@@ -602,14 +714,25 @@ export default function RegistrationModal({
         acceptedTerms: true,
         distance: selectedDistance,
         priceSnapshot: pricing.finalAmount,
-        isLocalResident: pricing.isLocalResident,
+        isLocalResident: pricing.discountSource === 'resident',
         discountPercentApplied: pricing.discountPercentApplied,
+        discountSource: pricing.discountSource,
+        couponCode: usesCoupon ? appliedCoupon.code : '',
+        couponDiscountPercent: usesCoupon ? pricing.couponPercentApplied : 0,
+        couponLabel: usesCoupon ? appliedCoupon.label || '' : '',
         originalPrice: pricing.originalPrice,
         finalAmount: pricing.finalAmount,
-        paymentPlan: effectivePaymentPlan,
-        installmentsTotal: effectivePaymentPlan === 'cuotas' ? maxInstallments : 1,
-        installmentAmount:
-          effectivePaymentPlan === 'cuotas' ? pricing.installmentAmount : pricing.finalAmount,
+        paymentPlan: isFreeByCoupon ? 'total' : effectivePaymentPlan,
+        installmentsTotal: isFreeByCoupon
+          ? 1
+          : effectivePaymentPlan === 'cuotas'
+            ? maxInstallments
+            : 1,
+        installmentAmount: isFreeByCoupon
+          ? '$0'
+          : effectivePaymentPlan === 'cuotas'
+            ? pricing.installmentAmount
+            : pricing.finalAmount,
         receiptUrl: uploaded.secureUrl,
         receiptPublicId: uploaded.publicId,
         receiptFormat: uploaded.format || '',
@@ -652,7 +775,11 @@ export default function RegistrationModal({
           confirmedReg.paymentPlan === 'cuotas'
             ? ` · Pago en ${confirmedReg.installmentsTotal || 3} Cuotas - Cuota 1/${confirmedReg.installmentsTotal || 3}: ${confirmedReg.installmentAmount}`
             : ''
-        }). Ya adjunté el comprobante en la web.`
+        }). ${
+          !confirmedReg.receiptUrl && confirmedReg.couponCode
+            ? `Con cupón *${confirmedReg.couponCode}* (${confirmedReg.discountPercentApplied}% OFF · Sin comprobante).`
+            : 'Ya adjunté el comprobante en la web.'
+        }`
       )}`
     : buildWhatsAppUrl(selectedDistance, raceConfig.whatsappNumber, raceConfig);
 
@@ -842,7 +969,9 @@ export default function RegistrationModal({
               <div className="rounded-2xl bg-zinc-950 border border-[#3E5C23] p-5 text-center">
                 <CheckCircle2 className="w-12 h-12 text-[#3E5C23] mx-auto" />
                 <p className="mt-2 text-xs font-bold uppercase tracking-widest text-[#3E5C23]">
-                  Ficha y Comprobante Recibidos
+                  {!confirmedReg.receiptUrl && confirmedReg.discountPercentApplied >= 100
+                    ? 'Ficha Recibida · Pase Bonificado 100%'
+                    : 'Ficha y Comprobante Recibidos'}
                 </p>
                 <div className="mt-2 inline-block rounded-xl bg-zinc-950 border border-[#3E5C23] px-4 py-2">
                   <span className="block text-[10px] uppercase tracking-wider text-stone-400">
@@ -885,13 +1014,22 @@ export default function RegistrationModal({
                       }`}
                     >
                       {confirmedReg.distance}{' '}
-                      {confirmedReg.isLocalResident && confirmedReg.originalPrice && (
+                      {(confirmedReg.isLocalResident || confirmedReg.discountSource === 'coupon') &&
+                        confirmedReg.originalPrice &&
+                        confirmedReg.originalPrice !== confirmedReg.finalAmount && (
                         <span className="text-stone-500 line-through font-normal text-xs mr-1">
                           {confirmedReg.originalPrice}
                         </span>
                       )}
                       ({confirmedReg.finalAmount || confirmedReg.priceSnapshot})
                     </span>
+                    {confirmedReg.discountSource === 'coupon' && confirmedReg.couponCode && (
+                      <div className="mt-1 flex flex-col items-end gap-0.5">
+                        <span className="inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-zinc-950 border border-amber-400/70 text-amber-300">
+                          Cupón {confirmedReg.couponCode} (-{confirmedReg.discountPercentApplied || 0}%)
+                        </span>
+                      </div>
+                    )}
                     {confirmedReg.isLocalResident && (
                       <div className="mt-1 flex flex-col items-end gap-0.5">
                         <span className="inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-zinc-950 border border-[#3E5C23] text-[#3E5C23]">
@@ -926,17 +1064,23 @@ export default function RegistrationModal({
                 </div>
                 <div className="flex justify-between items-center gap-3 pt-1">
                   <span className="text-stone-400">Comprobante adjunto</span>
-                  <a
-                    href={getOptimizedReceiptUrl(confirmedReg.receiptUrl, {
-                      format: confirmedReg.receiptFormat,
-                    })}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-bold text-sky-400 hover:text-sky-300 underline"
-                  >
-                    Ver comprobante subido
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </a>
+                  {confirmedReg.receiptUrl ? (
+                    <a
+                      href={getOptimizedReceiptUrl(confirmedReg.receiptUrl, {
+                        format: confirmedReg.receiptFormat,
+                      })}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-bold text-sky-400 hover:text-sky-300 underline"
+                    >
+                      Ver comprobante subido
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </a>
+                  ) : (
+                    <span className="text-xs font-bold text-emerald-400">
+                      Bonificado 100% (Sin comprobante)
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -1345,7 +1489,9 @@ export default function RegistrationModal({
                     const itemPricing = computeRegistrationPricing(
                       item.price,
                       raceConfig,
-                      isResidentActive
+                      isResidentActive,
+                      null,
+                      couponPercentValue
                     );
                     const cardClass = active
                       ? is13K
@@ -1378,7 +1524,7 @@ export default function RegistrationModal({
                             >
                               {item.title}
                             </span>
-                            {itemPricing.isLocalResident ? (
+                            {itemPricing.hasDiscount ? (
                               <span
                                 className={`inline-flex items-center gap-1.5 text-xs font-extrabold px-2 py-0.5 rounded-md ${priceBadgeClass}`}
                               >
@@ -1424,227 +1570,356 @@ export default function RegistrationModal({
                 )}
               </section>
 
-              {/* 2. Datos Bancarios para Transferir */}
+              {/* 2. Datos Bancarios para Transferir + Cupón de Descuento */}
               <section className="rounded-2xl bg-zinc-950 border border-orange-500/40 p-4 space-y-3">
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-2">
                     <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
                     <span className="text-xs font-bold uppercase tracking-wider text-white">
                       2 · Modalidad de Pago y Transferencia (
-                      {effectivePaymentPlan === 'cuotas'
-                        ? `Cuota 1/${maxInstallments}: ${pricing.installmentAmount}`
-                        : pricing.isLocalResident
-                          ? pricing.finalAmount
-                          : activeDistanceInfo.price}
+                      {pricing.isFreeByDiscount
+                        ? 'Bonificado 100% · $0'
+                        : effectivePaymentPlan === 'cuotas'
+                          ? `Cuota 1/${maxInstallments}: ${pricing.installmentAmount}`
+                          : pricing.hasDiscount
+                            ? pricing.finalAmount
+                            : activeDistanceInfo.price}
                       )
                     </span>
                   </div>
-                  {pricing.isLocalResident && (
-                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-zinc-950 border border-emerald-500/50 text-emerald-400">
-                      -{pricing.discountPercentApplied}% Residente
+                  {pricing.discountSource === 'coupon' && appliedCoupon ? (
+                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-zinc-950 border border-amber-400/60 text-amber-300">
+                      -{pricing.couponPercentApplied}% Cupón {appliedCoupon.code}
                     </span>
+                  ) : (
+                    pricing.isLocalResident && (
+                      <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-zinc-950 border border-emerald-500/50 text-emerald-400">
+                        -{pricing.discountPercentApplied}% Residente
+                      </span>
+                    )
                   )}
                 </div>
 
-                {/* Aviso de fechas límite para pagar en cuotas */}
-                <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-3 text-[11px] text-stone-300 space-y-1 shadow-none">
-                  <span className="block font-display font-bold uppercase tracking-wider text-amber-400">
-                    Condiciones de Financiación por Fecha
-                  </span>
-                  <ul className="space-y-0.5 text-stone-200 leading-snug">
-                    <li>
-                      • <strong className="text-white">Hasta el 31 de enero:</strong> se puede
-                      abonar hasta en <strong className="text-amber-300">3 cuotas</strong>.
-                    </li>
-                    <li>
-                      • <strong className="text-white">Del 1 al 27 de febrero:</strong> se puede
-                      abonar hasta en <strong className="text-amber-300">2 cuotas</strong>.
-                    </li>
-                    <li>
-                      • <strong className="text-white">Después del 27 de febrero:</strong>{' '}
-                      únicamente en <strong className="text-amber-300">1 solo pago</strong>.
-                    </li>
-                  </ul>
+                {/* Bloque de Cupón de Descuento */}
+                <div className="rounded-xl bg-stone-950/90 border border-amber-500/35 p-3 space-y-2">
+                  <label
+                    htmlFor="reg-coupon-input"
+                    className="flex items-center gap-1.5 text-xs font-semibold text-amber-300"
+                  >
+                    <Ticket className="w-3.5 h-3.5 shrink-0" />
+                    <span>¿Tenés un cupón de descuento?</span>
+                  </label>
+                  <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
+                    <input
+                      id="reg-coupon-input"
+                      type="text"
+                      value={couponInput}
+                      disabled={Boolean(appliedCoupon) || couponLoading}
+                      onChange={(e) => {
+                        setCouponInput(e.target.value.toUpperCase());
+                        if (couponError) setCouponError('');
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (!appliedCoupon) handleApplyCoupon();
+                        }
+                      }}
+                      placeholder="Ej. TEAMHALCONES10 o RAF-FREE-ABC123"
+                      className="flex-1 min-w-[160px] rounded-xl bg-zinc-950 border border-orange-500/45 focus:border-amber-400 focus:outline-none px-3 py-2 text-xs sm:text-sm font-mono uppercase tracking-wider text-white disabled:opacity-70"
+                    />
+                    {appliedCoupon ? (
+                      <button
+                        type="button"
+                        onClick={handleRemoveCoupon}
+                        className="rounded-xl bg-zinc-950 border border-red-500/70 hover:border-red-400 text-red-400 text-xs font-bold uppercase tracking-wider px-4 py-2 cursor-pointer transition-colors shrink-0"
+                      >
+                        Quitar
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleApplyCoupon}
+                        disabled={couponLoading}
+                        className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2 cursor-pointer transition-colors shrink-0 disabled:opacity-50"
+                      >
+                        {couponLoading ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            <span>Validando...</span>
+                          </>
+                        ) : (
+                          <span>Aplicar</span>
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  {couponError && (
+                    <p role="alert" className="text-[11px] text-red-400 flex items-center gap-1.5">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      <span>{couponError}</span>
+                    </p>
+                  )}
+
+                  {appliedCoupon && (
+                    <div className="space-y-1">
+                      <p className="text-[11px] text-emerald-400 flex flex-wrap items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                        <span>
+                          Cupón <strong className="font-mono">{appliedCoupon.code}</strong>{' '}
+                          disponible: <strong>{appliedCoupon.discountPercent}% OFF</strong>
+                          {appliedCoupon.label ? ` (${appliedCoupon.label})` : ''}
+                          {appliedCoupon.maxUsos > 1
+                            ? ` · Quedan ${
+                                appliedCoupon.remainingUses ??
+                                Math.max(0, appliedCoupon.maxUsos - (appliedCoupon.usosActuales || 0))
+                              } de ${appliedCoupon.maxUsos} usos`
+                            : ''}
+                          .
+                        </span>
+                      </p>
+                      {isResidentActive && pricing.discountSource === 'resident' && (
+                        <p className="text-[11px] text-amber-300 leading-snug">
+                          Los descuentos no son acumulables: prevalece tu beneficio de Residente (-
+                          {pricing.configuredPercent}%) por ser igual o mayor que el cupón (-
+                          {appliedCoupon.discountPercent}%). El cupón no se consumirá.
+                        </p>
+                      )}
+                      {isResidentActive && pricing.discountSource === 'coupon' && (
+                        <p className="text-[11px] text-amber-200 leading-snug">
+                          Los descuentos no son acumulables: prevalece el cupón (-
+                          {appliedCoupon.discountPercent}%) por ser mayor al beneficio de Residente
+                          (-{pricing.configuredPercent}%).
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                {/* Selector: Pago Total vs Cuotas habilitadas según fecha */}
-                {maxInstallments > 1 ? (
+                {pricing.isFreeByDiscount ? (
+                  <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/50 p-3.5 space-y-1.5">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className="inline-flex items-center gap-1.5 font-display text-xs sm:text-sm font-black uppercase text-emerald-300">
+                        <Sparkles className="w-4 h-4 shrink-0" />
+                        ¡Pase Libre 100% Bonificado!
+                      </span>
+                      <div className="flex items-center gap-2 font-mono">
+                        <span className="text-xs text-stone-400 line-through">
+                          {pricing.originalPrice}
+                        </span>
+                        <span className="text-lg font-black text-emerald-300">$0</span>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-stone-200 leading-snug">
+                      El total a abonar es <strong className="text-white">$0</strong>. No necesitás
+                      realizar transferencia ni adjuntar comprobante de pago. Al confirmar la
+                      inscripción se registrará el uso del cupón automáticamente.
+                    </p>
+                  </div>
+                ) : (
                   <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      <button
-                        type="button"
-                        onClick={() => setPaymentPlan('total')}
-                        className={`text-left rounded-xl p-3 border shadow-none transition-colors cursor-pointer flex items-center justify-between gap-2 ${
-                          effectivePaymentPlan === 'total'
-                            ? 'bg-zinc-950 border-orange-500'
-                            : 'bg-zinc-950 border-orange-500/40 hover:border-orange-500'
-                        }`}
-                      >
-                        <div>
-                          <span
-                            className={`block font-display text-xs sm:text-sm font-bold uppercase ${
-                              effectivePaymentPlan === 'total' ? 'text-orange-400' : 'text-white'
-                            }`}
-                          >
-                            Pago Total (1 pago)
-                          </span>
-                          <span className="block text-[11px] text-stone-300 mt-0.5">
-                            Transferís hoy:{' '}
-                            <strong className="text-amber-300 font-mono">
-                              {pricing.finalAmount}
-                            </strong>
-                          </span>
-                        </div>
-                        <CheckCircle2
-                          className={`w-4 h-4 shrink-0 ${
-                            effectivePaymentPlan === 'total' ? 'text-orange-400' : 'text-stone-700'
-                          }`}
-                        />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setPaymentPlan('cuotas')}
-                        className={`text-left rounded-xl p-3 border shadow-none transition-colors cursor-pointer flex items-center justify-between gap-2 ${
-                          effectivePaymentPlan === 'cuotas'
-                            ? 'bg-zinc-950 border-orange-500'
-                            : 'bg-zinc-950 border-orange-500/40 hover:border-orange-500'
-                        }`}
-                      >
-                        <div>
-                          <span
-                            className={`flex items-center gap-1.5 font-display text-xs sm:text-sm font-bold uppercase ${
-                              effectivePaymentPlan === 'cuotas' ? 'text-orange-400' : 'text-white'
-                            }`}
-                          >
-                            <span>Pago en {maxInstallments} Cuotas</span>
-                          </span>
-                          <span className="block text-[11px] text-stone-300 mt-0.5">
-                            {maxInstallments} cuotas de{' '}
-                            <strong className="text-amber-300 font-mono">
-                              {pricing.installmentAmount}
-                            </strong>{' '}
-                            (Total {pricing.finalAmount})
-                          </span>
-                        </div>
-                        <CheckCircle2
-                          className={`w-4 h-4 shrink-0 ${
-                            effectivePaymentPlan === 'cuotas'
-                              ? 'text-orange-400'
-                              : 'text-stone-700'
-                          }`}
-                        />
-                      </button>
+                    {/* Aviso de fechas límite para pagar en cuotas */}
+                    <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-3 text-[11px] text-stone-300 space-y-1 shadow-none">
+                      <span className="block font-display font-bold uppercase tracking-wider text-amber-400">
+                        Condiciones de Financiación por Fecha
+                      </span>
+                      <ul className="space-y-0.5 text-stone-200 leading-snug">
+                        <li>
+                          • <strong className="text-white">Hasta el 31 de enero:</strong> se puede
+                          abonar hasta en <strong className="text-amber-300">3 cuotas</strong>.
+                        </li>
+                        <li>
+                          • <strong className="text-white">Del 1 al 27 de febrero:</strong> se puede
+                          abonar hasta en <strong className="text-amber-300">2 cuotas</strong>.
+                        </li>
+                        <li>
+                          • <strong className="text-white">Después del 27 de febrero:</strong>{' '}
+                          únicamente en <strong className="text-amber-300">1 solo pago</strong>.
+                        </li>
+                      </ul>
                     </div>
 
-                    {effectivePaymentPlan === 'cuotas' && (
-                      <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-3 text-xs text-stone-200 space-y-1 shadow-none">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="font-semibold text-amber-400 uppercase text-[11px]">
-                            Monto a transferir hoy (Cuota 1 de {maxInstallments})
+                    {/* Selector: Pago Total vs Cuotas habilitadas según fecha */}
+                    {maxInstallments > 1 ? (
+                      <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => setPaymentPlan('total')}
+                            className={`text-left rounded-xl p-3 border shadow-none transition-colors cursor-pointer flex items-center justify-between gap-2 ${
+                              effectivePaymentPlan === 'total'
+                                ? 'bg-zinc-950 border-orange-500'
+                                : 'bg-zinc-950 border-orange-500/40 hover:border-orange-500'
+                            }`}
+                          >
+                            <div>
+                              <span
+                                className={`block font-display text-xs sm:text-sm font-bold uppercase ${
+                                  effectivePaymentPlan === 'total' ? 'text-orange-400' : 'text-white'
+                                }`}
+                              >
+                                Pago Total (1 pago)
+                              </span>
+                              <span className="block text-[11px] text-stone-300 mt-0.5">
+                                Transferís hoy:{' '}
+                                <strong className="text-amber-300 font-mono">
+                                  {pricing.finalAmount}
+                                </strong>
+                              </span>
+                            </div>
+                            <CheckCircle2
+                              className={`w-4 h-4 shrink-0 ${
+                                effectivePaymentPlan === 'total' ? 'text-orange-400' : 'text-stone-700'
+                              }`}
+                            />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setPaymentPlan('cuotas')}
+                            className={`text-left rounded-xl p-3 border shadow-none transition-colors cursor-pointer flex items-center justify-between gap-2 ${
+                              effectivePaymentPlan === 'cuotas'
+                                ? 'bg-zinc-950 border-orange-500'
+                                : 'bg-zinc-950 border-orange-500/40 hover:border-orange-500'
+                            }`}
+                          >
+                            <div>
+                              <span
+                                className={`flex items-center gap-1.5 font-display text-xs sm:text-sm font-bold uppercase ${
+                                  effectivePaymentPlan === 'cuotas' ? 'text-orange-400' : 'text-white'
+                                }`}
+                              >
+                                <span>Pago en {maxInstallments} Cuotas</span>
+                              </span>
+                              <span className="block text-[11px] text-stone-300 mt-0.5">
+                                {maxInstallments} cuotas de{' '}
+                                <strong className="text-amber-300 font-mono">
+                                  {pricing.installmentAmount}
+                                </strong>{' '}
+                                (Total {pricing.finalAmount})
+                              </span>
+                            </div>
+                            <CheckCircle2
+                              className={`w-4 h-4 shrink-0 ${
+                                effectivePaymentPlan === 'cuotas'
+                                  ? 'text-orange-400'
+                                  : 'text-stone-700'
+                              }`}
+                            />
+                          </button>
+                        </div>
+
+                        {effectivePaymentPlan === 'cuotas' && (
+                          <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-3 text-xs text-stone-200 space-y-1 shadow-none">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-semibold text-amber-400 uppercase text-[11px]">
+                                Monto a transferir hoy (Cuota 1 de {maxInstallments})
+                              </span>
+                              <span className="font-display text-base sm:text-lg font-black text-amber-300 font-mono">
+                                {pricing.installmentAmount}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-stone-400 leading-snug">
+                              Subí hoy el comprobante de la{' '}
+                              <strong className="text-white">Cuota 1/{maxInstallments}</strong>. Tiempo
+                              después podrás cargar{' '}
+                              <strong className="text-white">
+                                {maxInstallments === 3 ? 'las Cuotas 2 y 3' : 'la Cuota 2/2'}
+                              </strong>{' '}
+                              desde la pestaña{' '}
+                              <strong className="text-amber-300">
+                                &ldquo;Ya me inscribí · Subir Cuota 2 o 3&rdquo;
+                              </strong>
+                              .
+                            </p>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="rounded-xl bg-zinc-950 border border-orange-500 p-3 flex items-center justify-between gap-2 shadow-none">
+                        <div>
+                          <span className="block font-display text-xs sm:text-sm font-bold text-orange-400 uppercase">
+                            Pago Total (1 único pago)
                           </span>
-                          <span className="font-display text-base sm:text-lg font-black text-amber-300 font-mono">
-                            {pricing.installmentAmount}
+                          <span className="block text-[11px] text-stone-300 mt-0.5">
+                            Monto total a transferir:{' '}
+                            <strong className="text-amber-300 font-mono">{pricing.finalAmount}</strong>
                           </span>
                         </div>
-                        <p className="text-[11px] text-stone-400 leading-snug">
-                          Subí hoy el comprobante de la{' '}
-                          <strong className="text-white">Cuota 1/{maxInstallments}</strong>. Tiempo
-                          después podrás cargar{' '}
-                          <strong className="text-white">
-                            {maxInstallments === 3 ? 'las Cuotas 2 y 3' : 'la Cuota 2/2'}
-                          </strong>{' '}
-                          desde la pestaña{' '}
-                          <strong className="text-amber-300">
-                            &ldquo;Ya me inscribí · Subir Cuota 2 o 3&rdquo;
-                          </strong>
-                          .
-                        </p>
+                        <CheckCircle2 className="w-4 h-4 text-orange-400 shrink-0" />
                       </div>
                     )}
+
+                    {renderResidentDiscountSummary(false)}
+
+                    <p className="text-xs text-stone-300 leading-relaxed">
+                      {payment.instructions}
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                      <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-2.5 flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <span className="block text-[10px] uppercase text-stone-400">
+                            Alias
+                          </span>
+                          <span className="font-mono font-bold text-amber-300 truncate block">
+                            {payment.bankAlias}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyText('alias', payment.bankAlias)}
+                          className="inline-flex items-center gap-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 px-2.5 py-1.5 text-[11px] font-semibold cursor-pointer shrink-0"
+                        >
+                          {copiedField === 'alias' ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>¡Copiado!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5" />
+                              <span>Copiar Alias</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-2.5 flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <span className="block text-[10px] uppercase text-stone-400">
+                            CBU / CVU
+                          </span>
+                          <span className="font-mono font-bold text-stone-100 truncate block">
+                            {payment.bankCbu}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyText('cbu', payment.bankCbu)}
+                          className="inline-flex items-center gap-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 px-2.5 py-1.5 text-[11px] font-semibold cursor-pointer shrink-0"
+                        >
+                          {copiedField === 'cbu' ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>¡Copiado!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5" />
+                              <span>Copiar CBU</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <p className="text-[11px] text-stone-400">
+                      Titular: <strong className="text-stone-200">{payment.bankHolder}</strong>
+                    </p>
                   </>
-                ) : (
-                  <div className="rounded-xl bg-zinc-950 border border-orange-500 p-3 flex items-center justify-between gap-2 shadow-none">
-                    <div>
-                      <span className="block font-display text-xs sm:text-sm font-bold text-orange-400 uppercase">
-                        Pago Total (1 único pago)
-                      </span>
-                      <span className="block text-[11px] text-stone-300 mt-0.5">
-                        Monto total a transferir:{' '}
-                        <strong className="text-amber-300 font-mono">{pricing.finalAmount}</strong>
-                      </span>
-                    </div>
-                    <CheckCircle2 className="w-4 h-4 text-orange-400 shrink-0" />
-                  </div>
                 )}
-
-                {renderResidentDiscountSummary(false)}
-
-                <p className="text-xs text-stone-300 leading-relaxed">
-                  {payment.instructions}
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                  <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-2.5 flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <span className="block text-[10px] uppercase text-stone-400">
-                        Alias
-                      </span>
-                      <span className="font-mono font-bold text-amber-300 truncate block">
-                        {payment.bankAlias}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleCopyText('alias', payment.bankAlias)}
-                      className="inline-flex items-center gap-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 px-2.5 py-1.5 text-[11px] font-semibold cursor-pointer shrink-0"
-                    >
-                      {copiedField === 'alias' ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>¡Copiado!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" />
-                          <span>Copiar Alias</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  <div className="rounded-xl bg-zinc-950 border border-orange-500/40 p-2.5 flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <span className="block text-[10px] uppercase text-stone-400">
-                        CBU / CVU
-                      </span>
-                      <span className="font-mono font-bold text-stone-100 truncate block">
-                        {payment.bankCbu}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleCopyText('cbu', payment.bankCbu)}
-                      className="inline-flex items-center gap-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 px-2.5 py-1.5 text-[11px] font-semibold cursor-pointer shrink-0"
-                    >
-                      {copiedField === 'cbu' ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>¡Copiado!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" />
-                          <span>Copiar CBU</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <p className="text-[11px] text-stone-400">
-                  Titular: <strong className="text-stone-200">{payment.bankHolder}</strong>
-                </p>
               </section>
 
               {/* 3. Datos Personales del Corredor */}
@@ -2115,6 +2390,18 @@ export default function RegistrationModal({
               </section>
 
               {/* 4. Adjuntar Comprobante */}
+              {pricing.isFreeByDiscount ? (
+                <section className="rounded-2xl border border-emerald-500/45 bg-emerald-500/10 p-4 space-y-1.5">
+                  <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-300">
+                    <CheckCircle2 className="w-4 h-4 shrink-0" />
+                    4 · Comprobante de Pago (No requerido)
+                  </span>
+                  <p className="text-xs text-stone-200 leading-relaxed">
+                    Tu cupón <strong className="font-mono text-amber-300">{appliedCoupon?.code}</strong> cubre el{' '}
+                    <strong className="text-white">100% de la inscripción ($0)</strong>. Podés confirmar directamente sin subir comprobante.
+                  </p>
+                </section>
+              ) : (
               <section className="space-y-2.5">
                 <span className="block text-xs font-bold uppercase tracking-wider text-white">
                   4 · Adjuntar Comprobante de Pago{' '}
@@ -2169,6 +2456,7 @@ export default function RegistrationModal({
                   </div>
                 </div>
               </section>
+              )}
 
               {/* 5. Aceptación Legal de Reglamento y Deslinde */}
               <section className="rounded-2xl bg-zinc-950 border border-orange-500/50 p-4 space-y-3">
@@ -2363,7 +2651,7 @@ export default function RegistrationModal({
                 ) : (
                   <>
                     <CheckCircle2 className="w-4 h-4" />
-                    {pricing.isLocalResident
+                    {pricing.hasDiscount
                       ? `Confirmar Inscripción (${selectedDistance} · ${pricing.finalAmount})`
                       : `Confirmar Inscripción (${selectedDistance})`}
                   </>
