@@ -1030,7 +1030,7 @@ export default function AdminRegistrationsTab({
 
       {/* Controles de filtro y exportación */}
       <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3 space-y-2.5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap lg:flex-nowrap items-center justify-center gap-2 sm:gap-2.5">
           <select
             aria-label="Filtrar por distancia"
             value={regDistanceFilter}
@@ -1097,12 +1097,10 @@ export default function AdminRegistrationsTab({
                 ? `Exportar los ${filteredRegistrations.length} inscriptos del filtro activo`
                 : 'Exportar todos los inscriptos a Excel (.XLSX)'
             }
-            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-emerald-500/70 hover:border-emerald-400 text-emerald-400 shadow-none text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-emerald-500/70 hover:border-emerald-400 text-emerald-400 shadow-none text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0 tabular-nums"
           >
             <Download className="w-3.5 h-3.5 shrink-0" />
-            {filteredRegistrations.length !== registrationsCount
-              ? `Exportar Excel (${filteredRegistrations.length})`
-              : 'Exportar Excel (.XLSX)'}
+            <span>{`Exportar Excel (${filteredRegistrations.length})`}</span>
           </button>
 
           <button
