@@ -581,7 +581,7 @@ export default function AdminRegistrationsTab({
         type="button"
         onClick={() => handleToggleDuplicateFilter(filterValue)}
         aria-pressed={isActive}
-        className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
+        className={`inline-flex items-center justify-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] whitespace-nowrap shrink-0 tabular-nums transition-colors cursor-pointer ${
           isActive
             ? 'bg-stone-950 border-red-500 text-white font-medium'
             : 'bg-stone-950 border-orange-500/60 text-zinc-200 hover:border-orange-400 hover:text-white font-medium'
@@ -596,14 +596,14 @@ export default function AdminRegistrationsTab({
         <span className={hasDuplicates ? 'text-red-500 font-medium' : 'text-zinc-500'}>
           ({count})
         </span>
-        {isActive && (
-          <span
-            aria-hidden="true"
-            className="ml-0.5 text-[10px] leading-none text-red-500 font-medium"
-          >
-            ✕
-          </span>
-        )}
+        <span
+          aria-hidden="true"
+          className={`ml-0.5 text-[10px] leading-none text-red-500 font-medium ${
+            isActive ? 'visible' : 'invisible'
+          }`}
+        >
+          ✕
+        </span>
       </button>
     );
   };
@@ -1097,7 +1097,7 @@ export default function AdminRegistrationsTab({
                 ? `Exportar los ${filteredRegistrations.length} inscriptos del filtro activo`
                 : 'Exportar todos los inscriptos a Excel (.XLSX)'
             }
-            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-emerald-500/70 hover:border-emerald-400 text-emerald-400 shadow-none text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0 tabular-nums"
+            className="inline-flex items-center justify-center gap-1.5 min-w-[185px] rounded-xl bg-zinc-950 border border-emerald-500/70 hover:border-emerald-400 text-emerald-400 shadow-none text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0 tabular-nums"
           >
             <Download className="w-3.5 h-3.5 shrink-0" />
             <span>{`Exportar Excel (${filteredRegistrations.length})`}</span>
