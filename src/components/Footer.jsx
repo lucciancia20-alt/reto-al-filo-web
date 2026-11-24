@@ -8,7 +8,6 @@ import {
   expandOrdinalEdition,
   parseTargetDateParts,
 } from '../data/raceConfig';
-import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
 export default function Footer({
   raceConfig = RACE_CONFIG,
@@ -28,22 +27,21 @@ export default function Footer({
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <img
-            src={optimizeCloudinaryUrl('/logo-raf.png', 400)}
+            src="/logo-raf.png"
             alt={`Logo ${raceTitle}`}
-            loading="lazy"
             decoding="async"
-            className="w-14 h-14 sm:w-16 sm:h-16 object-contain drop-shadow-md shrink-0"
+            className="w-14 h-14 sm:w-16 sm:h-16 object-contain shrink-0"
           />
           <div>
             <p className="flex flex-wrap items-baseline gap-x-2 leading-none uppercase">
               <span className="hero-title-athletic text-base sm:text-lg leading-none tracking-[0.06em] [word-spacing:0.1em]">
-                <span className="text-[var(--theme-primary)]">{firstTitleWord}</span>
+                <span className="navbar-word-accent">{firstTitleWord}</span>
                 {restTitleWords && <span className="text-white"> {restTitleWords}</span>}
               </span>
               {expandedEdition && (
-                <span className="hero-subtitle-edition font-bold text-[18.5px] sm:text-[21px] leading-none -translate-y-[0.5px] tracking-[0.1em] [text-shadow:none]">
+                <span className="hero-subtitle-edition font-bold text-[18.5px] sm:text-[21px] leading-none -translate-y-[0.5px] tracking-[0.1em]">
                   <span className="text-white">- </span>
-                  <span className="text-[var(--theme-edition-text)]">{expandedEdition}</span>
+                  <span className="text-[var(--theme-footer-edition)]">{expandedEdition}</span>
                 </span>
               )}
             </p>

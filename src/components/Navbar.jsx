@@ -54,7 +54,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
           />
           <span className="inline-flex flex-col items-stretch leading-none gap-[3px] uppercase min-w-0 font-display-athletic">
             <span className="block whitespace-nowrap hero-title-athletic text-[12px] sm:text-[13.5px] leading-none">
-              <span className="text-[var(--theme-primary)]">{firstTitleWord}</span>
+              <span className="navbar-word-accent">{firstTitleWord}</span>
               {restTitleWords && <span className="text-white"> {restTitleWords}</span>}
             </span>
             {editionChars.length > 0 && (
@@ -72,10 +72,10 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
             {yearChars.length > 0 && (
               <span
                 aria-label={year}
-                className="w-full flex items-center justify-between text-[9.5px] sm:text-[10px] leading-none text-[var(--theme-sub)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)] select-none"
+                className="w-full flex items-center justify-between text-[9.5px] sm:text-[10px] leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)] select-none"
               >
                 {yearChars.map((ch, idx) => (
-                  <span key={idx} aria-hidden="true">
+                  <span key={idx} aria-hidden="true" className="navbar-year-digit">
                     {ch}
                   </span>
                 ))}
