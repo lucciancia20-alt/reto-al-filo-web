@@ -63,8 +63,6 @@ export async function sendRegistrationNotificationEmail({
       (isFreeCoupon ? 'Bonificado 100% (Sin comprobante)' : 'Pendiente de adjuntar'),
   };
 
-  console.log('Enviando email EmailJS...', templateParams);
-
   try {
     return await emailjs.send(
       EMAILJS_SERVICE_ID,

@@ -517,9 +517,11 @@ export default function AdminRegistrationsTab({
       if (sortConfig.field === 'status') {
         const rankMap =
           sortConfig.direction === 'asc'
-            ? { pendiente: 0, confirmado: 1, rechazado: 2 }
-            : { confirmado: 0, pendiente: 1, rechazado: 2 };
-        const diff = (rankMap[a.status] ?? 9) - (rankMap[b.status] ?? 9);
+            ? { pendiente: 0, parcial: 1, confirmado: 2, rechazado: 3 }
+            : { confirmado: 0, parcial: 1, pendiente: 2, rechazado: 3 };
+        const statusA = String(a.status || '').trim().toLowerCase();
+        const statusB = String(b.status || '').trim().toLowerCase();
+        const diff = (rankMap[statusA] ?? 9) - (rankMap[statusB] ?? 9);
         return diff !== 0 ? diff : compareNames(a, b);
       }
       if (sortConfig.field === 'bib') {

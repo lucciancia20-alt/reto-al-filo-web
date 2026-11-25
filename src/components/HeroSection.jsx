@@ -200,7 +200,12 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
 
   const teamsShowGroupCoupon = raceConfig?.teamsShowGroupCoupon !== false;
   const teamsShowFreePasses = raceConfig?.teamsShowFreePasses !== false;
-  const teamsBenefitEnabled = teamsShowGroupCoupon || teamsShowFreePasses;
+  const masterTeamsBenefitEnabled =
+    typeof raceConfig?.teamsBenefitEnabled === 'boolean'
+      ? raceConfig.teamsBenefitEnabled
+      : RACE_CONFIG.teamsBenefitEnabled;
+  const teamsBenefitEnabled =
+    masterTeamsBenefitEnabled && (teamsShowGroupCoupon || teamsShowFreePasses);
   const rawNotificationEmail = String(raceConfig?.notificationEmail ?? '').trim();
   const rawTeamsBenefitEmail = String(raceConfig?.teamsBenefitEmail ?? '').trim();
   const customTeamsBenefitEmail =

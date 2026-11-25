@@ -1095,7 +1095,7 @@ export default function AdminModal({
         'Valor',
         'Precio Base',
         'Monto Final',
-        'Beneficio Residente',
+        'Beneficio / Descuento',
         'Nombre y Apellido',
         'DNI',
         'Fecha de Nacimiento',
@@ -1126,6 +1126,16 @@ export default function AdminModal({
           parseArsPriceNumber(pricing.originalPrice) ||
           parseArsPriceNumber(draft?.circuits?.[distKey]?.price) ||
           finalAmountNum;
+        const benefitDescription =
+          pricing.discountSource === 'coupon'
+            ? pricing.discountPercentApplied >= 100
+              ? `Pase Libre 100% OFF (${pricing.couponCode || 'Sin código'})${pricing.couponLabel ? ` · ${pricing.couponLabel}` : ''}`
+              : `Cupón Grupal ${pricing.discountPercentApplied}% OFF (${pricing.couponCode || 'Sin código'})${pricing.couponLabel ? ` · ${pricing.couponLabel}` : ''}${r.isFree === true ? ' [FREE]' : ''}`
+            : r.isFree === true
+              ? 'FREE / Bonificado'
+              : pricing.isLocalResident
+                ? `${pricing.badgeText} - Verificar DNI`
+                : 'No';
         return [
           r.code || '',
           (r.status || '').toUpperCase(),
@@ -1134,11 +1144,7 @@ export default function AdminModal({
           finalAmountNum,
           basePriceNum,
           finalAmountNum,
-          r.isFree === true
-            ? 'FREE / Bonificado'
-            : pricing.isLocalResident
-              ? `${pricing.badgeText} - Verificar DNI`
-              : 'No',
+          benefitDescription,
           r.fullName || '',
           r.dni || '',
           r.birthDate || '',

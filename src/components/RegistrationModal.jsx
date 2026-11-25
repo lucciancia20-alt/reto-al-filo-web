@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   X,
   MessageCircle,
@@ -86,6 +86,24 @@ const UNDERAGE_ERROR_MSG =
   'La edad mínima para inscribirse es de 18 años cumplidos al día de la carrera.';
 const INVALID_BIRTHDATE_MSG =
   'Ingresá una Fecha de Nacimiento válida (desde 01/01/1926 y con al menos 18 años al día de la carrera).';
+const CONNECTION_SUBMIT_ERROR_MSG =
+  'No pudimos registrar tu inscripción por un problema de conexión. Por favor, volvé a intentar.';
+
+function normalizeDniSpacesAndDots(raw) {
+  return String(raw ?? '').replace(/\D/g, '').slice(0, 9);
+}
+
+function resolveFriendlySubmitError(err) {
+  const msg = String(err?.message || '').trim();
+  if (
+    !msg ||
+    err?.name === 'TypeError' ||
+    /failed to fetch|networkerror|load failed|network-request-failed|unavailable|offline/i.test(msg)
+  ) {
+    return CONNECTION_SUBMIT_ERROR_MSG;
+  }
+  return msg;
+}
 
 function getBirthDateValidationError(birthDateStr, raceDateIso, maxBirthDateIso) {
   const raw = String(birthDateStr || '').trim();
@@ -118,6 +136,8 @@ export default function RegistrationModal({
   const [modalTab, setModalTab] = useState(initialTab);
   const [selectedDistance, setSelectedDistance] = useState(initialDistance);
   const [paymentPlan, setPaymentPlan] = useState('total');
+  const uploadedReceiptCacheRef = useRef({ file: null, uploaded: null });
+  const uploadedInstCacheRef = useRef({ file: null, uploaded: null });
   const [form, setForm] = useState(INITIAL_FORM);
   const [receiptFile, setReceiptFile] = useState(null);
   const [receiptPreview, setReceiptPreview] = useState('');
@@ -510,6 +530,8 @@ export default function RegistrationModal({
   const handleResetAll = () => {
     handleClearReceipt();
     handleClearInstReceipt();
+    uploadedReceiptCacheRef.current = { file: null, uploaded: null };
+    uploadedInstCacheRef.current = { file: null, uploaded: null };
     setForm(INITIAL_FORM);
     setPaymentPlan('total');
     setInstForm(INITIAL_INSTALLMENT_FORM);
@@ -534,13 +556,20 @@ export default function RegistrationModal({
     e.preventDefault();
     setInstError('');
 
-    const cleanDni = String(instForm.dni || '').trim();
+    const cleanDni = normalizeDniSpacesAndDots(instForm.dni);
+    if (cleanDni !== instForm.dni) {
+      setInstForm((prev) => ({ ...prev, dni: cleanDni }));
+    }
     const cleanName = String(instForm.fullName || '').trim();
     const cleanCode = String(instForm.code || '').trim();
     const instNum = Number(instForm.installmentNumber) === 3 ? 3 : 2;
 
     if (!cleanDni) {
       setInstError('Ingresá el DNI con el que te inscribiste.');
+      return;
+    }
+    if (!/^\d{7,9}$/.test(cleanDni)) {
+      setInstError('Ingresá un número de DNI válido (entre 7 y 9 dígitos numéricos).');
       return;
     }
     if (!cleanName) {
@@ -561,20 +590,29 @@ export default function RegistrationModal({
         const lookup = await fetchPublicRunnerStatus(cleanCode);
         if (lookup?.invalidQuery) {
           throw new Error(
-            'El código RAF ingresado no tiene un formato válido (ejemplo: RAF-12345). Si no lo recordás, dejalo vacío.'
+            'El código RAF ingresado no tiene un formato válido (ejemplo: RAF-A1B2C3D4). Si no lo recordás, dejalo vacío.'
           );
         }
       }
 
-      setInstStep(`Optimizando y subiendo comprobante de Cuota ${instNum}/3...`);
-      const fileToUpload = await compressReceiptImage(instFile, {
-        maxDimension: 1200,
-        quality: 0.78,
-      });
-      const uploaded = await uploadImageToCloudinary(fileToUpload, {
-        folder: 'reto-al-filo/comprobantes',
-        resourceType: 'auto',
-      });
+      let uploaded = null;
+      if (
+        uploadedInstCacheRef.current.file === instFile &&
+        uploadedInstCacheRef.current.uploaded?.secureUrl
+      ) {
+        uploaded = uploadedInstCacheRef.current.uploaded;
+      } else {
+        setInstStep(`Optimizando y subiendo comprobante de Cuota ${instNum}/3...`);
+        const fileToUpload = await compressReceiptImage(instFile, {
+          maxDimension: 1200,
+          quality: 0.78,
+        });
+        uploaded = await uploadImageToCloudinary(fileToUpload, {
+          folder: 'reto-al-filo/comprobantes',
+          resourceType: 'auto',
+        });
+        uploadedInstCacheRef.current = { file: instFile, uploaded };
+      }
 
       setInstStep('Asociando comprobante a tu inscripción...');
       const saved = await submitInstallmentReceipt({
@@ -586,6 +624,9 @@ export default function RegistrationModal({
         receiptPublicId: uploaded.publicId,
         receiptFormat: uploaded.format || '',
       });
+      if (saved?.persistedTo !== 'firestore') {
+        throw new Error(CONNECTION_SUBMIT_ERROR_MSG);
+      }
 
       void (async () => {
         try {
@@ -602,9 +643,7 @@ export default function RegistrationModal({
 
       setConfirmedInstallment(saved);
     } catch (err) {
-      setInstError(
-        err?.message || 'No se pudo cargar el comprobante de la cuota. Intentá nuevamente.'
-      );
+      setInstError(resolveFriendlySubmitError(err));
     } finally {
       setInstSubmitting(false);
       setInstStep('');
@@ -653,6 +692,15 @@ export default function RegistrationModal({
     e.preventDefault();
     setSubmitError('');
 
+    const cleanDni = normalizeDniSpacesAndDots(form.dni);
+    if (cleanDni !== form.dni) {
+      handleFieldChange('dni', cleanDni);
+    }
+    if (!/^\d{7,9}$/.test(cleanDni)) {
+      setSubmitError('Ingresá un número de DNI válido (entre 7 y 9 dígitos numéricos).');
+      return;
+    }
+
     const birthValidationError = getBirthDateValidationError(
       form.birthDate,
       raceDateIso,
@@ -688,15 +736,23 @@ export default function RegistrationModal({
     try {
       let uploaded = { secureUrl: '', publicId: '', format: '' };
       if (!pricing.isFreeByDiscount) {
-        setSubmitStep('Optimizando y subiendo comprobante de pago de forma segura...');
-        const fileToUpload = await compressReceiptImage(receiptFile, {
-          maxDimension: 1200,
-          quality: 0.78,
-        });
-        uploaded = await uploadImageToCloudinary(fileToUpload, {
-          folder: 'reto-al-filo/comprobantes',
-          resourceType: 'auto',
-        });
+        if (
+          uploadedReceiptCacheRef.current.file === receiptFile &&
+          uploadedReceiptCacheRef.current.uploaded?.secureUrl
+        ) {
+          uploaded = uploadedReceiptCacheRef.current.uploaded;
+        } else {
+          setSubmitStep('Optimizando y subiendo comprobante de pago de forma segura...');
+          const fileToUpload = await compressReceiptImage(receiptFile, {
+            maxDimension: 1200,
+            quality: 0.78,
+          });
+          uploaded = await uploadImageToCloudinary(fileToUpload, {
+            folder: 'reto-al-filo/comprobantes',
+            resourceType: 'auto',
+          });
+          uploadedReceiptCacheRef.current = { file: receiptFile, uploaded };
+        }
       }
 
       const usesCoupon = pricing.discountSource === 'coupon' && Boolean(appliedCoupon?.code);
@@ -709,6 +765,7 @@ export default function RegistrationModal({
       );
       const created = await submitRunnerRegistration({
         ...form,
+        dni: cleanDni,
         birthDate: formatBirthDateDmy(form.birthDate),
         targetDateIso: raceDateIso,
         acceptedTerms: true,
@@ -737,6 +794,9 @@ export default function RegistrationModal({
         receiptPublicId: uploaded.publicId,
         receiptFormat: uploaded.format || '',
       });
+      if (created?.persistedTo !== 'firestore') {
+        throw new Error(CONNECTION_SUBMIT_ERROR_MSG);
+      }
 
       void (async () => {
         try {
@@ -756,9 +816,7 @@ export default function RegistrationModal({
       })();
       setConfirmedReg(created);
     } catch (err) {
-      setSubmitError(
-        err?.message || 'No se pudo completar la inscripción. Intentá nuevamente.'
-      );
+      setSubmitError(resolveFriendlySubmitError(err));
     } finally {
       setSubmitting(false);
       setSubmitStep('');
@@ -1317,11 +1375,25 @@ export default function RegistrationModal({
                       id="inst-dni"
                       type="text"
                       inputMode="numeric"
+                      maxLength={9}
                       required
                       value={instForm.dni}
                       onChange={(e) =>
-                        setInstForm((prev) => ({ ...prev, dni: e.target.value }))
+                        setInstForm((prev) => ({
+                          ...prev,
+                          dni: e.target.value.replace(/\D/g, '').slice(0, 9),
+                        }))
                       }
+                      onPaste={(e) => {
+                        const pasted = e.clipboardData?.getData('text');
+                        if (typeof pasted === 'string') {
+                          e.preventDefault();
+                          setInstForm((prev) => ({
+                            ...prev,
+                            dni: pasted.replace(/\D/g, '').slice(0, 9),
+                          }));
+                        }
+                      }}
                       placeholder="Ej. 34567890"
                       className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
                     />
@@ -1964,10 +2036,26 @@ export default function RegistrationModal({
                       name="dni"
                       type="text"
                       inputMode="numeric"
+                      maxLength={9}
                       required
                       autoComplete="on"
                       value={form.dni}
-                      onChange={(e) => handleFieldChange('dni', e.target.value)}
+                      onChange={(e) => {
+                        handleFieldChange('dni', e.target.value.replace(/\D/g, '').slice(0, 9));
+                        if (submitError.includes('DNI')) {
+                          setSubmitError('');
+                        }
+                      }}
+                      onPaste={(e) => {
+                        const pasted = e.clipboardData?.getData('text');
+                        if (typeof pasted === 'string') {
+                          e.preventDefault();
+                          handleFieldChange('dni', pasted.replace(/\D/g, '').slice(0, 9));
+                          if (submitError.includes('DNI')) {
+                            setSubmitError('');
+                          }
+                        }
+                      }}
                       placeholder="Ej. 34567890"
                       className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
                     />

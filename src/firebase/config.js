@@ -635,9 +635,26 @@ export async function fetchRegistrationStats() {
   }
 }
 
+const REGISTRATION_CODE_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
 function generateRegistrationCode() {
-  const randomDigits = Math.floor(10000 + Math.random() * 90000);
-  return `RAF-${randomDigits}`;
+  const length = 8;
+  let suffix = '';
+  if (typeof globalThis !== 'undefined' && globalThis.crypto?.getRandomValues) {
+    const bytes = new Uint8Array(length);
+    globalThis.crypto.getRandomValues(bytes);
+    for (let i = 0; i < length; i += 1) {
+      suffix += REGISTRATION_CODE_ALPHABET[bytes[i] % REGISTRATION_CODE_ALPHABET.length];
+    }
+  } else {
+    for (let i = 0; i < length; i += 1) {
+      suffix +=
+        REGISTRATION_CODE_ALPHABET[
+          Math.floor(Math.random() * REGISTRATION_CODE_ALPHABET.length)
+        ];
+    }
+  }
+  return `RAF-${suffix}`;
 }
 
 export const COUPON_CODE_REGEX = /^[A-Z0-9][A-Z0-9-]{2,29}$/;
@@ -703,6 +720,11 @@ export async function submitRunnerRegistration(payload) {
     }
   }
 
+  const cleanDni = String(payload.dni || '').replace(/[.\s]+/g, '').trim();
+  if (!/^\d{7,9}$/.test(cleanDni)) {
+    throw new Error('Ingresá un número de DNI válido (entre 7 y 9 dígitos numéricos).');
+  }
+
   const normalizedGender = normalizeRunnerGender(payload.gender);
   if (!normalizedGender) {
     throw new Error('Seleccioná un género válido (Masculino o Femenino).');
@@ -753,7 +775,7 @@ export async function submitRunnerRegistration(payload) {
           payload.installmentAmount || payload.finalAmount || payload.priceSnapshot || ''
         ).trim(),
     fullName: String(payload.fullName).trim(),
-    dni: String(payload.dni).trim(),
+    dni: cleanDni,
     birthDate: String(payload.birthDate).trim(),
     gender: normalizedGender,
     phone: String(payload.phone).trim(),
@@ -775,88 +797,98 @@ export async function submitRunnerRegistration(payload) {
     updatedAt: now,
   };
 
-  let persistedId = `local-${now}`;
-  let persistedTo = 'local-only';
-  let errorCode = '';
+  const CONNECTION_ERROR_MSG =
+    'No pudimos registrar tu inscripción por un problema de conexión. Por favor, volvé a intentar.';
+
+  if (!isFirebaseConfigured()) {
+    throw new Error(CONNECTION_ERROR_MSG);
+  }
+
+  const bundle = await getFirestoreDb();
+  if (!bundle) {
+    throw new Error(CONNECTION_ERROR_MSG);
+  }
+
+  let persistedId = '';
+  const { db, firestore } = bundle;
 
   if (usesCoupon) {
-    if (!isFirebaseConfigured()) {
-      throw new Error('Firebase no está configurado para validar y consumir cupones.');
-    }
-    const bundle = await getFirestoreDb();
-    if (!bundle) {
-      throw new Error('No se pudo conectar con Firestore para validar el cupón.');
-    }
-    const { db, firestore } = bundle;
     const { collection, doc, runTransaction } = firestore;
+    const makeCouponError = (message) => {
+      const err = new Error(message);
+      err.isCouponValidationError = true;
+      return err;
+    };
 
-    persistedId = await runTransaction(db, async (tx) => {
-      const couponRef = doc(db, 'coupons', couponCode);
-      const couponSnap = await tx.get(couponRef);
-      if (!couponSnap.exists()) {
-        throw new Error(
-          'El cupón ingresado no existe o fue eliminado. Quitá el cupón o ingresá otro.'
-        );
-      }
-      const couponData = couponSnap.data() || {};
-      const maxUses = Math.max(1, Math.round(Number(couponData.maxUsos ?? 1) || 1));
-      const legacyUsed = String(couponData.status || '').toLowerCase() === 'usado';
-      const rawCurrentUses = Number(couponData.usosActuales ?? (legacyUsed ? maxUses : 0));
-      const currentUses =
-        Number.isFinite(rawCurrentUses) && rawCurrentUses >= 0 ? Math.round(rawCurrentUses) : 0;
-
-      if (currentUses >= maxUses) {
-        throw new Error(
-          'Este cupón ya alcanzó el límite de usos disponibles (Agotado). Quitá el cupón o ingresá otro.'
-        );
-      }
-      const remotePercent = Math.round(
-        Number(couponData.descuento ?? couponData.discountPercent ?? 0)
-      );
-      if (remotePercent !== appliedPercent) {
-        throw new Error(
-          'El porcentaje del cupón cambió. Volvé a aplicarlo antes de confirmar.'
-        );
-      }
-
-      const regRef = doc(collection(db, 'registrations'));
-      const nextUses = currentUses + 1;
-      const nextStatus = nextUses >= maxUses ? 'agotado' : 'disponible';
-      const prevUsadosPor = Array.isArray(couponData.usadosPor) ? couponData.usadosPor : [];
-      const nextUsadosPor = [
-        ...prevUsadosPor,
-        {
-          nombre: record.fullName,
-          dni: record.dni,
-          registrationCode: record.code,
-          registrationId: regRef.id,
-          fecha: now,
-        },
-      ];
-
-      tx.set(regRef, record);
-      tx.update(couponRef, {
-        usosActuales: nextUses,
-        status: nextStatus,
-        usadosPor: nextUsadosPor,
-        lastUsedAt: now,
-      });
-      return regRef.id;
-    });
-    persistedTo = 'firestore';
-  } else if (isFirebaseConfigured()) {
     try {
-      const bundle = await getFirestoreDb();
-      if (bundle) {
-        const { db, firestore } = bundle;
-        const { collection, addDoc } = firestore;
-        const docRef = await addDoc(collection(db, 'registrations'), record);
-        persistedId = docRef.id;
-        persistedTo = 'firestore';
-      }
+      persistedId = await runTransaction(db, async (tx) => {
+        const couponRef = doc(db, 'coupons', couponCode);
+        const couponSnap = await tx.get(couponRef);
+        if (!couponSnap.exists()) {
+          throw makeCouponError(
+            'El cupón ingresado no existe o fue eliminado. Quitá el cupón o ingresá otro.'
+          );
+        }
+        const couponData = couponSnap.data() || {};
+        const maxUses = Math.max(1, Math.round(Number(couponData.maxUsos ?? 1) || 1));
+        const legacyUsed = String(couponData.status || '').toLowerCase() === 'usado';
+        const rawCurrentUses = Number(couponData.usosActuales ?? (legacyUsed ? maxUses : 0));
+        const currentUses =
+          Number.isFinite(rawCurrentUses) && rawCurrentUses >= 0 ? Math.round(rawCurrentUses) : 0;
+
+        if (currentUses >= maxUses) {
+          throw makeCouponError(
+            'Este cupón ya alcanzó el límite de usos disponibles (Agotado). Quitá el cupón o ingresá otro.'
+          );
+        }
+        const remotePercent = Math.round(
+          Number(couponData.descuento ?? couponData.discountPercent ?? 0)
+        );
+        if (remotePercent !== appliedPercent) {
+          throw makeCouponError(
+            'El porcentaje del cupón cambió. Volvé a aplicarlo antes de confirmar.'
+          );
+        }
+
+        const regRef = doc(collection(db, 'registrations'));
+        const nextUses = currentUses + 1;
+        const nextStatus = nextUses >= maxUses ? 'agotado' : 'disponible';
+        const prevUsadosPor = Array.isArray(couponData.usadosPor) ? couponData.usadosPor : [];
+        const nextUsadosPor = [
+          ...prevUsadosPor,
+          {
+            nombre: record.fullName,
+            dni: record.dni,
+            registrationCode: record.code,
+            registrationId: regRef.id,
+            fecha: now,
+          },
+        ];
+
+        tx.set(regRef, record);
+        tx.update(couponRef, {
+          usosActuales: nextUses,
+          status: nextStatus,
+          usadosPor: nextUsadosPor,
+          lastUsedAt: now,
+        });
+        return regRef.id;
+      });
     } catch (error) {
-      errorCode = error?.code || 'unknown';
-      console.warn('[Reto al Filo] Error guardando inscripción en Firestore:', errorCode);
+      if (error?.isCouponValidationError) {
+        throw error;
+      }
+      console.error('[Reto al Filo] Error en transacción de inscripción con cupón:', error?.code || error);
+      throw new Error(CONNECTION_ERROR_MSG);
+    }
+  } else {
+    try {
+      const { collection, addDoc } = firestore;
+      const docRef = await addDoc(collection(db, 'registrations'), record);
+      persistedId = docRef.id;
+    } catch (error) {
+      console.error('[Reto al Filo] Error guardando inscripción en Firestore:', error?.code || error);
+      throw new Error(CONNECTION_ERROR_MSG);
     }
   }
 
@@ -869,8 +901,8 @@ export async function submitRunnerRegistration(payload) {
 
   return {
     ...savedRecord,
-    persistedTo,
-    errorCode,
+    persistedTo: 'firestore',
+    errorCode: '',
   };
 }
 
@@ -908,8 +940,8 @@ function normalizeInstallmentCode(value) {
   const upper = String(value ?? '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
   if (!upper) return '';
   if (/^RAF-\d{4,}$/.test(upper) || /^RAF-[A-Z0-9]{8}$/.test(upper)) return upper;
-  if (/^RAF\d{4,}$/.test(upper)) return `RAF-${upper.slice(3)}`;
-  if (/^\d{5}$/.test(upper)) return `RAF-${upper}`;
+  if (/^RAF\d{4,}$/.test(upper) || /^RAF[A-Z0-9]{8}$/.test(upper)) return `RAF-${upper.slice(3)}`;
+  if (/^\d{5}$/.test(upper) || /^[A-Z0-9]{8}$/.test(upper)) return `RAF-${upper}`;
   return upper;
 }
 
@@ -982,13 +1014,16 @@ function attachInstallmentsToRegistrations(registrations = [], submissions = [])
  * Registra el comprobante de la Cuota 2 o Cuota 3 de un corredor ya inscripto.
  */
 export async function submitInstallmentReceipt(payload) {
-  const dni = String(payload?.dni || '').trim();
+  const dni = String(payload?.dni || '').replace(/[.\s]+/g, '').trim();
   const fullName = String(payload?.fullName || '').trim();
   const receiptUrl = String(payload?.receiptUrl || '').trim();
   const installmentNumber = Number(payload?.installmentNumber);
 
   if (!dni) {
     throw new Error('Ingresá el DNI con el que te inscribiste.');
+  }
+  if (!/^\d{7,9}$/.test(dni)) {
+    throw new Error('Ingresá un número de DNI válido (entre 7 y 9 dígitos numéricos).');
   }
   if (!fullName) {
     throw new Error('Ingresá tu Nombre y Apellido.');
@@ -998,6 +1033,18 @@ export async function submitInstallmentReceipt(payload) {
   }
   if (!receiptUrl) {
     throw new Error('Adjuntá el comprobante de transferencia de la cuota.');
+  }
+
+  const CONNECTION_ERROR_MSG =
+    'No pudimos registrar tu inscripción por un problema de conexión. Por favor, volvé a intentar.';
+
+  if (!isFirebaseConfigured()) {
+    throw new Error(CONNECTION_ERROR_MSG);
+  }
+
+  const bundle = await getFirestoreDb();
+  if (!bundle) {
+    throw new Error(CONNECTION_ERROR_MSG);
   }
 
   const cleanCode = normalizeInstallmentCode(payload?.code);
@@ -1013,24 +1060,15 @@ export async function submitInstallmentReceipt(payload) {
     createdAt: now,
   };
 
-  let persistedId = `local-inst-${now}`;
-  let persistedTo = 'local-only';
-  let errorCode = '';
-
-  if (isFirebaseConfigured()) {
-    try {
-      const bundle = await getFirestoreDb();
-      if (bundle) {
-        const { db, firestore } = bundle;
-        const { collection, addDoc } = firestore;
-        const docRef = await addDoc(collection(db, 'installmentSubmissions'), record);
-        persistedId = docRef.id;
-        persistedTo = 'firestore';
-      }
-    } catch (error) {
-      errorCode = error?.code || 'unknown';
-      console.warn('[Reto al Filo] Error guardando comprobante de cuota en Firestore:', errorCode);
-    }
+  let persistedId = '';
+  try {
+    const { db, firestore } = bundle;
+    const { collection, addDoc } = firestore;
+    const docRef = await addDoc(collection(db, 'installmentSubmissions'), record);
+    persistedId = docRef.id;
+  } catch (error) {
+    console.error('[Reto al Filo] Error guardando comprobante de cuota en Firestore:', error?.code || error);
+    throw new Error(CONNECTION_ERROR_MSG);
   }
 
   const savedRecord = { id: persistedId, ...record };
@@ -1039,8 +1077,8 @@ export async function submitInstallmentReceipt(payload) {
 
   return {
     ...savedRecord,
-    persistedTo,
-    errorCode,
+    persistedTo: 'firestore',
+    errorCode: '',
   };
 }
 
@@ -1422,11 +1460,11 @@ function buildLookupCandidates(rawQuery) {
   const upper = String(rawQuery || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
   if (!upper) return [];
 
-  // La consulta pública es solo por código RAF (el DNI ya no se usa como clave pública).
-  if (/^RAF-?\d{4,}$/.test(upper)) {
+  // La consulta pública es por código RAF (formato alfanumérico RAF-XXXXXXXX o legado RAF-12345).
+  if (/^RAF-?(\d{4,}|[A-Z0-9]{8})$/.test(upper)) {
     return [`code-RAF-${upper.replace(/^RAF-?/, '')}`];
   }
-  if (/^\d{4,}$/.test(upper)) {
+  if (/^(\d{4,}|[A-Z0-9]{8})$/.test(upper)) {
     return [`code-RAF-${upper}`];
   }
   return [];
