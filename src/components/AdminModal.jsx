@@ -1825,6 +1825,13 @@ export default function AdminModal({
                   couponsError={couponsError}
                   couponsGenerating={couponsGenerating}
                   couponBusyCode={couponBusyCode}
+                  teamsGroupDiscountPercent={
+                    draft?.teamsGroupDiscountPercent !== '' &&
+                    draft?.teamsGroupDiscountPercent !== null &&
+                    draft?.teamsGroupDiscountPercent !== undefined
+                      ? draft.teamsGroupDiscountPercent
+                      : (raceConfig?.teamsGroupDiscountPercent ?? 10)
+                  }
                   onGenerateBatch={handleGenerateCouponBatch}
                   onCreateGroupCoupon={handleCreateGroupCoupon}
                   onDeleteCoupon={handleDeleteCoupon}

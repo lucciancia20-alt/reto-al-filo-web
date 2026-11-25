@@ -4,7 +4,6 @@ import {
   RACE_CONFIG,
   DEFAULT_RESIDENT_DISCOUNT_PERCENT,
   DEFAULT_TEAMS_BENEFIT_EMAIL,
-  DEFAULT_TEAMS_FREE_EVERY,
   DEFAULT_TEAMS_GROUP_DISCOUNT_PERCENT,
   parseTargetDateParts,
   resolveTargetDateIso,
@@ -199,7 +198,9 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
       ? Math.min(100, Math.max(1, Math.round(rawDiscountPercent)))
       : DEFAULT_RESIDENT_DISCOUNT_PERCENT;
 
-  const teamsBenefitEnabled = true;
+  const teamsShowGroupCoupon = raceConfig?.teamsShowGroupCoupon !== false;
+  const teamsShowFreePasses = raceConfig?.teamsShowFreePasses !== false;
+  const teamsBenefitEnabled = teamsShowGroupCoupon || teamsShowFreePasses;
   const rawNotificationEmail = String(raceConfig?.notificationEmail ?? '').trim();
   const rawTeamsBenefitEmail = String(raceConfig?.teamsBenefitEmail ?? '').trim();
   const customTeamsBenefitEmail =
@@ -210,15 +211,6 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
   const teamsBenefitEmail =
     rawNotificationEmail || customTeamsBenefitEmail || DEFAULT_TEAMS_BENEFIT_EMAIL;
 
-  const rawTeamsFreeEvery = Number(
-    raceConfig?.teamsFreeEvery ?? RACE_CONFIG.teamsFreeEvery
-  );
-  const teamsFreeEvery =
-    Number.isFinite(rawTeamsFreeEvery) && rawTeamsFreeEvery >= 1
-      ? Math.min(100, Math.max(1, Math.round(rawTeamsFreeEvery)))
-      : DEFAULT_TEAMS_FREE_EVERY;
-  const teamsFreeEveryUnit = teamsFreeEvery === 1 ? 'inscripto' : 'inscriptos';
-
   const rawTeamsGroupDiscount = Number(
     raceConfig?.teamsGroupDiscountPercent ?? RACE_CONFIG.teamsGroupDiscountPercent
   );
@@ -226,6 +218,15 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
     Number.isFinite(rawTeamsGroupDiscount) && rawTeamsGroupDiscount >= 1
       ? Math.min(100, Math.max(1, Math.round(rawTeamsGroupDiscount)))
       : DEFAULT_TEAMS_GROUP_DISCOUNT_PERCENT;
+
+  const teamsAriaBenefits = [
+    teamsShowGroupCoupon
+      ? `Código Grupal ${teamsGroupDiscountPercent}% OFF para el Team`
+      : null,
+    teamsShowFreePasses ? 'Cupones 100% OFF: Profe y Pases Libres' : null,
+  ]
+    .filter(Boolean)
+    .join(' y ');
 
   return (
     <section
@@ -320,7 +321,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
               {teamsBenefitEnabled && (
                 <a
                   href={`mailto:${teamsBenefitEmail}?subject=${encodeURIComponent(`Beneficios para Teams - ${raceTitle}`)}`}
-                  aria-label={`Beneficios para Teams: Código Grupal ${teamsGroupDiscountPercent}% OFF para el Team y Cupones 100% OFF para Profe y Pases Libres (1 cada ${teamsFreeEvery} ${teamsFreeEveryUnit}). Solicitá los códigos para canjear en la web al mail ${teamsBenefitEmail}`}
+                  aria-label={`Beneficios para Teams: ${teamsAriaBenefits}. Solicitá los códigos para canjear en la web al mail ${teamsBenefitEmail}`}
                   className="z-20 min-[1360px]:absolute min-[1360px]:right-full min-[1360px]:mr-16 2xl:mr-24 min-[1360px]:-top-12 -rotate-2 min-[1360px]:-rotate-[5deg] hover:rotate-0 min-[1360px]:hover:-rotate-[1.5deg] hover:scale-105 antialiased transform-gpu [backface-visibility:hidden] rounded-2xl bg-zinc-900/15 hover:bg-zinc-900/25 backdrop-blur-[2px] border border-[var(--theme-primary)] hover:border-[var(--theme-secondary)] shadow-none px-3.5 py-2.5 sm:px-3.5 sm:py-3 transition-all duration-200 cursor-pointer flex flex-col items-stretch w-[264px] sm:w-[278px] text-center no-underline"
                 >
                   <span className="block font-poster-condensed poster-title-stroke uppercase leading-[0.86] tracking-[0.02em] drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] select-none">
@@ -328,20 +329,24 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                     <span className="block text-[31px] sm:text-[34px] mt-0.5">PARA TEAMS</span>
                   </span>
                   <span className="mt-2 flex flex-col gap-1">
-                    <span className="block rounded-[3px] bg-[#F5ECD2] px-2.5 py-0.5 font-display text-[11.5px] sm:text-xs font-bold text-zinc-900 leading-snug whitespace-nowrap">
-                      Código Grupal:{' '}
-                      <strong className="font-black text-[var(--theme-strip-accent)]">
-                        {teamsGroupDiscountPercent}% OFF
-                      </strong>{' '}
-                      para el Team
-                    </span>
-                    <span className="block rounded-[3px] bg-[#F5ECD2] px-2.5 py-0.5 font-display text-[11.5px] sm:text-xs font-bold text-zinc-900 leading-snug whitespace-nowrap">
-                      Cupones{' '}
-                      <strong className="font-black text-[var(--theme-strip-accent)]">
-                        100% OFF
-                      </strong>
-                      : Profe y Pases Libres
-                    </span>
+                    {teamsShowGroupCoupon && (
+                      <span className="block rounded-[3px] bg-[#F5ECD2] px-2.5 py-0.5 font-display text-[11.5px] sm:text-xs font-bold text-zinc-900 leading-snug whitespace-nowrap">
+                        Código Grupal:{' '}
+                        <strong className="font-black text-[var(--theme-strip-accent)]">
+                          {teamsGroupDiscountPercent}% OFF
+                        </strong>{' '}
+                        para el Team
+                      </span>
+                    )}
+                    {teamsShowFreePasses && (
+                      <span className="block rounded-[3px] bg-[#F5ECD2] px-2.5 py-0.5 font-display text-[11.5px] sm:text-xs font-bold text-zinc-900 leading-snug whitespace-nowrap">
+                        Cupones{' '}
+                        <strong className="font-black text-[var(--theme-strip-accent)]">
+                          100% OFF
+                        </strong>
+                        : Profe y Pases Libres
+                      </span>
+                    )}
                   </span>
                   <span className="mt-1.5 block font-display text-[10.5px] sm:text-[11px] font-semibold text-white/95 leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
                     Solicitá los códigos para canjear

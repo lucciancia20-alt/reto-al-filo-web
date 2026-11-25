@@ -751,6 +751,9 @@ export default function AdminGeneralTab({
             ? draft.teamsBenefitEnabled
             : RACE_CONFIG.teamsBenefitEnabled;
 
+        const teamsShowGroupCoupon = draft.teamsShowGroupCoupon !== false;
+        const teamsShowFreePasses = draft.teamsShowFreePasses !== false;
+
         const orgEmailValue =
           String(draft.notificationEmail ?? '') !== ''
             ? draft.notificationEmail
@@ -979,25 +982,108 @@ export default function AdminGeneralTab({
                 </div>
               </div>
 
-              <div className="sm:col-span-2 rounded-xl bg-zinc-950 border border-stone-800 p-2.5 flex flex-col justify-center gap-1.5">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-300">
-                  Vista previa en el cartel del Hero
-                </span>
-                <div className="rounded-lg bg-transparent border border-amber-300/35 p-2 space-y-1.5">
-                  <div className="rounded-[3px] bg-[#F5ECD2] px-2.5 py-1 text-xs text-zinc-900 font-bold">
-                    Código Grupal:{' '}
-                    <strong className="font-black text-[#173f2d]">
-                      {previewTeamsGroupDiscount}% OFF
-                    </strong>{' '}
-                    para el Team
-                  </div>
-                  <div className="rounded-[3px] bg-[#F5ECD2] px-2.5 py-1 text-xs text-zinc-900 font-bold">
-                    Cupones <strong className="font-black text-[#173f2d]">100% OFF</strong>: Profe
-                    y Pases Libres{' '}
-                    <span className="text-[11px] font-semibold text-zinc-700">
-                      (1 cada {previewTeamsFreeEvery}{' '}
-                      {previewTeamsFreeEvery === 1 ? 'inscripto' : 'inscriptos'})
+              <div className="sm:col-span-2 rounded-xl bg-transparent border border-stone-800 p-2.5 flex flex-col justify-center gap-1.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-300">
+                    Vista previa en el cartel del Hero
+                  </span>
+                  {!teamsShowGroupCoupon && !teamsShowFreePasses && (
+                    <span className="text-[10px] font-medium text-amber-200/90">
+                      Ambos apagados: tarjeta oculta en portada
                     </span>
+                  )}
+                </div>
+                <div className="rounded-lg bg-transparent border border-amber-300/35 p-2.5 space-y-2">
+                  <div className="flex items-center justify-between gap-2.5">
+                    <div
+                      className={`flex-1 min-w-0 rounded-[3px] bg-[#F5ECD2] px-2.5 py-0.5 font-display text-[11.5px] sm:text-xs font-bold text-zinc-900 leading-snug transition-opacity ${
+                        teamsShowGroupCoupon ? '' : 'opacity-40'
+                      }`}
+                    >
+                      Código Grupal:{' '}
+                      <strong className="font-black text-[var(--theme-strip-accent)]">
+                        {previewTeamsGroupDiscount}% OFF
+                      </strong>{' '}
+                      para el Team
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span
+                        className={`min-w-[26px] text-right text-[11px] font-semibold ${
+                          teamsShowGroupCoupon ? 'text-emerald-300/90' : 'text-stone-400'
+                        }`}
+                      >
+                        {teamsShowGroupCoupon ? 'ON' : 'OFF'}
+                      </span>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={teamsShowGroupCoupon}
+                        aria-label="Mostrar u ocultar barra de Código Grupal para el Team"
+                        onClick={() =>
+                          setDraft((prev) => ({
+                            ...prev,
+                            teamsShowGroupCoupon: prev.teamsShowGroupCoupon === false,
+                          }))
+                        }
+                        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-transparent border transition-colors cursor-pointer ${
+                          teamsShowGroupCoupon ? 'border-emerald-300/75' : 'border-stone-700'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
+                            teamsShowGroupCoupon
+                              ? 'translate-x-5.5 bg-emerald-300'
+                              : 'translate-x-1 bg-stone-400'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2.5">
+                    <div
+                      className={`flex-1 min-w-0 rounded-[3px] bg-[#F5ECD2] px-2.5 py-0.5 font-display text-[11.5px] sm:text-xs font-bold text-zinc-900 leading-snug transition-opacity ${
+                        teamsShowFreePasses ? '' : 'opacity-40'
+                      }`}
+                    >
+                      Cupones{' '}
+                      <strong className="font-black text-[var(--theme-strip-accent)]">
+                        100% OFF
+                      </strong>
+                      : Profe y Pases Libres
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span
+                        className={`min-w-[26px] text-right text-[11px] font-semibold ${
+                          teamsShowFreePasses ? 'text-emerald-300/90' : 'text-stone-400'
+                        }`}
+                      >
+                        {teamsShowFreePasses ? 'ON' : 'OFF'}
+                      </span>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={teamsShowFreePasses}
+                        aria-label="Mostrar u ocultar barra de Cupones 100% OFF Profe y Pases Libres"
+                        onClick={() =>
+                          setDraft((prev) => ({
+                            ...prev,
+                            teamsShowFreePasses: prev.teamsShowFreePasses === false,
+                          }))
+                        }
+                        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-transparent border transition-colors cursor-pointer ${
+                          teamsShowFreePasses ? 'border-emerald-300/75' : 'border-stone-700'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
+                            teamsShowFreePasses
+                              ? 'translate-x-5.5 bg-emerald-300'
+                              : 'translate-x-1 bg-stone-400'
+                          }`}
+                        />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

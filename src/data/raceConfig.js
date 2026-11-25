@@ -17,6 +17,8 @@ export const DEFAULT_TEAMS_BENEFIT_ENABLED = true;
 export const DEFAULT_TEAMS_BENEFIT_EMAIL = 'retoalfilo@gmail.com';
 export const DEFAULT_TEAMS_FREE_EVERY = 10;
 export const DEFAULT_TEAMS_GROUP_DISCOUNT_PERCENT = 10;
+export const DEFAULT_TEAMS_SHOW_GROUP_COUPON = true;
+export const DEFAULT_TEAMS_SHOW_FREE_PASSES = true;
 
 /**
  * Texto por defecto de las cláusulas del Deslinde de Responsabilidad A4.
@@ -336,7 +338,11 @@ export const RACE_CONFIG = {
   teamsBenefitEmail: '',
   teamsFreeEvery: DEFAULT_TEAMS_FREE_EVERY,
   teamsGroupDiscountPercent: DEFAULT_TEAMS_GROUP_DISCOUNT_PERCENT,
+  teamsShowGroupCoupon: DEFAULT_TEAMS_SHOW_GROUP_COUPON,
+  teamsShowFreePasses: DEFAULT_TEAMS_SHOW_FREE_PASSES,
 };
+
+export const DEFAULT_RACE_CONFIG = RACE_CONFIG;
 
 const ARGENTINA_TIMEZONE = 'America/Argentina/Buenos_Aires';
 const MONTHS_ES = [
@@ -770,6 +776,16 @@ export function mergeRaceConfig(override) {
       ? Math.min(100, Math.max(1, Math.round(parsedTeamsGroupDiscount)))
       : RACE_CONFIG.teamsGroupDiscountPercent;
 
+  const resolvedTeamsShowGroupCoupon =
+    typeof override.teamsShowGroupCoupon === 'boolean'
+      ? override.teamsShowGroupCoupon
+      : RACE_CONFIG.teamsShowGroupCoupon;
+
+  const resolvedTeamsShowFreePasses =
+    typeof override.teamsShowFreePasses === 'boolean'
+      ? override.teamsShowFreePasses
+      : RACE_CONFIG.teamsShowFreePasses;
+
   return {
     ...RACE_CONFIG,
     ...override,
@@ -804,6 +820,8 @@ export function mergeRaceConfig(override) {
     teamsBenefitEmail: resolvedTeamsBenefitEmail,
     teamsFreeEvery: resolvedTeamsFreeEvery,
     teamsGroupDiscountPercent: resolvedTeamsGroupDiscountPercent,
+    teamsShowGroupCoupon: resolvedTeamsShowGroupCoupon,
+    teamsShowFreePasses: resolvedTeamsShowFreePasses,
   };
 }
 

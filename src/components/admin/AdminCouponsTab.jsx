@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Ticket,
   Plus,
@@ -81,21 +81,35 @@ export default function AdminCouponsTab({
   couponsError = '',
   couponsGenerating = false,
   couponBusyCode = '',
+  teamsGroupDiscountPercent = 10,
   onGenerateBatch,
   onCreateGroupCoupon,
   onDeleteCoupon,
 }) {
+  const parsedDefaultDiscount = Number(teamsGroupDiscountPercent);
+  const defaultGroupDiscount =
+    Number.isFinite(parsedDefaultDiscount) && parsedDefaultDiscount >= 1
+      ? Math.min(100, Math.max(1, Math.round(parsedDefaultDiscount)))
+      : 10;
+
   const [creationMode, setCreationMode] = useState('pase_libre');
 
   // Modalidad A: Lote de pases libres 100% OFF, 1 uso
   const [batchQuantity, setBatchQuantity] = useState('10');
   const [batchLabel, setBatchLabel] = useState('');
 
-  // Modalidad B: Código grupal para Teams (10% OFF, tope editable default 15)
+  // Modalidad B: Código grupal para Teams (descuento por defecto sincronizado, tope editable default 15)
   const [groupCode, setGroupCode] = useState('');
-  const [groupDiscount, setGroupDiscount] = useState('10');
+  const [groupDiscount, setGroupDiscount] = useState(() => String(defaultGroupDiscount));
+  const groupDiscountEditedRef = useRef(false);
   const [groupMaxUses, setGroupMaxUses] = useState('15');
   const [groupLabel, setGroupLabel] = useState('');
+
+  useEffect(() => {
+    if (!groupDiscountEditedRef.current) {
+      setGroupDiscount(String(defaultGroupDiscount));
+    }
+  }, [defaultGroupDiscount]);
 
   const [createFeedback, setCreateFeedback] = useState(null);
   const [lastBatchCodes, setLastBatchCodes] = useState([]);
@@ -469,7 +483,7 @@ export default function AdminCouponsTab({
             <Users className="w-4 h-4 shrink-0" />
             <div className="min-w-0">
               <span className="block font-display text-xs font-bold uppercase tracking-wide">
-                B · Código Grupal para Teams (10% OFF)
+                B · Código Grupal para Teams ({defaultGroupDiscount}% OFF)
               </span>
               <span className="block text-[11px] text-stone-400">
                 Código único personalizado · Tope de usos editable
@@ -585,7 +599,10 @@ export default function AdminCouponsTab({
                   max={100}
                   step={1}
                   value={groupDiscount}
-                  onChange={(e) => setGroupDiscount(e.target.value)}
+                  onChange={(e) => {
+                    groupDiscountEditedRef.current = true;
+                    setGroupDiscount(e.target.value);
+                  }}
                   className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-2 text-sm font-mono font-bold text-sky-300"
                 />
               </div>
