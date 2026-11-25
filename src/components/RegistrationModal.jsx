@@ -90,7 +90,7 @@ const CONNECTION_SUBMIT_ERROR_MSG =
   'No pudimos registrar tu inscripción por un problema de conexión. Por favor, volvé a intentar.';
 
 function normalizeDniSpacesAndDots(raw) {
-  return String(raw ?? '').replace(/\D/g, '').slice(0, 9);
+  return String(raw ?? '').replace(/\D/g, '').slice(0, 8);
 }
 
 function resolveFriendlySubmitError(err) {
@@ -568,8 +568,8 @@ export default function RegistrationModal({
       setInstError('Ingresá el DNI con el que te inscribiste.');
       return;
     }
-    if (!/^\d{7,9}$/.test(cleanDni)) {
-      setInstError('Ingresá un número de DNI válido (entre 7 y 9 dígitos numéricos).');
+    if (!/^\d{7,8}$/.test(cleanDni)) {
+      setInstError('Ingresá un número de DNI válido (7 u 8 dígitos numéricos).');
       return;
     }
     if (!cleanName) {
@@ -696,8 +696,8 @@ export default function RegistrationModal({
     if (cleanDni !== form.dni) {
       handleFieldChange('dni', cleanDni);
     }
-    if (!/^\d{7,9}$/.test(cleanDni)) {
-      setSubmitError('Ingresá un número de DNI válido (entre 7 y 9 dígitos numéricos).');
+    if (!/^\d{7,8}$/.test(cleanDni)) {
+      setSubmitError('Ingresá un número de DNI válido (7 u 8 dígitos numéricos).');
       return;
     }
 
@@ -1375,13 +1375,13 @@ export default function RegistrationModal({
                       id="inst-dni"
                       type="text"
                       inputMode="numeric"
-                      maxLength={9}
+                      maxLength={8}
                       required
                       value={instForm.dni}
                       onChange={(e) =>
                         setInstForm((prev) => ({
                           ...prev,
-                          dni: e.target.value.replace(/\D/g, '').slice(0, 9),
+                          dni: e.target.value.replace(/\D/g, '').slice(0, 8),
                         }))
                       }
                       onPaste={(e) => {
@@ -1390,7 +1390,7 @@ export default function RegistrationModal({
                           e.preventDefault();
                           setInstForm((prev) => ({
                             ...prev,
-                            dni: pasted.replace(/\D/g, '').slice(0, 9),
+                            dni: pasted.replace(/\D/g, '').slice(0, 8),
                           }));
                         }
                       }}
@@ -2036,12 +2036,12 @@ export default function RegistrationModal({
                       name="dni"
                       type="text"
                       inputMode="numeric"
-                      maxLength={9}
+                      maxLength={8}
                       required
                       autoComplete="on"
                       value={form.dni}
                       onChange={(e) => {
-                        handleFieldChange('dni', e.target.value.replace(/\D/g, '').slice(0, 9));
+                        handleFieldChange('dni', e.target.value.replace(/\D/g, '').slice(0, 8));
                         if (submitError.includes('DNI')) {
                           setSubmitError('');
                         }
@@ -2050,7 +2050,7 @@ export default function RegistrationModal({
                         const pasted = e.clipboardData?.getData('text');
                         if (typeof pasted === 'string') {
                           e.preventDefault();
-                          handleFieldChange('dni', pasted.replace(/\D/g, '').slice(0, 9));
+                          handleFieldChange('dni', pasted.replace(/\D/g, '').slice(0, 8));
                           if (submitError.includes('DNI')) {
                             setSubmitError('');
                           }

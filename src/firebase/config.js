@@ -721,8 +721,8 @@ export async function submitRunnerRegistration(payload) {
   }
 
   const cleanDni = String(payload.dni || '').replace(/[.\s]+/g, '').trim();
-  if (!/^\d{7,9}$/.test(cleanDni)) {
-    throw new Error('Ingresá un número de DNI válido (entre 7 y 9 dígitos numéricos).');
+  if (!/^\d{7,8}$/.test(cleanDni)) {
+    throw new Error('Ingresá un número de DNI válido (7 u 8 dígitos numéricos).');
   }
 
   const normalizedGender = normalizeRunnerGender(payload.gender);
@@ -1022,8 +1022,8 @@ export async function submitInstallmentReceipt(payload) {
   if (!dni) {
     throw new Error('Ingresá el DNI con el que te inscribiste.');
   }
-  if (!/^\d{7,9}$/.test(dni)) {
-    throw new Error('Ingresá un número de DNI válido (entre 7 y 9 dígitos numéricos).');
+  if (!/^\d{7,8}$/.test(dni)) {
+    throw new Error('Ingresá un número de DNI válido (7 u 8 dígitos numéricos).');
   }
   if (!fullName) {
     throw new Error('Ingresá tu Nombre y Apellido.');
