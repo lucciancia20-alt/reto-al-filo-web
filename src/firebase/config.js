@@ -1470,7 +1470,7 @@ function buildLookupCandidates(rawQuery) {
   return [];
 }
 /**
- * Consulta pública segura de estado/dorsal por DNI o código RAF-XXXXX.
+ * Consulta pública segura de estado/dorsal por código RAF-XXXXXXXX.
  */
 export async function fetchPublicRunnerStatus(rawQuery) {
   const candidates = buildLookupCandidates(rawQuery);

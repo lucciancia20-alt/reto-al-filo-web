@@ -499,7 +499,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                 ¿Ya te inscribiste? Consultá tu Estado y Dorsal
               </h2>
               <p className="mt-1 text-xs sm:text-sm text-stone-300">
-                Ingresá tu código <span className="font-mono text-orange-400">RAF-XXXXX</span> para verificar confirmación, talle y número asignado.
+                Ingresá tu código <span className="font-mono text-orange-400">RAF-XXXXXXXX</span> para verificar confirmación, talle y número asignado.
               </p>
             </div>
 
@@ -513,9 +513,9 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                   type="text"
                   value={lookupQuery}
                   onChange={(e) => setLookupQuery(e.target.value)}
-                  placeholder="Ej: RAF-12345"
+                  placeholder="Ej. RAF-A7K9M2X4"
                   aria-label="Código de inscripción RAF"
-                  className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-stone-500 font-mono"
+                  className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-white/30 font-mono"
                 />
               </div>
               <button
@@ -714,7 +714,7 @@ export default function InfoFaqSection({ raceConfig = RACE_CONFIG }) {
                       <AlertCircle className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
                       <span>
                         {lookupResult.invalidQuery
-                          ? 'Ingresá tu código RAF-XXXXX para realizar la consulta.'
+                          ? 'Ingresá tu código RAF-XXXXXXXX para realizar la consulta.'
                           : lookupResult.errorCode === 'permission-denied'
                             ? 'El consultor online está actualizando permisos en Firebase. Mientras tanto podés verificar tu estado escribiéndonos por WhatsApp.'
                             : 'No encontramos ninguna inscripción con ese código RAF. Verificá los datos o consultanos por WhatsApp si te inscribiste recién.'}

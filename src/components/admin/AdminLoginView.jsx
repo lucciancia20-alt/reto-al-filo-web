@@ -118,7 +118,7 @@ export default function AdminLoginView({
                 placeholder=""
                 required
                 disabled={!firebaseReady || authLoading}
-                className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm font-mono font-semibold text-white placeholder:text-stone-500"
+                className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm font-mono font-semibold text-white placeholder:text-white/30 placeholder:font-normal"
               />
             </div>
           </div>
@@ -146,7 +146,7 @@ export default function AdminLoginView({
                 required
                 minLength={6}
                 disabled={!firebaseReady || authLoading}
-                className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm font-mono font-semibold text-white placeholder:text-stone-500"
+                className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm font-mono font-semibold text-white placeholder:text-white/30 placeholder:font-normal"
               />
             </div>
           </div>

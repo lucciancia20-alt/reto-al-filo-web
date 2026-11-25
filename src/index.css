@@ -148,6 +148,12 @@
   h1, h2, h3, .font-display {
     font-family: 'Outfit', 'Inter', system-ui, sans-serif;
   }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+    font-weight: 400;
+  }
 }
 
 /* Input de fecha nativo con estética oscura (desktop + mobile) */

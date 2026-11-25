@@ -1611,7 +1611,7 @@ export default function AdminRegistrationsTab({
                 onChange={(e) => setRegSearch(e.target.value)}
                 placeholder="Buscar por nombre, DNI, código RAF, dorsal, localidad..."
                 aria-label="Buscar por nombre, DNI, código RAF, dorsal o localidad"
-                className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-300/75 focus:outline-none pl-8 pr-3 py-1.5 text-xs font-mono font-semibold text-stone-100 placeholder:text-stone-500"
+                className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-300/75 focus:outline-none pl-8 pr-3 py-1.5 text-xs font-mono font-semibold text-white placeholder:text-white/30 placeholder:font-normal"
               />
             </div>
 
@@ -1810,7 +1810,7 @@ export default function AdminRegistrationsTab({
                               }`
                             : isBibLocked
                               ? 'w-12 rounded-lg bg-transparent border border-amber-300/35 px-1 py-1 text-xs font-mono font-medium text-amber-200/90 text-center cursor-default'
-                              : 'w-12 rounded-lg bg-transparent border border-amber-300/50 focus:border-amber-300/80 focus:outline-none px-1 py-1 text-xs font-mono font-semibold text-stone-100 text-center'
+                              : 'w-12 rounded-lg bg-transparent border border-amber-300/50 focus:border-amber-300/80 focus:outline-none px-1 py-1 text-xs font-mono font-semibold text-white placeholder:text-white/30 placeholder:font-normal text-center'
                         }
                       />
                       {isBibLocked && (

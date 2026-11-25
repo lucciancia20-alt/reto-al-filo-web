@@ -590,7 +590,7 @@ export default function RegistrationModal({
         const lookup = await fetchPublicRunnerStatus(cleanCode);
         if (lookup?.invalidQuery) {
           throw new Error(
-            'El código RAF ingresado no tiene un formato válido (ejemplo: RAF-A1B2C3D4). Si no lo recordás, dejalo vacío.'
+            'El código RAF ingresado no tiene un formato válido (ejemplo: RAF-A7K9M2X4). Si no lo recordás, dejalo vacío.'
           );
         }
       }
@@ -1395,7 +1395,7 @@ export default function RegistrationModal({
                         }
                       }}
                       placeholder="Ej. 34567890"
-                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white placeholder:text-white/30"
                     />
                   </div>
 
@@ -1413,8 +1413,8 @@ export default function RegistrationModal({
                       onChange={(e) =>
                         setInstForm((prev) => ({ ...prev, code: e.target.value }))
                       }
-                      placeholder="Ej. RAF-12345"
-                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+                      placeholder="Ej. RAF-A7K9M2X4"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white placeholder:text-white/30"
                     />
                   </div>
 
@@ -1434,7 +1434,7 @@ export default function RegistrationModal({
                         setInstForm((prev) => ({ ...prev, fullName: e.target.value }))
                       }
                       placeholder="Ej. María Gómez"
-                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white placeholder:text-white/30"
                     />
                   </div>
                 </div>
@@ -1698,7 +1698,7 @@ export default function RegistrationModal({
                         }
                       }}
                       placeholder="Ej. TEAMHALCONES10 o RAF-FREE-ABC123"
-                      className="flex-1 min-w-[160px] rounded-xl bg-zinc-950 border border-orange-500/45 focus:border-amber-400 focus:outline-none px-3 py-2 text-xs sm:text-sm font-mono uppercase tracking-wider text-white disabled:opacity-70"
+                      className="flex-1 min-w-[160px] rounded-xl bg-zinc-950 border border-orange-500/45 focus:border-amber-400 focus:outline-none px-3 py-2 text-xs sm:text-sm font-mono uppercase tracking-wider text-white placeholder:text-white/30 placeholder:font-normal disabled:opacity-70"
                     />
                     {appliedCoupon ? (
                       <button
@@ -2020,7 +2020,7 @@ export default function RegistrationModal({
                       value={form.fullName}
                       onChange={(e) => handleFieldChange('fullName', e.target.value)}
                       placeholder="Ej. María Gómez"
-                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white placeholder:text-white/30"
                     />
                   </div>
 
@@ -2057,7 +2057,7 @@ export default function RegistrationModal({
                         }
                       }}
                       placeholder="Ej. 34567890"
-                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white placeholder:text-white/30"
                     />
                   </div>
 
@@ -2091,7 +2091,9 @@ export default function RegistrationModal({
                           setSubmitError(msg || UNDERAGE_ERROR_MSG);
                         }
                       }}
-                      className={`w-full rounded-xl bg-zinc-950 border transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono text-white [color-scheme:dark] ${
+                      className={`w-full rounded-xl bg-zinc-950 border transition-colors focus:outline-none px-3.5 py-2.5 text-sm font-mono ${
+                        form.birthDate ? 'text-white' : 'text-white/30 focus:text-white'
+                      } [color-scheme:dark] ${
                         birthDateError
                           ? 'border-red-500 focus:border-red-400'
                           : 'border-orange-500/40 focus:border-orange-500'
@@ -2173,7 +2175,7 @@ export default function RegistrationModal({
                       value={form.phone}
                       onChange={(e) => handleFieldChange('phone', e.target.value)}
                       placeholder="Ej. 291 4000000"
-                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white placeholder:text-white/30"
                     />
                   </div>
 
@@ -2193,7 +2195,7 @@ export default function RegistrationModal({
                       value={form.email}
                       onChange={(e) => handleFieldChange('email', e.target.value)}
                       placeholder="corredor@mail.com"
-                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white placeholder:text-white/30"
                     />
                   </div>
 
@@ -2213,7 +2215,7 @@ export default function RegistrationModal({
                       value={form.city}
                       onChange={(e) => handleCityChange(e.target.value)}
                       placeholder="Ej. Bahía Blanca, Bs. As."
-                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white placeholder:text-white/30"
                     />
                   </div>
 
@@ -2292,7 +2294,7 @@ export default function RegistrationModal({
                       value={form.team}
                       onChange={(e) => handleFieldChange('team', e.target.value)}
                       placeholder="Ej. Sierra Trail Runners o Libre"
-                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                      className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white placeholder:text-white/30"
                     />
                   </div>
 
@@ -2408,7 +2410,7 @@ export default function RegistrationModal({
                           handleFieldChange('emergencyContactName', e.target.value)
                         }
                         placeholder="Ej. Carlos Gómez (Familiar)"
-                        className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                        className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white placeholder:text-white/30"
                       />
                     </div>
                     <div>
@@ -2429,7 +2431,7 @@ export default function RegistrationModal({
                           handleFieldChange('emergencyContactPhone', e.target.value)
                         }
                         placeholder="Ej. 291 4001122"
-                        className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                        className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white placeholder:text-white/30"
                       />
                     </div>
                     <div>
@@ -2470,7 +2472,7 @@ export default function RegistrationModal({
                           handleFieldChange('medicalNotes', e.target.value)
                         }
                         placeholder="Ej. OSDE · Sin alergias"
-                        className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white"
+                        className="w-full rounded-xl bg-zinc-950 border border-orange-500/40 focus:border-orange-500 transition-colors focus:outline-none px-3.5 py-2.5 text-sm text-white placeholder:text-white/30"
                       />
                     </div>
                   </div>
