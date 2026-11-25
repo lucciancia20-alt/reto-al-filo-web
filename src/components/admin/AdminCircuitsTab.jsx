@@ -25,11 +25,11 @@ export default function AdminCircuitsTab({
           const colorClass =
             d === '27K'
               ? active
-                ? 'bg-zinc-950 text-cyan-400 border border-cyan-400'
-                : 'bg-zinc-950 text-cyan-400 border border-transparent opacity-80 hover:opacity-100'
+                ? 'bg-transparent text-cyan-400 border border-cyan-400'
+                : 'bg-transparent text-cyan-400 border border-transparent opacity-80 hover:opacity-100'
               : active
-                ? 'bg-zinc-950 text-red-500 border border-red-500'
-                : 'bg-zinc-950 text-red-500 border border-transparent opacity-80 hover:opacity-100';
+                ? 'bg-transparent text-red-500 border border-red-500'
+                : 'bg-transparent text-red-500 border border-transparent opacity-80 hover:opacity-100';
 
           return (
             <button
@@ -105,10 +105,10 @@ export default function AdminCircuitsTab({
           <button
             type="button"
             onClick={onAddStation}
-            className={`inline-flex items-center gap-1 rounded-xl border text-xs font-medium px-3 py-1.5 cursor-pointer transition-colors ${
+            className={`inline-flex items-center gap-1 rounded-xl bg-transparent border text-xs font-medium px-3 py-1.5 cursor-pointer transition-colors ${
               editDistance === '13K'
-                ? 'bg-zinc-950 text-red-500 border-red-500/70 hover:border-red-400'
-                : 'bg-zinc-950 text-cyan-400 border-cyan-500/70 hover:border-cyan-400'
+                ? 'text-red-500 border-red-500/70 hover:border-red-400'
+                : 'text-cyan-400 border-cyan-500/70 hover:border-cyan-400'
             }`}
           >
             <Plus className="w-3.5 h-3.5" />
@@ -178,7 +178,7 @@ export default function AdminCircuitsTab({
             Subí un archivo .gpx exportado de Garmin, COROS, Strava o Wikiloc para actualizar el
             mapa y la altimetría.
           </p>
-          {gpxStatus && <p className="mt-1 text-xs text-orange-400 font-medium">{gpxStatus}</p>}
+          {gpxStatus && <p className="mt-1 text-xs text-amber-200/90 font-medium">{gpxStatus}</p>}
         </div>
 
         <div className="flex items-center gap-2">
@@ -186,13 +186,13 @@ export default function AdminCircuitsTab({
             <button
               type="button"
               onClick={onClearCustomGpx}
-              className="rounded-xl bg-stone-800 hover:bg-stone-700 text-xs text-stone-200 px-3 py-2 cursor-pointer"
+              className="rounded-xl bg-transparent border border-stone-700 hover:border-stone-500 text-xs text-stone-200 px-3 py-2 transition-colors cursor-pointer"
             >
               Usar GPX original
             </button>
           )}
-          <label className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 transition-colors text-xs font-medium px-3.5 py-2 cursor-pointer">
-            <Upload className="w-4 h-4 text-orange-500" />
+          <label className="inline-flex items-center gap-2 rounded-xl bg-transparent text-amber-200/90 hover:text-amber-100 border border-amber-300/45 hover:border-amber-200/75 transition-colors text-xs font-medium px-3.5 py-2 cursor-pointer">
+            <Upload className="w-4 h-4 text-amber-300/90" />
             Subir archivo .GPX
             <input type="file" accept=".gpx" onChange={onGpxFileUpload} className="hidden" />
           </label>

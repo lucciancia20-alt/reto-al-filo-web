@@ -162,7 +162,7 @@ export default function AdminPhotosTab({
             </h4>
             <p className="text-xs text-stone-400 mt-0.5">
               Elegí una o varias fotos juntas desde tu celular o PC (se suben a tu nube{' '}
-              <span className="font-mono text-orange-400">
+              <span className="font-mono text-amber-200/90">
                 {defaultCloudName || 'no configurada'}
               </span>
               ). Apenas subas tu primera foto, reemplazará las de demostración.
@@ -191,8 +191,8 @@ export default function AdminPhotosTab({
             </div>
 
             <div className="flex flex-wrap items-center gap-2 shrink-0">
-              <label className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 font-display font-medium text-xs uppercase tracking-wider px-3.5 py-2 cursor-pointer transition-colors">
-                <Upload className="w-4 h-4 text-orange-500" />
+              <label className="inline-flex items-center gap-2 rounded-xl bg-transparent text-amber-200/90 hover:text-amber-100 border border-amber-300/45 hover:border-amber-200/75 font-display font-medium text-xs uppercase tracking-wider px-3.5 py-2 cursor-pointer transition-colors">
+                <Upload className="w-4 h-4 text-amber-300/90" />
                 {photoFiles.length > 0 ? 'Cambiar Fotos' : 'Elegir Fotos'}
                 <input
                   type="file"
@@ -236,7 +236,7 @@ export default function AdminPhotosTab({
           <button
             type="submit"
             disabled={photoSubmitting}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-5 py-3 shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-transparent border border-emerald-300/65 hover:border-emerald-200 text-emerald-300/90 hover:text-emerald-200 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-5 py-3 transition-colors cursor-pointer disabled:opacity-50"
           >
             <Upload className="w-4 h-4" />
             {photoSubmitting
@@ -246,21 +246,21 @@ export default function AdminPhotosTab({
         )}
 
         {photoStepMessage && (
-          <div className="p-3 rounded-xl text-xs bg-orange-500/15 text-orange-200 border border-orange-500/30">
+          <div className="p-3 rounded-xl text-xs bg-transparent text-amber-200/90 border border-amber-300/40">
             {photoStepMessage}
           </div>
         )}
 
         {photoStatus && (
           <div
-            className={`p-3 rounded-xl text-xs flex items-start gap-2 ${
+            className={`p-3 rounded-xl bg-transparent text-xs flex items-start gap-2 ${
               photoStatus.type === 'success'
-                ? 'bg-zinc-950 text-orange-400 border border-orange-500/70'
-                : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
+                ? 'text-amber-200/90 border border-amber-300/45'
+                : 'text-rose-300 border border-rose-300/45'
             }`}
           >
             {photoStatus.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-4 h-4 text-amber-300/90 shrink-0 mt-0.5" />
             ) : (
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             )}
@@ -278,7 +278,7 @@ export default function AdminPhotosTab({
             </h4>
             <p
               className={`text-[11px] mt-0.5 ${
-                galleryCustomCount > 0 ? 'text-orange-400 font-medium' : 'text-stone-400'
+                galleryCustomCount > 0 ? 'text-amber-200/90 font-medium' : 'text-stone-400'
               }`}
             >
               {galleryCustomCount > 0
@@ -290,10 +290,10 @@ export default function AdminPhotosTab({
             type="button"
             onClick={onLoadGalleryItems}
             disabled={galleryLoading}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-xs font-semibold px-3 py-1.5 cursor-pointer transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 text-xs font-semibold px-3 py-1.5 cursor-pointer transition-colors"
           >
             <RefreshCw
-              className={`w-3.5 h-3.5 text-orange-500 ${galleryLoading ? 'animate-spin' : ''}`}
+              className={`w-3.5 h-3.5 text-amber-300/90 ${galleryLoading ? 'animate-spin' : ''}`}
             />
             Actualizar
           </button>
@@ -315,8 +315,8 @@ export default function AdminPhotosTab({
                   onDrop={(e) => handleDrop(e, item)}
                   onDragEnd={handleDragEnd}
                   onClick={() => setPreviewIndex(idx)}
-                  className={`relative aspect-[4/3] rounded-xl overflow-hidden bg-zinc-950 border border-orange-500/80 hover:border-orange-400 cursor-grab active:cursor-grabbing transition-all group ${
-                    isDragOver ? 'ring-2 ring-orange-400 scale-[1.02]' : ''
+                  className={`relative aspect-[4/3] rounded-xl overflow-hidden bg-zinc-950 border border-amber-300/45 hover:border-amber-200/75 cursor-grab active:cursor-grabbing transition-all group ${
+                    isDragOver ? 'ring-2 ring-amber-300/75 scale-[1.02]' : ''
                   } ${isDragged ? 'opacity-60' : ''}`}
                 >
                   <img
@@ -327,7 +327,7 @@ export default function AdminPhotosTab({
                     draggable={false}
                     className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
                   />
-                  <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 rounded-full bg-zinc-950/20 backdrop-blur-sm border border-orange-500/80 text-orange-400 font-semibold text-[10px] px-2 py-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                  <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 rounded-full bg-zinc-950/35 backdrop-blur-sm border border-amber-300/55 text-amber-200/95 font-semibold text-[10px] px-2 py-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
                     ✓ Publicada en la web
                   </span>
                   <button
@@ -339,13 +339,13 @@ export default function AdminPhotosTab({
                       setPreviewIndex(idx);
                     }}
                     aria-label={`Ampliar postal ${item.sector}`}
-                    className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-md border border-orange-500/70 hover:border-orange-400 text-orange-400 flex items-center justify-center cursor-pointer transition-all"
+                    className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-zinc-900/35 hover:bg-zinc-900/55 backdrop-blur-md border border-amber-300/50 hover:border-amber-200/80 text-amber-200/90 flex items-center justify-center cursor-pointer transition-all"
                   >
                     <Maximize2 className="w-3.5 h-3.5" />
                   </button>
                   <div
                     onClick={(e) => e.stopPropagation()}
-                    className="absolute bottom-0 inset-x-0 z-10 rounded-b-xl px-2.5 py-2 bg-zinc-950/12 backdrop-blur-sm border-t-2 border-orange-500/80 flex items-center justify-between gap-2"
+                    className="absolute bottom-0 inset-x-0 z-10 rounded-b-xl px-2.5 py-2 bg-zinc-950/12 backdrop-blur-sm border-t-2 border-amber-300/50 flex items-center justify-between gap-2"
                   >
                     <div className="flex items-center gap-1.5 min-w-0">
                       <GripVertical className="w-3.5 h-3.5 text-stone-200 shrink-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
@@ -392,14 +392,14 @@ export default function AdminPhotosTab({
           onClick={() => setPreviewIndex(null)}
         >
           <div
-            className="relative w-fit h-fit min-w-[280px] min-h-[200px] max-w-[92vw] max-h-[85vh] flex items-center justify-center rounded-2xl overflow-hidden overscroll-contain border border-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.3)]"
+            className="relative w-fit h-fit min-w-[280px] min-h-[200px] max-w-[92vw] max-h-[85vh] flex items-center justify-center rounded-2xl overflow-hidden overscroll-contain border border-amber-300/55 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
               onClick={() => setPreviewIndex(null)}
               aria-label="Cerrar vista previa"
-              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-amber-300/50 hover:border-amber-200/80 text-amber-200/90 cursor-pointer transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -412,7 +412,7 @@ export default function AdminPhotosTab({
                     setPreviewIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length)
                   }
                   aria-label="Foto anterior"
-                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-amber-300/50 hover:border-amber-200/80 text-amber-200/90 cursor-pointer transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
@@ -422,7 +422,7 @@ export default function AdminPhotosTab({
                     setPreviewIndex((prev) => (prev + 1) % galleryItems.length)
                   }
                   aria-label="Foto siguiente"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-orange-500/70 hover:border-orange-400 text-orange-400 cursor-pointer transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-zinc-900/45 backdrop-blur-md hover:bg-zinc-900/65 border border-amber-300/50 hover:border-amber-200/80 text-amber-200/90 cursor-pointer transition-colors"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
@@ -439,9 +439,9 @@ export default function AdminPhotosTab({
               className="block max-w-[92vw] max-h-[85vh] w-auto h-auto"
             />
 
-            <div className="absolute bottom-0 inset-x-0 z-10 p-4 sm:p-5 bg-zinc-950/15 backdrop-blur-sm border-t-2 border-orange-500/85 flex items-center justify-between gap-2">
+            <div className="absolute bottom-0 inset-x-0 z-10 p-4 sm:p-5 bg-zinc-950/15 backdrop-blur-sm border-t-2 border-amber-300/55 flex items-center justify-between gap-2">
               <div>
-                <span className="text-xs font-medium uppercase tracking-wider text-orange-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                <span className="text-xs font-medium uppercase tracking-wider text-amber-200/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
                   1ra Edición · {raceTitle || 'Reto al Filo'}
                 </span>
                 <p className="mt-0.5 text-sm sm:text-base font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">

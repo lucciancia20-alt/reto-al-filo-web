@@ -1592,13 +1592,13 @@ export default function AdminModal({
         />
       )}
       <div
-        className={`w-full max-w-5xl ${unlocked ? 'h-[88vh] max-h-[850px]' : 'h-auto max-h-[90dvh]'} rounded-2xl bg-stone-900 border border-orange-500/80 shadow-2xl flex flex-col justify-start overflow-hidden overscroll-contain text-stone-100`}
+        className={`w-full max-w-5xl ${unlocked ? 'h-[88vh] max-h-[850px]' : 'h-auto max-h-[90dvh]'} rounded-2xl bg-stone-900 border border-amber-300/45 shadow-2xl flex flex-col justify-start overflow-hidden overscroll-contain text-stone-100`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header del Modal */}
         <div className="px-4 sm:px-5 py-3.5 bg-stone-950 border-b border-stone-800 flex items-center justify-between gap-2 sm:gap-3 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-9 h-9 rounded-xl bg-transparent border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0">
+            <span className="w-9 h-9 rounded-xl bg-transparent border border-amber-300/45 text-amber-300/90 flex items-center justify-center shrink-0">
               {unlocked ? <ShieldCheck className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
             </span>
             <div className="min-w-0">
@@ -1623,10 +1623,10 @@ export default function AdminModal({
                     ? 'Confirmar cierre de sesión de administrador'
                     : 'Cerrar sesión de administrador'
                 }
-                className={`inline-flex items-center gap-1.5 rounded-xl text-xs font-semibold px-3.5 py-1.5 cursor-pointer transition-colors ${
+                className={`inline-flex items-center gap-1.5 rounded-xl bg-transparent text-xs font-semibold px-3.5 py-1.5 cursor-pointer transition-colors ${
                   confirmingLogout
-                    ? 'bg-zinc-950 border border-red-500 text-red-400'
-                    : 'bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 hover:text-red-500'
+                    ? 'border border-red-400/70 text-red-400'
+                    : 'border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-red-400'
                 }`}
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -1680,10 +1680,10 @@ export default function AdminModal({
                     type="button"
                     onClick={() => setActiveTab(tab.id)}
                     aria-pressed={active}
-                    className={`flex items-center justify-center gap-1.5 rounded-xl bg-zinc-950 shadow-none text-[11px] sm:text-xs uppercase tracking-wide transition-colors cursor-pointer ${
+                    className={`flex items-center justify-center gap-1.5 rounded-xl bg-transparent shadow-none text-[11px] sm:text-xs uppercase tracking-wide transition-colors cursor-pointer ${
                       active
-                        ? 'border-2 px-[9px] py-[9px] border-amber-400 text-amber-400 font-bold'
-                        : 'border px-2.5 py-2.5 border-orange-500/45 text-zinc-300 font-semibold hover:border-amber-400 hover:text-amber-300'
+                        ? 'border-2 px-[9px] py-[9px] border-amber-200/85 text-amber-200 font-bold'
+                        : 'border px-2.5 py-2.5 border-amber-300/35 text-stone-300 font-semibold hover:border-amber-200/70 hover:text-amber-200'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -1838,8 +1838,8 @@ export default function AdminModal({
                 <div
                   className={`p-3.5 rounded-xl bg-transparent text-xs flex items-start gap-2.5 ${
                     saveFeedback.type === 'success'
-                      ? 'text-emerald-300 border border-emerald-500/30'
-                      : 'text-amber-200 border border-amber-500/30'
+                      ? 'text-emerald-300/90 border border-emerald-300/45'
+                      : 'text-amber-200/90 border border-amber-300/45'
                   }`}
                 >
                   {saveFeedback.type === 'success' ? (
@@ -1860,11 +1860,7 @@ export default function AdminModal({
                   <button
                     type="button"
                     onClick={handleSafeClose}
-                    className={`inline-flex items-center gap-1.5 rounded-xl bg-transparent border text-xs font-semibold px-4 py-2.5 transition-colors cursor-pointer ${
-                      activeTab === 'registrations'
-                        ? 'border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100'
-                        : 'border-orange-500/80 hover:border-orange-400 text-orange-400'
-                    }`}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 text-xs font-semibold px-4 py-2.5 transition-colors cursor-pointer"
                   >
                     Cerrar Panel
                   </button>
@@ -1873,13 +1869,13 @@ export default function AdminModal({
                     type="button"
                     onClick={handleReset}
                     disabled={saving}
-                    className={`inline-flex items-center gap-1.5 rounded-xl text-xs font-semibold px-4 py-2.5 cursor-pointer transition-colors ${
+                    className={`inline-flex items-center gap-1.5 rounded-xl bg-transparent text-xs font-semibold px-4 py-2.5 cursor-pointer transition-colors ${
                       confirmingReset
-                        ? 'bg-zinc-950 border border-red-500 text-red-400'
-                        : 'bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400'
+                        ? 'border border-red-400/70 text-red-400'
+                        : 'border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100'
                     }`}
                   >
-                    <RotateCcw className={`w-3.5 h-3.5 ${confirmingReset ? 'text-red-400' : 'text-orange-500'}`} />
+                    <RotateCcw className={`w-3.5 h-3.5 ${confirmingReset ? 'text-red-400' : 'text-amber-300/90'}`} />
                     {confirmingReset ? '¿Confirmar restauración?' : 'Restaurar valores originales'}
                   </button>
                 )}
@@ -1900,17 +1896,9 @@ export default function AdminModal({
                   onClick={handleScrollDown}
                   title="Ir abajo"
                   aria-label="Ir abajo"
-                  className={`w-8 h-8 rounded-full bg-transparent flex items-center justify-center shadow-none transition-colors cursor-pointer sm:absolute sm:left-1/2 sm:-translate-x-1/2 ${
-                    activeTab === 'registrations'
-                      ? 'border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100'
-                      : 'hover:bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400'
-                  }`}
+                  className="w-8 h-8 rounded-full bg-transparent flex items-center justify-center shadow-none transition-colors cursor-pointer sm:absolute sm:left-1/2 sm:-translate-x-1/2 border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100"
                 >
-                  <ChevronDown
-                    className={`w-4 h-4 animate-bounce ${
-                      activeTab === 'registrations' ? 'text-amber-300/90' : 'text-orange-400'
-                    }`}
-                  />
+                  <ChevronDown className="w-4 h-4 animate-bounce text-amber-300/90" />
                 </button>
               )}
 
@@ -1920,7 +1908,7 @@ export default function AdminModal({
                     type="submit"
                     form="admin-photo-form"
                     disabled={photoSubmitting}
-                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-6 py-3 shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-xl bg-transparent border border-emerald-300/65 hover:border-emerald-200 text-emerald-300/90 hover:text-emerald-200 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-6 py-3 transition-colors cursor-pointer disabled:opacity-50"
                   >
                     <Camera className="w-4 h-4" />
                     {photoSubmitting
@@ -1938,9 +1926,9 @@ export default function AdminModal({
                           ?.scrollIntoView({ behavior: 'smooth' });
                       }, 80);
                     }}
-                    className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-6 py-3 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-6 py-3 transition-colors cursor-pointer"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-orange-500" />
+                    <CheckCircle2 className="w-4 h-4 text-amber-300/90" />
                     ✓ Listo · Ver Galería en la Web
                   </button>
                 )
@@ -1971,9 +1959,9 @@ export default function AdminModal({
                   type="button"
                   onClick={loadCoupons}
                   disabled={couponsLoading}
-                  className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-xl bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  <RefreshCw className={`w-4 h-4 text-orange-500 ${couponsLoading ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-4 h-4 text-amber-300/90 ${couponsLoading ? 'animate-spin' : ''}`} />
                   {couponsLoading ? 'Actualizando...' : 'Actualizar Cupones'}
                 </button>
               ) : (
@@ -1981,10 +1969,10 @@ export default function AdminModal({
                   type="button"
                   onClick={handleSaveAll}
                   disabled={saving || !hasUnsavedChanges}
-                  className={`inline-flex items-center gap-2 rounded-xl font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-6 py-3 transition-colors ${
+                  className={`inline-flex items-center gap-2 rounded-xl bg-transparent font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-6 py-3 transition-colors ${
                     hasUnsavedChanges || saving
-                      ? 'bg-amber-400 hover:bg-amber-300 text-black shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50'
-                      : 'bg-zinc-950 border border-orange-500/80 text-zinc-400 cursor-default'
+                      ? 'border-2 border-amber-200/85 hover:border-amber-100 text-amber-200 hover:text-amber-100 cursor-pointer disabled:opacity-50'
+                      : 'border border-amber-300/40 text-stone-400 cursor-default'
                   }`}
                 >
                   {hasUnsavedChanges || saving ? (
@@ -1994,9 +1982,9 @@ export default function AdminModal({
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="w-4 h-4 text-orange-500" />
+                      <CheckCircle2 className="w-4 h-4 text-amber-300/90" />
                       <span>Cambios Guardados</span>
-                      <span className="text-orange-400">✓</span>
+                      <span className="text-amber-200/90">✓</span>
                     </>
                   )}
                 </button>

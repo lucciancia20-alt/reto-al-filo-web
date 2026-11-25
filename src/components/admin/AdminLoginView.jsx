@@ -31,7 +31,7 @@ export default function AdminLoginView({
     <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6 sm:py-6 flex items-center justify-center">
       <div className="w-full max-w-md space-y-4">
         <div className="text-center">
-          <span className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-400 inline-flex items-center justify-center">
+          <span className="w-12 h-12 rounded-2xl bg-transparent border border-amber-300/45 text-amber-300/90 inline-flex items-center justify-center">
             <ShieldCheck className="w-6 h-6" />
           </span>
           <h3 className="mt-3 font-display text-xl font-medium text-white">
@@ -44,8 +44,8 @@ export default function AdminLoginView({
         </div>
 
         {!firebaseReady && (
-          <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 text-xs text-amber-200 flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+          <div className="rounded-xl bg-transparent border border-amber-300/40 p-3 text-xs text-amber-200/90 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-300/90" />
             <span>
               Firebase no está configurado en este entorno. Verificá las variables de entorno de
               Firebase.
@@ -58,7 +58,7 @@ export default function AdminLoginView({
           type="button"
           onClick={onGoogleSignIn}
           disabled={authLoading || !firebaseReady}
-          className="w-full min-h-[46px] inline-flex items-center justify-center gap-3 rounded-xl bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 font-semibold text-sm px-4 py-3 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full min-h-[46px] inline-flex items-center justify-center gap-3 rounded-xl bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 font-semibold text-sm px-4 py-3 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -104,7 +104,7 @@ export default function AdminLoginView({
               Correo electrónico autorizado
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-orange-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Mail className="w-4 h-4 text-amber-300/90 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 id="admin-email"
                 name="email"
@@ -118,7 +118,7 @@ export default function AdminLoginView({
                 placeholder=""
                 required
                 disabled={!firebaseReady || authLoading}
-                className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm font-mono font-semibold text-white placeholder:text-stone-500"
+                className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm font-mono font-semibold text-white placeholder:text-stone-500"
               />
             </div>
           </div>
@@ -131,7 +131,7 @@ export default function AdminLoginView({
               Contraseña
             </label>
             <div className="relative">
-              <KeyRound className="w-4 h-4 text-orange-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <KeyRound className="w-4 h-4 text-amber-300/90 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 id="admin-password"
                 name="password"
@@ -146,7 +146,7 @@ export default function AdminLoginView({
                 required
                 minLength={6}
                 disabled={!firebaseReady || authLoading}
-                className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm font-mono font-semibold text-white placeholder:text-stone-500"
+                className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none pl-10 pr-3.5 py-2.5 text-sm font-mono font-semibold text-white placeholder:text-stone-500"
               />
             </div>
           </div>
@@ -154,7 +154,7 @@ export default function AdminLoginView({
           <button
             type="submit"
             disabled={!firebaseReady || authLoading}
-            className="w-full min-h-[44px] rounded-xl bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 font-display font-semibold uppercase text-xs sm:text-sm py-2.5 cursor-pointer transition-colors disabled:opacity-50"
+            className="w-full min-h-[44px] rounded-xl bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 font-display font-semibold uppercase text-xs sm:text-sm py-2.5 cursor-pointer transition-colors disabled:opacity-50"
           >
             {authLoading ? 'Ingresando...' : 'Ingresar con Correo'}
           </button>
@@ -164,7 +164,7 @@ export default function AdminLoginView({
               type="button"
               onClick={onPasswordReset}
               disabled={!firebaseReady || authLoading}
-              className="text-xs text-orange-400 hover:opacity-85 underline underline-offset-2 cursor-pointer disabled:opacity-50"
+              className="text-xs text-amber-200/90 hover:text-amber-100 underline underline-offset-2 cursor-pointer disabled:opacity-50"
             >
               ¿Olvidaste tu contraseña? Enviar enlace por mail
             </button>
@@ -174,16 +174,16 @@ export default function AdminLoginView({
         {authError && (
           <div
             role="alert"
-            className="rounded-xl bg-rose-500/15 border border-rose-500/35 p-3 text-xs text-rose-200 flex items-start gap-2"
+            className="rounded-xl bg-transparent border border-rose-300/45 p-3 text-xs text-rose-200 flex items-start gap-2"
           >
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-300" />
             <span>{authError}</span>
           </div>
         )}
 
         {authInfo && (
-          <div className="rounded-xl bg-emerald-500/15 border border-emerald-500/35 p-3 text-xs text-emerald-200 flex items-start gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+          <div className="rounded-xl bg-transparent border border-emerald-300/45 p-3 text-xs text-emerald-200 flex items-start gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-300" />
             <span>{authInfo}</span>
           </div>
         )}

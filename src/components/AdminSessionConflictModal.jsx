@@ -28,10 +28,10 @@ export default function AdminSessionConflictModal({
       aria-label="Conflicto de sesión activa"
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="w-full max-w-sm rounded-2xl bg-stone-900 border border-amber-500/70 shadow-2xl flex flex-col gap-0 overflow-hidden">
+      <div className="w-full max-w-sm rounded-2xl bg-stone-900 border border-amber-300/45 shadow-2xl flex flex-col gap-0 overflow-hidden">
         {/* Header */}
         <div className="px-5 py-4 bg-stone-950 border-b border-stone-800 flex items-center gap-3">
-          <span className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0">
+          <span className="w-9 h-9 rounded-xl bg-transparent border border-amber-300/45 text-amber-300/90 flex items-center justify-center shrink-0">
             <AlertTriangle className="w-4 h-4" />
           </span>
           <div>
@@ -44,13 +44,13 @@ export default function AdminSessionConflictModal({
 
         {/* Body */}
         <div className="px-5 py-5 space-y-4">
-          <div className="flex items-start gap-3 rounded-xl bg-amber-500/10 border border-amber-500/25 p-3.5">
-            <MonitorSmartphone className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-            <p className="text-xs text-amber-200 leading-relaxed">
+          <div className="flex items-start gap-3 rounded-xl bg-transparent border border-amber-300/35 p-3.5">
+            <MonitorSmartphone className="w-4 h-4 text-amber-300/90 shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-200/90 leading-relaxed">
               Hay una sesión activa en{' '}
-              <span className="font-semibold text-amber-300">{deviceInfo}</span>
+              <span className="font-semibold text-amber-100">{deviceInfo}</span>
               {startedAtText && (
-                <> desde las <span className="font-semibold text-amber-300">{startedAtText}</span></>
+                <> desde las <span className="font-semibold text-amber-100">{startedAtText}</span></>
               )}
               . Para evitar pisar cambios en vivo, cerrá la otra sesión o tomá el control desde este dispositivo.
             </p>
@@ -62,7 +62,7 @@ export default function AdminSessionConflictModal({
           <button
             type="button"
             onClick={onTakeover}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-display font-semibold text-sm uppercase tracking-wide py-3 cursor-pointer transition-colors shadow-lg shadow-amber-500/20"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-transparent border border-amber-200/80 hover:border-amber-100 text-amber-200 hover:text-amber-100 font-display font-semibold text-sm uppercase tracking-wide py-3 cursor-pointer transition-colors"
           >
             <LogIn className="w-4 h-4" />
             Cerrar la otra sesión y entrar acá
@@ -70,7 +70,7 @@ export default function AdminSessionConflictModal({
           <button
             type="button"
             onClick={onCancel}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-950 border border-stone-700 hover:border-stone-500 text-stone-300 hover:text-white font-semibold text-sm py-2.5 cursor-pointer transition-colors"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-transparent border border-stone-700 hover:border-stone-500 text-stone-300 hover:text-white font-semibold text-sm py-2.5 cursor-pointer transition-colors"
           >
             <X className="w-4 h-4" />
             Cancelar

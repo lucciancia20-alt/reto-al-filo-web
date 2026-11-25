@@ -417,7 +417,7 @@ export default function AdminCouponsTab({
       <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 sm:p-4 space-y-3.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Ticket className="w-4 h-4 text-orange-500 shrink-0" />
+            <Ticket className="w-4 h-4 text-amber-300/90 shrink-0" />
             <div>
               <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
                 Gestor de Cupones con Tope de Usos
@@ -437,10 +437,10 @@ export default function AdminCouponsTab({
               setCreationMode('pase_libre');
               setCreateFeedback(null);
             }}
-            className={`rounded-xl p-3 border text-left transition-colors cursor-pointer flex items-center gap-2.5 ${
+            className={`rounded-xl p-3 bg-transparent text-left transition-colors cursor-pointer flex items-center gap-2.5 ${
               creationMode === 'pase_libre'
-                ? 'bg-zinc-950 border-amber-400 text-amber-300'
-                : 'bg-zinc-950 border-stone-800 text-stone-300 hover:border-orange-500/60'
+                ? 'border-2 border-amber-200/80 text-amber-200'
+                : 'border border-stone-800 text-stone-300 hover:border-amber-300/50 hover:text-amber-200/90'
             }`}
           >
             <Sparkles className="w-4 h-4 shrink-0" />
@@ -460,10 +460,10 @@ export default function AdminCouponsTab({
               setCreationMode('grupal');
               setCreateFeedback(null);
             }}
-            className={`rounded-xl p-3 border text-left transition-colors cursor-pointer flex items-center gap-2.5 ${
+            className={`rounded-xl p-3 bg-transparent text-left transition-colors cursor-pointer flex items-center gap-2.5 ${
               creationMode === 'grupal'
-                ? 'bg-zinc-950 border-orange-500 text-orange-400'
-                : 'bg-zinc-950 border-stone-800 text-stone-300 hover:border-orange-500/60'
+                ? 'border-2 border-amber-200/80 text-amber-200'
+                : 'border border-stone-800 text-stone-300 hover:border-amber-300/50 hover:text-amber-200/90'
             }`}
           >
             <Users className="w-4 h-4 shrink-0" />
@@ -497,7 +497,7 @@ export default function AdminCouponsTab({
                   value={batchQuantity}
                   onChange={(e) => setBatchQuantity(e.target.value)}
                   placeholder="Ej. 100"
-                  className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-sm font-mono font-bold text-white"
+                  className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-2 text-sm font-mono font-bold text-white"
                 />
               </div>
 
@@ -505,7 +505,7 @@ export default function AdminCouponsTab({
                 <span className="block text-xs font-semibold text-stone-300 mb-1">
                   Regla fija de Pase Libre
                 </span>
-                <div className="rounded-xl bg-zinc-950 border border-amber-500/40 px-3 py-2 text-xs font-mono font-bold text-amber-300 flex items-center justify-between">
+                <div className="rounded-xl bg-transparent border border-amber-300/40 px-3 py-2 text-xs font-mono font-bold text-amber-200/90 flex items-center justify-between">
                   <span>100% OFF ($0)</span>
                   <span className="text-stone-400 font-normal">1 uso / código</span>
                 </div>
@@ -525,7 +525,7 @@ export default function AdminCouponsTab({
                   value={batchLabel}
                   onChange={(e) => setBatchLabel(e.target.value)}
                   placeholder="Ej. Preparador físico / Manager / Sponsors"
-                  className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-sm text-white"
+                  className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-2 text-sm text-white"
                 />
               </div>
             </div>
@@ -534,7 +534,7 @@ export default function AdminCouponsTab({
               <button
                 type="submit"
                 disabled={couponsGenerating}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 shadow-lg shadow-amber-500/15 transition-colors cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-transparent border border-amber-200/75 hover:border-amber-100 text-amber-200 hover:text-amber-100 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
               >
                 {couponsGenerating ? (
                   <>
@@ -567,7 +567,7 @@ export default function AdminCouponsTab({
                   value={groupCode}
                   onChange={(e) => setGroupCode(e.target.value.toUpperCase().replace(/\s+/g, ''))}
                   placeholder="Ej. TEAMHALCONES10"
-                  className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-sm font-mono font-bold uppercase text-white"
+                  className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-2 text-sm font-mono font-bold uppercase text-white"
                 />
               </div>
 
@@ -586,7 +586,7 @@ export default function AdminCouponsTab({
                   step={1}
                   value={groupDiscount}
                   onChange={(e) => setGroupDiscount(e.target.value)}
-                  className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-sm font-mono font-bold text-sky-300"
+                  className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-2 text-sm font-mono font-bold text-sky-300"
                 />
               </div>
 
@@ -605,7 +605,7 @@ export default function AdminCouponsTab({
                   step={1}
                   value={groupMaxUses}
                   onChange={(e) => setGroupMaxUses(e.target.value)}
-                  className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-sm font-mono font-bold text-amber-400"
+                  className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-2 text-sm font-mono font-bold text-amber-200/90"
                 />
               </div>
 
@@ -623,7 +623,7 @@ export default function AdminCouponsTab({
                   value={groupLabel}
                   onChange={(e) => setGroupLabel(e.target.value)}
                   placeholder="Ej. Halcones Running Team"
-                  className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-sm text-white"
+                  className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-2 text-sm text-white"
                 />
               </div>
             </div>
@@ -635,7 +635,7 @@ export default function AdminCouponsTab({
               <button
                 type="submit"
                 disabled={couponsGenerating}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 shadow-lg shadow-amber-500/15 transition-colors cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-transparent border border-amber-200/75 hover:border-amber-100 text-amber-200 hover:text-amber-100 font-display font-bold text-xs uppercase tracking-wider px-4 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
               >
                 {couponsGenerating ? (
                   <>
@@ -656,10 +656,10 @@ export default function AdminCouponsTab({
         {createFeedback && (
           <div
             role="status"
-            className={`rounded-xl p-3 text-xs flex flex-wrap items-center justify-between gap-2 ${
+            className={`rounded-xl bg-transparent p-3 text-xs flex flex-wrap items-center justify-between gap-2 ${
               createFeedback.type === 'success'
-                ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-300'
-                : 'bg-red-500/15 border border-red-500/40 text-red-300'
+                ? 'border border-emerald-300/45 text-emerald-300/90'
+                : 'border border-red-400/55 text-red-400'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -674,7 +674,7 @@ export default function AdminCouponsTab({
               <button
                 type="button"
                 onClick={handleCopyLastBatch}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 border border-emerald-500/60 hover:border-emerald-400 text-emerald-300 px-2.5 py-1 text-[11px] font-semibold cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-transparent border border-emerald-300/50 hover:border-emerald-200 text-emerald-300/90 hover:text-emerald-200 px-2.5 py-1 text-[11px] font-semibold transition-colors cursor-pointer"
               >
                 {copiedKey === 'last-batch' ? (
                   <>
@@ -699,29 +699,29 @@ export default function AdminCouponsTab({
 
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <div className="rounded-xl bg-stone-950 border border-stone-800 px-3 py-2.5">
+        <div className="rounded-xl bg-transparent border border-stone-800 px-3 py-2.5">
           <span className="block text-[10px] font-bold uppercase tracking-wider text-stone-400">
             Total Códigos
           </span>
           <span className="font-mono text-xl font-bold text-white">{stats.total}</span>
         </div>
-        <div className="rounded-xl bg-stone-950 border border-emerald-500/40 px-3 py-2.5">
-          <span className="block text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+        <div className="rounded-xl bg-transparent border border-emerald-300/45 px-3 py-2.5">
+          <span className="block text-[10px] font-bold uppercase tracking-wider text-emerald-300/90">
             Disponibles
           </span>
-          <span className="font-mono text-xl font-bold text-emerald-300">{stats.available}</span>
+          <span className="font-mono text-xl font-bold text-emerald-300/90">{stats.available}</span>
         </div>
-        <div className="rounded-xl bg-stone-950 border border-stone-700 px-3 py-2.5">
+        <div className="rounded-xl bg-transparent border border-stone-700 px-3 py-2.5">
           <span className="block text-[10px] font-bold uppercase tracking-wider text-stone-400">
             Agotados
           </span>
           <span className="font-mono text-xl font-bold text-stone-200">{stats.exhausted}</span>
         </div>
-        <div className="rounded-xl bg-stone-950 border border-amber-500/40 px-3 py-2.5">
-          <span className="block text-[10px] font-bold uppercase tracking-wider text-amber-400">
+        <div className="rounded-xl bg-transparent border border-amber-300/45 px-3 py-2.5">
+          <span className="block text-[10px] font-bold uppercase tracking-wider text-amber-200/90">
             Usos Consumidos
           </span>
-          <span className="font-mono text-xl font-bold text-amber-300">
+          <span className="font-mono text-xl font-bold text-amber-300/90">
             {stats.totalUsesConsumed}
             <span className="text-xs font-normal text-stone-400"> / {stats.totalUsesCapacity}</span>
           </span>
@@ -742,7 +742,7 @@ export default function AdminCouponsTab({
               }}
               placeholder="Buscar código, equipo, nombre o DNI..."
               aria-label="Buscar cupones"
-              className="w-full rounded-xl bg-zinc-950 border border-stone-700 focus:border-orange-400 focus:outline-none pl-8 pr-3 py-1.5 text-xs text-white"
+              className="w-full rounded-xl bg-zinc-950 border border-stone-700 focus:border-amber-200/80 focus:outline-none pl-8 pr-3 py-1.5 text-xs text-white"
             />
           </div>
 
@@ -753,7 +753,7 @@ export default function AdminCouponsTab({
               setStatusFilter(e.target.value);
               setShowAllRows(false);
             }}
-            className="rounded-xl bg-zinc-950 border border-stone-700 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-xs text-white"
+            className="rounded-xl bg-zinc-950 border border-stone-700 focus:border-amber-200/80 focus:outline-none px-2.5 py-1.5 text-xs text-white"
           >
             <option value="all">Estado: Todos</option>
             <option value="disponible">Disponible</option>
@@ -767,7 +767,7 @@ export default function AdminCouponsTab({
               setModeFilter(e.target.value);
               setShowAllRows(false);
             }}
-            className="rounded-xl bg-zinc-950 border border-stone-700 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-xs text-white"
+            className="rounded-xl bg-zinc-950 border border-stone-700 focus:border-amber-200/80 focus:outline-none px-2.5 py-1.5 text-xs text-white"
           >
             <option value="all">Modalidad: Todas</option>
             <option value="pase_libre">Pases Libres (100%)</option>
@@ -785,7 +785,7 @@ export default function AdminCouponsTab({
                   setLabelFilter(e.target.value);
                   setShowAllRows(false);
                 }}
-                className="rounded-xl bg-zinc-950 border border-stone-700 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-xs text-white"
+                className="rounded-xl bg-zinc-950 border border-stone-700 focus:border-amber-200/80 focus:outline-none px-2.5 py-1.5 text-xs text-white"
               >
                 <option value="all">Etiqueta: Todas</option>
                 <option value="__none__">Sin etiqueta</option>
@@ -808,11 +808,11 @@ export default function AdminCouponsTab({
               disabled={filteredCoupons.length === 0}
               onClick={handleCopyBulk}
               title="Copia los códigos disponibles filtrados (o todos los filtrados)"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-xs font-semibold px-3 py-1.5 cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 text-xs font-semibold px-3 py-1.5 cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {copiedKey === 'bulk' ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <Check className="w-3.5 h-3.5 text-emerald-300/90" />
                   <span>¡Copiados!</span>
                 </>
               ) : (
@@ -827,7 +827,7 @@ export default function AdminCouponsTab({
               type="button"
               disabled={filteredCoupons.length === 0}
               onClick={handleExportCsv}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-sky-500/70 hover:border-sky-400 text-sky-400 text-xs font-semibold px-3 py-1.5 cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-transparent border border-sky-300/45 hover:border-sky-300/80 text-sky-300/90 hover:text-sky-200 text-xs font-semibold px-3 py-1.5 cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Exportar CSV</span>
@@ -837,7 +837,7 @@ export default function AdminCouponsTab({
               type="button"
               disabled={filteredCoupons.length === 0}
               onClick={handleExportExcel}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-emerald-500/70 hover:border-emerald-400 text-emerald-400 text-xs font-semibold px-3 py-1.5 cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-transparent border border-emerald-300/45 hover:border-emerald-300/80 text-emerald-300/90 hover:text-emerald-200 text-xs font-semibold px-3 py-1.5 cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
               <span>Exportar Excel</span>
@@ -856,7 +856,7 @@ export default function AdminCouponsTab({
       {couponsError && (
         <div
           role="alert"
-          className="rounded-xl bg-red-500/15 border border-red-500/40 p-3 text-xs text-red-300 flex items-center gap-2"
+          className="rounded-xl bg-transparent border border-red-400/55 p-3 text-xs text-red-400 flex items-center gap-2"
         >
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{couponsError}</span>
@@ -867,7 +867,7 @@ export default function AdminCouponsTab({
       <div className="rounded-2xl bg-stone-950 border border-stone-800 overflow-hidden">
         {couponsLoading ? (
           <div className="p-8 text-center text-xs text-stone-400 flex items-center justify-center gap-2">
-            <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
+            <Loader2 className="w-4 h-4 animate-spin text-amber-300/90" />
             <span>Cargando cupones desde Firestore...</span>
           </div>
         ) : filteredCoupons.length === 0 ? (
@@ -923,10 +923,10 @@ export default function AdminCouponsTab({
                               onClick={() => handleCopySingle(coupon.code)}
                               title={`Copiar ${coupon.code}`}
                               aria-label={`Copiar código ${coupon.code}`}
-                              className="p-1 rounded-md text-stone-400 hover:text-amber-300 hover:bg-stone-900 cursor-pointer transition-colors"
+                              className="p-1 rounded-md text-stone-400 hover:text-amber-200 hover:bg-transparent cursor-pointer transition-colors"
                             >
                               {copiedKey === `single-${coupon.code}` ? (
-                                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                <Check className="w-3.5 h-3.5 text-emerald-300/90" />
                               ) : (
                                 <Copy className="w-3.5 h-3.5" />
                               )}
@@ -938,7 +938,7 @@ export default function AdminCouponsTab({
                           <div className="flex flex-col items-start gap-1">
                             <span
                               className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide ${
-                                isGroup ? 'text-orange-400' : 'text-amber-300'
+                                isGroup ? 'text-amber-200/90' : 'text-amber-300/90'
                               }`}
                             >
                               {isGroup ? (
@@ -954,8 +954,8 @@ export default function AdminCouponsTab({
                               )}
                             </span>
                             {coupon.label && (
-                              <span className="inline-flex items-center gap-1 rounded-md bg-zinc-950 border border-stone-700 px-2 py-0.5 text-[11px] text-stone-200">
-                                <Tag className="w-3 h-3 text-orange-400 shrink-0" />
+                              <span className="inline-flex items-center gap-1 rounded-md bg-transparent border border-stone-700 px-2 py-0.5 text-[11px] text-stone-200">
+                                <Tag className="w-3 h-3 text-amber-300/90 shrink-0" />
                                 <span>{coupon.label}</span>
                               </span>
                             )}
@@ -964,10 +964,10 @@ export default function AdminCouponsTab({
 
                         <td className="py-2.5 px-3 whitespace-nowrap">
                           <span
-                            className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-bold font-mono ${
+                            className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-bold font-mono bg-transparent ${
                               isFree
-                                ? 'border-amber-400/70 text-amber-300 bg-amber-500/10'
-                                : 'border-sky-500/60 text-sky-300 bg-sky-500/10'
+                                ? 'border-amber-300/45 text-amber-200/90'
+                                : 'border-sky-300/45 text-sky-300/90'
                             }`}
                           >
                             {coupon.descuento}% OFF
@@ -983,10 +983,10 @@ export default function AdminCouponsTab({
 
                         <td className="py-2.5 px-3 whitespace-nowrap">
                           <span
-                            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-transparent ${
                               isExhausted
-                                ? 'border-stone-700 text-stone-400 bg-zinc-950'
-                                : 'border-emerald-500/60 text-emerald-400 bg-emerald-500/10'
+                                ? 'border-stone-700 text-stone-400'
+                                : 'border-emerald-300/45 text-emerald-300/90'
                             }`}
                           >
                             {isExhausted ? 'Agotado' : 'Disponible'}
@@ -1004,7 +1004,7 @@ export default function AdminCouponsTab({
                               <div className="text-[11px] font-mono text-stone-400 flex flex-wrap items-center gap-x-2">
                                 {usadosPor[0].dni && <span>DNI {usadosPor[0].dni}</span>}
                                 {usadosPor[0].registrationCode && (
-                                  <span className="text-amber-300">
+                                  <span className="text-amber-200/90">
                                     {usadosPor[0].registrationCode}
                                   </span>
                                 )}
@@ -1019,7 +1019,7 @@ export default function AdminCouponsTab({
                                 type="button"
                                 onClick={() => toggleExpandUsers(coupon.code)}
                                 aria-expanded={isUsersExpanded}
-                                className="inline-flex items-center gap-1 rounded-lg bg-zinc-950 border border-stone-700 hover:border-orange-500/70 text-stone-200 px-2 py-1 text-[11px] font-semibold cursor-pointer transition-colors"
+                                className="inline-flex items-center gap-1 rounded-lg bg-transparent border border-stone-700 hover:border-amber-300/55 text-stone-200 px-2 py-1 text-[11px] font-semibold cursor-pointer transition-colors"
                               >
                                 <span>Ver {usadosPor.length} corredores</span>
                                 <ChevronDown
@@ -1061,10 +1061,10 @@ export default function AdminCouponsTab({
                                   ? 'Confirmar eliminación de cupón'
                                   : `Eliminar cupón ${coupon.code}`
                               }
-                              className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[11px] font-semibold transition-colors cursor-pointer disabled:opacity-40 ${
+                              className={`inline-flex items-center gap-1 rounded-lg bg-transparent border px-2 py-1 text-[11px] font-semibold transition-colors cursor-pointer disabled:opacity-40 ${
                                 isConfirmDelete
-                                  ? 'border-red-500 text-red-400 bg-red-500/10'
-                                  : 'border-transparent text-stone-400 hover:border-red-500/60 hover:text-red-400'
+                                  ? 'border-red-400/70 text-red-400'
+                                  : 'border-transparent text-stone-400 hover:border-red-400/60 hover:text-red-400'
                               }`}
                             >
                               {isBusy ? (
@@ -1092,7 +1092,7 @@ export default function AdminCouponsTab({
                 <button
                   type="button"
                   onClick={() => setShowAllRows(true)}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-amber-300 text-xs font-semibold px-4 py-1.5 cursor-pointer transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 text-xs font-semibold px-4 py-1.5 cursor-pointer transition-colors"
                 >
                   Mostrar todos ({filteredCoupons.length} códigos)
                 </button>

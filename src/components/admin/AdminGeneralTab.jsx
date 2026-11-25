@@ -138,7 +138,7 @@ export default function AdminGeneralTab({
             value={draft.title ?? ''}
             placeholder={DEFAULT_RACE_TITLE}
             onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-            className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
+            className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
           />
         </div>
         <div>
@@ -150,7 +150,7 @@ export default function AdminGeneralTab({
             value={draft.edition ?? ''}
             placeholder="Dejar vacío para ocultar"
             onChange={(e) => setDraft({ ...draft, edition: e.target.value })}
-            className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
+            className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
           />
         </div>
         <div>
@@ -161,7 +161,7 @@ export default function AdminGeneralTab({
             type="text"
             value={draft.subtitle}
             onChange={(e) => setDraft({ ...draft, subtitle: e.target.value })}
-            className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
+            className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
           />
         </div>
         <div>
@@ -174,18 +174,18 @@ export default function AdminGeneralTab({
               aria-label="Fecha de largada"
               value={datePart}
               onChange={(e) => handleTargetDateChange(e.target.value, timePart)}
-              className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-sm font-mono font-semibold text-white [color-scheme:dark]"
+              className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-2.5 py-1.5 text-sm font-mono font-semibold text-white [color-scheme:dark]"
             />
             <input
               type="time"
               aria-label="Hora de largada"
               value={timePart}
               onChange={(e) => handleTargetDateChange(datePart, e.target.value)}
-              className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-sm font-mono font-semibold text-white [color-scheme:dark]"
+              className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-2.5 py-1.5 text-sm font-mono font-semibold text-white [color-scheme:dark]"
             />
           </div>
           <p className="mt-1 text-[11px] text-stone-400">
-            Cuenta regresiva del Hero → <span className="font-mono text-orange-400">{formattedShortDate}</span>
+            Cuenta regresiva del Hero → <span className="font-mono text-amber-200/90">{formattedShortDate}</span>
             {' · '}
             {formattedDayMonth} · {formattedTime}
           </p>
@@ -199,7 +199,7 @@ export default function AdminGeneralTab({
             placeholder="5492915228310"
             value={draft.whatsappNumber ?? ''}
             onChange={(e) => setDraft({ ...draft, whatsappNumber: e.target.value })}
-            className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
+            className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
           />
         </div>
         <div>
@@ -220,14 +220,14 @@ export default function AdminGeneralTab({
                 }));
                 if (emailTestStatus) setEmailTestStatus(null);
               }}
-              className="flex-1 min-w-0 rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
+              className="flex-1 min-w-0 rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
             />
             <button
               type="button"
               disabled={testingEmail}
               onClick={handleTestEmailSend}
               title="Enviar correo de prueba real a esta dirección con EmailJS"
-              className="inline-flex items-center gap-1 rounded-xl bg-stone-950 hover:bg-stone-800 border border-orange-500/60 hover:border-orange-400 text-orange-400 font-medium text-xs px-2.5 py-1.5 shrink-0 cursor-pointer transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1 rounded-xl bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 font-medium text-xs px-2.5 py-1.5 shrink-0 cursor-pointer transition-colors disabled:opacity-50"
             >
               {testingEmail ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -261,7 +261,7 @@ export default function AdminGeneralTab({
             type="url"
             value={draft.googleMapsUrl}
             onChange={(e) => setDraft({ ...draft, googleMapsUrl: e.target.value })}
-            className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
+            className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
           />
         </div>
         <div className="sm:col-span-2">
@@ -272,7 +272,7 @@ export default function AdminGeneralTab({
             type="text"
             value={draft.locationName}
             onChange={(e) => setDraft({ ...draft, locationName: e.target.value })}
-            className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
+            className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
           />
         </div>
 
@@ -323,7 +323,7 @@ export default function AdminGeneralTab({
       {/* Precios y Datos Bancarios de Inscripción */}
       <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5">
         <div className="flex items-center gap-2">
-          <Landmark className="w-4 h-4 text-orange-500 shrink-0" />
+          <Landmark className="w-4 h-4 text-amber-300/90 shrink-0" />
           <div>
             <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
               Valores y Cuenta Bancaria para Inscripciones
@@ -369,7 +369,7 @@ export default function AdminGeneralTab({
               value={draft.payment?.bankAlias || ''}
               onChange={(e) => onUpdatePaymentField('bankAlias', e.target.value)}
               placeholder="RETO.AL.FILO"
-              className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-orange-400"
+              className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-amber-200/90"
             />
           </div>
           <div>
@@ -379,7 +379,7 @@ export default function AdminGeneralTab({
               value={draft.payment?.bankCbu || ''}
               onChange={(e) => onUpdatePaymentField('bankCbu', e.target.value)}
               placeholder="0000003100000000000000"
-              className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
+              className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
             />
           </div>
           <div>
@@ -391,7 +391,7 @@ export default function AdminGeneralTab({
               value={draft.payment?.bankHolder || ''}
               onChange={(e) => onUpdatePaymentField('bankHolder', e.target.value)}
               placeholder="Organización Reto al Filo"
-              className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
+              className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
             />
           </div>
           <div>
@@ -403,7 +403,7 @@ export default function AdminGeneralTab({
               value={draft.payment?.bankEntity || ''}
               onChange={(e) => onUpdatePaymentField('bankEntity', e.target.value)}
               placeholder="Mercado Pago / Banco Provincia"
-              className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
+              className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
             />
           </div>
           <div className="sm:col-span-3">
@@ -414,7 +414,7 @@ export default function AdminGeneralTab({
               rows={1}
               value={draft.payment?.instructions || ''}
               onChange={(e) => onUpdatePaymentField('instructions', e.target.value)}
-              className="rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-xs text-stone-200"
+              className="rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-2 text-xs text-stone-200"
             />
           </div>
         </div>
@@ -546,7 +546,7 @@ export default function AdminGeneralTab({
           <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2.5">
               <div className="flex items-center gap-2 min-w-0">
-                <MapPin className="w-4 h-4 text-orange-500 shrink-0" />
+                <MapPin className="w-4 h-4 text-amber-300/90 shrink-0" />
                 <div className="min-w-0">
                   <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
                     Descuento Residentes del Distrito
@@ -561,7 +561,7 @@ export default function AdminGeneralTab({
               <div className="flex items-center gap-2.5 shrink-0">
                 <span
                   className={`text-[11px] font-semibold ${
-                    discountEnabled ? 'text-emerald-400' : 'text-stone-400'
+                    discountEnabled ? 'text-emerald-300/90' : 'text-stone-400'
                   }`}
                 >
                   {discountEnabled ? 'Beneficio Activo' : 'Desactivado'}
@@ -572,16 +572,16 @@ export default function AdminGeneralTab({
                   aria-checked={discountEnabled}
                   aria-label="Activar o desactivar descuento para residentes del distrito"
                   onClick={handleToggleResidentDiscount}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full border transition-colors cursor-pointer ${
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full bg-transparent border transition-colors cursor-pointer ${
                     discountEnabled
-                      ? 'bg-emerald-500/25 border-emerald-400'
-                      : 'bg-zinc-900 border-stone-700'
+                      ? 'border-emerald-300/75'
+                      : 'border-stone-700'
                   }`}
                 >
                   <span
                     className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
                       discountEnabled
-                        ? 'translate-x-5.5 bg-emerald-400'
+                        ? 'translate-x-5.5 bg-emerald-300'
                         : 'translate-x-1 bg-stone-400'
                     }`}
                   />
@@ -607,7 +607,7 @@ export default function AdminGeneralTab({
                     value={draft.residentDiscountPercent ?? DEFAULT_RESIDENT_DISCOUNT_PERCENT}
                     onChange={(e) => handlePercentChange(e.target.value)}
                     onBlur={handlePercentBlur}
-                    className="w-24 rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-bold text-emerald-400 text-center"
+                    className="w-24 rounded-xl bg-stone-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-bold text-emerald-300/90 text-center"
                   />
                   <span className="text-sm font-mono font-bold text-stone-300">% OFF</span>
                 </div>
@@ -664,7 +664,7 @@ export default function AdminGeneralTab({
                   <button
                     type="button"
                     onClick={handleRestoreDefaultLocalities}
-                    className="inline-flex items-center gap-1 rounded-xl bg-stone-950 text-stone-300 border border-stone-700 hover:border-orange-500/70 hover:text-orange-400 text-[11px] font-medium px-2.5 py-1 cursor-pointer transition-colors"
+                    className="inline-flex items-center gap-1 rounded-xl bg-transparent text-stone-300 border border-stone-700 hover:border-amber-200/75 hover:text-amber-200 text-[11px] font-medium px-2.5 py-1 cursor-pointer transition-colors"
                   >
                     <RotateCcw className="w-3 h-3" />
                     <span>Restaurar localidades oficiales</span>
@@ -676,7 +676,7 @@ export default function AdminGeneralTab({
                 {currentLocalities.map((loc, idx) => (
                   <span
                     key={`${loc}-${idx}`}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-stone-950 border border-emerald-500/45 px-2.5 py-1 text-[11px] font-medium text-emerald-300"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-transparent border border-emerald-300/45 px-2.5 py-1 text-[11px] font-medium text-emerald-300/90"
                   >
                     <span>{loc}</span>
                     <button
@@ -691,7 +691,7 @@ export default function AdminGeneralTab({
                   </span>
                 ))}
                 {currentLocalities.length === 0 && (
-                  <span className="text-[11px] text-amber-400 italic">
+                  <span className="text-[11px] text-amber-200/90 italic">
                     Lista vacía: al guardar se restaurarán las localidades oficiales por defecto.
                   </span>
                 )}
@@ -710,12 +710,12 @@ export default function AdminGeneralTab({
                   }}
                   placeholder="Agregar localidad (ej. Dufaur o varias separadas por coma)"
                   aria-label="Agregar nueva localidad habilitada"
-                  className="flex-1 min-w-0 rounded-xl bg-stone-950 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs text-white"
+                  className="flex-1 min-w-0 rounded-xl bg-stone-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-xs text-white"
                 />
                 <button
                   type="button"
                   onClick={handleAddLocalities}
-                  className="inline-flex items-center gap-1 rounded-xl bg-stone-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-medium px-3 py-1.5 cursor-pointer shrink-0 transition-colors"
+                  className="inline-flex items-center gap-1 rounded-xl bg-transparent text-amber-200/90 hover:text-amber-100 border border-amber-300/45 hover:border-amber-200/75 text-xs font-medium px-3 py-1.5 cursor-pointer shrink-0 transition-colors"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Agregar</span>
@@ -736,7 +736,7 @@ export default function AdminGeneralTab({
                   onChange={(e) => handleLocalitiesTextChange(e.target.value)}
                   onBlur={handleLocalitiesTextBlur}
                   placeholder={DEFAULT_RESIDENT_LOCALITIES.join(', ')}
-                  className="w-full rounded-xl bg-stone-950 border border-stone-800 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono text-stone-200"
+                  className="w-full rounded-xl bg-stone-950 border border-stone-800 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-xs font-mono text-stone-200"
                 />
               </div>
             </div>
@@ -832,7 +832,7 @@ export default function AdminGeneralTab({
           <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5">
             <div className="flex flex-wrap items-center justify-between gap-2.5">
               <div className="flex items-center gap-2 min-w-0">
-                <Users className="w-4 h-4 text-orange-500 shrink-0" />
+                <Users className="w-4 h-4 text-amber-300/90 shrink-0" />
                 <div className="min-w-0">
                   <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
                     Beneficios para Teams (Tarjeta en Hero)
@@ -847,7 +847,7 @@ export default function AdminGeneralTab({
               <div className="flex items-center gap-2.5 shrink-0">
                 <span
                   className={`text-[11px] font-semibold ${
-                    teamsBenefitEnabled ? 'text-emerald-400' : 'text-stone-400'
+                    teamsBenefitEnabled ? 'text-emerald-300/90' : 'text-stone-400'
                   }`}
                 >
                   {teamsBenefitEnabled ? 'Tarjeta Activa' : 'Oculta'}
@@ -867,16 +867,16 @@ export default function AdminGeneralTab({
                       ),
                     }))
                   }
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full border transition-colors cursor-pointer ${
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full bg-transparent border transition-colors cursor-pointer ${
                     teamsBenefitEnabled
-                      ? 'bg-emerald-500/25 border-emerald-400'
-                      : 'bg-zinc-900 border-stone-700'
+                      ? 'border-emerald-300/75'
+                      : 'border-stone-700'
                   }`}
                 >
                   <span
                     className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
                       teamsBenefitEnabled
-                        ? 'translate-x-5.5 bg-emerald-400'
+                        ? 'translate-x-5.5 bg-emerald-300'
                         : 'translate-x-1 bg-stone-400'
                     }`}
                   />
@@ -915,7 +915,7 @@ export default function AdminGeneralTab({
                   }
                 }}
                 placeholder={DEFAULT_TEAMS_BENEFIT_EMAIL}
-                className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
+                className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-semibold text-white"
               />
               <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
                 <span className="text-[11px] text-stone-400">
@@ -947,7 +947,7 @@ export default function AdminGeneralTab({
                       value={draft.teamsGroupDiscountPercent ?? DEFAULT_TEAMS_GROUP_DISCOUNT_PERCENT}
                       onChange={(e) => handleTeamsGroupDiscountChange(e.target.value)}
                       onBlur={handleTeamsGroupDiscountBlur}
-                      className="w-24 rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-bold text-amber-400 text-center"
+                      className="w-24 rounded-xl bg-stone-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-bold text-amber-200/90 text-center"
                     />
                     <span className="text-xs font-mono font-semibold text-stone-300">% OFF</span>
                   </div>
@@ -970,7 +970,7 @@ export default function AdminGeneralTab({
                       value={draft.teamsFreeEvery ?? DEFAULT_TEAMS_FREE_EVERY}
                       onChange={(e) => handleTeamsFreeEveryChange(e.target.value)}
                       onBlur={handleTeamsFreeEveryBlur}
-                      className="w-24 rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-bold text-amber-400 text-center"
+                      className="w-24 rounded-xl bg-stone-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-sm font-mono font-bold text-amber-200/90 text-center"
                     />
                     <span className="text-xs font-semibold text-stone-300">
                       {previewTeamsFreeEvery === 1 ? 'inscripto' : 'inscriptos'}
@@ -983,16 +983,16 @@ export default function AdminGeneralTab({
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-300">
                   Vista previa en el cartel del Hero
                 </span>
-                <div className="rounded-lg bg-stone-950 border border-orange-500/35 px-3 py-2 space-y-1">
+                <div className="rounded-lg bg-transparent border border-amber-300/35 px-3 py-2 space-y-1">
                   <div className="text-xs text-stone-200 font-medium">
                     • Código Grupal:{' '}
-                    <strong className="font-black text-amber-400">
+                    <strong className="font-black text-amber-200/90">
                       {previewTeamsGroupDiscount}% OFF
                     </strong>{' '}
                     para el Team
                   </div>
                   <div className="text-xs text-stone-200 font-medium">
-                    • Cupones <strong className="font-black text-amber-400">100% OFF</strong>: Profe
+                    • Cupones <strong className="font-black text-amber-200/90">100% OFF</strong>: Profe
                     y Pases Libres{' '}
                     <span className="text-[11px] text-stone-400">
                       (1 cada {previewTeamsFreeEvery}{' '}
@@ -1048,7 +1048,7 @@ export default function AdminGeneralTab({
           <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <PackageCheck className="w-4 h-4 text-orange-500 shrink-0" />
+                <PackageCheck className="w-4 h-4 text-amber-300/90 shrink-0" />
                 <div>
                   <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
                     ¿Qué incluye la Inscripción? (Kit del Corredor)
@@ -1062,7 +1062,7 @@ export default function AdminGeneralTab({
               <button
                 type="button"
                 onClick={handleAddKitItem}
-                className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-medium px-3 py-1.5 cursor-pointer transition-colors"
+                className="inline-flex items-center gap-1 rounded-xl bg-transparent text-amber-200/90 hover:text-amber-100 border border-amber-300/45 hover:border-amber-200/75 text-xs font-medium px-3 py-1.5 cursor-pointer transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Agregar ítem</span>
@@ -1078,7 +1078,7 @@ export default function AdminGeneralTab({
                     onChange={(e) => handleKitItemChange(idx, e.target.value)}
                     placeholder="Ej. Remera técnica oficial del evento"
                     aria-label={`Ítem incluido en el kit ${idx + 1}`}
-                    className="flex-1 min-w-0 rounded-xl bg-zinc-950 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono font-semibold text-white"
+                    className="flex-1 min-w-0 rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-1.5 text-xs font-mono font-semibold text-white"
                   />
                   <button
                     type="button"
@@ -1159,7 +1159,7 @@ export default function AdminGeneralTab({
           <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <Handshake className="w-4 h-4 text-orange-500 shrink-0" />
+                <Handshake className="w-4 h-4 text-amber-300/90 shrink-0" />
                 <div>
                   <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
                     Sponsors Oficiales (Zócalo «Nos acompañan:»)
@@ -1172,7 +1172,7 @@ export default function AdminGeneralTab({
               <button
                 type="button"
                 onClick={handleAddSponsor}
-                className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-medium px-3 py-1.5 cursor-pointer transition-colors"
+                className="inline-flex items-center gap-1 rounded-xl bg-transparent text-amber-200/90 hover:text-amber-100 border border-amber-300/45 hover:border-amber-200/75 text-xs font-medium px-3 py-1.5 cursor-pointer transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Agregar Sponsor</span>
@@ -1223,7 +1223,7 @@ export default function AdminGeneralTab({
                           onChange={(e) => handleSponsorFieldChange(idx, 'name', e.target.value)}
                           placeholder="Nombre (ej. ENA Sport)"
                           aria-label={`Nombre del sponsor ${idx + 1}`}
-                          className="w-full rounded-lg bg-stone-950 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-xs font-mono font-semibold text-white"
+                          className="w-full rounded-lg bg-stone-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-2.5 py-1.5 text-xs font-mono font-semibold text-white"
                         />
                         <input
                           type="text"
@@ -1231,7 +1231,7 @@ export default function AdminGeneralTab({
                           onChange={(e) => handleSponsorFieldChange(idx, 'linkUrl', e.target.value)}
                           placeholder="Instagram o Web (ej. @enasport o https://...)"
                           aria-label={`Link web o Instagram del sponsor ${idx + 1}`}
-                          className="w-full rounded-lg bg-stone-950 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-xs font-mono text-white"
+                          className="w-full rounded-lg bg-stone-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-2.5 py-1.5 text-xs font-mono text-white"
                         />
                         <div className="flex items-center gap-1.5">
                           <input
@@ -1240,11 +1240,11 @@ export default function AdminGeneralTab({
                             onChange={(e) => handleSponsorFieldChange(idx, 'logoUrl', e.target.value)}
                             placeholder="URL del logo o subir →"
                             aria-label={`URL del logo del sponsor ${idx + 1}`}
-                            className="flex-1 min-w-0 rounded-lg bg-stone-950 border border-orange-500/50 focus:border-orange-400 focus:outline-none px-2.5 py-1.5 text-xs font-mono text-stone-300"
+                            className="flex-1 min-w-0 rounded-lg bg-stone-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-2.5 py-1.5 text-xs font-mono text-stone-300"
                           />
                           <label
                             title="Subir archivo de logo (PNG, WebP, SVG o JPG)"
-                            className={`inline-flex items-center gap-1 rounded-lg bg-stone-950 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-[11px] font-medium px-2 py-1.5 shrink-0 transition-colors ${
+                            className={`inline-flex items-center gap-1 rounded-lg bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 text-[11px] font-medium px-2 py-1.5 shrink-0 transition-colors ${
                               isUploading ? 'opacity-50 cursor-wait' : 'cursor-pointer'
                             }`}
                           >
@@ -1276,10 +1276,10 @@ export default function AdminGeneralTab({
                             handleSponsorFieldChange(idx, 'invertOnDark', !sp.invertOnDark)
                           }
                           title="Invierte logos negros a blanco puro para que contrasten en el pie de página oscuro"
-                          className={`rounded-lg border px-2 py-1 text-[10px] font-semibold transition-colors cursor-pointer ${
+                          className={`rounded-lg bg-transparent border px-2 py-1 text-[10px] font-semibold transition-colors cursor-pointer ${
                             sp.invertOnDark
-                              ? 'bg-white text-stone-950 border-white'
-                              : 'bg-stone-950 text-stone-400 border-stone-700 hover:border-stone-500 hover:text-stone-200'
+                              ? 'border-stone-200/85 text-stone-100'
+                              : 'text-stone-400 border-stone-700 hover:border-stone-500 hover:text-stone-200'
                           }`}
                         >
                           {sp.invertOnDark ? 'Blanco ✓' : 'Color original'}
@@ -1324,14 +1324,14 @@ export default function AdminGeneralTab({
         return (
           <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-4">
             <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4 text-orange-500 shrink-0" />
+              <FileText className="w-4 h-4 text-amber-300/90 shrink-0" />
               <div>
                 <h4 className="font-display text-sm font-medium text-white uppercase tracking-wide">
                   Documentos Legales (Deslinde y Apto Médico A4)
                 </h4>
                 <p className="text-[11px] text-stone-400">
                   Editá el texto que aparece impreso en el Deslinde y en el Apto Médico. Usá{' '}
-                  <code className="text-orange-400 bg-zinc-900 px-1 rounded">{'{RACE_TITLE}'}</code>{' '}
+                  <code className="text-amber-200/90 bg-transparent border border-amber-300/35 px-1 rounded">{'{RACE_TITLE}'}</code>{' '}
                   donde quieras que aparezca el nombre del evento.
                 </p>
               </div>
@@ -1351,7 +1351,7 @@ export default function AdminGeneralTab({
                     type="button"
                     onClick={() => openPrintableWaiver({ raceConfig: draft })}
                     title="Vista previa A4 del Deslinde con el texto actual"
-                    className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-medium px-2.5 py-1.5 cursor-pointer transition-colors"
+                    className="inline-flex items-center gap-1 rounded-xl bg-transparent text-amber-200/90 hover:text-amber-100 border border-amber-300/45 hover:border-amber-200/75 text-xs font-medium px-2.5 py-1.5 cursor-pointer transition-colors"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     <span>Vista previa A4</span>
@@ -1361,14 +1361,14 @@ export default function AdminGeneralTab({
                       type="button"
                       onClick={() => setDraft((prev) => ({ ...prev, waiverCustomText: '' }))}
                       title="Restaurar el texto original del Deslinde"
-                      className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-stone-400 border border-stone-700 hover:border-rose-500 hover:text-rose-400 text-xs font-medium px-2.5 py-1.5 cursor-pointer transition-colors"
+                      className="inline-flex items-center gap-1 rounded-xl bg-transparent text-stone-400 border border-stone-700 hover:border-rose-400/70 hover:text-rose-300 text-xs font-medium px-2.5 py-1.5 cursor-pointer transition-colors"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>Restaurar original</span>
                     </button>
                   )}
                   {waiverIsDefault && (
-                    <span className="text-[11px] text-emerald-500 font-medium">✓ Texto oficial</span>
+                    <span className="text-[11px] text-emerald-300/90 font-medium">✓ Texto oficial</span>
                   )}
                 </div>
               </div>
@@ -1377,7 +1377,7 @@ export default function AdminGeneralTab({
                 value={waiverText}
                 onChange={(e) => setDraft((prev) => ({ ...prev, waiverCustomText: e.target.value }))}
                 placeholder={DEFAULT_WAIVER_TEXT}
-                className="rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-xs text-stone-200 font-mono"
+                className="rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-2 text-xs text-stone-200 font-mono"
               />
             </div>
 
@@ -1392,7 +1392,7 @@ export default function AdminGeneralTab({
                     type="button"
                     onClick={() => openPrintableMedicalCert({ raceConfig: draft })}
                     title="Vista previa A4 del Apto Médico con el texto actual"
-                    className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-orange-400 border border-orange-500/70 hover:border-orange-400 text-xs font-medium px-2.5 py-1.5 cursor-pointer transition-colors"
+                    className="inline-flex items-center gap-1 rounded-xl bg-transparent text-amber-200/90 hover:text-amber-100 border border-amber-300/45 hover:border-amber-200/75 text-xs font-medium px-2.5 py-1.5 cursor-pointer transition-colors"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     <span>Vista previa A4</span>
@@ -1402,14 +1402,14 @@ export default function AdminGeneralTab({
                       type="button"
                       onClick={() => setDraft((prev) => ({ ...prev, medicalCustomText: '' }))}
                       title="Restaurar el texto original del Apto Médico"
-                      className="inline-flex items-center gap-1 rounded-xl bg-zinc-950 text-stone-400 border border-stone-700 hover:border-rose-500 hover:text-rose-400 text-xs font-medium px-2.5 py-1.5 cursor-pointer transition-colors"
+                      className="inline-flex items-center gap-1 rounded-xl bg-transparent text-stone-400 border border-stone-700 hover:border-rose-400/70 hover:text-rose-300 text-xs font-medium px-2.5 py-1.5 cursor-pointer transition-colors"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>Restaurar original</span>
                     </button>
                   )}
                   {medicalIsDefault && (
-                    <span className="text-[11px] text-emerald-500 font-medium">✓ Texto oficial</span>
+                    <span className="text-[11px] text-emerald-300/90 font-medium">✓ Texto oficial</span>
                   )}
                 </div>
               </div>
@@ -1418,7 +1418,7 @@ export default function AdminGeneralTab({
                 value={medicalText}
                 onChange={(e) => setDraft((prev) => ({ ...prev, medicalCustomText: e.target.value }))}
                 placeholder={DEFAULT_MEDICAL_TEXT}
-                className="rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-2 text-xs text-stone-200 font-mono"
+                className="rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-200/80 focus:outline-none px-3 py-2 text-xs text-stone-200 font-mono"
               />
               <p className="text-[11px] text-stone-500">
                 Este texto aparece luego del nombre y DNI del corredor en la sección «Certifico que…».
