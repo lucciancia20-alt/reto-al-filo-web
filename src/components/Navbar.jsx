@@ -60,7 +60,7 @@ export default function Navbar({ raceConfig = RACE_CONFIG, onOpenModal }) {
             {editionChars.length > 0 && (
               <span
                 aria-label={editionText}
-                className="w-full flex items-center justify-between text-[9.5px] sm:text-[10px] leading-none text-[var(--theme-sub)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)] select-none"
+                className="w-full rounded-sm bg-[#F5ECD2] px-1.5 py-[2px] flex items-center justify-between text-[8.5px] sm:text-[9px] font-extrabold italic leading-none text-zinc-900 select-none"
               >
                 {editionChars.map((ch, idx) => (
                   <span key={idx} aria-hidden="true">

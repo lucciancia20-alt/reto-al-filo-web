@@ -983,18 +983,18 @@ export default function AdminGeneralTab({
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-300">
                   Vista previa en el cartel del Hero
                 </span>
-                <div className="rounded-lg bg-transparent border border-amber-300/35 px-3 py-2 space-y-1">
-                  <div className="text-xs text-stone-200 font-medium">
-                    • Código Grupal:{' '}
-                    <strong className="font-black text-amber-200/90">
+                <div className="rounded-lg bg-transparent border border-amber-300/35 p-2 space-y-1.5">
+                  <div className="rounded-[3px] bg-[#F5ECD2] px-2.5 py-1 text-xs text-zinc-900 font-bold">
+                    Código Grupal:{' '}
+                    <strong className="font-black text-[#173f2d]">
                       {previewTeamsGroupDiscount}% OFF
                     </strong>{' '}
                     para el Team
                   </div>
-                  <div className="text-xs text-stone-200 font-medium">
-                    • Cupones <strong className="font-black text-amber-200/90">100% OFF</strong>: Profe
+                  <div className="rounded-[3px] bg-[#F5ECD2] px-2.5 py-1 text-xs text-zinc-900 font-bold">
+                    Cupones <strong className="font-black text-[#173f2d]">100% OFF</strong>: Profe
                     y Pases Libres{' '}
-                    <span className="text-[11px] text-stone-400">
+                    <span className="text-[11px] font-semibold text-zinc-700">
                       (1 cada {previewTeamsFreeEvery}{' '}
                       {previewTeamsFreeEvery === 1 ? 'inscripto' : 'inscriptos'})
                     </span>

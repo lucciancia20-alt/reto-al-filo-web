@@ -247,7 +247,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
         {/* Franja de sponsors — arriba debajo del Navbar fijo */}
         {activeSponsors.length > 0 && (
           <div className="w-full max-w-6xl xl:max-w-7xl mx-auto mb-3.5 px-2 sm:px-4 flex flex-col items-center justify-center gap-2">
-            <span className="inline-flex items-center px-4 py-1 rounded-md bg-[var(--theme-edition-pill-bg)] backdrop-blur-sm border border-[var(--theme-edition-pill-border)] shadow-none text-[var(--theme-edition-text)] font-display-athletic font-extrabold text-sm sm:text-base tracking-widest -skew-x-6 shrink-0">
+            <span className="inline-flex items-center px-4 py-1 rounded-md bg-[#F5ECD2] border border-[var(--theme-edition-pill-border)] shadow-none text-zinc-900 font-display-athletic font-extrabold text-sm sm:text-base tracking-widest -skew-x-6 shrink-0">
               <span className="skew-x-6">Nos acompañan:</span>
             </span>
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mx-auto max-w-[300px] sm:max-w-none">
@@ -319,14 +319,14 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
                     <span className="block text-[31px] sm:text-[34px] mt-0.5">PARA TEAMS</span>
                   </span>
                   <span className="mt-2 flex flex-col gap-1">
-                    <span className="block rounded-[3px] bg-[#f4f2e1] px-2.5 py-0.5 font-display text-[11.5px] sm:text-xs font-bold text-slate-950 leading-snug whitespace-nowrap">
+                    <span className="block rounded-[3px] bg-[#F5ECD2] px-2.5 py-0.5 font-display text-[11.5px] sm:text-xs font-bold text-zinc-900 leading-snug whitespace-nowrap">
                       Código Grupal:{' '}
                       <strong className="font-black text-[var(--theme-strip-accent)]">
                         {teamsGroupDiscountPercent}% OFF
                       </strong>{' '}
                       para el Team
                     </span>
-                    <span className="block rounded-[3px] bg-[#f4f2e1] px-2.5 py-0.5 font-display text-[11.5px] sm:text-xs font-bold text-slate-950 leading-snug whitespace-nowrap">
+                    <span className="block rounded-[3px] bg-[#F5ECD2] px-2.5 py-0.5 font-display text-[11.5px] sm:text-xs font-bold text-zinc-900 leading-snug whitespace-nowrap">
                       Cupones{' '}
                       <strong className="font-black text-[var(--theme-strip-accent)]">
                         100% OFF
@@ -388,7 +388,7 @@ export default function HeroSection({ raceConfig = RACE_CONFIG, onOpenModal }) {
               {editionChars.length > 0 && (
                 <p
                   aria-label={raceEdition}
-                  className="hero-subtitle-edition mt-2.5 sm:mt-3 w-full px-3.5 sm:px-5 py-1 sm:py-1.5 rounded-lg bg-[var(--theme-edition-pill-bg)] backdrop-blur-sm border border-[var(--theme-edition-pill-border)] flex items-center justify-between text-sm sm:text-lg md:text-[24px] leading-none select-none"
+                  className="hero-subtitle-edition mt-2.5 sm:mt-3 w-full px-3.5 sm:px-5 py-1 sm:py-1.5 rounded-lg bg-[#F5ECD2] border border-[var(--theme-edition-pill-border)] flex items-center justify-between text-sm sm:text-lg md:text-[24px] leading-none select-none"
                 >
                   {editionChars.map((ch, idx) => (
                     <span key={idx} aria-hidden="true">
