@@ -3,39 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0c0a09" />
-    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <title>Reto al Filo - 2da Edición | Trail Running Abril 2027</title>
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=2" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <title>Reto al Filo - 2da Edición | Trail Running Marzo 2027</title>
     <meta
       name="description"
-      content="Carrera de trail running de montaña Reto al Filo - 2da Edición. 10 de abril de 2027 en Tornquist / Sierra de la Ventana. Distancias 27K Competitivo (+1.510m) y 13K Competitivo (+671m)."
+      content="Carrera de trail running de montaña Reto al Filo - 2da Edición. 13 de marzo de 2027 (8:00 hs) en Tornquist / Sierra de la Ventana. Distancias 27K Competitivo (+1.510m) y 13K Competitivo (+671m)."
     />
 
     <!-- Open Graph / WhatsApp Preview -->
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_AR" />
-    <meta property="og:url" content="https://reto-al-filo-web.onrender.com/" />
-    <meta property="og:title" content="Reto al Filo - 2da Edición | Trail Running Abril 2027" />
+    <meta property="og:url" content="https://reto-al-filo-web.pages.dev/" />
+    <meta property="og:title" content="Reto al Filo - 2da Edición | Trail Running Marzo 2027" />
     <meta
       property="og:description"
-      content="Desafiá las sierras de Tornquist el 10 de abril de 2027. Circuitos GPX reales 27K Competitivo (+1.510m) y 13K Competitivo (+671m). ¡Inscribite ahora!"
+      content="Desafiá las sierras de Tornquist el 13 de marzo de 2027 (8:00 hs). Circuitos GPX reales 27K Competitivo (+1.510m) y 13K Competitivo (+671m). ¡Inscribite ahora!"
     />
     <meta
       property="og:image"
-      content="/images/hero-trail-runners.jpg"
+      content="https://reto-al-filo-web.pages.dev/logo-raf.png"
     />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Reto al Filo - 2da Edición | Trail Running Abril 2027" />
+    <meta name="twitter:title" content="Reto al Filo - 2da Edición | Trail Running Marzo 2027" />
     <meta
       name="twitter:description"
-      content="Carrera de trail running en Tornquist / Sierra de la Ventana. 10 de abril de 2027 · 27K (+1.510m) y 13K (+671m)."
+      content="Carrera de trail running en Tornquist / Sierra de la Ventana. 13 de marzo de 2027 (8:00 hs) · 27K (+1.510m) y 13K (+671m)."
     />
     <meta
       name="twitter:image"
-      content="/images/hero-trail-runners.jpg"
+      content="https://reto-al-filo-web.pages.dev/logo-raf.png"
     />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -45,8 +46,60 @@
       rel="stylesheet"
     />
     <link href="https://fonts.cdnfonts.com/css/vipnagorgialla" rel="stylesheet" />
+
+    <style>
+      #app-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #0a0a0a;
+        opacity: 1;
+        transition: opacity 500ms ease-out, visibility 500ms ease-out;
+      }
+      #app-splash.splash-hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      #app-splash img {
+        width: clamp(150px, 34vw, 220px);
+        height: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.75));
+        animation: raf-splash-in 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      @keyframes raf-splash-in {
+        0% {
+          opacity: 0;
+          transform: scale(0.88);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #app-splash {
+          transition: opacity 200ms linear, visibility 200ms linear;
+        }
+        #app-splash img {
+          animation: none;
+          opacity: 1;
+          transform: none;
+        }
+      }
+    </style>
   </head>
   <body class="bg-stone-950 text-stone-100 antialiased selection:bg-amber-500 selection:text-stone-950">
+    <div id="app-splash" aria-hidden="true">
+      <img src="/logo-raf.png" alt="Reto al Filo" />
+    </div>
+    <script>
+      window.__RAF_SPLASH_START__ = Date.now();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

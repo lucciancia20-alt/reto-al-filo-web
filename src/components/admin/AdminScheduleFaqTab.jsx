@@ -176,7 +176,7 @@ export default function AdminScheduleFaqTab({
                     type="text"
                     value={item.day ?? ''}
                     onChange={(e) => onScheduleChange(idx, 'day', e.target.value)}
-                    placeholder="Ej. Sábado 10"
+                    placeholder="Ej. Sábado 13"
                     aria-label="Día del cronograma"
                     className="sm:col-span-3 w-full rounded-lg bg-zinc-950 border border-orange-500/70 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-xs font-mono font-semibold text-orange-300"
                   />

@@ -1,0 +1,23 @@
+{
+  "name": "Reto al Filo - 2da Edición",
+  "short_name": "Reto al Filo",
+  "description": "Carrera de trail running en Tornquist / Sierra de la Ventana. 13 de marzo de 2027 (8:00 hs).",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

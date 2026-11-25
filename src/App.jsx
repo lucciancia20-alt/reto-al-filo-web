@@ -31,6 +31,32 @@ export default function App() {
   const [adminOpen, setAdminOpen] = useState(() => isAdminUrl());
 
   useEffect(() => {
+    const splashEl = document.getElementById('app-splash');
+    if (!splashEl) return undefined;
+
+    const startedAt =
+      typeof window.__RAF_SPLASH_START__ === 'number'
+        ? window.__RAF_SPLASH_START__
+        : Date.now();
+    const remainingMs = Math.max(0, 2000 - (Date.now() - startedAt));
+    let removeTimer = null;
+
+    const fadeTimer = setTimeout(() => {
+      splashEl.classList.add('splash-hidden');
+      removeTimer = setTimeout(() => {
+        splashEl.remove();
+      }, 550);
+    }, remainingMs);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      if (removeTimer !== null) {
+        clearTimeout(removeTimer);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     const onHashChange = () => {
       if (isAdminUrl()) {
         setAdminOpen(true);

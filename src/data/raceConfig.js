@@ -1,5 +1,5 @@
 export const DEFAULT_RACE_TITLE = 'Reto al Filo';
-export const DEFAULT_TARGET_DATE_ISO = '2027-04-10T09:00:00-03:00';
+export const DEFAULT_TARGET_DATE_ISO = '2027-03-13T08:00:00-03:00';
 export const DEFAULT_RESIDENT_DISCOUNT_ENABLED = true;
 export const DEFAULT_RESIDENT_DISCOUNT_PERCENT = 20;
 export const DEFAULT_RESIDENT_LOCALITIES = [
@@ -16,6 +16,7 @@ export const DEFAULT_RESIDENT_LOCALITIES = [
 export const DEFAULT_TEAMS_BENEFIT_ENABLED = true;
 export const DEFAULT_TEAMS_BENEFIT_EMAIL = 'retoalfilo@gmail.com';
 export const DEFAULT_TEAMS_FREE_EVERY = 10;
+export const DEFAULT_TEAMS_GROUP_DISCOUNT_PERCENT = 10;
 
 /**
  * Texto por defecto de las cláusulas del Deslinde de Responsabilidad A4.
@@ -52,7 +53,7 @@ export const THEME_COLOR_OPTIONS = [
 export const RACE_CONFIG = {
   title: DEFAULT_RACE_TITLE,
   edition: '2da Edición',
-  subtitle: 'Abril 2027',
+  subtitle: 'Marzo 2027',
   themeColor: 'orange',
   targetDateIso: DEFAULT_TARGET_DATE_ISO,
   whatsappNumber: '5492915228310',
@@ -218,7 +219,7 @@ export const RACE_CONFIG = {
 
   schedule: [
     {
-      day: 'Sábado 10',
+      day: 'Sábado 13',
       time: '06:00 hs',
       title: 'Acreditación y entrega de kits',
       description:
@@ -226,7 +227,7 @@ export const RACE_CONFIG = {
       tag: 'Carpa Central',
     },
     {
-      day: 'Sábado 10',
+      day: 'Sábado 13',
       time: '07:30 hs',
       title: 'Charla Técnica obligatoria',
       description:
@@ -234,15 +235,15 @@ export const RACE_CONFIG = {
       tag: 'Arco de Largada',
     },
     {
-      day: 'Sábado 10',
-      time: '09:00 hs',
+      day: 'Sábado 13',
+      time: '08:00 hs',
       title: 'Largada 27K y 13K',
       description:
         'Salida puntual de ambas distancias desde el arco principal del predio hacia el sendero de ascenso.',
       tag: 'Puntual',
     },
     {
-      day: 'Sábado 10',
+      day: 'Sábado 13',
       time: '13:30 hs',
       title: 'Premiación y Tercer Tiempo',
       description:
@@ -334,6 +335,7 @@ export const RACE_CONFIG = {
   teamsBenefitEnabled: DEFAULT_TEAMS_BENEFIT_ENABLED,
   teamsBenefitEmail: '',
   teamsFreeEvery: DEFAULT_TEAMS_FREE_EVERY,
+  teamsGroupDiscountPercent: DEFAULT_TEAMS_GROUP_DISCOUNT_PERCENT,
 };
 
 const ARGENTINA_TIMEZONE = 'America/Argentina/Buenos_Aires';
@@ -371,8 +373,8 @@ const MONTHS_SHORT_ES = [
  */
 export function parseTargetDateParts(isoString = RACE_CONFIG.targetDateIso) {
   const raw = String(isoString || DEFAULT_TARGET_DATE_ISO).trim();
-  let datePart = '2027-04-10';
-  let timePart = '09:00';
+  let datePart = '2027-03-13';
+  let timePart = '08:00';
 
   const parsedMs = Date.parse(raw);
   if (!Number.isNaN(parsedMs)) {
@@ -404,10 +406,10 @@ export function parseTargetDateParts(isoString = RACE_CONFIG.targetDateIso) {
   }
 
   const [yearStr, monthStr, dayStr] = datePart.split('-');
-  const dayNum = Number(dayStr) || 10;
-  const monthIdx = Math.max(0, Math.min(11, (Number(monthStr) || 4) - 1));
-  const monthFull = MONTHS_ES[monthIdx] || 'Abril';
-  const monthShort = MONTHS_SHORT_ES[monthIdx] || 'Abr';
+  const dayNum = Number(dayStr) || 13;
+  const monthIdx = Math.max(0, Math.min(11, (Number(monthStr) || 3) - 1));
+  const monthFull = MONTHS_ES[monthIdx] || 'Marzo';
+  const monthShort = MONTHS_SHORT_ES[monthIdx] || 'Mar';
 
   return {
     datePart,
@@ -629,7 +631,7 @@ export function mergeRaceConfig(override) {
 
   const rawSchedule = Array.isArray(override.schedule)
     ? override.schedule.map((item) => ({
-        day: item?.day ?? 'Sábado 10',
+        day: item?.day ?? 'Sábado 13',
         ...item,
         title: normalizeDistanceCopy(item?.title),
         description: normalizeDistanceCopy(item?.description),
@@ -756,6 +758,18 @@ export function mergeRaceConfig(override) {
     ? Math.min(100, Math.max(1, Math.round(parsedTeamsFreeEvery)))
     : RACE_CONFIG.teamsFreeEvery;
 
+  const rawTeamsGroupDiscount = override.teamsGroupDiscountPercent;
+  const parsedTeamsGroupDiscount =
+    rawTeamsGroupDiscount !== undefined &&
+    rawTeamsGroupDiscount !== null &&
+    String(rawTeamsGroupDiscount).trim() !== ''
+      ? Number(rawTeamsGroupDiscount)
+      : NaN;
+  const resolvedTeamsGroupDiscountPercent =
+    Number.isFinite(parsedTeamsGroupDiscount) && parsedTeamsGroupDiscount >= 1
+      ? Math.min(100, Math.max(1, Math.round(parsedTeamsGroupDiscount)))
+      : RACE_CONFIG.teamsGroupDiscountPercent;
+
   return {
     ...RACE_CONFIG,
     ...override,
@@ -789,6 +803,7 @@ export function mergeRaceConfig(override) {
     teamsBenefitEnabled: resolvedTeamsBenefitEnabled,
     teamsBenefitEmail: resolvedTeamsBenefitEmail,
     teamsFreeEvery: resolvedTeamsFreeEvery,
+    teamsGroupDiscountPercent: resolvedTeamsGroupDiscountPercent,
   };
 }
 
@@ -834,7 +849,7 @@ function parseIsoOrDmyDate(dateStr) {
 
 export function getMaxBirthDateIso(targetDateIso = RACE_CONFIG.targetDateIso, minAge = 18) {
   const targetParts = parseTargetDateParts(targetDateIso || RACE_CONFIG.targetDateIso);
-  const race = parseIsoOrDmyDate(targetParts.datePart) || { year: 2027, month: 4, day: 10 };
+  const race = parseIsoOrDmyDate(targetParts.datePart) || { year: 2027, month: 3, day: 13 };
   const targetYear = race.year - Number(minAge || 18);
   const lastDayOfMonth = new Date(targetYear, race.month, 0).getDate();
   const safeDay = Math.min(race.day, lastDayOfMonth);

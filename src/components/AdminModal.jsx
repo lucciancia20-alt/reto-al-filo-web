@@ -1356,7 +1356,7 @@ export default function AdminModal({
       schedule: [
         ...prev.schedule,
         {
-          day: 'Sábado 10',
+          day: 'Sábado 13',
           time: '14:00 hs',
           title: 'Nuevo hito',
           tag: 'Predio',

@@ -28,6 +28,7 @@ import {
   DEFAULT_RESIDENT_LOCALITIES,
   DEFAULT_TEAMS_BENEFIT_EMAIL,
   DEFAULT_TEAMS_FREE_EVERY,
+  DEFAULT_TEAMS_GROUP_DISCOUNT_PERCENT,
   THEME_COLOR_OPTIONS,
   getRaceTitle,
   getRaceFullTitle,
@@ -793,6 +794,40 @@ export default function AdminGeneralTab({
           });
         };
 
+        const rawTeamsGroupDiscount = Number(draft.teamsGroupDiscountPercent);
+        const previewTeamsGroupDiscount =
+          draft.teamsGroupDiscountPercent !== '' &&
+          draft.teamsGroupDiscountPercent !== null &&
+          Number.isFinite(rawTeamsGroupDiscount) &&
+          rawTeamsGroupDiscount >= 1
+            ? Math.min(100, Math.max(1, Math.round(rawTeamsGroupDiscount)))
+            : DEFAULT_TEAMS_GROUP_DISCOUNT_PERCENT;
+
+        const handleTeamsGroupDiscountChange = (rawVal) => {
+          if (rawVal === '') {
+            setDraft((prev) => ({ ...prev, teamsGroupDiscountPercent: '' }));
+            return;
+          }
+          const parsed = Number.parseInt(rawVal, 10);
+          if (!Number.isFinite(parsed)) return;
+          const clamped = Math.min(100, Math.max(1, parsed));
+          setDraft((prev) => ({ ...prev, teamsGroupDiscountPercent: clamped }));
+        };
+
+        const handleTeamsGroupDiscountBlur = () => {
+          setDraft((prev) => {
+            const parsed = Number(prev.teamsGroupDiscountPercent);
+            const normalized =
+              prev.teamsGroupDiscountPercent !== '' &&
+              prev.teamsGroupDiscountPercent !== null &&
+              Number.isFinite(parsed) &&
+              parsed >= 1
+                ? Math.min(100, Math.max(1, Math.round(parsed)))
+                : DEFAULT_TEAMS_GROUP_DISCOUNT_PERCENT;
+            return { ...prev, teamsGroupDiscountPercent: normalized };
+          });
+        };
+
         return (
           <div className="rounded-2xl bg-stone-950 border border-stone-800 p-3.5 space-y-2.5">
             <div className="flex flex-wrap items-center justify-between gap-2.5">
@@ -894,44 +929,76 @@ export default function AdminGeneralTab({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 items-stretch pt-1">
-              <div className="rounded-xl bg-zinc-950 border border-stone-800 p-2.5 flex flex-col justify-between">
-                <label
-                  htmlFor="admin-teams-free-every"
-                  className="block text-xs font-semibold text-stone-300 mb-1.5"
-                >
-                  Cada cuántos inscriptos un Team recibe 1 cupo FREE
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    id="admin-teams-free-every"
-                    type="number"
-                    min={1}
-                    max={100}
-                    step={1}
-                    value={draft.teamsFreeEvery ?? DEFAULT_TEAMS_FREE_EVERY}
-                    onChange={(e) => handleTeamsFreeEveryChange(e.target.value)}
-                    onBlur={handleTeamsFreeEveryBlur}
-                    className="w-24 rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-bold text-amber-400 text-center"
-                  />
-                  <span className="text-xs font-semibold text-stone-300">
-                    {previewTeamsFreeEvery === 1 ? 'inscripto' : 'inscriptos'}
-                  </span>
+              <div className="rounded-xl bg-zinc-950 border border-stone-800 p-2.5 flex flex-col justify-between gap-2">
+                <div>
+                  <label
+                    htmlFor="admin-teams-group-discount"
+                    className="block text-xs font-semibold text-stone-300 mb-1"
+                  >
+                    Descuento Código Grupal (% OFF)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="admin-teams-group-discount"
+                      type="number"
+                      min={1}
+                      max={100}
+                      step={1}
+                      value={draft.teamsGroupDiscountPercent ?? DEFAULT_TEAMS_GROUP_DISCOUNT_PERCENT}
+                      onChange={(e) => handleTeamsGroupDiscountChange(e.target.value)}
+                      onBlur={handleTeamsGroupDiscountBlur}
+                      className="w-24 rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-bold text-amber-400 text-center"
+                    />
+                    <span className="text-xs font-mono font-semibold text-stone-300">% OFF</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="admin-teams-free-every"
+                    className="block text-xs font-semibold text-stone-300 mb-1"
+                  >
+                    1 cupo FREE cada cuántos inscriptos
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="admin-teams-free-every"
+                      type="number"
+                      min={1}
+                      max={100}
+                      step={1}
+                      value={draft.teamsFreeEvery ?? DEFAULT_TEAMS_FREE_EVERY}
+                      onChange={(e) => handleTeamsFreeEveryChange(e.target.value)}
+                      onBlur={handleTeamsFreeEveryBlur}
+                      className="w-24 rounded-xl bg-stone-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none px-3 py-1.5 text-sm font-mono font-bold text-amber-400 text-center"
+                    />
+                    <span className="text-xs font-semibold text-stone-300">
+                      {previewTeamsFreeEvery === 1 ? 'inscripto' : 'inscriptos'}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="sm:col-span-2 rounded-xl bg-zinc-950 border border-stone-800 p-2.5 flex flex-col justify-center gap-1">
+              <div className="sm:col-span-2 rounded-xl bg-zinc-950 border border-stone-800 p-2.5 flex flex-col justify-center gap-1.5">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-300">
                   Vista previa en el cartel del Hero
                 </span>
-                <div className="rounded-lg bg-stone-950 border border-orange-500/35 px-3 py-2 flex items-center justify-between gap-2">
-                  <span className="text-xs text-stone-200 font-medium">
-                    <strong className="font-black text-amber-400">1 Corredor FREE</strong>{' '}
-                    cada {previewTeamsFreeEvery}{' '}
-                    {previewTeamsFreeEvery === 1 ? 'inscripto' : 'inscriptos'}
-                  </span>
-                  <span className="text-[10px] font-mono text-stone-400 shrink-0">
-                    Default: {DEFAULT_TEAMS_FREE_EVERY}
-                  </span>
+                <div className="rounded-lg bg-stone-950 border border-orange-500/35 px-3 py-2 space-y-1">
+                  <div className="text-xs text-stone-200 font-medium">
+                    • Código Grupal:{' '}
+                    <strong className="font-black text-amber-400">
+                      {previewTeamsGroupDiscount}% OFF
+                    </strong>{' '}
+                    para el Team
+                  </div>
+                  <div className="text-xs text-stone-200 font-medium">
+                    • Cupones <strong className="font-black text-amber-400">100% OFF</strong>: Profe
+                    y Pases Libres{' '}
+                    <span className="text-[11px] text-stone-400">
+                      (1 cada {previewTeamsFreeEvery}{' '}
+                      {previewTeamsFreeEvery === 1 ? 'inscripto' : 'inscriptos'})
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
