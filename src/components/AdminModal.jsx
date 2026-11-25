@@ -1598,7 +1598,7 @@ export default function AdminModal({
         {/* Header del Modal */}
         <div className="px-4 sm:px-5 py-3.5 bg-stone-950 border-b border-stone-800 flex items-center justify-between gap-2 sm:gap-3 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0">
+            <span className="w-9 h-9 rounded-xl bg-transparent border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0">
               {unlocked ? <ShieldCheck className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
             </span>
             <div className="min-w-0">
@@ -1836,10 +1836,10 @@ export default function AdminModal({
                 activeTab !== 'registrations' &&
                 activeTab !== 'coupons' && (
                 <div
-                  className={`p-3.5 rounded-xl text-xs flex items-start gap-2.5 ${
+                  className={`p-3.5 rounded-xl bg-transparent text-xs flex items-start gap-2.5 ${
                     saveFeedback.type === 'success'
-                      ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                      : 'bg-amber-500/15 text-amber-200 border border-amber-500/30'
+                      ? 'text-emerald-300 border border-emerald-500/30'
+                      : 'text-amber-200 border border-amber-500/30'
                   }`}
                 >
                   {saveFeedback.type === 'success' ? (
@@ -1860,7 +1860,11 @@ export default function AdminModal({
                   <button
                     type="button"
                     onClick={handleSafeClose}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 text-xs font-semibold px-4 py-2.5 transition-colors cursor-pointer"
+                    className={`inline-flex items-center gap-1.5 rounded-xl bg-transparent border text-xs font-semibold px-4 py-2.5 transition-colors cursor-pointer ${
+                      activeTab === 'registrations'
+                        ? 'border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100'
+                        : 'border-orange-500/80 hover:border-orange-400 text-orange-400'
+                    }`}
                   >
                     Cerrar Panel
                   </button>
@@ -1883,7 +1887,7 @@ export default function AdminModal({
                 {activeTab === 'registrations' && syncMessage && (
                   <span
                     role="status"
-                    className={`text-xs font-medium ${syncMessage.ok ? 'text-emerald-400' : 'text-red-400'}`}
+                    className={`text-xs font-medium ${syncMessage.ok ? 'text-emerald-300/90' : 'text-red-400'}`}
                   >
                     {syncMessage.text}
                   </span>
@@ -1896,9 +1900,17 @@ export default function AdminModal({
                   onClick={handleScrollDown}
                   title="Ir abajo"
                   aria-label="Ir abajo"
-                  className="w-8 h-8 rounded-full bg-transparent hover:bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400 flex items-center justify-center shadow-none transition-colors cursor-pointer sm:absolute sm:left-1/2 sm:-translate-x-1/2"
+                  className={`w-8 h-8 rounded-full bg-transparent flex items-center justify-center shadow-none transition-colors cursor-pointer sm:absolute sm:left-1/2 sm:-translate-x-1/2 ${
+                    activeTab === 'registrations'
+                      ? 'border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100'
+                      : 'hover:bg-zinc-950 border border-orange-500/80 hover:border-orange-400 text-orange-400'
+                  }`}
                 >
-                  <ChevronDown className="w-4 h-4 text-orange-400 animate-bounce" />
+                  <ChevronDown
+                    className={`w-4 h-4 animate-bounce ${
+                      activeTab === 'registrations' ? 'text-amber-300/90' : 'text-orange-400'
+                    }`}
+                  />
                 </button>
               )}
 
@@ -1939,18 +1951,18 @@ export default function AdminModal({
                     onClick={handleSyncPublicStatuses}
                     disabled={syncingPublic || regsLoading || registrations.length === 0 || regsSource !== 'firestore'}
                     title="Escribe el estado público de todos los inscriptos (consume escrituras). Usar solo cuando haga falta."
-                    className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-2 rounded-xl bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <ShieldCheck className={`w-4 h-4 text-orange-500 ${syncingPublic ? 'animate-pulse' : ''}`} />
+                    <ShieldCheck className={`w-4 h-4 text-amber-300/90 ${syncingPublic ? 'animate-pulse' : ''}`} />
                     {syncingPublic ? 'Sincronizando...' : 'Sincronizar'}
                   </button>
                   <button
                     type="button"
                     onClick={() => loadRegistrations({ force: true })}
                     disabled={regsLoading}
-                    className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 border border-orange-500 hover:border-orange-400 text-orange-400 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-xl bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 font-display font-medium text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 transition-colors cursor-pointer disabled:opacity-50"
                   >
-                    <RefreshCw className={`w-4 h-4 text-orange-500 ${regsLoading ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`w-4 h-4 text-amber-300/90 ${regsLoading ? 'animate-spin' : ''}`} />
                     {regsLoading ? 'Actualizando...' : 'Actualizar Inscriptos'}
                   </button>
                 </div>

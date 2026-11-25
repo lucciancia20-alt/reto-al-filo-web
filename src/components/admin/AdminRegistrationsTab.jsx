@@ -547,10 +547,10 @@ export default function AdminRegistrationsTab({
         type="button"
         onClick={() => handleSort(field)}
         aria-label={`Ordenar por ${label}`}
-        className={`inline-flex items-center gap-1 rounded-lg bg-stone-950 border px-2 py-1 text-[11px] transition-colors cursor-pointer ${
+        className={`inline-flex items-center gap-1 rounded-lg bg-transparent border px-2 py-1 text-[11px] transition-colors cursor-pointer ${
           isActive
-            ? 'border-orange-500 text-orange-400 font-medium'
-            : 'border-orange-500/40 text-white/85 hover:text-white font-medium'
+            ? 'border-amber-300/85 text-amber-200 font-semibold'
+            : 'border-amber-300/35 text-stone-200/90 hover:border-amber-300/65 hover:text-amber-200 font-medium'
         }`}
       >
         <span>{label}</span>
@@ -581,24 +581,24 @@ export default function AdminRegistrationsTab({
         type="button"
         onClick={() => handleToggleDuplicateFilter(filterValue)}
         aria-pressed={isActive}
-        className={`inline-flex items-center justify-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] whitespace-nowrap shrink-0 tabular-nums transition-colors cursor-pointer ${
+        className={`inline-flex items-center justify-center gap-1 rounded-lg bg-transparent border px-2.5 py-1 text-[11px] whitespace-nowrap shrink-0 tabular-nums transition-colors cursor-pointer ${
           isActive
-            ? 'bg-stone-950 border-red-500 text-white font-medium'
-            : 'bg-stone-950 border-orange-500/60 text-zinc-200 hover:border-orange-400 hover:text-white font-medium'
+            ? 'border-red-400/85 text-red-200 font-semibold'
+            : 'border-amber-300/45 text-amber-200/90 hover:border-amber-200/75 hover:text-amber-100 font-medium'
         }`}
       >
         {hasDuplicates && (
-          <span aria-hidden="true" className="text-[11px] leading-none text-red-500">
+          <span aria-hidden="true" className="text-[11px] leading-none text-red-400">
             ⚠
           </span>
         )}
         <span>{label}</span>
-        <span className={hasDuplicates ? 'text-red-500 font-medium' : 'text-zinc-500'}>
+        <span className={hasDuplicates ? 'text-red-400 font-medium' : 'text-stone-400'}>
           ({count})
         </span>
         <span
           aria-hidden="true"
-          className={`ml-0.5 text-[10px] leading-none text-red-500 font-medium ${
+          className={`ml-0.5 text-[10px] leading-none text-red-400 font-medium ${
             isActive ? 'visible' : 'invisible'
           }`}
         >
@@ -797,7 +797,7 @@ export default function AdminRegistrationsTab({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2 min-w-0">
             <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-stone-200">
-              <Banknote className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <Banknote className="w-3.5 h-3.5 text-emerald-300/85 shrink-0" />
               <span>Ingresos Confirmados</span>
             </span>
             <span className="text-[10px] font-mono text-stone-400">
@@ -816,16 +816,16 @@ export default function AdminRegistrationsTab({
             onClick={handleToggleRevenue}
             aria-pressed={showRevenue}
             title={showRevenue ? 'Ocultar montos de ingresos' : 'Mostrar montos de ingresos'}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 hover:bg-white/5 border border-orange-500/80 hover:border-orange-400 text-stone-200 hover:text-white text-[11px] font-medium px-2.5 py-1 transition-colors cursor-pointer shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 text-[11px] font-medium px-2.5 py-1 transition-colors cursor-pointer shrink-0"
           >
             {showRevenue ? (
               <>
-                <EyeOff className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                <EyeOff className="w-3.5 h-3.5 text-amber-300/90 shrink-0" />
                 <span>Ocultar ingresos</span>
               </>
             ) : (
               <>
-                <Eye className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                <Eye className="w-3.5 h-3.5 text-amber-300/90 shrink-0" />
                 <span>Mostrar ingresos</span>
               </>
             )}
@@ -834,21 +834,21 @@ export default function AdminRegistrationsTab({
 
         {showRevenue && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            <div className="rounded-xl bg-zinc-950 border border-cyan-500/70 hover:border-cyan-300 transition-colors px-3 py-2 flex items-center justify-between gap-2">
+            <div className="rounded-xl bg-transparent border border-sky-300/45 hover:border-sky-300/75 transition-colors px-3 py-2 flex items-center justify-between gap-2">
               <div>
-                <span className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
+                <span className="block text-xs font-bold uppercase tracking-wider text-sky-300/90">
                   Ingresos 27K
                 </span>
-                <span className="block text-[10px] text-white">
+                <span className="block text-[10px] text-stone-300">
                   {regStats.confirmed27k || 0} confirmados
                 </span>
               </div>
-              <span className="font-mono text-sm sm:text-base font-bold text-cyan-400">
+              <span className="font-mono text-sm sm:text-base font-bold text-sky-300/90">
                 {formatArsPrice(regStats.revenue27k || 0)}
               </span>
             </div>
 
-            <div className="rounded-xl bg-zinc-950 border border-red-500/75 hover:border-red-500 hover:brightness-125 transition-all px-3 py-2 flex items-center justify-between gap-2">
+            <div className="rounded-xl bg-transparent border border-red-500/75 hover:border-red-500 transition-colors px-3 py-2 flex items-center justify-between gap-2">
               <div>
                 <span className="block text-xs font-bold uppercase tracking-wider text-red-500">
                   Ingresos 13K
@@ -862,16 +862,16 @@ export default function AdminRegistrationsTab({
               </span>
             </div>
 
-            <div className="rounded-xl bg-zinc-950 border border-emerald-500/70 hover:border-emerald-300 transition-colors px-3 py-2 flex items-center justify-between gap-2">
+            <div className="rounded-xl bg-transparent border border-emerald-300/45 hover:border-emerald-300/75 transition-colors px-3 py-2 flex items-center justify-between gap-2">
               <div>
-                <span className="block text-xs font-bold uppercase tracking-wider text-emerald-400">
+                <span className="block text-xs font-bold uppercase tracking-wider text-emerald-300/90">
                   Total General
                 </span>
-                <span className="block text-[10px] text-white">
+                <span className="block text-[10px] text-stone-300">
                   27K + 13K confirmados
                 </span>
               </div>
-              <span className="font-mono text-sm sm:text-base font-extrabold text-emerald-400">
+              <span className="font-mono text-sm sm:text-base font-extrabold text-emerald-300/90">
                 {formatArsPrice(regStats.revenueTotal || 0)}
               </span>
             </div>
@@ -885,11 +885,11 @@ export default function AdminRegistrationsTab({
           {
             label: 'Total',
             value: regStats.total,
-            tone: 'text-stone-100',
-            inactiveClass: 'bg-zinc-950 border-white/75 hover:border-white hover:brightness-125',
-            activeClass: 'bg-zinc-950 border-white ring-2 ring-white/85 ring-offset-2 ring-offset-zinc-950',
-            labelClass: 'text-white',
-            dotClass: 'bg-white',
+            tone: 'text-stone-200',
+            inactiveClass: 'bg-transparent border-stone-300/35 hover:border-stone-200/65',
+            activeClass: 'bg-transparent border-stone-200/80 ring-2 ring-stone-200/40 ring-offset-2 ring-offset-zinc-950',
+            labelClass: 'text-stone-200',
+            dotClass: 'bg-stone-200',
             isActive: !hasSpecificFilter,
             onClick: () => {
               setRegDuplicateFilter?.('none');
@@ -903,11 +903,11 @@ export default function AdminRegistrationsTab({
           {
             label: 'Confirmados',
             value: regStats.confirmed,
-            tone: 'text-emerald-400',
-            inactiveClass: 'bg-zinc-950 border-emerald-400/75 hover:border-emerald-400 hover:brightness-125',
-            activeClass: 'bg-zinc-950 border-emerald-400 ring-2 ring-emerald-400/85 ring-offset-2 ring-offset-zinc-950',
-            labelClass: 'text-emerald-400',
-            dotClass: 'bg-emerald-400',
+            tone: 'text-emerald-300/90',
+            inactiveClass: 'bg-transparent border-emerald-300/45 hover:border-emerald-300/75',
+            activeClass: 'bg-transparent border-emerald-300/80 ring-2 ring-emerald-300/45 ring-offset-2 ring-offset-zinc-950',
+            labelClass: 'text-emerald-300/85',
+            dotClass: 'bg-emerald-300',
             isActive: regStatusFilter === 'confirmado' && regDuplicateFilter === 'none',
             onClick: () => {
               const isAlreadyActive =
@@ -922,11 +922,11 @@ export default function AdminRegistrationsTab({
           {
             label: 'Parciales',
             value: regStats.partial || 0,
-            tone: 'text-violet-400',
-            inactiveClass: 'bg-zinc-950 border-violet-400/75 hover:border-violet-400 hover:brightness-125',
-            activeClass: 'bg-zinc-950 border-violet-400 ring-2 ring-violet-400/85 ring-offset-2 ring-offset-zinc-950',
-            labelClass: 'text-violet-400',
-            dotClass: 'bg-violet-400',
+            tone: 'text-indigo-300/90',
+            inactiveClass: 'bg-transparent border-indigo-300/45 hover:border-indigo-300/75',
+            activeClass: 'bg-transparent border-indigo-300/80 ring-2 ring-indigo-300/45 ring-offset-2 ring-offset-zinc-950',
+            labelClass: 'text-indigo-300/85',
+            dotClass: 'bg-indigo-300',
             isActive: regStatusFilter === 'parcial' && regDuplicateFilter === 'none',
             onClick: () => {
               const isAlreadyActive =
@@ -941,11 +941,11 @@ export default function AdminRegistrationsTab({
           {
             label: 'Pendientes',
             value: regStats.pending,
-            tone: 'text-amber-400',
-            inactiveClass: 'bg-zinc-950 border-amber-400/75 hover:border-amber-400 hover:brightness-125',
-            activeClass: 'bg-zinc-950 border-amber-400 ring-2 ring-amber-400/85 ring-offset-2 ring-offset-zinc-950',
-            labelClass: 'text-amber-400',
-            dotClass: 'bg-amber-400',
+            tone: 'text-amber-300/90',
+            inactiveClass: 'bg-transparent border-amber-300/45 hover:border-amber-300/75',
+            activeClass: 'bg-transparent border-amber-300/80 ring-2 ring-amber-300/45 ring-offset-2 ring-offset-zinc-950',
+            labelClass: 'text-amber-200/90',
+            dotClass: 'bg-amber-300',
             isActive: regStatusFilter === 'pendiente' && regDuplicateFilter === 'none',
             onClick: () => {
               const isAlreadyActive =
@@ -960,11 +960,11 @@ export default function AdminRegistrationsTab({
           {
             label: '27K',
             value: regStats.count27k,
-            tone: 'text-cyan-400',
-            inactiveClass: 'bg-zinc-950 border-cyan-400/75 hover:border-cyan-400 hover:brightness-125',
-            activeClass: 'bg-zinc-950 border-cyan-400 ring-2 ring-cyan-400/85 ring-offset-2 ring-offset-zinc-950',
-            labelClass: 'text-cyan-400',
-            dotClass: 'bg-cyan-300',
+            tone: 'text-sky-300/90',
+            inactiveClass: 'bg-transparent border-sky-300/45 hover:border-sky-300/75',
+            activeClass: 'bg-transparent border-sky-300/80 ring-2 ring-sky-300/45 ring-offset-2 ring-offset-zinc-950',
+            labelClass: 'text-sky-300/85',
+            dotClass: 'bg-sky-300',
             isActive:
               regDistanceFilter === '27K' &&
               regGenderFilter === 'all' &&
@@ -985,8 +985,8 @@ export default function AdminRegistrationsTab({
             label: '13K',
             value: regStats.count13k,
             tone: 'text-red-500',
-            inactiveClass: 'bg-zinc-950 border-red-500/75 hover:border-red-500 hover:brightness-125',
-            activeClass: 'bg-zinc-950 border-red-500 ring-2 ring-red-500/85 ring-offset-2 ring-offset-zinc-950',
+            inactiveClass: 'bg-transparent border-red-500/75 hover:border-red-500',
+            activeClass: 'bg-transparent border-red-500 ring-2 ring-red-500/85 ring-offset-2 ring-offset-zinc-950',
             labelClass: 'text-red-500',
             dotClass: 'bg-red-500',
             isActive:
@@ -1017,7 +1017,7 @@ export default function AdminRegistrationsTab({
           >
             <span
               className={`flex items-center justify-center gap-1.5 text-[10px] leading-4 uppercase tracking-wider font-medium ${
-                stat.isActive ? 'text-white' : stat.labelClass
+                stat.isActive ? 'text-stone-100' : stat.labelClass
               }`}
             >
               {stat.isActive && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${stat.dotClass}`} />}
@@ -1037,16 +1037,16 @@ export default function AdminRegistrationsTab({
             onChange={(e) => setRegDistanceFilter(e.target.value)}
             className={`w-fit rounded-xl bg-zinc-950 border focus:outline-none pl-2 pr-1.5 py-1.5 text-[11px] xl:text-xs transition-colors shrink-0 ${
               regDistanceFilter === '27K'
-                ? 'text-cyan-400 font-medium border-cyan-500/60 focus:border-cyan-400'
+                ? 'text-sky-300/90 font-medium border-sky-300/45 focus:border-sky-300/75'
                 : regDistanceFilter === '13K'
                   ? 'text-red-500 font-medium border-red-500/60 focus:border-red-500'
-                  : 'text-white font-semibold border-white/15 focus:border-orange-400'
+                  : 'text-stone-200 font-semibold border-stone-700/80 focus:border-amber-300/60'
             }`}
           >
-            <option value="all" className="bg-stone-950 text-white font-normal">
+            <option value="all" className="bg-stone-950 text-stone-200 font-normal">
               Todas las distancias
             </option>
-            <option value="27K" className="bg-stone-950 text-cyan-400 font-medium">
+            <option value="27K" className="bg-stone-950 text-sky-300 font-medium">
               Solo 27K
             </option>
             <option value="13K" className="bg-stone-950 text-red-500 font-medium">
@@ -1063,27 +1063,27 @@ export default function AdminRegistrationsTab({
             }}
             className={`w-fit rounded-xl bg-zinc-950 border focus:outline-none pl-2 pr-1.5 py-1.5 text-[11px] xl:text-xs transition-colors shrink-0 ${
               regStatusFilter === 'pendiente'
-                ? 'text-amber-400 border-amber-500/60 focus:border-amber-400 font-medium'
+                ? 'text-amber-200/90 border-amber-300/45 focus:border-amber-300/75 font-medium'
                 : regStatusFilter === 'parcial'
-                  ? 'text-violet-400 border-violet-500/60 focus:border-violet-400 font-medium'
+                  ? 'text-indigo-300/90 border-indigo-300/45 focus:border-indigo-300/75 font-medium'
                   : regStatusFilter === 'confirmado'
-                    ? 'text-emerald-400 border-emerald-500/60 focus:border-emerald-400 font-medium'
-                    : 'text-white font-semibold border-white/15 focus:border-orange-400'
+                    ? 'text-emerald-300/90 border-emerald-300/45 focus:border-emerald-300/75 font-medium'
+                    : 'text-stone-200 font-semibold border-stone-700/80 focus:border-amber-300/60'
             }`}
           >
-            <option value="all" className="bg-stone-950 text-white font-normal">
+            <option value="all" className="bg-stone-950 text-stone-200 font-normal">
               Todos los estados
             </option>
-            <option value="pendiente" className="bg-stone-950 text-amber-400 font-medium">
+            <option value="pendiente" className="bg-stone-950 text-amber-200 font-medium">
               Pendientes
             </option>
-            <option value="parcial" className="bg-stone-950 text-violet-400 font-medium">
+            <option value="parcial" className="bg-stone-950 text-indigo-300 font-medium">
               Parciales (en cuotas)
             </option>
-            <option value="confirmado" className="bg-stone-950 text-emerald-400 font-medium">
+            <option value="confirmado" className="bg-stone-950 text-emerald-300 font-medium">
               Confirmados
             </option>
-            <option value="rechazado" className="bg-stone-950 text-white font-normal">
+            <option value="rechazado" className="bg-stone-950 text-stone-200 font-normal">
               Rechazados
             </option>
           </select>
@@ -1097,7 +1097,7 @@ export default function AdminRegistrationsTab({
                 ? `Exportar los ${filteredRegistrations.length} inscriptos del filtro activo`
                 : 'Exportar todos los inscriptos a Excel (.XLSX)'
             }
-            className="inline-flex items-center justify-center gap-1.5 min-w-[185px] rounded-xl bg-zinc-950 border border-emerald-500/70 hover:border-emerald-400 text-emerald-400 shadow-none text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0 tabular-nums"
+            className="inline-flex items-center justify-center gap-1.5 min-w-[185px] rounded-xl bg-transparent border border-emerald-300/45 hover:border-emerald-300/80 text-emerald-300/90 hover:text-emerald-200 shadow-none text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0 tabular-nums"
           >
             <Download className="w-3.5 h-3.5 shrink-0" />
             <span>{`Exportar Excel (${filteredRegistrations.length})`}</span>
@@ -1108,7 +1108,7 @@ export default function AdminRegistrationsTab({
             onClick={onPrintAccreditationSheet}
             disabled={(regStats.confirmed || 0) === 0}
             title="Imprimir planilla A4 de acreditación y seguridad SOS ordenada por dorsal"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-orange-500/70 hover:border-orange-400 text-orange-400 shadow-none text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-transparent border border-amber-300/45 hover:border-amber-200/80 text-amber-200/90 hover:text-amber-100 shadow-none text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0"
           >
             <Printer className="w-3.5 h-3.5 shrink-0" />
             Imprimir Planilla Acreditación
@@ -1119,7 +1119,7 @@ export default function AdminRegistrationsTab({
             target="_blank"
             rel="noopener noreferrer"
             title="Abrir actividad y transferencias recibidas en Mercado Pago"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border border-sky-500/70 hover:border-sky-400 text-sky-400 shadow-none text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-transparent border border-sky-300/45 hover:border-sky-300/80 text-sky-300/90 hover:text-sky-200 shadow-none text-[11px] xl:text-xs font-medium px-2 xl:px-2.5 py-1.5 transition-colors whitespace-nowrap shrink-0"
           >
             <Wallet className="w-3.5 h-3.5 shrink-0" />
             <span>Mercado Pago</span>
@@ -1138,10 +1138,10 @@ export default function AdminRegistrationsTab({
             disabled={registrationsCount === 0}
             aria-expanded={showBibTools}
             title="Auto-asignar dorsales por rango o importar planilla de Bahía Corre"
-            className={`inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 border shadow-none text-[11px] xl:text-xs font-medium px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0 ${
+            className={`inline-flex items-center gap-1.5 rounded-xl bg-transparent border shadow-none text-[11px] xl:text-xs font-medium px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 whitespace-nowrap shrink-0 ${
               showBibTools
-                ? 'border-orange-400 text-orange-300'
-                : 'border-orange-500/70 hover:border-orange-400 text-orange-400'
+                ? 'border-amber-200/85 text-amber-100 font-semibold'
+                : 'border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100'
             }`}
           >
             <Hash className="w-3.5 h-3.5 shrink-0" />
@@ -1156,7 +1156,7 @@ export default function AdminRegistrationsTab({
               {/* Bloque 1: Auto-asignar por rango */}
               <div className="rounded-xl bg-zinc-950 border border-stone-800 p-3 space-y-2.5">
                 <div className="flex items-center justify-between gap-2">
-                  <h4 className="text-[11px] font-semibold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
+                  <h4 className="text-[11px] font-semibold uppercase tracking-wider text-amber-200/90 flex items-center gap-1.5">
                     <Wand2 className="w-3.5 h-3.5 shrink-0" />
                     Auto-asignar por rango (Confirmados)
                   </h4>
@@ -1167,7 +1167,7 @@ export default function AdminRegistrationsTab({
                   <div>
                     <label
                       htmlFor="bib-range-13k"
-                      className="block text-[10px] font-medium text-red-400 mb-1"
+                      className="block text-[10px] font-medium text-red-500 mb-1"
                     >
                       Inicio 13K
                     </label>
@@ -1183,7 +1183,7 @@ export default function AdminRegistrationsTab({
                   <div>
                     <label
                       htmlFor="bib-range-27k"
-                      className="block text-[10px] font-medium text-cyan-400 mb-1"
+                      className="block text-[10px] font-medium text-sky-300/85 mb-1"
                     >
                       Inicio 27K
                     </label>
@@ -1193,7 +1193,7 @@ export default function AdminRegistrationsTab({
                       min={1}
                       value={rangeStart27k}
                       onChange={(e) => setRangeStart27k(e.target.value)}
-                      className="w-full rounded-lg bg-stone-950 border border-cyan-500/60 focus:border-cyan-400 focus:outline-none px-2 py-1 text-xs font-mono text-white"
+                      className="w-full rounded-lg bg-stone-950 border border-sky-300/45 focus:border-sky-300/75 focus:outline-none px-2 py-1 text-xs font-mono text-stone-100"
                     />
                   </div>
                   <div className="col-span-2">
@@ -1207,7 +1207,7 @@ export default function AdminRegistrationsTab({
                       id="bib-range-scope"
                       value={rangeScope}
                       onChange={(e) => setRangeScope(e.target.value)}
-                      className="w-full rounded-lg bg-stone-950 border border-stone-700 focus:border-orange-400 focus:outline-none px-2 py-1 text-[11px] text-white"
+                      className="w-full rounded-lg bg-stone-950 border border-stone-700 focus:border-amber-300/60 focus:outline-none px-2 py-1 text-[11px] text-stone-200"
                     >
                       <option value="missing">Solo confirmados sin dorsal</option>
                       <option value="all">Reasignar todos los confirmados</option>
@@ -1227,7 +1227,7 @@ export default function AdminRegistrationsTab({
                       id="bib-range-order"
                       value={rangeOrder}
                       onChange={(e) => setRangeOrder(e.target.value)}
-                      className="min-w-0 flex-1 rounded-lg bg-stone-950 border border-stone-700 focus:border-orange-400 focus:outline-none px-2 py-1 text-[11px] text-white"
+                      className="min-w-0 flex-1 rounded-lg bg-stone-950 border border-stone-700 focus:border-amber-300/60 focus:outline-none px-2 py-1 text-[11px] text-stone-200"
                     >
                       <option value="createdAt">Por fecha de inscripción (1° al último)</option>
                       <option value="alphabetical">Alfabético (A → Z)</option>
@@ -1238,7 +1238,7 @@ export default function AdminRegistrationsTab({
                     type="button"
                     disabled={batchSaving || (regStats.confirmed || 0) === 0}
                     onClick={handlePreviewRangeAssignment}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-stone-950 hover:bg-white/5 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
                   >
                     <Wand2 className="w-3.5 h-3.5 shrink-0" />
                     Previsualizar Rangos
@@ -1249,7 +1249,7 @@ export default function AdminRegistrationsTab({
               {/* Bloque 2: Importar Excel de Bahía Corre */}
               <div className="rounded-xl bg-zinc-950 border border-stone-800 p-3 flex flex-col justify-between gap-2.5">
                 <div className="space-y-1">
-                  <h4 className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                  <h4 className="text-[11px] font-semibold uppercase tracking-wider text-emerald-300/90 flex items-center gap-1.5">
                     <Upload className="w-3.5 h-3.5 shrink-0" />
                     Importar desde Excel de Bahía Corre
                   </h4>
@@ -1273,7 +1273,7 @@ export default function AdminRegistrationsTab({
                     type="button"
                     disabled={batchSaving || registrationsCount === 0}
                     onClick={() => excelInputRef.current?.click()}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-stone-950 hover:bg-white/5 border border-emerald-500/70 hover:border-emerald-400 text-emerald-400 text-[11px] font-semibold px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-transparent border border-emerald-300/45 hover:border-emerald-300/80 text-emerald-300/90 hover:text-emerald-200 text-[11px] font-semibold px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
                   >
                     <Upload className="w-3.5 h-3.5 shrink-0" />
                     Subir Excel de Bahía Corre
@@ -1285,9 +1285,9 @@ export default function AdminRegistrationsTab({
             {bibToolsError && (
               <div
                 role="alert"
-                className="rounded-xl bg-zinc-950 border border-red-500/70 p-2.5 text-xs text-red-500 flex items-start gap-2"
+                className="rounded-xl bg-zinc-950 border border-red-500/70 p-2.5 text-xs text-red-400 flex items-start gap-2"
               >
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-400" />
                 <span>{bibToolsError}</span>
               </div>
             )}
@@ -1295,24 +1295,24 @@ export default function AdminRegistrationsTab({
             {bibToolsNotice && (
               <div
                 role="status"
-                className="rounded-xl bg-zinc-950 border border-emerald-500/60 p-2.5 text-xs text-emerald-300 flex items-start gap-2"
+                className="rounded-xl bg-transparent border border-emerald-300/45 p-2.5 text-xs text-emerald-200/90 flex items-start gap-2"
               >
-                <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+                <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-300" />
                 <span>{bibToolsNotice}</span>
               </div>
             )}
 
             {/* Barra de vista previa y confirmación de lote */}
             {batchPreview && (
-              <div className="rounded-xl bg-zinc-950 border border-orange-500/80 p-3 space-y-2.5">
+              <div className="rounded-xl bg-zinc-950 border border-amber-300/45 p-3 space-y-2.5">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div className="space-y-0.5">
-                    <p className="text-xs font-medium text-white">
+                    <p className="text-xs font-medium text-stone-100">
                       Listos para actualizar:{' '}
-                      <strong className="text-orange-400">{batchPreview.changes.length}</strong>{' '}
+                      <strong className="text-amber-200">{batchPreview.changes.length}</strong>{' '}
                       {batchPreview.changes.length === 1 ? 'dorsal' : 'dorsales'} (
-                      <span className="text-red-400">{batchPreview.count13k} en 13K</span> ·{' '}
-                      <span className="text-cyan-400">{batchPreview.count27k} en 27K</span>).{' '}
+                      <span className="text-red-500 font-semibold">{batchPreview.count13k} en 13K</span> ·{' '}
+                      <span className="text-sky-300/90">{batchPreview.count27k} en 27K</span>).{' '}
                       <span className="text-stone-400 font-normal">
                         Solo se escribirán los documentos que cambiaron.
                       </span>
@@ -1335,7 +1335,7 @@ export default function AdminRegistrationsTab({
                       type="button"
                       disabled={batchSaving}
                       onClick={handleCancelBatchPreview}
-                      className="inline-flex items-center gap-1 rounded-lg bg-stone-950 hover:bg-white/5 border border-stone-700 text-stone-300 text-xs font-medium px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40"
+                      className="inline-flex items-center gap-1 rounded-lg bg-transparent border border-stone-700 hover:border-stone-500 text-stone-300 hover:text-stone-100 text-xs font-medium px-3 py-1.5 transition-colors cursor-pointer disabled:opacity-40"
                     >
                       <X className="w-3.5 h-3.5" />
                       Cancelar
@@ -1344,7 +1344,7 @@ export default function AdminRegistrationsTab({
                       type="button"
                       disabled={batchSaving || !onBatchAssignBibs}
                       onClick={handleConfirmBatchSave}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-xs font-bold px-3.5 py-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-transparent border border-emerald-300/60 hover:border-emerald-200 text-emerald-200 hover:text-emerald-100 text-xs font-bold px-3.5 py-1.5 transition-colors cursor-pointer disabled:opacity-50"
                     >
                       <Check className="w-3.5 h-3.5" />
                       {batchSaving
@@ -1355,7 +1355,7 @@ export default function AdminRegistrationsTab({
                 </div>
 
                 {batchPreview.duplicateWarnings?.length > 0 && (
-                  <div className="rounded-lg bg-zinc-950 border border-red-500/70 px-2.5 py-1.5 text-[11px] text-red-500">
+                  <div className="rounded-lg bg-zinc-950 border border-red-500/70 px-2.5 py-1.5 text-[11px] text-red-400">
                     <strong>⚠ Dorsales repetidos detectados:</strong> quedarán duplicados los números{' '}
                     <span className="font-mono font-semibold">
                       {batchPreview.duplicateWarnings.map((b) => `#${b}`).join(', ')}
@@ -1372,20 +1372,20 @@ export default function AdminRegistrationsTab({
                     >
                       <div className="flex items-center gap-1.5 min-w-0">
                         <span
-                          className={`text-[10px] font-mono px-1.5 py-0.2 rounded border shrink-0 ${
+                          className={`text-[10px] font-mono px-1.5 py-0.2 rounded bg-transparent border shrink-0 ${
                             is13kDistance(item.distance)
-                              ? 'border-red-500/70 text-red-400'
-                              : 'border-cyan-500/70 text-cyan-400'
+                              ? 'border-red-500 text-red-500 font-semibold'
+                              : 'border-sky-300/45 text-sky-300/90'
                           }`}
                         >
                           {item.distance}
                         </span>
-                        <span className="text-white truncate">{item.fullName}</span>
+                        <span className="text-stone-100 truncate">{item.fullName}</span>
                         <span className="font-mono text-[10px] text-stone-500 shrink-0">
                           DNI {item.dni}
                         </span>
                       </div>
-                      <span className="font-mono font-semibold text-orange-400 shrink-0">
+                      <span className="font-mono font-semibold text-amber-200/90 shrink-0">
                         {item.oldBib ? `#${item.oldBib} → ` : ''}#{item.newBib}
                       </span>
                     </div>
@@ -1413,9 +1413,9 @@ export default function AdminRegistrationsTab({
               count: regStats.total || 0,
               distance: 'all',
               gender: 'all',
-              activeClass: 'border-2 px-[7px] py-[3px] bg-zinc-950 border-white text-white font-bold',
+              activeClass: 'border-2 px-[7px] py-[3px] bg-transparent border-stone-200/85 text-stone-100 font-bold',
               inactiveClass:
-                'border px-2 py-1 bg-zinc-950 border-white/35 text-white/60 font-medium hover:border-white/70 hover:text-white',
+                'border px-2 py-1 bg-transparent border-stone-300/35 text-stone-300/85 font-medium hover:border-stone-200/65 hover:text-stone-100',
             },
             {
               id: '27K-Masculino',
@@ -1424,9 +1424,9 @@ export default function AdminRegistrationsTab({
               distance: '27K',
               gender: 'Masculino',
               activeClass:
-                'border-2 px-[7px] py-[3px] bg-zinc-950 border-cyan-400 text-cyan-400 font-bold',
+                'border-2 px-[7px] py-[3px] bg-transparent border-sky-300/85 text-sky-200 font-bold',
               inactiveClass:
-                'border px-2 py-1 bg-zinc-950 border-cyan-400/35 text-cyan-400/65 font-medium hover:border-cyan-400/75 hover:text-cyan-400',
+                'border px-2 py-1 bg-transparent border-sky-300/40 text-sky-300/85 font-medium hover:border-sky-300/70 hover:text-sky-200',
             },
             {
               id: '27K-Femenino',
@@ -1435,9 +1435,9 @@ export default function AdminRegistrationsTab({
               distance: '27K',
               gender: 'Femenino',
               activeClass:
-                'border-2 px-[7px] py-[3px] bg-zinc-950 border-cyan-400 text-cyan-400 font-bold',
+                'border-2 px-[7px] py-[3px] bg-transparent border-sky-300/85 text-sky-200 font-bold',
               inactiveClass:
-                'border px-2 py-1 bg-zinc-950 border-cyan-400/35 text-cyan-400/65 font-medium hover:border-cyan-400/75 hover:text-cyan-400',
+                'border px-2 py-1 bg-transparent border-sky-300/40 text-sky-300/85 font-medium hover:border-sky-300/70 hover:text-sky-200',
             },
             {
               id: '13K-Masculino',
@@ -1446,9 +1446,9 @@ export default function AdminRegistrationsTab({
               distance: '13K',
               gender: 'Masculino',
               activeClass:
-                'border-2 px-[7px] py-[3px] bg-zinc-950 border-red-500 text-red-400 font-bold',
+                'border-2 px-[7px] py-[3px] bg-transparent border-red-500 text-red-400 font-bold',
               inactiveClass:
-                'border px-2 py-1 bg-zinc-950 border-red-500/70 text-red-500 font-medium hover:border-red-500 hover:text-red-400',
+                'border px-2 py-1 bg-transparent border-red-500/70 text-red-500 font-medium hover:border-red-500 hover:text-red-400',
             },
             {
               id: '13K-Femenino',
@@ -1457,9 +1457,9 @@ export default function AdminRegistrationsTab({
               distance: '13K',
               gender: 'Femenino',
               activeClass:
-                'border-2 px-[7px] py-[3px] bg-zinc-950 border-red-500 text-red-400 font-bold',
+                'border-2 px-[7px] py-[3px] bg-transparent border-red-500 text-red-400 font-bold',
               inactiveClass:
-                'border px-2 py-1 bg-zinc-950 border-red-500/70 text-red-500 font-medium hover:border-red-500 hover:text-red-400',
+                'border px-2 py-1 bg-transparent border-red-500/70 text-red-500 font-medium hover:border-red-500 hover:text-red-400',
             },
           ].map((item) => {
             const isSelected =
@@ -1496,7 +1496,7 @@ export default function AdminRegistrationsTab({
         <div className="pt-2 border-t border-stone-800/80 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-[11px]">
           <div className="flex flex-wrap items-center gap-1">
             <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-stone-400 mr-0.5 shrink-0">
-              <Shirt className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+              <Shirt className="w-3.5 h-3.5 text-amber-300/85 shrink-0" />
               Talles:
             </span>
             {(regStats.shirtSizes || []).map((item) => {
@@ -1507,15 +1507,15 @@ export default function AdminRegistrationsTab({
                   type="button"
                   onClick={() => setRegShirtFilter?.(isSelected ? 'all' : item.size)}
                   title={`Filtrar por talle ${item.size}: ${item.confirmed} confirmados de ${item.total} inscriptos no rechazados`}
-                  className={`inline-flex items-center gap-0.5 rounded-lg border px-1.5 py-0.5 text-[10px] sm:text-[11px] font-mono whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
+                  className={`inline-flex items-center gap-0.5 rounded-lg bg-transparent border px-1.5 py-0.5 text-[10px] sm:text-[11px] font-mono whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
                     isSelected
-                      ? 'bg-zinc-950 border-orange-500 text-orange-400 font-medium'
-                      : 'bg-zinc-950 border-orange-500/50 text-white hover:border-orange-400'
+                      ? 'border-amber-200/90 text-amber-100 font-semibold'
+                      : 'border-amber-300/40 text-amber-200/90 hover:border-amber-200/70'
                   }`}
                 >
-                  <span className="text-white font-semibold">{item.size}:</span>
+                  <span className="text-amber-100/95 font-semibold">{item.size}:</span>
                   <span>
-                    <strong className="text-white font-medium">{item.confirmed}</strong>/{item.total}
+                    <strong className="text-amber-200 font-medium">{item.confirmed}</strong>/{item.total}
                   </span>
                 </button>
               );
@@ -1524,7 +1524,7 @@ export default function AdminRegistrationsTab({
               <button
                 type="button"
                 onClick={() => setRegShirtFilter?.('all')}
-                className="text-[10px] text-orange-400 hover:opacity-85 underline ml-1 cursor-pointer"
+                className="text-[10px] text-amber-300/90 hover:opacity-85 underline ml-1 cursor-pointer"
               >
                 Limpiar talle
               </button>
@@ -1533,7 +1533,7 @@ export default function AdminRegistrationsTab({
 
           <div className="flex flex-wrap items-center gap-1.5 shrink-0">
             <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-stone-400 mr-0.5 shrink-0">
-              <PackageCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <PackageCheck className="w-3.5 h-3.5 text-emerald-300/85 shrink-0" />
               Mesa Kit:
             </span>
             <button
@@ -1541,10 +1541,10 @@ export default function AdminRegistrationsTab({
               onClick={() =>
                 setRegCheckInFilter?.(regCheckInFilter === 'checked' ? 'all' : 'checked')
               }
-              className={`rounded-lg border px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+              className={`rounded-lg bg-transparent border px-2 py-0.5 text-[10px] sm:text-[11px] whitespace-nowrap transition-colors cursor-pointer ${
                 regCheckInFilter === 'checked'
-                  ? 'bg-zinc-950 border-orange-500 text-orange-400 font-medium'
-                  : 'bg-zinc-950 border-orange-500/50 text-white hover:border-orange-400'
+                  ? 'border-emerald-300/90 text-emerald-200 font-semibold'
+                  : 'border-emerald-300/45 text-emerald-300/90 hover:border-emerald-300/75 font-medium'
               }`}
             >
               Kits entregados ({regStats.checkedInCount || 0})
@@ -1556,10 +1556,10 @@ export default function AdminRegistrationsTab({
                   regCheckInFilter === 'pending_checkin' ? 'all' : 'pending_checkin'
                 )
               }
-              className={`rounded-lg border px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+              className={`rounded-lg bg-transparent border px-2 py-0.5 text-[10px] sm:text-[11px] whitespace-nowrap transition-colors cursor-pointer ${
                 regCheckInFilter === 'pending_checkin'
-                  ? 'bg-zinc-950 border-orange-500 text-orange-400 font-medium'
-                  : 'bg-zinc-950 border-orange-500/50 text-white hover:border-orange-400'
+                  ? 'border-amber-200/90 text-amber-100 font-semibold'
+                  : 'border-amber-300/45 text-amber-200/90 hover:border-amber-200/75 font-medium'
               }`}
             >
               Pendientes de retirar ({regStats.pendingCheckInCount || 0})
@@ -1570,15 +1570,15 @@ export default function AdminRegistrationsTab({
         <p className="text-[11px] text-stone-400">
           Mostrando <strong className="text-stone-200">{filteredRegistrations.length}</strong> de{' '}
           <strong className="text-stone-200">{registrationsCount}</strong> inscripciones · Fuente:{' '}
-          <span className="font-mono text-white font-semibold">
+          <span className="font-mono text-stone-200 font-semibold">
             {regsSource === 'firestore' ? 'Firestore en vivo' : 'Respaldo local'}
           </span>
         </p>
       </div>
 
       {regsError && (
-        <div className="rounded-xl bg-stone-950 border border-red-500/70 p-3 text-xs text-red-500 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
+        <div className="rounded-xl bg-stone-950 border border-red-500/70 p-3 text-xs text-red-400 flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-400" />
           <span>{regsError}</span>
         </div>
       )}
@@ -1609,7 +1609,7 @@ export default function AdminRegistrationsTab({
                 onChange={(e) => setRegSearch(e.target.value)}
                 placeholder="Buscar por nombre, DNI, código RAF, dorsal, localidad..."
                 aria-label="Buscar por nombre, DNI, código RAF, dorsal o localidad"
-                className="w-full rounded-xl bg-zinc-950 border border-orange-500/60 focus:border-orange-400 focus:outline-none pl-8 pr-3 py-1.5 text-xs font-mono font-semibold text-white placeholder:text-stone-500"
+                className="w-full rounded-xl bg-zinc-950 border border-amber-300/40 focus:border-amber-300/75 focus:outline-none pl-8 pr-3 py-1.5 text-xs font-mono font-semibold text-stone-100 placeholder:text-stone-500"
               />
             </div>
 
@@ -1661,12 +1661,12 @@ export default function AdminRegistrationsTab({
             const totalInstallments = pricing.installmentsTotal === 2 ? 2 : 3;
             const statusBadgeClass =
               reg.status === 'confirmado'
-                ? 'bg-transparent text-emerald-400 border-emerald-500/60'
+                ? 'bg-transparent text-emerald-300/90 border-emerald-300/45'
                 : isPartial
-                  ? 'bg-transparent text-violet-300 border-violet-400/75'
+                  ? 'bg-transparent text-indigo-300/90 border-indigo-300/45'
                   : reg.status === 'rechazado'
-                    ? 'bg-transparent text-red-500 border-red-500/70'
-                    : 'bg-transparent text-amber-400 border-amber-500/60';
+                    ? 'bg-transparent text-red-400 border-red-400/55'
+                    : 'bg-transparent text-amber-200/90 border-amber-300/45';
 
             return (
               <div
@@ -1678,27 +1678,27 @@ export default function AdminRegistrationsTab({
                   {/* Identificación rápida del corredor (estructura fija en 2 líneas) */}
                   <div className="w-full md:w-auto md:flex-1 min-w-0 space-y-1.5">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="font-mono text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded-md bg-transparent border border-amber-500/60 text-white shrink-0">
+                      <span className="font-mono text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded-md bg-transparent border border-amber-300/45 text-amber-200/95 shrink-0">
                         {reg.code}
                       </span>
                       <span
-                        className={`text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded-md border bg-transparent shrink-0 ${
+                        className={`text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded-md bg-transparent border shrink-0 ${
                           reg.distance === '13K'
                             ? 'border-red-500 text-red-500'
-                            : 'border-cyan-500 text-cyan-400'
+                            : 'border-sky-300/45 text-sky-300/90'
                         }`}
                       >
                         {reg.distance}
                       </span>
                       <h4
                         title={reg.fullName}
-                        className="text-[13px] font-medium text-white whitespace-nowrap truncate min-w-0"
+                        className="text-[13px] font-medium text-stone-100 whitespace-nowrap truncate min-w-0"
                       >
                         {reg.fullName}
                       </h4>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-[11px] text-white font-medium shrink-0">
+                      <span className="font-mono text-[11px] text-stone-200 font-medium shrink-0">
                         DNI {reg.dni}
                       </span>
                       {(() => {
@@ -1706,9 +1706,9 @@ export default function AdminRegistrationsTab({
                         const label = normGender || String(reg.gender || '').trim() || 'Sin género';
                         const genderBadgeClass =
                           normGender === 'Masculino'
-                            ? 'border-cyan-500/70 text-cyan-400 bg-transparent'
+                            ? 'border-sky-300/45 text-sky-300/85 bg-transparent'
                             : normGender === 'Femenino'
-                              ? 'border-red-500/70 text-red-500 bg-transparent'
+                              ? 'border-rose-300/45 text-rose-300/85 bg-transparent'
                               : 'border-stone-700 text-stone-400 bg-transparent';
                         return (
                           <span
@@ -1728,7 +1728,7 @@ export default function AdminRegistrationsTab({
                           title={`Modalidad ${totalInstallments} cuotas${
                             pricing.installmentAmount ? ` (${pricing.installmentAmount} c/u)` : ''
                           }`}
-                          className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-violet-400/75 bg-transparent text-violet-300 shrink-0"
+                          className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-indigo-300/45 bg-transparent text-indigo-300/90 shrink-0"
                         >
                           {totalInstallments} Cuotas (
                           {Math.min(totalInstallments, Math.max(1, installmentReceipts.length))}/
@@ -1738,7 +1738,7 @@ export default function AdminRegistrationsTab({
                       {pricing.isLocalResident && (
                         <span
                           title="Verificar domicilio del Partido de Tornquist en el DNI"
-                          className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-emerald-500/70 bg-transparent text-emerald-400 shrink-0"
+                          className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-emerald-300/45 bg-transparent text-emerald-300/90 shrink-0"
                         >
                           {pricing.badgeText}
                         </span>
@@ -1750,7 +1750,7 @@ export default function AdminRegistrationsTab({
                               ? `Cupón (${pricing.couponLabel})`
                               : 'Cupón de descuento aplicado'
                           }
-                          className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-amber-400/70 bg-transparent text-amber-300 shrink-0"
+                          className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-amber-300/45 bg-transparent text-amber-200/90 shrink-0"
                         >
                           {pricing.badgeText}
                         </span>
@@ -1758,13 +1758,13 @@ export default function AdminRegistrationsTab({
                       {reg.isFree === true && (
                         <span
                           title="Corredor FREE / Bonificado: computa $0 en Ingresos Confirmados"
-                          className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-yellow-400/70 bg-transparent text-yellow-300 shrink-0"
+                          className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border border-amber-300/45 bg-transparent text-amber-200/90 shrink-0"
                         >
                           FREE
                         </span>
                       )}
                       {reg.checkedIn && (
-                        <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-full border border-emerald-500/60 bg-transparent text-emerald-400 shrink-0">
+                        <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-full border border-emerald-300/45 bg-transparent text-emerald-300/90 shrink-0">
                           Kit ✓
                         </span>
                       )}
@@ -1801,14 +1801,14 @@ export default function AdminRegistrationsTab({
                         placeholder="Dorsal"
                         className={
                           isDuplicateBib
-                            ? `w-12 rounded-lg bg-zinc-950 border border-red-500 px-1 py-1 text-xs font-mono font-medium text-red-500 text-center ${
+                            ? `w-12 rounded-lg bg-transparent border border-red-500 px-1 py-1 text-xs font-mono font-medium text-red-500 text-center ${
                                 isBibLocked
                                   ? 'cursor-default'
                                   : 'focus:border-red-400 focus:outline-none'
                               }`
                             : isBibLocked
-                              ? 'w-12 rounded-lg bg-zinc-950 border border-orange-500/40 px-1 py-1 text-xs font-mono font-medium text-orange-400 text-center cursor-default'
-                              : 'w-12 rounded-lg bg-zinc-950 border border-orange-500 focus:border-orange-400 focus:outline-none px-1 py-1 text-xs font-mono font-semibold text-white text-center'
+                              ? 'w-12 rounded-lg bg-transparent border border-amber-300/35 px-1 py-1 text-xs font-mono font-medium text-amber-200/90 text-center cursor-default'
+                              : 'w-12 rounded-lg bg-transparent border border-amber-300/50 focus:border-amber-300/80 focus:outline-none px-1 py-1 text-xs font-mono font-semibold text-stone-100 text-center'
                         }
                       />
                       {isBibLocked && (
@@ -1818,7 +1818,7 @@ export default function AdminRegistrationsTab({
                           onClick={() => startEditingBib(reg.id)}
                           aria-label={`Editar dorsal de ${reg.fullName}`}
                           title="Editar dorsal"
-                          className="p-1 rounded-lg bg-transparent border border-orange-500/50 hover:border-orange-400 text-stone-400 hover:text-orange-400 shadow-none transition-colors cursor-pointer disabled:opacity-40"
+                          className="p-1 rounded-lg bg-transparent border border-amber-300/40 hover:border-amber-200/75 text-stone-400 hover:text-amber-200 shadow-none transition-colors cursor-pointer disabled:opacity-40"
                         >
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
@@ -1842,21 +1842,21 @@ export default function AdminRegistrationsTab({
                       }
                       className={`inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none font-display font-medium text-[10px] sm:text-[11px] uppercase px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
                         armedStatusAction === 'unconfirm'
-                          ? 'text-red-500 border border-red-500/80 hover:border-red-500'
+                          ? 'text-red-400 border border-red-400/60 hover:border-red-400'
                           : armedStatusAction === 'confirm'
-                            ? 'text-orange-400 border border-orange-500/80 hover:border-orange-400'
+                            ? 'text-amber-200/90 border border-amber-300/55 hover:border-amber-200'
                             : isAlreadySaved
-                              ? 'text-zinc-300 border border-zinc-700 hover:border-zinc-400'
-                              : 'text-emerald-400 border border-emerald-500/70 hover:border-emerald-400'
+                              ? 'text-stone-300 border border-stone-700 hover:border-stone-500'
+                              : 'text-emerald-300/90 hover:text-emerald-200 border border-emerald-300/45 hover:border-emerald-300/75'
                       }`}
                     >
                       <CheckCircle2
                         className={`w-3.5 h-3.5 shrink-0 ${
                           armedStatusAction === 'unconfirm'
-                            ? 'text-red-500'
+                            ? 'text-red-400'
                             : armedStatusAction === 'confirm'
-                              ? 'text-orange-400'
-                              : 'text-emerald-400'
+                              ? 'text-amber-300/90'
+                              : 'text-emerald-300/85'
                         }`}
                       />
                       {armedStatusAction === 'unconfirm'
@@ -1885,12 +1885,12 @@ export default function AdminRegistrationsTab({
                       }
                       className={`inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none font-display font-medium text-[10px] sm:text-[11px] uppercase px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
                         armedStatusAction === 'unpartial'
-                          ? 'text-red-500 border border-red-500/80 hover:border-red-500'
+                          ? 'text-red-400 border border-red-400/60 hover:border-red-400'
                           : armedStatusAction === 'partial'
-                            ? 'text-orange-400 border border-orange-500/80 hover:border-orange-400'
+                            ? 'text-amber-200/90 border border-amber-300/55 hover:border-amber-200'
                             : isPartial
-                              ? 'text-violet-300 border border-violet-400 hover:border-violet-300'
-                              : 'text-violet-400 border border-violet-500/65 hover:border-violet-400'
+                              ? 'text-indigo-200 border border-indigo-300/80 hover:border-indigo-200'
+                              : 'text-indigo-300/85 border border-indigo-300/45 hover:border-indigo-300/75'
                       }`}
                     >
                       {armedStatusAction === 'unpartial'
@@ -1916,12 +1916,12 @@ export default function AdminRegistrationsTab({
                         }
                         className={`inline-flex items-center justify-center gap-1 md:w-[116px] whitespace-nowrap rounded-lg bg-transparent shadow-none border text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors cursor-pointer disabled:opacity-50 ${
                           armedKitAction === 'revoke'
-                            ? 'border-red-500/80 hover:border-red-500 text-red-500'
+                            ? 'border-red-400/60 hover:border-red-400 text-red-400'
                             : armedKitAction === 'deliver'
-                              ? 'border-orange-500/80 hover:border-orange-400 text-orange-400'
+                              ? 'border-amber-200/80 hover:border-amber-100 text-amber-200'
                               : reg.checkedIn
-                                ? 'border-emerald-500/70 hover:border-emerald-400 text-emerald-400'
-                                : 'border-orange-500/70 hover:border-orange-400 text-orange-400'
+                                ? 'border-emerald-300/45 hover:border-emerald-300/75 text-emerald-300/90'
+                                : 'border-amber-300/45 hover:border-amber-200/75 text-amber-200/90'
                         }`}
                       >
                         <PackageCheck className="w-3.5 h-3.5 shrink-0" />
@@ -1947,7 +1947,7 @@ export default function AdminRegistrationsTab({
                           target="_blank"
                           rel="noopener noreferrer"
                           title={`Ver comprobante de Cuota ${item.number} de ${totalInstallments}`}
-                          className="inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none text-sky-400 border border-sky-500/60 hover:border-sky-400 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
+                          className="inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none text-sky-300/90 hover:text-sky-200 border border-sky-300/45 hover:border-sky-300/75 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
                           <span>
@@ -1963,7 +1963,7 @@ export default function AdminRegistrationsTab({
                         target="_blank"
                         rel="noopener noreferrer"
                         title="Ver comprobante adjunto"
-                        className="inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none text-sky-400 border border-sky-500/60 hover:border-sky-400 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
+                        className="inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none text-sky-300/90 hover:text-sky-200 border border-sky-300/45 hover:border-sky-300/75 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">Comprobante</span>
@@ -1971,7 +1971,7 @@ export default function AdminRegistrationsTab({
                     ) : (
                       pricing.discountSource === 'coupon' &&
                       pricing.discountPercentApplied >= 100 && (
-                        <span className="inline-flex items-center rounded-lg bg-transparent text-amber-300 border border-amber-500/50 text-[10px] font-medium px-2 py-1">
+                        <span className="inline-flex items-center rounded-lg bg-transparent text-amber-200/90 border border-amber-300/45 text-[10px] font-medium px-2 py-1">
                           Sin comprobante (100%)
                         </span>
                       )
@@ -1984,7 +1984,7 @@ export default function AdminRegistrationsTab({
                         rel="noopener noreferrer"
                         title="Enviar confirmación por WhatsApp"
                         aria-label={`Enviar WhatsApp a ${reg.fullName}`}
-                        className="inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none text-emerald-400 border border-emerald-500/60 hover:border-emerald-400 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
+                        className="inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none text-emerald-300/90 hover:text-emerald-200 border border-emerald-300/45 hover:border-emerald-300/75 text-[10px] sm:text-[11px] font-medium px-2 py-1 transition-colors"
                       >
                         <MessageCircle className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">WhatsApp</span>
@@ -1999,8 +1999,8 @@ export default function AdminRegistrationsTab({
                       title="Ver detalles completos"
                       className={`inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none border px-1.5 py-1 text-[10px] sm:text-[11px] font-semibold transition-colors cursor-pointer ${
                         isExpanded
-                          ? 'border-orange-500 text-orange-400'
-                          : 'border-stone-700 text-stone-300 hover:border-orange-400 hover:text-white'
+                          ? 'border-amber-300/75 text-amber-200'
+                          : 'border-stone-700 text-stone-300 hover:border-amber-300/55 hover:text-stone-100'
                       }`}
                     >
                       <span className="hidden md:inline">Detalles</span>
@@ -2017,7 +2017,7 @@ export default function AdminRegistrationsTab({
                       onClick={() => onDeleteRegistration(reg)}
                       aria-label={`Eliminar inscripción de ${reg.fullName}`}
                       title="Eliminar inscripción"
-                      className="p-1 rounded-lg bg-transparent border border-transparent hover:border-red-500/70 text-stone-400 hover:text-red-500 shadow-none transition-colors cursor-pointer disabled:opacity-40"
+                      className="p-1 rounded-lg bg-transparent border border-transparent hover:border-red-400/60 text-stone-400 hover:text-red-400 shadow-none transition-colors cursor-pointer disabled:opacity-40"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -2030,30 +2030,30 @@ export default function AdminRegistrationsTab({
                   return (
                     <div className="border-t border-stone-800/90 bg-stone-950 px-3.5 py-2.5 space-y-2 text-xs text-stone-300">
                       <div className="flex flex-wrap items-center gap-2 pb-2 border-b border-stone-800/70">
-                        <span className="inline-flex items-center gap-1 rounded-lg bg-transparent border border-amber-500/60 px-2.5 py-1 text-[11px] text-zinc-200">
-                          Categoría Oficial: <span className="text-white font-medium">{cat.fullCategory}</span>
+                        <span className="inline-flex items-center gap-1 rounded-lg bg-transparent border border-amber-300/40 px-2.5 py-1 text-[11px] text-stone-200">
+                          Categoría Oficial: <span className="text-stone-100 font-medium">{cat.fullCategory}</span>
                         </span>
-                        <span className="inline-flex items-center gap-1 rounded-lg bg-transparent border border-amber-500/60 px-2.5 py-1 text-[11px] text-zinc-200">
+                        <span className="inline-flex items-center gap-1 rounded-lg bg-transparent border border-amber-300/40 px-2.5 py-1 text-[11px] text-stone-200">
                           Edad al día de carrera:{' '}
-                          <span className="text-white font-medium">
+                          <span className="text-stone-100 font-medium">
                             {cat.age !== null ? `${cat.age} años` : 'Sin fecha'}
                           </span>
                         </span>
-                        <span className="inline-flex items-center gap-1 rounded-lg bg-transparent border border-amber-500/60 px-2.5 py-1 text-[11px] text-zinc-200">
+                        <span className="inline-flex items-center gap-1 rounded-lg bg-transparent border border-amber-300/40 px-2.5 py-1 text-[11px] text-stone-200">
                           Mesa Kit:{' '}
-                          <span className="text-white font-medium">
+                          <span className="text-stone-100 font-medium">
                             {reg.checkedIn ? 'Kit entregado ✓' : 'Pendiente de retiro'}
                           </span>
                         </span>
                         {pricing.finalAmount && (
-                          <span className="inline-flex flex-wrap items-center gap-1.5 rounded-lg bg-transparent border border-emerald-500/50 px-2.5 py-1 text-[11px] text-zinc-200">
+                          <span className="inline-flex flex-wrap items-center gap-1.5 rounded-lg bg-transparent border border-emerald-300/45 px-2.5 py-1 text-[11px] text-stone-200">
                             Monto:{' '}
                             {reg.isFree === true ? (
                               <>
                                 <span className="text-stone-500 line-through font-mono">
                                   {pricing.finalAmount}
                                 </span>
-                                <span className="text-yellow-300 font-mono font-semibold">
+                                <span className="text-amber-200/90 font-mono font-semibold">
                                   $0 · FREE
                                 </span>
                               </>
@@ -2066,18 +2066,18 @@ export default function AdminRegistrationsTab({
                                       {pricing.originalPrice}
                                     </span>
                                   )}
-                                <span className="text-emerald-400 font-mono font-semibold">
+                                <span className="text-emerald-300/90 font-mono font-semibold">
                                   {pricing.finalAmount}
                                 </span>
                               </>
                             )}
                             {pricing.isLocalResident && (
-                              <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-transparent text-emerald-400 border border-emerald-500/60">
+                              <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-transparent text-emerald-300/90 border border-emerald-300/45">
                                 {pricing.badgeText} · Verificar domicilio en DNI
                               </span>
                             )}
                             {pricing.discountSource === 'coupon' && pricing.badgeText && (
-                              <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-transparent text-amber-300 border border-amber-400/60">
+                              <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-transparent text-amber-200/90 border border-amber-300/45">
                                 {pricing.badgeText}
                                 {pricing.couponLabel ? ` · ${pricing.couponLabel}` : ''}
                               </span>
@@ -2097,8 +2097,8 @@ export default function AdminRegistrationsTab({
                             }
                             className={`inline-flex items-center gap-1 rounded-lg bg-transparent shadow-none border px-2.5 py-1 text-[11px] font-medium transition-colors cursor-pointer disabled:opacity-50 ${
                               reg.isFree === true
-                                ? 'border-yellow-400/80 text-yellow-300 hover:border-yellow-300'
-                                : 'border-stone-700 text-stone-300 hover:border-yellow-400/70 hover:text-yellow-300'
+                                ? 'border-amber-200/75 text-amber-200 hover:border-amber-100'
+                                : 'border-stone-700 text-stone-300 hover:border-amber-300/55 hover:text-amber-200'
                             }`}
                           >
                             {reg.isFree === true ? 'Quitar FREE' : 'Marcar FREE / Bonificado'}
@@ -2161,7 +2161,7 @@ export default function AdminRegistrationsTab({
                             type="button"
                             disabled={isBusy}
                             onClick={() => onChangeRegStatus(reg, 'pendiente')}
-                            className="rounded-lg bg-zinc-900/80 border border-orange-500/70 hover:border-orange-400 text-orange-400 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer disabled:opacity-50"
+                            className="rounded-lg bg-transparent border border-amber-300/45 hover:border-amber-200/75 text-amber-200/90 hover:text-amber-100 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer disabled:opacity-50"
                           >
                             Pasar a Pendiente
                           </button>
